@@ -11,3 +11,4 @@ mkd_model_answers/
 run_script_phybench.py
 run_script_phybench.sh
 batchrun_copy2.py
+.env
