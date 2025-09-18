@@ -71,6 +71,8 @@ def _create_Physics_agent(Tools_list:List[type[Tool]],
     #     timeout=1200)
     # tools for the manager agent
     tools = []
+    print('Tools_list: ', Tools_list)
+    print('kwargs: ', kwargs)
     for tool in Tools_list:
         if tool.__name__ == "AskImageTool" and "image_tool_model" in kwargs:
             tools.append(tool(vision_model_id=kwargs["image_tool_model"]))
@@ -91,7 +93,7 @@ def _create_Physics_agent(Tools_list:List[type[Tool]],
         name="physics_agent",
         description="",
         managed_agents=managed_agents_list
-    )
+    ) # max_steps=80，which means the agent can only run 80 steps
     
     if kwargs["manager_type"] == "CodeAgent":
         manager_agent_kwargs["additional_authorized_imports"] = [
@@ -157,6 +159,20 @@ def create_agent(model_id:str = "openrouter/google/gemini-2.5-pro",
                         managed_agents_list: List[str] = None,
                         managed_agents_list_model_id:str=None,
                         **kwargs) -> ToolCallingAgent | CodeAgent:
+    '''
+        managerAgent = create_agent(
+        model_id=args.manager_model,
+        input_markdown_file=args.input_markdown_file,
+        tools_list=args.tools_list,
+        image_tool_model=args.image_tool_model,
+        review_tool_model=args.review_tool_model,
+        managed_agents_list=args.managed_agents_list if hasattr(args, 'managed_agents_list') else None,
+        managed_agents_list_model_id=args.managed_agents_list_model if hasattr(args, 'managed_agents_list_model') else None,
+        manager_type = args.manager_type,
+    )
+    '''
+
+
     markdown_content = load_markdown_from_filepath(input_markdown_file)
     
     # create the manager agent
@@ -330,7 +346,6 @@ def main():
         managed_agents_list=args.managed_agents_list if hasattr(args, 'managed_agents_list') else None, # system prompt is related to managed agents
         manager_type = args.manager_type, # system prompt is related to manager type (ToolCallingAgent or CodeAgent
     )
-    
     
     managerAgent.run(task, images=compressed_problem_images)
     
