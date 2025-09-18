@@ -258,7 +258,8 @@ def parse_args():
         "--tools-list",
         type=str,
         nargs='*',
-        default=["wolfram_alpha_query", "ask_image_expert", "ask_review_expert"],
+        # default=["wolfram_alpha_query", "ask_image_expert", "ask_review_expert"],
+        default=["ask_image_expert", "ask_review_expert"],
         help="List of tool names to use in the agent.",
     )
     # LLM model ids for the tools
