@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LLM-SR Method Diagram</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      padding: 30px;
+      max-width: 1400px;
+      width: 100%;
+    }
+    
+    svg {
+      width: 100%;
+      height: auto;
+      max-width: 1200px;
+      display: block;
+      margin: 0 auto;
+    }
+    
+    /* 添加悬停效果 */
+    .stage-group:hover {
+      filter: brightness(1.1);
+      transform: translateY(-2px);
+      transition: all 0.3s ease;
+    }
+    
+    .stage-rect {
+      transition: all 0.3s ease;
+    }
+    
+    .stage-group:hover .stage-rect {
+      stroke-width: 3;
+    }
+    
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+      
+      .container {
+        padding: 20px;
+      }
+      
+      svg {
+        height: 600px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+<svg width="1200" height="1010" viewBox="0 0 1200 1010" xmlns="http://www.w3.org/2000/svg">
+  <!-- Author: Gemini -->
+  <!-- Definitions for reusable elements like arrowheads -->
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2c3e50"></path>
+    </marker>
+    
+    <!-- 添加渐变色定义 -->
+    <linearGradient id="stage1Gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e3f2fd;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#bbdefb;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="stage2Gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e8f5e9;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#c8e6c9;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="stage3Gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fffde7;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#fff9c4;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- 添加阴影滤镜 -->
+    <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="3" dy="3" stdDeviation="3" flood-color="#000000" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <!-- Main Title -->
+  <text x="600" y="40" font-family="'Segoe UI', sans-serif" font-size="32" font-weight="bold" text-anchor="middle" fill="#2c3e50">LLM-SR 方法流程图</text>
+  <text x="600" y="70" font-family="'Segoe UI', sans-serif" font-size="18" text-anchor="middle" fill="#34495e">一个结合大语言模型与进化搜索的科学方程发现框架</text>
+
+  <!-- STAGE 1: Hypothesis Generation -->
+  <g id="stage1" class="stage-group">
+    <rect class="stage-rect" x="300" y="90" width="600" height="280" rx="15" fill="url(#stage1Gradient)" stroke="#1976d2" stroke-width="2" filter="url(#dropShadow)"></rect>
+    <text x="600" y="120" font-family="'Segoe UI', sans-serif" font-size="22" font-weight="bold" text-anchor="middle" fill="#1976d2">1. 假设生成 (Hypothesis Generation)</text>
+
+    <!-- Prompt Box -->
+    <rect x="320" y="140" width="260" height="210" rx="10" fill="#ffffff" stroke="#90caf9" stroke-width="2" filter="url(#dropShadow)"></rect>
+    <text x="450" y="165" font-family="'Segoe UI', sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#1976d2">结构化提示 (Prompt)</text>
+    <text x="330" y="185" font-family="'Consolas', monospace" font-size="12" fill="#2c3e50">指令: "你是一个用于发现..."</text>
+    <text x="330" y="205" font-family="'Consolas', monospace" font-size="12" fill="#2c3e50">问题定义 (以振荡器为例):</text>
+    <text x="335" y="220" font-family="'Consolas', monospace" font-size="11" fill="#34495e">"找到关于 x, v, t 的加速度方程"</text>
+    <text x="330" y="240" font-family="'Consolas', monospace" font-size="12" fill="#2c3e50">评估函数: evaluate(...)</text>
+    <text x="330" y="260" font-family="'Consolas', monospace" font-size="12" fill="#2c3e50">经验范例 (来自经验池):</text>
+    <rect x="330" y="270" width="240" height="70" fill="#f8f9fa" stroke="#e9ecef" rx="5"></rect>
+    <text x="340" y="285" font-family="'Consolas', monospace" font-size="11" fill="#0d47a1"># 从经验池采样得到</text>
+    <text x="340" y="300" font-family="'Consolas', monospace" font-size="11" fill="#2e7d32">def eq_best_1(...): ...</text>
+    <text x="340" y="315" font-family="'Consolas', monospace" font-size="11" fill="#2e7d32">def eq_best_2(...): ...</text>
+
+    <!-- LLM Box -->
+    <rect x="620" y="190" width="260" height="90" rx="10" fill="#e3f2fd" stroke="#1976d2" stroke-width="2" filter="url(#dropShadow)"></rect>
+    <text x="750" y="215" font-family="'Segoe UI', sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#1976d2">大语言模型 (LLM)</text>
+    <text x="750" y="238" font-family="'Segoe UI', sans-serif" font-size="14" text-anchor="middle" fill="#34495e">(GPT-3.5 / Mixtral)</text>
+    <text x="750" y="258" font-family="'Segoe UI', sans-serif" font-size="12" text-anchor="middle" fill="#7b1fa2">温度参数 τ = 0.8 (鼓励探索)</text>
+
+    <!-- Arrow from Prompt to LLM -->
+    <path d="M 585 235 L 615 235" stroke="#1976d2" stroke-width="3" marker-end="url(#arrow)"></path>
+  </g>
+
+  <!-- Flow from Stage 1 to Stage 2 -->
+  <path d="M 600 370 Q 600 390 600 410" stroke="#2c3e50" stroke-width="3" marker-end="url(#arrow)" fill="none"></path>
+  <text x="610" y="395" font-family="'Segoe UI', sans-serif" font-size="14" font-style="italic" fill="#7b1fa2">b=4 个方程程序框架</text>
+  <rect x="440" y="400" width="320" height="55" fill="#ffffff" stroke="#bdc3c7" stroke-width="2" rx="8" filter="url(#dropShadow)"></rect>
+  <text x="450" y="420" font-family="'Consolas', monospace" font-size="11" fill="#2e7d32">def eq(x,v,p): y=p[0]*sin(p[1]*x)...</text>
+  <text x="450" y="435" font-family="'Consolas', monospace" font-size="11" fill="#2e7d32">def eq(t,v,p): y=p[0]*v**3 + ...</text>
+
+  <!-- STAGE 2: Data-driven Evaluation -->
+  <g id="stage2" class="stage-group">
+    <rect class="stage-rect" x="300" y="465" width="600" height="180" rx="15" fill="url(#stage2Gradient)" stroke="#388e3c" stroke-width="2" filter="url(#dropShadow)"></rect>
+    <text x="600" y="495" font-family="'Segoe UI', sans-serif" font-size="22" font-weight="bold" text-anchor="middle" fill="#388e3c">2. 数据驱动评估 (Data-driven Evaluation)</text>
+    
+    <text x="600" y="520" font-family="'Segoe UI', sans-serif" font-size="14" text-anchor="middle" fill="#2c3e50">并行评估器 (e=4), 带有时限/内存限制</text>
+    
+    <rect x="350" y="535" width="220" height="90" rx="10" fill="#ffffff" stroke="#66bb6a" stroke-width="2" filter="url(#dropShadow)"></rect>
+    <text x="460" y="555" font-family="'Segoe UI', sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#388e3c">参数优化</text>
+    <text x="460" y="575" font-family="'Segoe UI', sans-serif" font-size="12" text-anchor="middle" fill="#2c3e50">numpy+BFGS / torch+Adam</text>
+    <text x="460" y="595" font-family="'Segoe UI', sans-serif" font-size="12" font-style="italic" text-anchor="middle" fill="#7b1fa2">找到最佳参数 `params*`</text>
+    
+    <rect x="210" y="555" width="130" height="50" rx="10" fill="#fff3e0" stroke="#ff9800" stroke-width="2"></rect>
+    <text x="275" y="575" font-family="'Segoe UI', sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#e65100">数据集</text>
+    <text x="275" y="590" font-family="'Segoe UI', sans-serif" font-size="12" text-anchor="middle" fill="#2c3e50">(t, x, v, a)</text>
+    <path d="M 340 580 L 345 580" stroke="#388e3c" stroke-width="3" marker-end="url(#arrow)"></path>
+    
+    <path d="M 575 580 L 625 580" stroke="#388e3c" stroke-width="3" marker-end="url(#arrow)"></path>
+    
+    <rect x="630" y="535" width="220" height="90" rx="10" fill="#ffffff" stroke="#66bb6a" stroke-width="2" filter="url(#dropShadow)"></rect>
+    <text x="740" y="565" font-family="'Segoe UI', sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#388e3c">性能评分</text>
+    <text x="740" y="588" font-family="'Segoe UI', sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#d32f2f">Score = -MSE</text>
+  </g>
+  
+  <!-- Flow from Stage 2 to Stage 3 -->
+  <path d="M 600 645 Q 600 665 600 735" stroke="#2c3e50" stroke-width="3" marker-end="url(#arrow)" fill="none"></path>
+  <text x="610" y="695" font-family="'Segoe UI', sans-serif" font-size="14" font-style="italic" fill="#7b1fa2">(方程, 分数) 对</text>
+
+  <!-- STAGE 3: Experience Management -->
+  <g id="stage3" class="stage-group">
+    <rect class="stage-rect" x="150" y="745" width="900" height="250" rx="15" fill="url(#stage3Gradient)" stroke="#f57f17" stroke-width="2" filter="url(#dropShadow)"></rect>
+    <text x="600" y="775" font-family="'Segoe UI', sans-serif" font-size="22" font-weight="bold" text-anchor="middle" fill="#f57f17">3. 经验管理 (Experience Management)</text>
+    
+    <rect x="170" y="795" width="860" height="180" rx="10" fill="#ffffff" stroke="#ffcc02" stroke-width="2" filter="url(#dropShadow)"></rect>
+    <text x="600" y="815" font-family="'Segoe UI', sans-serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#e65100">经验池 (Experience Buffer) - 岛屿模型 (m=10)</text>
+
+    <rect x="190" y="835" width="120" height="100" rx="8" fill="#e8f5e9" stroke="#4caf50" stroke-width="2"></rect>
+    <text x="250" y="850" font-family="'Segoe UI', sans-serif" font-size="12" text-anchor="middle" fill="#388e3c" font-weight="bold">岛屿 1</text>
+    <rect x="330" y="835" width="120" height="100" rx="8" fill="#e8f5e9" stroke="#4caf50" stroke-width="2"></rect>
+    <text x="390" y="850" font-family="'Segoe UI', sans-serif" font-size="12" text-anchor="middle" fill="#388e3c" font-weight="bold">岛屿 2</text>
+    <text x="495" y="885" font-family="'Segoe UI', sans-serif" font-size="24" fill="#666">...</text>
+    <rect x="560" y="835" width="120" height="100" rx="8" fill="#e8f5e9" stroke="#4caf50" stroke-width="2"></rect>
+    <text x="620" y="850" font-family="'Segoe UI', sans-serif" font-size="12" text-anchor="middle" fill="#388e3c" font-weight="bold">岛屿 i</text>
+    <text x="725" y="885" font-family="'Segoe UI', sans-serif" font-size="24" fill="#666">...</text>
+    <rect x="790" y="835" width="120" height="100" rx="8" fill="#ffebee" stroke="#f44336" stroke-width="3" stroke-dasharray="6,3"></rect>
+    <text x="850" y="850" font-family="'Segoe UI', sans-serif" font-size="12" text-anchor="middle" fill="#d32f2f" font-weight="bold">岛屿 j (最差)</text>
+    
+    <text x="180" y="980" font-family="'Segoe UI', sans-serif" font-size="13" fill="#2c3e50">更新: 如果新方程分数 > 岛屿最高分，则加入。</text>
+    <text x="730" y="980" font-family="'Segoe UI', sans-serif" font-size="13" fill="#2c3e50">重置: 周期性地用最优解重置最差的 m/2 个岛屿。</text>
+  </g>
+
+  <!-- FEEDBACK LOOP: Stage 3 to Stage 1 -->
+  <path d="M 150 880 L 80 880 Q 20 880 20 780 L 20 300 Q 20 250 100 250 L 315 250" stroke="#e91e63" stroke-width="3" marker-end="url(#arrow)" fill="none"></path>
+  <g transform="translate(40, 600) rotate(-90)">
+    <text x="0" y="0" font-family="'Segoe UI', sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#e91e63">反馈回路: 经验采样</text>
+  </g>
+  <rect x="60" y="630" width="220" height="100" rx="8" fill="#ffffff" stroke="#e91e63" stroke-width="2" filter="url(#dropShadow)"></rect>
+  <text x="170" y="650" font-family="'Segoe UI', sans-serif" font-size="14" text-anchor="middle" font-style="italic" fill="#e91e63" font-weight="bold">采样 k=2 个方程</text>
+  <text x="70" y="670" font-family="'Segoe UI', sans-serif" font-size="12" fill="#2c3e50">1. 随机选择一个岛屿。</text>
+  <text x="70" y="690" font-family="'Segoe UI', sans-serif" font-size="12" fill="#2c3e50">2. 选择聚类 (倾向高分)。</text>
+  <text x="70" y="710" font-family="'Segoe UI', sans-serif" font-size="12" fill="#2c3e50">3. 选择程序 (倾向简短)。</text>
+
+</svg>
+</div>
+
+</body>
+</html>
