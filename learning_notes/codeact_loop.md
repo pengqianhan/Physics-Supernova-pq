@@ -1,23 +1,3 @@
-I'll analyze the codebase to find the CodeAct Loop implementation that corresponds to the red-boxed section in the diagram. Let me start by examining the main execution file and searching for the relevant components.
-
-[2 tools called]
-
-Now let me search for the actual CodeAct Loop implementation and examine the smolagents library usage to understand the thought-action-observation cycle:
-
-[2 tools called]
-
-Let me look more specifically at the key execution point and the agent's memory/step handling:
-
-[2 tools called]
-
-Now let me examine the memory structure and tool implementations to understand the complete CodeAct loop:
-
-[3 tools called]
-
-Based on my analysis of the codebase, I can now identify where the CodeAct Loop (shown in the red box in the diagram) is implemented. Let me create a comprehensive overview:
-
-[1 tool called]
-
 根据我对代码的分析，图片中红色框标注的 **CodeAct Loop** 部分在代码中主要体现在以下几个关键位置：
 
 ## 1. 主要执行入口点
