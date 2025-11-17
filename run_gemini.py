@@ -262,7 +262,7 @@ def parse_args():
     ap.add_argument(
         "--manager-type",
         type=str,
-        default="ToolCallingAgent",
+        default="CodeAgent",
         choices=["ToolCallingAgent", "CodeAgent"],
         help="Type of agent to create (default: ToolCallingAgent).",
     )
@@ -275,7 +275,7 @@ def parse_args():
         type=str,
         nargs='*',
         # default=["wolfram_alpha_query", "ask_image_expert", "ask_review_expert"],
-        default=["ask_image_expert", "ask_review_expert"],
+        default=["ask_image_expert", "ask_review_expert", "finalize_part_answer"],
         help="List of tool names to use in the agent.",
     )
     # LLM model ids for the tools
