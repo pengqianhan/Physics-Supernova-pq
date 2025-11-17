@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physics-Supernova Agent 代码流程详解</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 4px solid #3498db;
+            padding-bottom: 15px;
+        }
+
+        h2 {
+            color: #34495e;
+            font-size: 1.8em;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-left: 15px;
+            border-left: 5px solid #3498db;
+        }
+
+        h3 {
+            color: #555;
+            font-size: 1.4em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            padding-left: 10px;
+            border-left: 3px solid #9b59b6;
+        }
+
+        h4 {
+            color: #666;
+            font-size: 1.2em;
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+
+        .command-box {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            border-left: 5px solid #e74c3c;
+        }
+
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .file-reference {
+            display: inline-block;
+            background: #e8f4f8;
+            color: #0366d6;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            margin: 2px;
+        }
+
+        .step-box {
+            background: #fff9e6;
+            border-left: 4px solid #f39c12;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .info-box {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .warning-box {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .tool-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+
+        .tool-name {
+            color: #8e44ad;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        ul, ol {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #c7254e;
+        }
+
+        pre {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        .mermaid {
+            text-align: center;
+            margin: 30px 0;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .highlight {
+            background: #ffffcc;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        .section-divider {
+            height: 2px;
+            background: linear-gradient(to right, #3498db, #9b59b6, #e74c3c);
+            margin: 40px 0;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Physics-Supernova Agent 代码执行流程详解</h1>
+
+        <div class="info-box">
+            <strong>📌 教程概述：</strong>本教程详细分析以下命令的完整执行流程：
+            <div class="command-box" style="margin-top: 10px;">
+python run.py --input-markdown-file examples/Problems/example/example1problem.md --manager-type CodeAgent --tools-list ask_image_expert ask_review_expert finalize_part_answer
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <h2>📋 目录</h2>
+        <ol>
+            <li><a href="#overview">项目架构概览</a></li>
+            <li><a href="#command-analysis">命令参数解析</a></li>
+            <li><a href="#main-flow">主流程分析</a></li>
+            <li><a href="#agent-creation">Agent 创建流程</a></li>
+            <li><a href="#tools-detail">工具详解</a></li>
+            <li><a href="#task-preparation">任务准备流程</a></li>
+            <li><a href="#execution">执行过程</a></li>
+            <li><a href="#flowchart">完整流程图</a></li>
+        </ol>
+
+        <div class="section-divider"></div>
+
+        <h2 id="overview">🏗️ 1. 项目架构概览</h2>
+
+        <p>Physics-Supernova 是一个基于 AI Agent 的物理奥林匹克问题求解系统。它使用 <code>smolagents</code> 框架，结合多个专业工具来解决复杂的物理问题。</p>
+
+        <h3>核心组件</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>组件</th>
+                    <th>文件</th>
+                    <th>功能</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>主程序</strong></td>
+                    <td><span class="file-reference">run.py</span></td>
+                    <td>程序入口，负责参数解析、Agent创建和任务执行</td>
+                </tr>
+                <tr>
+                    <td><strong>Markdown工具</strong></td>
+                    <td><span class="file-reference">utils/markdown_utils.py</span></td>
+                    <td>处理Markdown文件，解析文本和图像</td>
+                </tr>
+                <tr>
+                    <td><strong>图像分析工具</strong></td>
+                    <td><span class="file-reference">utils/imgTools.py</span></td>
+                    <td>使用视觉模型分析物理图表</td>
+                </tr>
+                <tr>
+                    <td><strong>审查工具</strong></td>
+                    <td><span class="file-reference">utils/reviewTools.py</span></td>
+                    <td>专家评审解决方案的准确性</td>
+                </tr>
+                <tr>
+                    <td><strong>记忆总结工具</strong></td>
+                    <td><span class="file-reference">utils/summemoryTools.py</span></td>
+                    <td>总结已完成的部分答案</td>
+                </tr>
+                <tr>
+                    <td><strong>WolframAlpha工具</strong></td>
+                    <td><span class="file-reference">utils/wolframTools.py</span></td>
+                    <td>执行数学计算和符号运算</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="section-divider"></div>
+
+        <h2 id="command-analysis">🔍 2. 命令参数解析</h2>
+
+        <div class="step-box">
+            <h4>命令分解：</h4>
+            <pre><code>python run.py \
+  --input-markdown-file examples/Problems/example/example1problem.md \
+  --manager-type CodeAgent \
+  --tools-list ask_image_expert ask_review_expert finalize_part_answer</code></pre>
+        </div>
+
+        <h3>参数详解</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>参数</th>
+                    <th>值</th>
+                    <th>说明</th>
+                    <th>代码位置</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>--input-markdown-file</code></td>
+                    <td>examples/Problems/example/example1problem.md</td>
+                    <td>包含物理问题和图像的Markdown文件路径</td>
+                    <td><span class="file-reference">run.py:217-222</span></td>
+                </tr>
+                <tr>
+                    <td><code>--manager-type</code></td>
+                    <td>CodeAgent</td>
+                    <td>使用 CodeAgent 类型（可执行Python代码）</td>
+                    <td><span class="file-reference">run.py:232-238</span></td>
+                </tr>
+                <tr>
+                    <td><code>--tools-list</code></td>
+                    <td>ask_image_expert<br>ask_review_expert<br>finalize_part_answer</td>
+                    <td>Agent可用的工具列表</td>
+                    <td><span class="file-reference">run.py:243-249</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="info-box">
+            <strong>💡 提示：</strong><code>--manager-type</code> 可选 <code>ToolCallingAgent</code> 或 <code>CodeAgent</code>。
+            <ul>
+                <li><strong>ToolCallingAgent</strong>：只能调用工具，不能执行代码</li>
+                <li><strong>CodeAgent</strong>：可以调用工具并执行Python代码</li>
+            </ul>
+        </div>
+
+        <h3>参数解析代码流程</h3>
+        <div class="code-block">
+<strong>文件：</strong><span class="file-reference">run.py:215-294</span>
+<pre>def parse_args():
+    ap = argparse.ArgumentParser(description="Run the Physics Agent...")
+
+    # 必需参数：Markdown文件路径
+    ap.add_argument("--input-markdown-file", type=str, required=True)
+
+    # Agent类型选择
+    ap.add_argument("--manager-type", type=str, default="ToolCallingAgent",
+                    choices=["ToolCallingAgent", "CodeAgent"])
+
+    # 工具列表
+    ap.add_argument("--tools-list", type=str, nargs='*',
+                    default=["wolfram_alpha_query", "ask_image_expert", "ask_review_expert"])
+
+    args = ap.parse_args()
+    return args</pre>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <h2 id="main-flow">⚙️ 3. 主流程分析</h2>
+
+        <p>程序从 <code>main()</code> 函数开始执行，主要分为三个阶段：</p>
+
+        <div class="mermaid">
+graph TB
+    A[程序启动] --> B[解析命令行参数<br/>parse_args]
+    B --> C[创建 Agent<br/>create_agent]
+    C --> D[准备任务和图像<br/>obtain_task_and_images]
+    D --> E[执行任务<br/>managerAgent.run]
+    E --> F[程序结束]
+
+    style A fill:#e8f5e9
+    style B fill:#fff9e6
+    style C fill:#e3f2fd
+    style D fill:#fce4ec
+    style E fill:#f3e5f5
+    style F fill:#e8f5e9
+        </div>
+
+        <h3>主函数代码</h3>
+        <div class="code-block">
+<strong>文件：</strong><span class="file-reference">run.py:297-321</span>
+<pre>def main():
+    # 【阶段1】解析命令行参数
+    args = parse_args()
+    print(f"Running Physics Agent with model: {args.manager_model}, "
+          f"tools: {args.tools_list}, markdown file: {args.input_markdown_file}")
+
+    # 【阶段2】创建 Manager Agent
+    managerAgent = create_agent(
+        model_id=args.manager_model,
+        input_markdown_file=args.input_markdown_file,
+        tools_list=args.tools_list,
+        image_tool_model=args.image_tool_model,
+        review_tool_model=args.review_tool_model,
+        managed_agents_list=args.managed_agents_list,
+        managed_agents_list_model_id=args.managed_agents_list_model,
+        manager_type=args.manager_type,
+    )
+
+    # 【阶段3】准备任务和图像
+    task, compressed_problem_images = obtain_task_and_images(
+        input_markdown_file=args.input_markdown_file,
+        tools_list=args.tools_list,
+        managed_agents_list=args.managed_agents_list,
+        manager_type=args.manager_type,
+    )
+
+    # 【阶段4】执行任务
+    managerAgent.run(task, images=compressed_problem_images)
+</pre>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <h2 id="agent-creation">🤖 4. Agent 创建流程</h2>
+
+        <p>Agent 的创建是整个系统的核心，涉及模型初始化、工具加载和配置。</p>
+
+        <h3>4.1 创建流程概览</h3>
+
+        <div class="mermaid">
+graph TB
+    A[create_agent] --> B[加载Markdown内容<br/>load_markdown_from_filepath]
+    B --> C[转换工具名称为工具类<br/>TOOLNAME2TOOL映射]
+    C --> D[创建物理Agent<br/>_create_Physics_agent]
+
+    D --> E[初始化LLM模型<br/>LiteLLMModel]
+    E --> F[实例化工具对象]
+    F --> F1[AskImageTool]
+    F --> F2[ReviewRequestTool]
+    F --> F3[SummarizeMemoryTool]
+
+    F1 --> G[创建CodeAgent或ToolCallingAgent]
+    F2 --> G
+    F3 --> G
+
+    G --> H[注册工具到Agent]
+    H --> I[设置高分辨率图像]
+    I --> J[返回配置好的Agent]
+
+    style A fill:#e3f2fd
+    style B fill:#fff9e6
+    style D fill:#e8f5e9
+    style G fill:#fce4ec
+    style J fill:#f3e5f5
+        </div>
+
+        <h3>4.2 工具名称映射</h3>
+        <div class="code-block">
+<strong>文件：</strong><span class="file-reference">run.py:41-46</span>
+<pre>TOOLNAME2TOOL = {
+    'wolfram_alpha_query': WolframAlphaTool,      # WolframAlpha计算工具
+    'ask_image_expert': AskImageTool,             # 图像分析专家
+    'ask_review_expert': ReviewRequestTool,       # 解决方案审查专家
+    'finalize_part_answer': SummarizeMemoryTool   # 答案总结工具
+}</pre>
+        </div>
+
+        <div class="info-box">
+            <strong>🔗 工具加载过程：</strong>
+            <ol>
+                <li>从命令行获取工具名称列表（如 <code>ask_image_expert</code>）</li>
+                <li>通过 <code>TOOLNAME2TOOL</code> 字典映射到对应的类（如 <code>AskImageTool</code>）</li>
+                <li>实例化每个工具类，传入相应的模型配置</li>
+                <li>将工具注册到 Agent 中</li>
+            </ol>
+        </div>
+
+        <h3>4.3 Agent 创建核心代码</h3>
+        <div class="code-block">
+<strong>文件：</strong><span class="file-reference">run.py:49-112</span>
+<pre>def _create_Physics_agent(Tools_list, markdown_content, model_id,
+                           managed_agents_list, max_steps=80, **kwargs):
+
+    # 1. 初始化LLM模型
+    model = LiteLLMModel(
+        model_id=model_id,  # 默认: "openrouter/google/gemini-2.5-pro"
+        api_key=os.environ.get("OPENROUTER_API_KEY"),
+        api_base=os.environ.get("OPENROUTER_API_BASE"),
+        max_completion_tokens=32768,
+        num_retries=3,
+        timeout=1200,
+    )
+
+    # 2. 实例化工具
+    tools = []
+    for tool in Tools_list:
+        if tool.__name__ == "AskImageTool":
+            tools.append(tool(vision_model_id=kwargs.get("image_tool_model")))
+        elif tool.__name__ == "ReviewRequestTool":
+            tools.append(tool(review_tool_model=kwargs.get("review_tool_model")))
+        elif tool.__name__ == "SummarizeMemoryTool":
+            tools.append(tool(summarize_model_id=kwargs.get("summarize_tool_model")))
+        else:
+            tools.append(tool())
+
+    # 3. 配置Agent参数
+    manager_agent_kwargs = dict(
+        model=model,
+        tools=tools,
+        max_steps=max_steps,
+        verbosity_level=2,
+        name="physics_agent",
+        managed_agents=managed_agents_list
+    )
+
+    # 4. 根据类型创建Agent
+    if kwargs["manager_type"] == "CodeAgent":
+        manager_agent_kwargs["additional_authorized_imports"] = [
+            "os", "sys", "time", "matplotlib.pyplot", "numpy", "pandas"
+        ]
+        managerAgent = CodeAgent(**manager_agent_kwargs)
+    else:
+        managerAgent = ToolCallingAgent(**manager_agent_kwargs)
+
+    # 5. 注册工具（建立双向引用）
+    for toolName in managerAgent.tools:
+        managerAgent.tools[toolName].worker_agent = managerAgent
+
+    # 6. 设置高分辨率图像
+    managerAgent.markdown_content_high_res_image = markdown_content
+
+    return managerAgent</pre>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <h2 id="tools-detail">🛠️ 5. 工具详解</h2>
+
+        <p>本次执行使用了三个专业工具，每个工具都有特定的功能和实现细节。</p>
+
+        <h3>5.1 AskImageTool - 图像分析专家</h3>
+        <div class="tool-card">
+            <div class="tool-name">📸 ask_image_expert</div>
+            <p><strong>功能：</strong>分析物理图表、测量数值、识别图像中的物理量</p>
+            <p><strong>文件：</strong><span class="file-reference">utils/imgTools.py</span></p>
+
+            <h4>工作流程：</h4>
+            <div class="mermaid">
+graph LR
+    A[接收图像引用<br/>如 image_1] --> B[从Markdown内容<br/>提取图像字节]
+    B --> C[调整图像分辨率<br/>可选]
+    C --> D[转换为PIL.Image]
+    D --> E[调用视觉模型<br/>LiteLLMModel]
+    E --> F[返回分析结果]
+
+    style A fill:#e3f2fd
+    style E fill:#fce4ec
+    style F fill:#e8f5e9
+            </div>
+
+            <h4>关键代码：</h4>
+            <div class="code-block">
+<strong>文件：</strong><span class="file-reference">utils/imgTools.py:72-120</span>
+<pre>def forward(self, image_ref: str, question: str) -> str:
+    """处理图像分析请求"""
+
+    # 1. 提取图像字节数据
+    img_bytes = self._extract_image_bytes(image_ref)
+
+    # 2. 调整图像大小（如果需要）
+    if self.max_short_side_pixels is not None:
+        from PIL import Image
+        from io import BytesIO
+
+        img = Image.open(BytesIO(img_bytes))
+        width, height = img.size
+        if min(width, height) > self.max_short_side_pixels:
+            scale = self.max_short_side_pixels / min(width, height)
+            new_size = (int(width * scale), int(height * scale))
+            img = img.resize(new_size, Image.Resampling.BILINEAR)
+
+    # 3. 准备消息给视觉模型
+    messages = [
+        ChatMessage(role=MessageRole.SYSTEM,
+                   content="You are an expert in dealing with image in Physics Olympiads."),
+        ChatMessage(role=MessageRole.USER, content=[
+            {"type": "image", "image": pil_img},
+            {"type": "text", "text": question},
+        ]),
+    ]
+
+    # 4. 调用视觉模型并返回结果
+    resp = self.vision_model.generate(messages)
+    return resp.content.strip()</pre>
+            </div>
+
+            <div class="warning-box">
+                <strong>⚠️ 注意：</strong>图像引用格式必须是 <code>&lt;image_N&gt;</code> 或纯数字 <code>N</code>，其中 N 是图像编号（从1开始）。
+            </div>
+        </div>
+
+        <h3>5.2 ReviewRequestTool - 解决方案审查专家</h3>
+        <div class="tool-card">
+            <div class="tool-name">🔍 ask_review_expert</div>
+            <p><strong>功能：</strong>批判性审查物理解决方案，检查逻辑、数学错误和单位一致性</p>
+            <p><strong>文件：</strong><span class="file-reference">utils/reviewTools.py</span></p>
+
+            <h4>工作流程：</h4>
+            <div class="mermaid">
+graph LR
+    A[接收待审查方案<br/>my_solution] --> B[获取压缩版问题图像]
+    B --> C[构建审查指令<br/>包含原问题]
+    C --> D[调用审查模型<br/>LiteLLMModel]
+    D --> E[返回详细反馈]
+
+    style A fill:#e3f2fd
+    style D fill:#fce4ec
+    style E fill:#e8f5e9
+            </div>
+
+            <h4>系统提示词（System Prompt）：</h4>
+            <div class="code-block">
+<strong>文件：</strong><span class="file-reference">utils/reviewTools.py:57-62</span>
+<pre>system_prompt = (
+    "You are an uncompromising physics peer-reviewer. "
+    "Your job is to find *every* logical, mathematical error in the worker's answer. "
+    "Check dimensional consistency, missing steps, incorrect sign conventions, "
+    "numerical mistakes, and unclear explanations. "
+    "Focus especially on wrong answers, less on presentations."
+)</pre>
+            </div>
+
+            <h4>关键代码：</h4>
+            <div class="code-block">
+<strong>文件：</strong><span class="file-reference">utils/reviewTools.py:48-102</span>
+<pre>def forward(self, my_solution: str, my_note: str) -> str:
+    """请求专家审查解决方案"""
+
+    # 1. 获取压缩版问题内容（包含图像）
+    markdown_content = compressed_image_content(
+        self.worker_agent.markdown_content_high_res_image
+    )
+
+    # 2. 构建审查指令
+    review_instruction = (
+        f"Please review the following solution:\n\n"
+        f"WORKER'S SOLUTION:\n{my_solution}\n\n"
+        f"WORKER'S NOTE: {my_note}\n\n"
+        f"Please provide detailed feedback on correctness."
+    )
+
+    # 3. 组合审查指令和原问题
+    combined_content = [
+        {"type": "text", "text": review_instruction}
+    ] + markdown_content.content
+
+    # 4. 调用审查模型
+    messages = [
+        ChatMessage(role=MessageRole.SYSTEM, content=system_prompt),
+        ChatMessage(role=MessageRole.USER, content=combined_content),
+    ]
+
+    returned = self.review_model.generate(messages).content
+    return returned.strip()</pre>
+            </div>
+
+            <div class="info-box">
+                <strong>💡 审查重点：</strong>
+                <ul>
+                    <li>量纲一致性检查</li>
+                    <li>数学步骤完整性</li>
+                    <li>符号约定正确性</li>
+                    <li>数值计算准确性</li>
+                    <li>物理逻辑合理性</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3>5.3 SummarizeMemoryTool - 答案总结工具</h3>
+        <div class="tool-card">
+            <div class="tool-name">📝 finalize_part_answer</div>
+            <p><strong>功能：</strong>总结已完成的部分答案，清理Agent内存，准备下一部分</p>
+            <p><strong>文件：</strong><span class="file-reference">utils/summemoryTools.py</span></p>
+
+            <h4>工作流程：</h4>
+            <div class="mermaid">
+graph TB
+    A[Agent调用工具] --> B[提取Agent记忆<br/>get_agent_memory_observation]
+    B --> C[构建总结提示词]
+    C --> D[调用总结模型<br/>summarize_agent_memory]
+    D --> E[生成答案总结]
+    E --> F[重置Agent内存<br/>memory.reset]
+    F --> G[保留原始任务<br/>添加上下文]
+    G --> H[返回总结内容]
+
+    style A fill:#e3f2fd
+    style D fill:#fce4ec
+    style F fill:#fff9e6
+    style H fill:#e8f5e9
+            </div>
+
+            <h4>记忆提取代码：</h4>
+            <div class="code-block">
+<strong>文件：</strong><span class="file-reference">utils/summemoryTools.py:23-33</span>
+<pre>def get_agent_memory_observation(agent: MultiStepAgent) -> str:
+    """提取Agent的完整问题解决历史"""
+
+    # 获取完整消息历史
+    newest_input_messages = agent.write_memory_to_messages().copy()
+
+    agent_observation_and_action_str = ""
+    agent_observation_and_action_str += f"You were given this task: {newest_input_messages[1]}\n"
+    agent_observation_and_action_str += "Here is your previous process: <Your previous solving process>"
+
+    # [0] 是系统提示，[1] 是任务，[2:] 是模型响应和工具响应
+    agent_observation_and_action_str += str(newest_input_messages[2:])
+    agent_observation_and_action_str += "</Your previous solving process>"
+
+    return agent_observation_and_action_str</pre>
+            </div>
+
+            <h4>内存重置机制：</h4>
+            <div class="code-block">
+<strong>文件：</strong><span class="file-reference">utils/summemoryTools.py:126-141</span>
+<pre>def forward(self) -> str:
+    """执行内存总结并重置"""
+
+    # 1. 生成总结
+    summary = summarize_agent_memory(self.summarize_model, agent=self.worker_agent)
+
+    # 2. 创建新的内存步骤（基于初始任务）
+    new_memory_step = deepcopy(memory.steps[0])
+    if self.is_first_use:
+        new_memory_step.task += (
+            "You have finished a portion of the problem... "
+            "Now continue to solve the rest parts..."
+        )
+
+    # 3. 清空内存并设置新起点
+    self.worker_agent.memory.reset()
+    self.worker_agent.memory.steps = []
+    self.worker_agent.memory.steps.append(new_memory_step)
+
+    # 4. 返回格式化的总结
+    return f"Till now, you have finished some portion... Summary:\n{summary}"</pre>
+            </div>
+
+            <div class="warning-box">
+                <strong>⚠️ 重要：</strong>此工具会清空 Agent 的工作内存，因此只应在完成一个完整部分后调用。过早调用会导致上下文丢失。
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <h2 id="task-preparation">📋 6. 任务准备流程</h2>
+
+        <p>在Agent执行之前，需要将Markdown文件转换为可执行的任务和图像数据。</p>
+
+        <h3>6.1 Markdown处理流程</h3>
+
+        <div class="mermaid">
+graph TB
+    A[Markdown文件] --> B[load_markdown_from_filepath]
+    B --> C[读取文件内容]
+    C --> D[obtain_newContent_and_images_from_markdown<br/>提取图像路径]
+    D --> E[替换图像为占位符<br/>如 image_1]
+    E --> F[encode_image_to_base64<br/>编码图像为base64]
+    F --> G[create_openai_message_content<br/>创建消息内容]
+    G --> H[MarkdownMessage对象<br/>包含文本和图像]
+
+    H --> I[markdown_to_plaintext<br/>提取纯文本]
+    H --> J[markdown_images_compress<br/>压缩图像]
+
+    I --> K[构建任务提示词]
+    J --> K
+    K --> L[返回task和images]
+
+    style A fill:#e3f2fd
+    style H fill:#fce4ec
+    style L fill:#e8f5e9
+        </div>
+
+        <h3>6.2 图像处理</h3>
+        <div class="code-block">
+<strong>文件：</strong><span class="file-reference">utils/markdown_utils.py:70-100</span>
+<pre>def obtain_newContent_and_images_from_markdown(content: str, image_base_dir: str):
+    """解析Markdown内容并提取图像"""
+
+    IMG_FILE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".gif", ".webp")
+    image_pattern = re.compile(r'!\[([^\]]*)\]\(([^)]+)\)')
+    images = {}
+    new_content = content
+
+    image_counter = 0
+    for match in image_pattern.finditer(content):
+        image_path = match.group(2)  # 获取路径部分
+        if any(image_path.lower().endswith(ext) for ext in IMG_FILE_EXTENSIONS):
+            image_counter += 1
+
+            # 解析相对路径
+            if not Path(image_path).is_absolute():
+                full_image_path = Path(image_base_dir) / image_path
+            else:
+                full_image_path = Path(image_path)
+
+            if full_image_path.exists():
+                # 创建占位符 <image_1>, <image_2>, etc.
+                current_key = f"<image_{image_counter}>"
+                images[current_key] = str(full_image_path)
+                new_content = new_content.replace(match.group(0), current_key)
+
+    return new_content, images</pre>
+        </div>
+
+        <h3>6.3 任务提示词构建</h3>
+        <div class="code-block">
+<strong>文件：</strong><span class="file-reference">run.py:161-211</span>
+<pre>def obtain_task_and_images(input_markdown_file, tools_list,
+                           managed_agents_list, manager_type):
+    """获取任务字符串和图像"""
+
+    # 1. 加载Markdown内容
+    markdown_content = load_markdown_from_filepath(input_markdown_file)
+    problem_text = markdown_to_plaintext(markdown_content)
+    compressed_problem_images = markdown_images_compress(markdown_content, max_short_side_pixels=1080)
+
+    # 2. 基础任务提示
+    task = "Below is the full physics problem. If there are Images, Images are attached..."
+
+    # 3. 根据工具列表添加提示
+    if AskImageTool in ToolsList:
+        task += "When you need to perform measurements on images, you MUST call the `ask_image_question` tool..."
+
+    if ReviewRequestTool in ToolsList:
+        task += "When you need expert review of your work, you MUST call the `ask_review_expert` tool..."
+
+    if SummarizeMemoryTool in ToolsList:
+        task += "When you are sure that you have finished a part of the problem, call `finalize_part_answer`..."
+
+    # 4. 添加问题解决提示
+    task += (
+        "Your task is to solve the problem part by part, step by step. "
+        "ONLY after you have FISHED the WHOLE PROBLEM should you call final_answer...\n\n"
+        "PROBLEM STATEMENT (text with image placeholders):\n" + problem_text
+    )
+
+    return task, compressed_problem_images</pre>
+        </div>
+
+        <div class="info-box">
+            <strong>💡 任务提示词的构成：</strong>
+            <ol>
+                <li><strong>基础说明</strong>：告知Agent有图像附件和占位符</li>
+                <li><strong>工具使用指南</strong>：根据可用工具动态添加使用说明</li>
+                <li><strong>问题解决策略</strong>：逐步解决，完成后再调用final_answer</li>
+                <li><strong>问题陈述</strong>：实际的物理问题文本（含图像占位符）</li>
+            </ol>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <h2 id="execution">🚀 7. 执行过程</h2>
+
+        <p>Agent执行是一个多步骤的推理和工具调用过程。</p>
+
+        <h3>7.1 执行循环</h3>
+
+        <div class="mermaid">
+graph TB
+    A[managerAgent.run<br/>启动执行] --> B{当前步骤 < max_steps?}
+    B -->|是| C[LLM生成下一步行动]
+    B -->|否| END[达到最大步数，结束]
+
+    C --> D{行动类型?}
+    D -->|调用工具| E[执行工具]
+    D -->|执行代码| F[运行Python代码]
+    D -->|返回答案| G[调用final_answer]
+
+    E --> H[获取工具输出]
+    F --> I[获取代码执行结果]
+    G --> J[结束执行]
+
+    H --> K[添加到内存]
+    I --> K
+    K --> B
+
+    style A fill:#e3f2fd
+    style C fill:#fff9e6
+    style E fill:#fce4ec
+    style F fill:#e1f5fe
+    style G fill:#e8f5e9
+    style J fill:#f3e5f5
+        </div>
+
+        <h3>7.2 示例执行序列</h3>
+
+        <div class="step-box">
+            <h4>针对示例问题的可能执行序列：</h4>
+            <ol>
+                <li><strong>Step 1</strong>: Agent 阅读问题，识别Part A需要WolframAlpha计算（但工具列表中没有）</li>
+                <li><strong>Step 2</strong>: 使用 <code>CodeAgent</code> 的代码执行能力计算积分</li>
+                <li><strong>Step 3</strong>: Part B 需要描述 Fig.1，调用 <code>ask_image_expert(image_ref="&lt;image_1&gt;", question="请描述这个图像")</code></li>
+                <li><strong>Step 4</strong>: 获取图像专家的描述结果</li>
+                <li><strong>Step 5</strong>: 调用 <code>ask_review_expert</code> 审查Part A和Part B的答案</li>
+                <li><strong>Step 6</strong>: 根据审查反馈修正答案</li>
+                <li><strong>Step 7</strong>: 调用 <code>finalize_part_answer()</code> 总结Part A和Part B</li>
+                <li><strong>Step 8</strong>: 内存重置，继续Part C</li>
+                <li><strong>Step 9</strong>: Part C 需要描述 Fig.2，调用 <code>ask_image_expert(image_ref="&lt;image_2&gt;", question="描述测量几何")</code></li>
+                <li><strong>Step 10</strong>: 完成所有部分后调用 <code>final_answer</code></li>
+            </ol>
+        </div>
+
+        <h3>7.3 CodeAgent 的代码执行能力</h3>
+
+        <div class="info-box">
+            <strong>🐍 CodeAgent 可以执行 Python 代码：</strong>
+            <ul>
+                <li>数值计算（使用 numpy, scipy）</li>
+                <li>数据处理（使用 pandas）</li>
+                <li>可视化（使用 matplotlib）</li>
+                <li>符号计算（如果安装了 sympy）</li>
+            </ul>
+
+            <p><strong>授权导入模块：</strong></p>
+            <div class="code-block">
+<strong>文件：</strong><span class="file-reference">run.py:92-95</span>
+<pre>additional_authorized_imports = [
+    "os", "sys", "time", "argparse", "pathlib",
+    "matplotlib.pyplot", "numpy", "pandas"
+]</pre>
+            </div>
+        </div>
+
+        <h3>7.4 工具调用示例</h3>
+
+        <div class="code-block">
+<strong>工具调用格式（由Agent自动生成）：</strong>
+<pre># 图像分析
+ask_image_expert(
+    image_ref="<image_1>",
+    question="What is the rotation velocity at radius 10 kpc in graph B?"
+)
+
+# 解决方案审查
+ask_review_expert(
+    my_solution="""
+    Part A: 使用数值积分，结果约为 3.544
+    Part B: Fig.1 显示 NGC 6946 星系的图片和旋转曲线...
+    """,
+    my_note="请检查数值计算和对图像的描述是否准确"
+)
+
+# 答案总结
+finalize_part_answer()  # 无参数，自动提取内存</pre>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <h2 id="flowchart">🗺️ 8. 完整流程图</h2>
+
+        <p>以下是整个系统的完整执行流程图，从程序启动到任务完成。</p>
+
+        <div class="mermaid">
+graph TB
+    START[程序启动<br/>python run.py ...] --> PARSE[parse_args<br/>解析命令行参数<br/>run.py:215-294]
+
+    PARSE --> CREATE_AGENT[create_agent<br/>run.py:144-158]
+
+    CREATE_AGENT --> LOAD_MD[load_markdown_from_filepath<br/>加载Markdown文件<br/>markdown_utils.py:179-205]
+
+    LOAD_MD --> TOOL_MAP[TOOLNAME2TOOL 映射<br/>工具名 → 工具类<br/>run.py:41-46]
+
+    TOOL_MAP --> CREATE_PHYSICS[_create_Physics_agent<br/>run.py:49-112]
+
+    CREATE_PHYSICS --> INIT_MODEL[初始化 LiteLLMModel<br/>run.py:58-65]
+
+    INIT_MODEL --> INST_TOOLS[实例化工具对象<br/>run.py:68-77]
+
+    INST_TOOLS --> TOOL1[AskImageTool<br/>imgTools.py:13-120]
+    INST_TOOLS --> TOOL2[ReviewRequestTool<br/>reviewTools.py:13-103]
+    INST_TOOLS --> TOOL3[SummarizeMemoryTool<br/>summemoryTools.py:77-143]
+
+    TOOL1 --> BUILD_AGENT[构建 CodeAgent<br/>run.py:91-96]
+    TOOL2 --> BUILD_AGENT
+    TOOL3 --> BUILD_AGENT
+
+    BUILD_AGENT --> REGISTER[注册工具到Agent<br/>run.py:105-106]
+
+    REGISTER --> SET_IMG[设置高分辨率图像<br/>run.py:110]
+
+    SET_IMG --> OBTAIN_TASK[obtain_task_and_images<br/>run.py:161-211]
+
+    OBTAIN_TASK --> PLAINTEXT[markdown_to_plaintext<br/>提取纯文本<br/>markdown_utils.py:208-215]
+
+    OBTAIN_TASK --> COMPRESS[markdown_images_compress<br/>压缩图像<br/>markdown_utils.py:217-246]
+
+    PLAINTEXT --> BUILD_PROMPT[构建任务提示词<br/>run.py:179-208]
+    COMPRESS --> BUILD_PROMPT
+
+    BUILD_PROMPT --> RUN[managerAgent.run<br/>task, images<br/>run.py:320]
+
+    RUN --> LOOP{执行循环<br/>step < max_steps?}
+
+    LOOP -->|是| LLM_GEN[LLM 生成下一步]
+    LOOP -->|否| MAX_STEPS[达到最大步数]
+
+    LLM_GEN --> ACTION{行动类型?}
+
+    ACTION -->|工具调用| CALL_TOOL[执行工具]
+    ACTION -->|代码执行| EXEC_CODE[运行Python代码]
+    ACTION -->|最终答案| FINAL[final_answer]
+
+    CALL_TOOL --> WHICH_TOOL{哪个工具?}
+
+    WHICH_TOOL -->|图像分析| IMG_TOOL[AskImageTool.forward<br/>imgTools.py:72-120]
+    WHICH_TOOL -->|审查| REV_TOOL[ReviewRequestTool.forward<br/>reviewTools.py:48-102]
+    WHICH_TOOL -->|总结| SUM_TOOL[SummarizeMemoryTool.forward<br/>summemoryTools.py:106-143]
+
+    IMG_TOOL --> EXTRACT_IMG[提取图像字节<br/>imgTools.py:44-70]
+    EXTRACT_IMG --> VISION[调用视觉模型<br/>imgTools.py:100-120]
+    VISION --> TOOL_RESULT[工具结果]
+
+    REV_TOOL --> GET_CONTEXT[获取问题上下文<br/>reviewTools.py:54]
+    GET_CONTEXT --> REVIEW_LLM[调用审查模型<br/>reviewTools.py:80-93]
+    REVIEW_LLM --> TOOL_RESULT
+
+    SUM_TOOL --> GET_MEM[提取Agent内存<br/>summemoryTools.py:23-33]
+    GET_MEM --> SUM_LLM[调用总结模型<br/>summemoryTools.py:35-75]
+    SUM_LLM --> RESET_MEM[重置内存<br/>summemoryTools.py:132-134]
+    RESET_MEM --> TOOL_RESULT
+
+    EXEC_CODE --> CODE_RESULT[代码执行结果]
+
+    TOOL_RESULT --> ADD_MEM[添加到内存]
+    CODE_RESULT --> ADD_MEM
+
+    ADD_MEM --> LOOP
+
+    FINAL --> END[任务完成]
+    MAX_STEPS --> END
+
+    style START fill:#e8f5e9,stroke:#4caf50,stroke-width:3px
+    style CREATE_AGENT fill:#e3f2fd,stroke:#2196f3,stroke-width:2px
+    style CREATE_PHYSICS fill:#e3f2fd,stroke:#2196f3,stroke-width:2px
+    style TOOL1 fill:#fce4ec,stroke:#e91e63,stroke-width:2px
+    style TOOL2 fill:#fce4ec,stroke:#e91e63,stroke-width:2px
+    style TOOL3 fill:#fce4ec,stroke:#e91e63,stroke-width:2px
+    style RUN fill:#fff9e6,stroke:#ff9800,stroke-width:2px
+    style LLM_GEN fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px
+    style IMG_TOOL fill:#fce4ec,stroke:#e91e63,stroke-width:2px
+    style REV_TOOL fill:#fce4ec,stroke:#e91e63,stroke-width:2px
+    style SUM_TOOL fill:#fce4ec,stroke:#e91e63,stroke-width:2px
+    style END fill:#e8f5e9,stroke:#4caf50,stroke-width:3px
+        </div>
+
+        <div class="section-divider"></div>
+
+        <h2>📊 9. 数据流总结</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>阶段</th>
+                    <th>输入</th>
+                    <th>处理</th>
+                    <th>输出</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>1. 参数解析</strong></td>
+                    <td>命令行参数</td>
+                    <td>argparse.ArgumentParser</td>
+                    <td>args 对象</td>
+                </tr>
+                <tr>
+                    <td><strong>2. Markdown加载</strong></td>
+                    <td>example1problem.md</td>
+                    <td>load_markdown_from_filepath</td>
+                    <td>MarkdownMessage（文本+图像）</td>
+                </tr>
+                <tr>
+                    <td><strong>3. 工具实例化</strong></td>
+                    <td>工具名称列表</td>
+                    <td>TOOLNAME2TOOL 映射</td>
+                    <td>工具对象列表</td>
+                </tr>
+                <tr>
+                    <td><strong>4. Agent创建</strong></td>
+                    <td>模型配置 + 工具</td>
+                    <td>CodeAgent 构造函数</td>
+                    <td>配置好的 Agent</td>
+                </tr>
+                <tr>
+                    <td><strong>5. 任务准备</strong></td>
+                    <td>MarkdownMessage</td>
+                    <td>obtain_task_and_images</td>
+                    <td>任务字符串 + 压缩图像</td>
+                </tr>
+                <tr>
+                    <td><strong>6. 执行</strong></td>
+                    <td>任务 + 图像</td>
+                    <td>Agent.run() 循环</td>
+                    <td>最终答案</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="section-divider"></div>
+
+        <h2>🎯 10. 关键要点总结</h2>
+
+        <div class="info-box">
+            <h3>系统设计亮点</h3>
+            <ul>
+                <li><strong>模块化设计</strong>：工具、模型、Agent分离，易于扩展</li>
+                <li><strong>多模态支持</strong>：文本 + 图像处理能力</li>
+                <li><strong>动态工具加载</strong>：根据命令行参数灵活配置</li>
+                <li><strong>内存管理</strong>：支持长问题的分段处理和内存重置</li>
+                <li><strong>错误恢复</strong>：工具调用带重试机制</li>
+            </ul>
+        </div>
+
+        <div class="warning-box">
+            <h3>使用注意事项</h3>
+            <ul>
+                <li><strong>环境变量</strong>：需要设置 <code>OPENROUTER_API_KEY</code></li>
+                <li><strong>图像格式</strong>：支持 .png, .jpg, .jpeg, .gif, .webp</li>
+                <li><strong>最大步数</strong>：默认80步，复杂问题可能需要调整</li>
+                <li><strong>内存消耗</strong>：高分辨率图像会增加内存使用</li>
+                <li><strong>API成本</strong>：多模态模型调用成本较高</li>
+            </ul>
+        </div>
+
+        <div class="step-box">
+            <h3>扩展建议</h3>
+            <ul>
+                <li><strong>添加新工具</strong>：在 <code>utils/</code> 创建新工具类，在 <code>TOOLNAME2TOOL</code> 注册</li>
+                <li><strong>更换模型</strong>：通过 <code>--manager-model</code> 参数指定其他LLM</li>
+                <li><strong>自定义提示词</strong>：修改 <code>obtain_task_and_images</code> 中的提示构建逻辑</li>
+                <li><strong>日志记录</strong>：在工具的 <code>forward</code> 方法中添加日志</li>
+            </ul>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <h2>📚 附录：文件索引</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>文件路径</th>
+                    <th>主要函数/类</th>
+                    <th>功能</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="file-reference">run.py</span></td>
+                    <td>main, parse_args, create_agent, _create_Physics_agent, obtain_task_and_images</td>
+                    <td>程序主入口，参数解析，Agent创建</td>
+                </tr>
+                <tr>
+                    <td><span class="file-reference">utils/__init__.py</span></td>
+                    <td>导出所有工具类</td>
+                    <td>工具模块初始化</td>
+                </tr>
+                <tr>
+                    <td><span class="file-reference">utils/markdown_utils.py</span></td>
+                    <td>MarkdownMessage, load_markdown_from_filepath, markdown_to_plaintext, markdown_images_compress</td>
+                    <td>Markdown文件处理</td>
+                </tr>
+                <tr>
+                    <td><span class="file-reference">utils/imgTools.py</span></td>
+                    <td>AskImageTool</td>
+                    <td>图像分析工具</td>
+                </tr>
+                <tr>
+                    <td><span class="file-reference">utils/reviewTools.py</span></td>
+                    <td>ReviewRequestTool</td>
+                    <td>解决方案审查工具</td>
+                </tr>
+                <tr>
+                    <td><span class="file-reference">utils/summemoryTools.py</span></td>
+                    <td>SummarizeMemoryTool, get_agent_memory_observation, summarize_agent_memory</td>
+                    <td>内存总结工具</td>
+                </tr>
+                <tr>
+                    <td><span class="file-reference">utils/wolframTools.py</span></td>
+                    <td>WolframAlphaTool</td>
+                    <td>WolframAlpha计算工具（本次未使用）</td>
+                </tr>
+                <tr>
+                    <td><span class="file-reference">examples/Problems/example/example1problem.md</span></td>
+                    <td>-</td>
+                    <td>示例物理问题</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="section-divider"></div>
+
+        <div style="text-align: center; margin-top: 50px; padding: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px;">
+            <h2 style="color: white; border: none;">🎓 教程完成</h2>
+            <p style="font-size: 1.1em;">希望这个详细的流程分析能帮助你深入理解 Physics-Supernova Agent 系统！</p>
+            <p style="margin-top: 20px; font-size: 0.9em; opacity: 0.9;">
+                如有疑问，请参考源代码中的注释或查阅 <code>smolagents</code> 框架文档。
+            </p>
+        </div>
+
+    </div>
+
+    <script>
+        // 初始化 Mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#e3f2fd',
+                primaryTextColor: '#1565c0',
+                primaryBorderColor: '#2196f3',
+                lineColor: '#1976d2',
+                secondaryColor: '#fff9e6',
+                tertiaryColor: '#f3e5f5',
+                fontSize: '14px',
+                fontFamily: 'Segoe UI, Microsoft YaHei, sans-serif'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            }
+        });
+    </script>
+</body>
+</html>
