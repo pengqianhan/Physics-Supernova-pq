@@ -12,17 +12,13 @@ from smolagents import (
 )
 from smolagents.models import ChatMessage, MessageRole
 from dotenv import load_dotenv
-from utils.imgTools_ha import HybridAutomatonImageTool
-
+import os
 load_dotenv()
 gemini_apikey = os.getenv('GEMINI_API_KEY')
 # print(gemini_apikey)
 model = LiteLLMModel(model_id="gemini/gemini-2.5-flash-lite", api_key=gemini_apikey) #
 
-# Initialize HybridAutomatonImageTool
-image_tool = HybridAutomatonImageTool()
-
-agent = CodeAgent(tools=[image_tool], model=model, add_base_tools=True)
+agent = CodeAgent(tools=[], model=model, add_base_tools=True)
 
 
 # 加载本地图片
