@@ -93,7 +93,7 @@ class HybridAutomatonImageTool(Tool):
         messages = [
             {
                 "role": "system",
-                "content": "You are an expert in dealing with image in Physics Olympiads."
+                "content": "You are an expert in dealing with image in hybrid automata analysis."
             },
             {
                 "role": "user",
