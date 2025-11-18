@@ -10,7 +10,7 @@ from base64 import b64decode
 from smolagents import (
     LiteLLMModel
 )
-from smolagents.models import ChatMessage, MessageRole
+from utils.imgTools_ha import HybridAutomatonImageTool
 from dotenv import load_dotenv
 import os
 load_dotenv()
@@ -18,9 +18,14 @@ gemini_apikey = os.getenv('GEMINI_API_KEY')
 # print(gemini_apikey)
 model = LiteLLMModel(model_id="gemini/gemini-2.5-flash-lite", api_key=gemini_apikey) #
 
-agent = CodeAgent(tools=[], model=model, add_base_tools=True)
+agent = CodeAgent(tools=[HybridAutomatonImageTool()], model=model, add_base_tools=True)
 
-
+# print(agent.tools)
+# 移除特定的默认工具
+tools_to_remove = ['web_search', 'visit_webpage']  # 例如移除这些工具
+for tool_name in tools_to_remove:
+    if tool_name in agent.tools:
+        del agent.tools[tool_name]
 # 加载本地图片
 image = Image.open("sample_0.png")
 task1 = """You are a hybrid automaton expert tasked with analyzing and improving hybrid automaton specifications.
@@ -31,7 +36,7 @@ System Configuration:
 - Number of Inputs: {1}
 
 Instructions:
-1. Carefully analyze the hybrid automaton structure shown in the provided image
+1. Carefully analyze the hybrid automaton structure shown in the provided image, you MUST use the hybrid_automaton_image_analysis_tool to analyze the image.
 2. Identify potential improvements to the "mode"("id","eq"), "edge"("direction","condition","reset"),
 3. Generate an improved version that maintains mathematical correctness and physical plausibility
 
@@ -83,9 +88,12 @@ PROMPT_HA_v0 = {
 
 """
 task1 = task1 + prompt1
+# agent.run(
+#     task1,
+#     additional_args={
+#         "image": image
+#     }
+# )
 agent.run(
     task1,
-    additional_args={
-        "image": image
-    }
 )
