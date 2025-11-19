@@ -16,7 +16,7 @@ except Exception:
     pass
 
 # use openrouter by default; if you want to use other API bases (e.g. openai api base, etc.), simply set OPENROUTER_API_BASE to your base
-os.environ["OPENROUTER_API_BASE"] = os.environ.get("OPENROUTER_API_BASE", "https://openrouter.ai/api/v1")
+os.environ["OPENROUTER_API_BASE"] = os.environ.get("OPENROUTER_API_BASE", "https://generativelanguage.googleapis.com/v1beta/openai/")
 
 import argparse
 
@@ -48,7 +48,7 @@ TOOLNAME2TOOL = {
 
 def _create_Physics_agent(Tools_list:List[type[Tool]],
                          markdown_content: MarkdownMessage,
-                         model_id: str = "openrouter/google/gemini-2.5-pro",
+                         model_id: str = "openrouter/google/gemini-flash-lite-latest",
                          managed_agents_list: List[MultiStepAgent] = None,
                          max_steps:int=80,
                          **kwargs)-> ToolCallingAgent | CodeAgent: # either returns ToolCallingAgent or CodeAgent
@@ -141,7 +141,7 @@ def get_managed_agents_list(managed_agents_list: List[str] = None, managed_agent
     return managed_agents
 
 # create the agent
-def create_agent(model_id:str = "openrouter/google/gemini-2.5-pro",
+def create_agent(model_id:str = "openrouter/google/gemini-flash-lite-latest",
                         input_markdown_file:str=None,
                         tools_list: List[str]=[],
                         managed_agents_list: List[str] = None,
@@ -223,7 +223,7 @@ def parse_args():
     ap.add_argument(
         "--manager-model",
         type=str,
-        default="openrouter/google/gemini-2.5-pro",
+        default="openrouter/google/gemini-flash-lite-latest",
         help="Model ID to use for the agent.",
     )
     
@@ -251,19 +251,19 @@ def parse_args():
     ap.add_argument(
         "--image-tool-model",
         type=str,
-        default="openrouter/google/gemini-2.5-pro",
+        default="openrouter/google/gemini-flash-lite-latest",
         help="Model ID to use for the image model.",
     )
     ap.add_argument(
         "--review-tool-model",
         type=str,
-        default="openrouter/google/gemini-2.5-pro",
+        default="openrouter/google/gemini-flash-lite-latest",
         help="Model ID to use for the review model.",
     )
     ap.add_argument(
         "--summarize-tool-model",
         type=str,
-        default="openrouter/google/gemini-2.5-pro",
+        default="openrouter/google/gemini-flash-lite-latest",
         help="Model ID to use for the summarizer model.",
     )
     
@@ -280,13 +280,13 @@ def parse_args():
     ap.add_argument(
         "--managed-agents-list-model",
         type=str,
-        default="openrouter/google/gemini-2.5-pro",
+        default="openrouter/google/gemini-flash-lite-latest",
         help="Model ID to use for the agent.",
     )
     
     args = ap.parse_args()
     
-    # for example, python run.py --input-markdown-file ./markdowns/physics_problem.md --manager-model openrouter/google/gemini-2.5-pro --tools-list wolfram_alpha_query ask_image_expert ask_review_expert
+    # for example, python run.py --input-markdown-file ./markdowns/physics_problem.md --manager-model openrouter/google/gemini-flash-lite-latest --tools-list wolfram_alpha_query ask_image_expert ask_review_expert
     if not args.input_markdown_file:
         raise ValueError("You must provide a markdown file position with --input-markdown-file.")
     if not os.path.exists(args.input_markdown_file):
