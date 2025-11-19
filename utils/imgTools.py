@@ -31,9 +31,9 @@ class AskImageTool(Tool):
         api_key = os.environ.get("OPENROUTER_API_KEY")
         # Initialize vision model for image analysis
         self.vision_model = LiteLLMModel(
-            model_id=vision_model_id,
+            model_id='gemini/gemini-flash-lite-latest',
             api_key=api_key,
-            api_base=os.environ.get("OPENROUTER_API_BASE", "https://openrouter.ai/api/v1"),
+            api_base=os.environ.get("OPENROUTER_API_BASE", "https://generativelanguage.googleapis.com/v1beta/openai/"),
             max_completion_tokens=8192,
             num_retries=3,
             timeout=1200,
