@@ -738,37 +738,74 @@ class HAEvaluator:
 
         return self.metrics, plot_base64
 
-    def _print_formatted_metrics(self):
+    def _print_formatted_metrics(self, print_to_console: bool = True) -> dict:
         """
-        Print formatted evaluation metrics to console.
+        Format evaluation metrics and optionally print to console.
 
-        Displays metrics from the Evaluation class in a well-formatted layout.
+        Args:
+            print_to_console: If True, print formatted metrics to console.
+
+        Returns:
+            dict: Formatted metrics with the following keys:
+                - 'raw': Original metrics dictionary
+                - 'formatted': Dictionary with formatted string values
+                - 'text': Complete formatted text output
         """
-        print("\n" + "=" * 80)
-        print("HYBRID AUTOMATON EVALUATION RESULTS")
-        print("=" * 80)
+        # Build formatted output lines
+        lines = []
+        lines.append("")
+        lines.append("=" * 80)
+        lines.append("HYBRID AUTOMATON EVALUATION RESULTS")
+        lines.append("=" * 80)
+        lines.append("")
+        lines.append("┌─ EVALUATION CLASS METRICS ───────────────────────────────────────────────┐")
+        lines.append("│ (From Evaluation class for HA learning comparison)                        │")
+        lines.append("└──────────────────────────────────────────────────────────────────────────┘")
 
-        print("\n┌─ EVALUATION CLASS METRICS ───────────────────────────────────────────────┐")
-        print("│ (From Evaluation class for HA learning comparison)                        │")
-        print("└──────────────────────────────────────────────────────────────────────────┘")
+        # Build formatted values dictionary
+        formatted = {}
 
         if self.metrics['tc'] is not None:
-            print(f"  TC (Change-Point Error):                {self.metrics['tc']:.6f} seconds")
+            formatted['tc'] = f"{self.metrics['tc']:.6f} seconds"
+            lines.append(f"  TC (Change-Point Error):                {formatted['tc']}")
         else:
-            print(f"  TC (Change-Point Error):                N/A")
+            formatted['tc'] = "N/A"
+            lines.append(f"  TC (Change-Point Error):                N/A")
 
-        print(f"  Train TC:                               {self.metrics['train_tc']:.6f} seconds")
+        formatted['train_tc'] = f"{self.metrics['train_tc']:.6f} seconds"
+        lines.append(f"  Train TC:                               {formatted['train_tc']}")
 
         if self.metrics['max_diff'] is not None:
-            print(f"  Max Difference:                         {self.metrics['max_diff']:.6f}")
-            print(f"  Mean Difference:                        {self.metrics['mean_diff']:.6f}")
+            formatted['max_diff'] = f"{self.metrics['max_diff']:.6f}"
+            formatted['mean_diff'] = f"{self.metrics['mean_diff']:.6f}"
+            lines.append(f"  Max Difference:                         {formatted['max_diff']}")
+            lines.append(f"  Mean Difference:                        {formatted['mean_diff']}")
         else:
-            print(f"  Max Difference:                         N/A")
-            print(f"  Mean Difference:                        N/A")
+            formatted['max_diff'] = "N/A"
+            formatted['mean_diff'] = "N/A"
+            lines.append(f"  Max Difference:                         N/A")
+            lines.append(f"  Mean Difference:                        N/A")
 
-        print(f"  Clustering Error:                       {self.metrics['clustering_error']}")
+        formatted['clustering_error'] = str(self.metrics['clustering_error'])
+        lines.append(f"  Clustering Error:                       {formatted['clustering_error']}")
 
-        print("\n" + "=" * 80 + "\n")
+        lines.append("")
+        lines.append("=" * 80)
+        lines.append("")
+
+        # Join all lines into formatted text
+        formatted_text = "\n".join(lines)
+
+        # Print to console if requested
+        if print_to_console:
+            print(formatted_text)
+
+        # Return structured result
+        return {
+            'raw': self.metrics,
+            'formatted': formatted,
+            'text': formatted_text
+        }
 
 
 
