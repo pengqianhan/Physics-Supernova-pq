@@ -563,13 +563,10 @@ class HAEvaluator:
 
     def compute_metrics(self) -> Dict[str, Any]:
         """
-        Compute comprehensive evaluation metrics.
-
-        Computes both absolute error metrics (for interpretability) and
-        normalized metrics (for comparison with traditional HA learning).
+        Compute evaluation metrics using the Evaluation class.
 
         Returns:
-            Dictionary containing all computed metrics
+            Dictionary containing computed metrics from Evaluation class
         """
         if self.ground_truth is None:
             self.load_ground_truth()
@@ -581,107 +578,40 @@ class HAEvaluator:
         sim_state = self.simulation_results['state']
         sim_mode = self.simulation_results['mode']
         sim_change_points = self.simulation_results['change_points']
-        sim_input = self.simulation_results['input']
 
         gt_state = self.ground_truth['state']
         gt_mode = self.ground_truth['mode']
         gt_change_points = self.ground_truth['change_points']
-        gt_input = self.ground_truth['input']
 
         # Truncate to shorter length for fair comparison
         min_len = min(sim_state.shape[1], gt_state.shape[1])
         sim_state_truncated = sim_state[:, :min_len]
         gt_state_truncated = gt_state[:, :min_len]
 
-        # Check dimension compatibility
-        use_evaluation_class = (sim_state_truncated.shape[0] == gt_state_truncated.shape[0])
+        # Use Evaluation class to compute metrics
+        evaluator = Evaluation(name="HA_Single_Trajectory_Evaluation")
 
-        # ========== Normalized metrics using Evaluation class ==========
-        if use_evaluation_class:
-            evaluator = Evaluation(name="HA_Single_Trajectory_Evaluation")
+        evaluator.submit(
+            fit_mode=[sim_mode[:min_len]],
+            fit_data=[sim_state_truncated],
+            gt_mode=[gt_mode[:min_len]] if gt_mode is not None else [[1] * min_len],
+            gt_data=[gt_state_truncated],
+            chp=[sim_change_points],
+            gt_chp=[gt_change_points] if gt_change_points is not None else [[0, min_len]],
+            mode_num=len(set(sim_mode)),
+            gt_mode_num=len(set(gt_mode)) if gt_mode is not None else 1,
+            dt=self.dt
+        )
 
-            evaluator.submit(
-                fit_mode=[sim_mode[:min_len]],
-                fit_data=[sim_state_truncated],
-                gt_mode=[gt_mode[:min_len]] if gt_mode is not None else [[1] * min_len],
-                gt_data=[gt_state_truncated],
-                chp=[sim_change_points],
-                gt_chp=[gt_change_points] if gt_change_points is not None else [[0, min_len]],
-                mode_num=len(set(sim_mode)),
-                gt_mode_num=len(set(gt_mode)) if gt_mode is not None else 1,
-                dt=self.dt
-            )
+        eval_results = evaluator.calc()
 
-            eval_results = evaluator.calc()
-        else:
-            # Dimension mismatch - compute limited metrics manually
-            print(f"Warning: State dimension mismatch (simulated: {sim_state_truncated.shape[0]}, "
-                  f"ground truth: {gt_state_truncated.shape[0]})")
-            print(f"         Evaluation class metrics will not be computed.")
-
-            # Compute change-point error manually
-            if gt_change_points is not None and gt_mode is not None:
-                chp_error_1 = max_min_abs_diff(sim_change_points, gt_change_points)
-                chp_error_2 = max_min_abs_diff(gt_change_points, sim_change_points)
-                tc_error = max(chp_error_1, chp_error_2) * self.dt
-            else:
-                tc_error = None
-
-            eval_results = {
-                'tc': tc_error,
-                'train_tc': 0.0,
-                'max_diff': None,
-                'mean_diff': None,
-                'clustering_error': abs(len(set(sim_mode)) - (len(set(gt_mode)) if gt_mode is not None else 1))
-            }
-
-        # ========== Absolute error metrics ==========
-        if use_evaluation_class:
-            diff_abs = sim_state_truncated - gt_state_truncated
-            state_rmse = np.sqrt(np.mean(diff_abs**2))
-            state_max_error = np.max(np.abs(diff_abs))
-            state_mae = np.mean(np.abs(diff_abs))
-        else:
-            # For dimension mismatch, only compare common dimensions
-            min_dims = min(sim_state_truncated.shape[0], gt_state_truncated.shape[0])
-            diff_abs = sim_state_truncated[:min_dims, :] - gt_state_truncated[:min_dims, :]
-            state_rmse = np.sqrt(np.mean(diff_abs**2))
-            state_max_error = np.max(np.abs(diff_abs))
-            state_mae = np.mean(np.abs(diff_abs))
-            print(f"         Note: Error metrics computed only for first {min_dims} state variable(s).")
-
-        # Mode tracking accuracy
-        mode_accuracy = None
-        if gt_mode is not None:
-            min_mode_len = min(len(sim_mode), len(gt_mode))
-            mode_matches = np.sum(sim_mode[:min_mode_len] == gt_mode[:min_mode_len])
-            mode_accuracy = mode_matches / min_mode_len
-
-        # Change-point error (stored in 'tc' from Evaluation class)
-        change_point_error = eval_results['tc']
-
-        # Input tracking error
-        min_input_len = min(sim_input.shape[1], gt_input.shape[1])
-        input_diff = sim_input[:, :min_input_len] - gt_input[:, :min_input_len]
-        input_mse = np.mean(input_diff**2)
-
-        # Assemble comprehensive results
+        # Assemble results
         self.metrics = {
-            # === Absolute error metrics (for interpretability) ===
-            'state_rmse': float(state_rmse),
-            'state_max_error': float(state_max_error),
-            'state_mae': float(state_mae),
-            'mode_accuracy': float(mode_accuracy) if mode_accuracy is not None else None,
-            'change_point_error': float(change_point_error) if change_point_error is not None else None,
-            'input_mse': float(input_mse),
-
-            # === Normalized metrics from Evaluation class ===
-            'normalized_max_diff': float(eval_results['max_diff']) if eval_results['max_diff'] is not None else None,
-            'normalized_mean_diff': float(eval_results['mean_diff']) if eval_results['mean_diff'] is not None else None,
+            'tc': float(eval_results['tc']) if eval_results['tc'] is not None else None,
             'train_tc': float(eval_results['train_tc']),
+            'max_diff': float(eval_results['max_diff']) if eval_results['max_diff'] is not None else None,
+            'mean_diff': float(eval_results['mean_diff']) if eval_results['mean_diff'] is not None else None,
             'clustering_error': int(eval_results['clustering_error']),
-
-            # === Data for further analysis ===
             'simulated_data': self.simulation_results,
             'ground_truth_data': self.ground_truth
         }
@@ -812,47 +742,30 @@ class HAEvaluator:
         """
         Print formatted evaluation metrics to console.
 
-        Displays both absolute error metrics and normalized metrics in a
-        well-formatted, easy-to-read layout.
+        Displays metrics from the Evaluation class in a well-formatted layout.
         """
         print("\n" + "=" * 80)
         print("HYBRID AUTOMATON EVALUATION RESULTS")
         print("=" * 80)
 
-        # Absolute Error Metrics
-        print("\n┌─ ABSOLUTE ERROR METRICS ─────────────────────────────────────────────────┐")
-        print("│ (Direct interpretability - units match original data)                    │")
+        print("\n┌─ EVALUATION CLASS METRICS ───────────────────────────────────────────────┐")
+        print("│ (From Evaluation class for HA learning comparison)                        │")
         print("└──────────────────────────────────────────────────────────────────────────┘")
 
-        print(f"  State RMSE (Root Mean Squared Error):  {self.metrics['state_rmse']:.6e}")
-        print(f"  State Max Error:                        {self.metrics['state_max_error']:.6e}")
-        print(f"  State MAE (Mean Absolute Error):        {self.metrics['state_mae']:.6e}")
-
-        if self.metrics['mode_accuracy'] is not None:
-            print(f"  Mode Classification Accuracy:           {self.metrics['mode_accuracy']:.2%}")
+        if self.metrics['tc'] is not None:
+            print(f"  TC (Change-Point Error):                {self.metrics['tc']:.6f} seconds")
         else:
-            print(f"  Mode Classification Accuracy:           N/A")
+            print(f"  TC (Change-Point Error):                N/A")
 
-        if self.metrics['change_point_error'] is not None:
-            print(f"  Change-Point Error:                     {self.metrics['change_point_error']:.6f} seconds")
+        print(f"  Train TC:                               {self.metrics['train_tc']:.6f} seconds")
+
+        if self.metrics['max_diff'] is not None:
+            print(f"  Max Difference:                         {self.metrics['max_diff']:.6f}")
+            print(f"  Mean Difference:                        {self.metrics['mean_diff']:.6f}")
         else:
-            print(f"  Change-Point Error:                     N/A")
+            print(f"  Max Difference:                         N/A")
+            print(f"  Mean Difference:                        N/A")
 
-        print(f"  Input MSE (Mean Squared Error):         {self.metrics['input_mse']:.6e}")
-
-        # Normalized Metrics
-        print("\n┌─ NORMALIZED METRICS ─────────────────────────────────────────────────────┐")
-        print("│ (For comparison with traditional HA learning - from Evaluation class)    │")
-        print("└──────────────────────────────────────────────────────────────────────────┘")
-
-        if self.metrics['normalized_max_diff'] is not None:
-            print(f"  Normalized Max Difference:              {self.metrics['normalized_max_diff']:.6f}")
-            print(f"  Normalized Mean Difference:             {self.metrics['normalized_mean_diff']:.6f}")
-        else:
-            print(f"  Normalized Max Difference:              N/A (dimension mismatch)")
-            print(f"  Normalized Mean Difference:             N/A (dimension mismatch)")
-
-        print(f"  Training TC (Time Cost):                {self.metrics['train_tc']:.6f} seconds")
         print(f"  Clustering Error:                       {self.metrics['clustering_error']}")
 
         print("\n" + "=" * 80 + "\n")
@@ -885,33 +798,13 @@ if __name__ == "__main__":
         }
     }
 
-    # Test data: Two-variable Duffing oscillator
-    data1 = {
-        "automaton": {
-            "var": "x1, x2",
-            "input": "u1",
-            "mode": [
-                {
-                    "id": 1,
-                    "eq": "x1[1] = x2[0], x2[1] = -0.1 * x2[0] - 1.0 * x1[0] - 1.0 * x1[0]**3 + u1"
-                }
-            ],
-            "edge": []
-        },
-        "config": {
-            "dt": 0.001,
-            "total_time": 10.0,
-            "dim": 2,
-            "other_items": ""
-        }
-    }
 
     # Create evaluator using the new HAEvaluator class
     print("Testing HAEvaluator with __call__() method...")
     print("=" * 80)
 
     evaluator = HAEvaluator(
-        ha_dict=data1,
+        ha_dict=data,
         npz_file_path='data_duffing/test_data0.npz',
         dt=0.001,
         total_time=10.0
@@ -944,11 +837,6 @@ if __name__ == "__main__":
     print("\n" + "=" * 80)
     print("All plots generated successfully!")
     print("\nEvaluation Summary:")
-    print(f"The automaton defined in data1 was evaluated against ground truth data")
+    print(f"The automaton defined in data was evaluated against ground truth data")
     print(f"from 'data_duffing/test_data0.npz'.")
     print(f"\nKey findings:")
-    if results1:
-        print(f"  - State tracking RMSE: {results1['state_rmse']:.6f}")
-        print(f"  - Maximum state error: {results1['state_max_error']:.6f}")
-        print(f"  - Mode classification accuracy: {results1['mode_accuracy']:.2%}" if results1['mode_accuracy'] else "  - Mode classification accuracy: N/A")
-    print(f"\nPlots saved to 'data_duffing_evaluation/' directory.")
