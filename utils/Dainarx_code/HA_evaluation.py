@@ -741,7 +741,6 @@ class HAEvaluator:
     def __call__(self,
                  plot_mode: str = "overlay",
                  save_path: Optional[str] = None,
-                 show_plot: bool = True,
                  print_metrics: bool = True) -> Dict[str, Any]:
         """
         Convenience method to directly call evaluator and display results.
@@ -752,7 +751,6 @@ class HAEvaluator:
         Args:
             plot_mode: Plotting mode - "single", "overlay", or "stacked"
             save_path: Optional path to save the plot
-            show_plot: Whether to display the plot (using plt.show())
             print_metrics: Whether to print formatted metrics to console
 
         Returns:
@@ -801,11 +799,8 @@ class HAEvaluator:
             if print_metrics:
                 print(f"Plot saved to: {save_path}")
 
-        # Show plot if requested
-        if show_plot:
-            plt.show()
-        else:
-            plotter.close()
+        # Clean up
+        plotter.close()
 
         # Print metrics if requested
         if print_metrics and self.metrics is not None:
@@ -927,7 +922,6 @@ if __name__ == "__main__":
     results1, plot_base64 = evaluator(
         plot_mode="single",
         save_path='data_duffing_evaluation/output_single.png',
-        show_plot=False,
         print_metrics=True
     )
 
@@ -936,7 +930,6 @@ if __name__ == "__main__":
     results2, plot_base64 = evaluator(
         plot_mode="overlay",
         save_path='data_duffing_evaluation/output_overlay.png',
-        show_plot=False,
         print_metrics=False
     )
 
@@ -945,7 +938,6 @@ if __name__ == "__main__":
     results3, plot_base64 = evaluator(
         plot_mode="stacked",
         save_path='data_duffing_evaluation/output_stacked.png',
-        show_plot=False,
         print_metrics=False
     )
 
