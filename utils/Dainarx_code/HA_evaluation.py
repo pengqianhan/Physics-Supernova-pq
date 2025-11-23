@@ -733,10 +733,9 @@ class HAEvaluator:
         plotter.close()
 
         # Print metrics if requested
-        if print_metrics and self.metrics is not None:
-            self._print_formatted_metrics()
+        metrics_text = self._print_formatted_metrics(print_to_console=print_metrics)
 
-        return self.metrics, plot_base64
+        return metrics_text, plot_base64
 
     def _print_formatted_metrics(self, print_to_console: bool = True) -> dict:
         """
@@ -747,51 +746,33 @@ class HAEvaluator:
 
         Returns:
             dict: Formatted metrics with the following keys:
-                - 'raw': Original metrics dictionary
                 - 'formatted': Dictionary with formatted string values
                 - 'text': Complete formatted text output
         """
         # Build formatted output lines
         lines = []
-        lines.append("")
-        lines.append("=" * 80)
-        lines.append("HYBRID AUTOMATON EVALUATION RESULTS")
-        lines.append("=" * 80)
-        lines.append("")
-        lines.append("┌─ EVALUATION CLASS METRICS ───────────────────────────────────────────────┐")
-        lines.append("│ (From Evaluation class for HA learning comparison)                        │")
-        lines.append("└──────────────────────────────────────────────────────────────────────────┘")
 
         # Build formatted values dictionary
         formatted = {}
 
         if self.metrics['tc'] is not None:
             formatted['tc'] = f"{self.metrics['tc']:.6f} seconds"
-            lines.append(f"  TC (Change-Point Error):                {formatted['tc']}")
+            lines.append(f"  TC (Change-Point Error):{formatted['tc']}")
         else:
             formatted['tc'] = "N/A"
-            lines.append(f"  TC (Change-Point Error):                N/A")
-
-        formatted['train_tc'] = f"{self.metrics['train_tc']:.6f} seconds"
-        lines.append(f"  Train TC:                               {formatted['train_tc']}")
+            lines.append(f"  TC (Change-Point Error):N/A")
 
         if self.metrics['max_diff'] is not None:
             formatted['max_diff'] = f"{self.metrics['max_diff']:.6f}"
             formatted['mean_diff'] = f"{self.metrics['mean_diff']:.6f}"
-            lines.append(f"  Max Difference:                         {formatted['max_diff']}")
-            lines.append(f"  Mean Difference:                        {formatted['mean_diff']}")
+            lines.append(f"  Max Difference:{formatted['max_diff']}")
+            lines.append(f"  Mean Difference:{formatted['mean_diff']}")
         else:
             formatted['max_diff'] = "N/A"
             formatted['mean_diff'] = "N/A"
-            lines.append(f"  Max Difference:                         N/A")
-            lines.append(f"  Mean Difference:                        N/A")
+            lines.append(f"  Max Difference:N/A")
+            lines.append(f"  Mean Difference:N/A")
 
-        formatted['clustering_error'] = str(self.metrics['clustering_error'])
-        lines.append(f"  Clustering Error:                       {formatted['clustering_error']}")
-
-        lines.append("")
-        lines.append("=" * 80)
-        lines.append("")
 
         # Join all lines into formatted text
         formatted_text = "\n".join(lines)
@@ -802,7 +783,6 @@ class HAEvaluator:
 
         # Return structured result
         return {
-            'raw': self.metrics,
             'formatted': formatted,
             'text': formatted_text
         }
@@ -849,7 +829,7 @@ if __name__ == "__main__":
 
     # Mode 1: Single plot (simulated only) with metrics
     print("\n1. Generating single plot (simulated only)...")
-    results1, plot_base64 = evaluator(
+    metrics_text, plot_base64 = evaluator(
         plot_mode="single",
         save_path='data_duffing_evaluation/output_single.png',
         print_metrics=True
@@ -857,7 +837,7 @@ if __name__ == "__main__":
 
     # Mode 2: Overlay comparison
     print("\n2. Generating overlay comparison plot...")
-    results2, plot_base64 = evaluator(
+    metrics_text, plot_base64 = evaluator(
         plot_mode="overlay",
         save_path='data_duffing_evaluation/output_overlay.png',
         print_metrics=False
@@ -865,15 +845,8 @@ if __name__ == "__main__":
 
     # Mode 3: Stacked comparison
     print("\n3. Generating stacked comparison plot...")
-    results3, plot_base64 = evaluator(
+    metrics_text, plot_base64 = evaluator(
         plot_mode="stacked",
         save_path='data_duffing_evaluation/output_stacked.png',
         print_metrics=False
     )
-
-    print("\n" + "=" * 80)
-    print("All plots generated successfully!")
-    print("\nEvaluation Summary:")
-    print(f"The automaton defined in data was evaluated against ground truth data")
-    print(f"from 'data_duffing/test_data0.npz'.")
-    print(f"\nKey findings:")
