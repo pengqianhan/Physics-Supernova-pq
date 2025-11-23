@@ -791,7 +791,7 @@ class HAEvaluator:
 
         # Generate plot
         plotter.plot(mode=plot_mode)
-
+        plot_base64 = plotter.to_base64()
         # Save if requested
         if save_path is not None:
             # Convert relative path to absolute path based on this file's location
@@ -811,7 +811,7 @@ class HAEvaluator:
         if print_metrics and self.metrics is not None:
             self._print_formatted_metrics()
 
-        return self.metrics
+        return self.metrics, plot_base64
 
     def _print_formatted_metrics(self):
         """
@@ -924,7 +924,7 @@ if __name__ == "__main__":
 
     # Mode 1: Single plot (simulated only) with metrics
     print("\n1. Generating single plot (simulated only)...")
-    results1 = evaluator(
+    results1, plot_base64 = evaluator(
         plot_mode="single",
         save_path='data_duffing_evaluation/output_single.png',
         show_plot=False,
@@ -933,7 +933,7 @@ if __name__ == "__main__":
 
     # Mode 2: Overlay comparison
     print("\n2. Generating overlay comparison plot...")
-    results2 = evaluator(
+    results2, plot_base64 = evaluator(
         plot_mode="overlay",
         save_path='data_duffing_evaluation/output_overlay.png',
         show_plot=False,
@@ -942,7 +942,7 @@ if __name__ == "__main__":
 
     # Mode 3: Stacked comparison
     print("\n3. Generating stacked comparison plot...")
-    results3 = evaluator(
+    results3, plot_base64 = evaluator(
         plot_mode="stacked",
         save_path='data_duffing_evaluation/output_stacked.png',
         show_plot=False,
