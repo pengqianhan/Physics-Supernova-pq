@@ -735,7 +735,7 @@ class HAEvaluator:
         # Print metrics if requested
         metrics_text = self._print_formatted_metrics(print_to_console=print_metrics)
 
-        return metrics_text, plot_base64
+        return metrics_text['text'], plot_base64
 
     def _print_formatted_metrics(self, print_to_console: bool = True) -> dict:
         """
@@ -829,11 +829,12 @@ if __name__ == "__main__":
 
     # Mode 1: Single plot (simulated only) with metrics
     print("\n1. Generating single plot (simulated only)...")
-    metrics_text, plot_base64 = evaluator(
+    metrics_text_str, plot_base64 = evaluator(
         plot_mode="single",
         save_path='data_duffing_evaluation/output_single.png',
         print_metrics=True
     )
+    print("Metrics text:", metrics_text_str)
 
     # Mode 2: Overlay comparison
     print("\n2. Generating overlay comparison plot...")
