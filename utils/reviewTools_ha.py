@@ -35,7 +35,6 @@ HA_REVIEW_SYSTEM_PROMPT = """You are an expert hybrid automata reviewer speciali
    - The evaluation metrics show how well the HA matches ground truth data
    - `tc` (change-point error): How accurately mode switches are detected (lower is better)
    - `max_diff` / `mean_diff`: Maximum and mean state trajectory differences (lower is better)
-   - `clustering_error`: How well modes are classified (lower is better)
    - Use these metrics to identify specific areas needing improvement
 
 5. **Visualization Analysis**:
