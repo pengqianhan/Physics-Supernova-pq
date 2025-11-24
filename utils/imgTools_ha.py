@@ -5,6 +5,8 @@ from smolagents.default_tools import Tool
 
 # Import smolagents components for LLM model and message handling
 from smolagents.models import ChatMessage, MessageRole
+from dotenv import load_dotenv
+load_dotenv()
 
 class HybridAutomatonImageTool(Tool):
     """Image expert to analyse the plot of the data collected from the system. You MUST call this tool when you need to measure quantities from an image."""
