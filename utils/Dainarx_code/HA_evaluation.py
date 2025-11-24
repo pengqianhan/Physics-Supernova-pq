@@ -754,6 +754,14 @@ class HAEvaluator:
 
         # Build formatted values dictionary
         formatted = {}
+        '''
+        4. **Metrics Interpretation**:
+        - The evaluation metrics show how well the HA matches ground truth data
+        - `tc` (change-point error): How accurately mode switches are detected (lower is better)
+        - `max_diff` / `mean_diff`: Maximum and mean state trajectory differences (lower is better)
+        - `clustering_error`: How well modes are classified (lower is better)
+        
+        '''
 
         if self.metrics['tc'] is not None:
             formatted['tc'] = f"{self.metrics['tc']:.6f} seconds"
