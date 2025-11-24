@@ -113,7 +113,9 @@ def _create_Physics_agent(Tools_list:List[type[Tool]],
         managerAgent.tools[toolName].worker_agent = managerAgent
 
 
-    # set high res images in the agent, for the AskImageTool to use
+    # Set high res images in the agent, for the AskImageTool to use
+    # Dynamically add custom attribute to agent for data sharing with tools
+    # Docs: https://huggingface.co/docs/smolagents/en/tutorials/building_good_agents (agents support dynamic attributes)
     managerAgent.markdown_content_high_res_image = markdown_content
     
     return managerAgent

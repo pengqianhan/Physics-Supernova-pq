@@ -41,7 +41,7 @@ Instructions:
 3. Generate an improved version that maintains mathematical correctness and physical plausibility
 
 Output Requirements:
-- Return ONLY a valid Python dictionary representing the hybrid automaton
+- Return ONLY a valid Python dict representing the hybrid automaton specification
 - Do NOT include any explanations, comments, or markdown formatting
 - Ensure all mathematical expressions are syntactically correct"""
 prompt1 = """
