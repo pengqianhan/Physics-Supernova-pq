@@ -122,7 +122,7 @@ class ReviewRequestTool_ha(Tool):
 
         # Step 5: Build unified review instruction combining HA solution + metrics + user note
         review_instruction = (
-            f"## Hybrid Automaton Solution Under Review:\n"
+            f"## Hybrid Automaton Solution (Python Dict) Under Review:\n"
             f"```json\n{json.dumps(ha_dict, indent=2)}\n```\n\n"
             f"## Evaluation Metrics:\n{metrics_text}\n\n"
             f"## Agent's Note:\n{my_note}\n\n"
@@ -136,7 +136,7 @@ class ReviewRequestTool_ha(Tool):
         # ] + markdown_content.content
         combined_content: List[Dict[str, Any]] = [
             {"type": "text", "text": review_instruction}
-        ] + markdown_content.content
+        ]
 
         # Add simulation plot visualization for comparison
         if plot_base64:
