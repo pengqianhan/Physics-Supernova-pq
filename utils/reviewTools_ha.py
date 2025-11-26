@@ -83,7 +83,7 @@ class ReviewRequestTool_ha(Tool):
             api_key=os.getenv("GEMINI_API_KEY") if os.getenv("GEMINI_API_KEY") else "<<<<<<your_api_key>>>>>>>",
         )
         self.review_model_id = review_model_id
-        self.npz_file_path = "data_duffing/test_data0.npz"
+        self.npz_file_path = "data_duffing/sample_0.npz"
 
     def forward(self, my_ha_solution: str, my_note: str) -> str:  # type: ignore[override]
         """Request expert review of hybrid automaton specification with focus areas and return detailed feedback."""
