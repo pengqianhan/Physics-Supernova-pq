@@ -204,6 +204,125 @@ def load_markdown_from_filepath(file_path: str) -> MarkdownMessage:
                 "text": f"Error parsing markdown file: {str(e)}"
             }], str(file_path))
             
+def load_trace_data_from_filepath(file_path: str = "utils/Dainarx_code/data_duffing") -> MarkdownMessage:
+    """
+    Load trace data from a directory containing images and npz files.
+    Returns OpenAI-compatible message content (same as load_markdown_from_filepath).
+    
+    Args:
+        file_path: Path to directory containing sample_X.png and test_dataX.npz files.
+                   Default is 'utils/Dainarx_code/data_duffing'.
+    
+    Returns:
+        MarkdownMessage with all samples combined (text descriptions + embedded images).
+    """
+    import numpy as np
+    import glob
+    
+    try:
+        dir_path = Path(file_path)
+        if not dir_path.exists():
+            raise FileNotFoundError(f"Directory not found: {file_path}")
+        
+        # Find all image files matching pattern sample_X.png
+        image_files = sorted(glob.glob(str(dir_path / "sample_*.png")))
+        
+        if not image_files:
+            return MarkdownMessage([{
+                "type": "text",
+                "text": f"No sample images found in: {file_path}"
+            }], str(dir_path))
+        
+        # Collect all text parts and image mappings
+        all_text_parts = []
+        all_images = {}
+        
+        # Parse sample files and sort by ID
+        sample_data = []
+        for img_path in image_files:
+            img_path = Path(img_path)
+            filename = img_path.stem  # sample_X
+            try:
+                sample_id = int(filename.split("_")[1])
+                sample_data.append((sample_id, img_path))
+            except (IndexError, ValueError):
+                continue
+        
+        sample_data.sort(key=lambda x: x[0])
+        
+        for sample_id, image_path in sample_data:
+            # Find corresponding npz file
+            npz_path = dir_path / f"test_data{sample_id}.npz"
+            
+            # Load npz data
+            npz_data = {}
+            if npz_path.exists():
+                try:
+                    with np.load(str(npz_path)) as data:
+                        npz_data = {key: data[key] for key in data.keys()}
+                except Exception as e:
+                    npz_data = {"error": str(e)}
+            
+            # Create text description for the sample
+            text = _generate_sample_description(sample_id, npz_data)
+            
+            # Create image placeholder
+            image_placeholder = f"<image_{sample_id}>"
+            all_images[image_placeholder] = str(image_path)
+            
+            # Add text and image placeholder
+            all_text_parts.append(f"{text}\n\n{image_placeholder}")
+        
+        # Combine all parts into one content string
+        combined_text = "\n\n---\n\n".join(all_text_parts)
+        
+        # Create OpenAI-compatible message content
+        message_content = create_openai_message_content(combined_text, all_images)
+        
+        return MarkdownMessage(message_content, str(dir_path))
+        
+    except Exception as e:
+        # Return error as MarkdownMessage
+        return MarkdownMessage([{
+            "type": "text",
+            "text": f"Error loading trace data: {str(e)}"
+        }], str(file_path))
+
+
+def _generate_sample_description(sample_id: int, npz_data: Dict[str, Any]) -> str:
+    """Generate a text description for a trace data sample."""
+    import numpy as np
+    
+    lines = [f"## Sample {sample_id}"]
+    
+    if not npz_data:
+        lines.append("No data available for this sample.")
+        return "\n".join(lines)
+    
+    if "error" in npz_data:
+        lines.append(f"Error loading data: {npz_data['error']}")
+        return "\n".join(lines)
+    
+    # Describe each data field
+    if "state" in npz_data:
+        state = npz_data["state"]
+        lines.append(f"- **State data**: shape {state.shape}, range [{state.min():.4f}, {state.max():.4f}]")
+    
+    if "mode" in npz_data:
+        mode = npz_data["mode"]
+        unique_modes = np.unique(mode)
+        lines.append(f"- **Mode data**: {len(mode)} time steps, unique modes: {list(unique_modes)}")
+    
+    if "input" in npz_data:
+        input_data = npz_data["input"]
+        lines.append(f"- **Input data**: shape {input_data.shape}, range [{input_data.min():.4f}, {input_data.max():.4f}]")
+    
+    if "change_points" in npz_data:
+        cp = npz_data["change_points"]
+        lines.append(f"- **Change points**: {len(cp)} transitions at indices {list(cp)}")
+    
+    return "\n".join(lines)
+            
 
 def markdown_to_plaintext(markdown_content: MarkdownMessage) -> str:
     """Extract plain text from MarkdownMessage for LLM context (keep image placeholders)."""
