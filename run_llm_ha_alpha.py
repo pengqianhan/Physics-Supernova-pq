@@ -40,7 +40,6 @@ for tool_name in tools_to_remove:
     if tool_name in agent.tools:
         del agent.tools[tool_name]
 # 加载本地图片
-image = Image.open("sample_0.png")
 task1 = """You are a hybrid automaton expert tasked with analyzing and improving hybrid automaton specifications.
 
 System Configuration:
@@ -101,12 +100,6 @@ PROMPT_HA_v0 = {
 
 """
 task1 = task1 + prompt1
-# agent.run(
-#     task1,
-#     additional_args={
-#         "image": image
-#     }
-# )
 agent.run(
     task1,
 )
