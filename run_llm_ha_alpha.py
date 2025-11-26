@@ -11,6 +11,8 @@ from smolagents import (
     LiteLLMModel
 )
 from utils.imgTools_ha import HybridAutomatonImageTool
+from utils.markdown_utils import MarkdownMessage, load_trace_data_from_filepath
+from utils.reviewTools_ha import ReviewRequestTool_ha
 from dotenv import load_dotenv
 import os
 load_dotenv()
@@ -18,7 +20,18 @@ gemini_apikey = os.getenv('GEMINI_API_KEY')
 # print(gemini_apikey)
 model = LiteLLMModel(model_id="gemini/gemini-2.5-flash-lite", api_key=gemini_apikey) #
 
-agent = CodeAgent(tools=[HybridAutomatonImageTool()], model=model, add_base_tools=True)
+agent = CodeAgent(tools=[HybridAutomatonImageTool(), ReviewRequestTool_ha()], model=model, add_base_tools=True)
+
+for toolName in agent.tools:
+    agent.tools[toolName].worker_agent = agent
+
+markdown_content = load_trace_data_from_filepath("utils/Dainarx_code/data_duffing")
+
+# Set high res images in the agent, for the AskImageTool to use
+# Dynamically add custom attribute to agent for data sharing with tools
+# Docs: https://huggingface.co/docs/smolagents/en/tutorials/building_good_agents (agents support dynamic attributes)
+print(markdown_content)
+agent.markdown_content_high_res_image = markdown_content
 
 # print(agent.tools)
 # 移除特定的默认工具
