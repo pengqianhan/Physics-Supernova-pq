@@ -68,7 +68,8 @@ class TrajectoryPlotter:
                  dt: float = DEFAULT_TIME_STEP,
                  original_state_data: Optional[np.ndarray] = None,
                  original_input_data: Optional[np.ndarray] = None,
-                 input_plot: bool = False):
+                 input_plot: bool = False,
+                 title: Optional[str] = None):
         """
         Initialize the trajectory plotter.
 
@@ -79,6 +80,7 @@ class TrajectoryPlotter:
             original_state_data: Optional ground truth state data
             original_input_data: Optional ground truth input data
             input_plot: Whether to include input data in plots
+            title: Optional custom title for single plot mode
 
         Raises:
             ValueError: If data dimensions are invalid
@@ -102,6 +104,7 @@ class TrajectoryPlotter:
         self.original_state_data = original_state_data
         self.original_input_data = self._process_input_data(original_input_data, self.num_steps) if original_input_data is not None else None
         self.input_plot = input_plot
+        self.title = title
 
         # Create time array and colormap
         self.time = np.arange(self.num_steps) * dt
@@ -201,8 +204,8 @@ class TrajectoryPlotter:
         self.fig, ax = plt.subplots(1, 1,
                                      figsize=(DEFAULT_FIGURE_WIDTH, DEFAULT_FIGURE_HEIGHT),
                                      constrained_layout=True)
-        self._plot_trajectory_on_axis(ax, self.state_data, self.input_data,
-                                      "Simulated Trajectory")
+        plot_title = self.title if self.title is not None else "Simulated Trajectory"
+        self._plot_trajectory_on_axis(ax, self.state_data, self.input_data, plot_title)
         self.axes = ax
         return self.fig
 
