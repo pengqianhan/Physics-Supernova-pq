@@ -210,7 +210,7 @@ def load_trace_data_from_filepath(file_path: str = "utils/Dainarx_code/data_duff
     Returns OpenAI-compatible message content (same as load_markdown_from_filepath).
     
     Args:
-        file_path: Path to directory containing sample_X.png and test_dataX.npz files.
+        file_path: Path to directory containing sample_X.png and sample_X.npz files.
                    Default is 'utils/Dainarx_code/data_duffing'.
     
     Returns:
@@ -218,60 +218,60 @@ def load_trace_data_from_filepath(file_path: str = "utils/Dainarx_code/data_duff
     """
     import numpy as np
     import glob
+    import re
     
     try:
         dir_path = Path(file_path)
         if not dir_path.exists():
             raise FileNotFoundError(f"Directory not found: {file_path}")
         
-        # Find all image files matching pattern sample_X.png
-        image_files = sorted(glob.glob(str(dir_path / "sample_*.png")))
+        # Find all sample IDs by looking for sample_X.png or sample_X.npz files
+        all_files = glob.glob(str(dir_path / "sample_*"))
         
-        if not image_files:
+        # Extract unique sample IDs using regex
+        sample_ids = set()
+        pattern = re.compile(r'sample_(\d+)\.(png|npz)$')
+        for f in all_files:
+            match = pattern.search(f)
+            if match:
+                sample_ids.add(int(match.group(1)))
+        
+        if not sample_ids:
             return MarkdownMessage([{
                 "type": "text",
-                "text": f"No sample images found in: {file_path}"
+                "text": f"No sample files found in: {file_path}"
             }], str(dir_path))
+        
+        # Sort sample IDs
+        sample_ids = sorted(sample_ids)
         
         # Collect all text parts and image mappings
         all_text_parts = []
         all_images = {}
         
-        # Parse sample files and sort by ID
-        sample_data = []
-        for img_path in image_files:
-            img_path = Path(img_path)
-            filename = img_path.stem  # sample_X
-            try:
-                sample_id = int(filename.split("_")[1])
-                sample_data.append((sample_id, img_path))
-            except (IndexError, ValueError):
-                continue
-        
-        sample_data.sort(key=lambda x: x[0])
-        
-        for sample_id, image_path in sample_data:
-            # Find corresponding npz file
-            npz_path = dir_path / f"test_data{sample_id}.npz"
+        # Load png and npz files for each sample using a for loop
+        for sample_id in sample_ids[:1]:
+            # Define file paths for this sample
+            png_path = dir_path / f"sample_{sample_id}.png"
+            npz_path = dir_path / f"sample_{sample_id}.npz"
             
-            # Load npz data
-            npz_data = {}
+            # Load npz data and generate description (NpzFile supports dict-like access)
             if npz_path.exists():
                 try:
-                    with np.load(str(npz_path)) as data:
-                        npz_data = {key: data[key] for key in data.keys()}
+                    with np.load(str(npz_path)) as npz_data:
+                        text = _generate_sample_description(sample_id, npz_data)
                 except Exception as e:
-                    npz_data = {"error": str(e)}
+                    text = _generate_sample_description(sample_id, {"error": str(e)})
+            else:
+                text = _generate_sample_description(sample_id, {})
             
-            # Create text description for the sample
-            text = _generate_sample_description(sample_id, npz_data)
-            
-            # Create image placeholder
+            # Create image placeholder and add to images dict if png exists
             image_placeholder = f"<image_{sample_id}>"
-            all_images[image_placeholder] = str(image_path)
-            
-            # Add text and image placeholder
-            all_text_parts.append(f"{text}\n\n{image_placeholder}")
+            if png_path.exists():
+                all_images[image_placeholder] = str(png_path)
+                all_text_parts.append(f"{text}\n\n{image_placeholder}")
+            else:
+                all_text_parts.append(text)
         
         # Combine all parts into one content string
         combined_text = "\n\n---\n\n".join(all_text_parts)
@@ -289,7 +289,7 @@ def load_trace_data_from_filepath(file_path: str = "utils/Dainarx_code/data_duff
         }], str(file_path))
 
 
-def _generate_sample_description(sample_id: int, npz_data: Dict[str, Any]) -> str:
+def _generate_sample_description(sample_id: int, npz_data) -> str:
     """Generate a text description for a trace data sample."""
     import numpy as np
     
@@ -308,18 +308,18 @@ def _generate_sample_description(sample_id: int, npz_data: Dict[str, Any]) -> st
         state = npz_data["state"]
         lines.append(f"- **State data**: shape {state.shape}, range [{state.min():.4f}, {state.max():.4f}]")
     
-    if "mode" in npz_data:
-        mode = npz_data["mode"]
-        unique_modes = np.unique(mode)
-        lines.append(f"- **Mode data**: {len(mode)} time steps, unique modes: {list(unique_modes)}")
+    # if "mode" in npz_data:
+    #     mode = npz_data["mode"]
+    #     unique_modes = np.unique(mode)
+    #     lines.append(f"- **Mode data**: {len(mode)} time steps, unique modes: {list(unique_modes)}")
     
     if "input" in npz_data:
         input_data = npz_data["input"]
         lines.append(f"- **Input data**: shape {input_data.shape}, range [{input_data.min():.4f}, {input_data.max():.4f}]")
     
-    if "change_points" in npz_data:
-        cp = npz_data["change_points"]
-        lines.append(f"- **Change points**: {len(cp)} transitions at indices {list(cp)}")
+    # if "change_points" in npz_data:
+    #     cp = npz_data["change_points"]
+    #     lines.append(f"- **Change points**: {len(cp)} transitions at indices {list(cp)}")
     
     return "\n".join(lines)
             
