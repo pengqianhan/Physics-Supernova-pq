@@ -20,23 +20,27 @@ def test_litellm_with_reasoning_effort():
     print("Testing LiteLLMModel with reasoning_effort")
     print("="*50)
     
-    # Create model with reasoning_effort (same config as run_llm_ha_beta.py)
-    model = LiteLLMModel(
-        model_id="openai/gemini-flash-lite-latest",
-        api_base="https://generativelanguage.googleapis.com/v1beta/openai/",
-        api_key=os.environ.get("GEMINI_API_KEY"),
-        max_completion_tokens=24576,
-        num_retries=3,
-        timeout=1200,
-    )
-
+    # Create model without reasoning_effort, use the openai compatible format
     # model = LiteLLMModel(
-    #     model_id="gemini/gemini-flash-lite-latest",
+    #     model_id="openai/gemini-flash-lite-latest",
+    #     api_base="https://generativelanguage.googleapis.com/v1beta/openai/",
     #     api_key=os.environ.get("GEMINI_API_KEY"),
-    #     max_completion_tokens=8192,
+    #     max_completion_tokens=24576,
     #     num_retries=3,
     #     timeout=1200,
+    #     reasoning_effort="low", # Only works with OpenAI o1/o3 models
     # )
+
+    # Create model with reasoning_effort
+    model = LiteLLMModel(
+        model_id="gemini/gemini-flash-lite-latest",
+        api_key=os.environ.get("GEMINI_API_KEY"),
+        max_completion_tokens=8192,
+        num_retries=3,
+        timeout=1200,
+        # thinking_budget = "1024" # gemini api format
+        thinking_level = "low" # high, low
+    )
     
     print(f"✓ Model created: {model.model_id}")
     
