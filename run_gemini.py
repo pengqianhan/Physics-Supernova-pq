@@ -108,7 +108,8 @@ def _create_Physics_agent(Tools_list:List[type[Tool]],
         raise ValueError(f"Unknown manager type: {kwargs['manager_type']}. Must be 'ToolCallingAgent' or 'CodeAgent'.")
 
 
-    # register the tools with the agent
+    # Inject agent reference into each tool (delayed injection pattern)
+    # This allows tools like ReviewRequestTool to access agent.markdown_content_high_res_image
     for toolName in managerAgent.tools:
         managerAgent.tools[toolName].worker_agent = managerAgent
 
