@@ -2,9 +2,11 @@ import os
 import time
 import openai
 from smolagents.default_tools import Tool
+from base64 import b64decode
 
 # Import smolagents components for LLM model and message handling
 from smolagents.models import ChatMessage, MessageRole
+from .markdown_utils import MarkdownMessage
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -35,29 +37,40 @@ class HybridAutomatonImageTool(Tool):
         self.max_short_side_pixels = max_short_side_pixels  # Maximum image resolution for processing
         
 
-    def _extract_image_bytes(self, image_ref: str = None) -> bytes | None:
-        """Read image bytes from sample_0.png file.
+    def _extract_image_bytes(self, image_ref: str) -> bytes | None:
+        """Extract image bytes from markdown content using image reference like <image_1>.
 
         Args:
-            image_ref: Unused parameter kept for API compatibility
+            image_ref: Image reference placeholder (e.g. <image_N> or plain number)
 
         Returns:
-            Image bytes from sample_0.png or None if error occurs
+            Image bytes from markdown content or None if not found
         """
-        # Get the directory where this script is located
-        current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        image_path = os.path.join(current_dir, "sample_0.png")
-
-        # Read and return image bytes from sample_0.png
-        try:
-            with open(image_path, "rb") as f:
-                return f.read()
-        except FileNotFoundError:
-            print(f"Error: sample_0.png not found at {image_path}")
+        if not self.worker_agent or not hasattr(self.worker_agent, "markdown_content_high_res_image"):
             return None
-        except Exception as e:
-            print(f"Error reading sample_0.png: {str(e)}")
+        md: MarkdownMessage = self.worker_agent.markdown_content_high_res_image
+        # Parse image reference to extract index (supports both <image_N> and plain numbers)
+        idx = None
+        if image_ref.startswith("<image_") and image_ref.endswith(">"):
+            try:
+                idx = int(image_ref.strip("<image_>"))  # Convert to 0-based index
+            except ValueError:
+                pass
+        else:
+            try:
+                idx = int(image_ref)  # Handle plain number references
+            except ValueError:
+                pass
+        if idx is None:
             return None
+        # Extract all image blocks from markdown content
+        img_blocks = [it for it in md.content if it.get("type") == "image_url"]
+        if 0 <= idx < len(img_blocks):
+            data_url = img_blocks[idx]["image_url"]["url"]
+            if data_url.startswith("data:image"):
+                base64_part = data_url.split(",", 1)[1]  # Remove data URL prefix
+                return b64decode(base64_part)  # Decode base64 to bytes
+        return None
 
     def forward(self, image_ref: str, question: str) -> str:  # type: ignore[override]
         """Process image analysis request and return expert response."""
@@ -68,7 +81,7 @@ class HybridAutomatonImageTool(Tool):
             from io import BytesIO
 
             if img_bytes is None:
-                return "Error: Could not read sample_0.png image file."
+                return f"Error: Could not find image {image_ref}; the parsed in image_ref should be like <image_N>."
 
             # Check image size and resize if necessary
             img = Image.open(BytesIO(img_bytes))
@@ -85,7 +98,7 @@ class HybridAutomatonImageTool(Tool):
                 img_bytes = buffer.getvalue()
 
         if img_bytes is None:
-            return "Error: Could not read sample_0.png image file."
+            return f"Error: Could not find image {image_ref}; the parsed in image_ref should be like <image_N>."
 
         # Convert image bytes to base64 for OpenAI API
         import base64
