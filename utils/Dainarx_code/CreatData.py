@@ -3,7 +3,7 @@ import os
 from math import *
 import matplotlib.pyplot as plt
 from typing import Optional
-from Dainarx_code.src.HybridAutomata import HybridAutomata
+from src.HybridAutomata import HybridAutomata
 import json
 
 
@@ -146,12 +146,12 @@ def creat_data(json_path: str, data_path: str, dT: float, times: float):
                      sample_index=cnt, save_path=figure_path, show=False)
 
             # save the data
-            np.savez(os.path.join(data_path, "test_data" + str(state_id)),
+            np.savez(os.path.join(data_path, "sample_" + str(state_id)),
                      state=state_data, mode=mode_data, input=input_data, change_points=change_points)
             state_id += 1
 
 
 if __name__ == "__main__":
-    # creat_data('automata/non_linear/duffing.json', 'data_duffing', 0.001, 10)
+    creat_data('automata/non_linear/duffing.json', 'data_duffing', 0.001, 10)
     # creat_data('automata/ATVA/ball.json', 'data_ball', 0.001, 10)
-    creat_data('automata/non_linear/lander.json', 'data_lander', 0.01, 10)
+    # creat_data('automata/non_linear/lander.json', 'data_lander', 0.01, 10)
