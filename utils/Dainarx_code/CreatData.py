@@ -82,7 +82,7 @@ def creat_data(json_path: str, data_path: str, dT: float, times: float):
                 state_data=state_data,
                 input_data=input_data,
                 dt=dT,
-                input_plot=True,
+                input_plot=False,
                 title=plot_title
             )
             plotter.plot(mode="single")
