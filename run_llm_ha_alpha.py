@@ -33,7 +33,8 @@ markdown_content = load_trace_data_from_filepath("utils/Dainarx_code/data_duffin
 print(markdown_content)
 agent.markdown_content_high_res_image = markdown_content
 
-# print(agent.tools)
+print("agent.tools: ", list(agent.tools.keys()  ))#
+# ['hybrid_automaton_image_analysis_tool', 'ask_ha_review_expert', 'web_search', 'visit_webpage', 'final_answer']  
 # 移除特定的默认工具
 tools_to_remove = ['web_search', 'visit_webpage']  # 例如移除这些工具
 for tool_name in tools_to_remove:
