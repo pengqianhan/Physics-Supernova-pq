@@ -29,7 +29,7 @@ from smolagents import (
 
 # deal with markdown contents
 from utils import MarkdownMessage
-from utils.markdown_utils import load_trace_data_from_filepath
+from utils.markdown_utils import load_trace_data_from_filepath, markdown_to_plaintext, markdown_images_compress
 
 # Import HA-specific tools
 from utils.imgTools_ha import HybridAutomatonImageTool
@@ -182,18 +182,20 @@ def create_agent(model_id: str = "gemini/gemini-flash-lite-latest",
     return haAgent
 
 
-# obtain task string for the agent to run
-def obtain_task(system_name: str = "Duffing Oscillator",
-               num_variables: int = 1,
-               num_inputs: int = 1,
-               initial_ha_spec: str = None,
-               tools_list: List[str] = [],
-               managed_agents_list: List[str] = None,
-               manager_type: str = "CodeAgent") -> str:
+# obtain task string and images for the agent to run
+def obtain_task_and_images(input_data_path: str = None,
+                           system_name: str = "Duffing Oscillator",
+                           num_variables: int = 1,
+                           num_inputs: int = 1,
+                           initial_ha_spec: str = None,
+                           tools_list: List[str] = [],
+                           managed_agents_list: List[str] = None,
+                           manager_type: str = "CodeAgent") -> tuple[str, list]:
     '''
-    Generate task prompt for HA learning agent.
+    Generate task prompt and compressed images for HA learning agent.
 
     Args:
+        input_data_path: Path to the trace data directory
         system_name: Name of the dynamical system
         num_variables: Number of state variables
         num_inputs: Number of input variables
@@ -203,12 +205,21 @@ def obtain_task(system_name: str = "Duffing Oscillator",
         manager_type: Type of manager agent
 
     Returns:
-        Task prompt string
+        Tuple of (task prompt string, list of compressed images)
     '''
     print("tools_list: ", tools_list)
 
+    # Load trace data with high res images
+    markdown_content = load_trace_data_from_filepath(input_data_path)
+
+    # Get task and images (to parse into agents) from the markdown content
+    trace_data_text = markdown_to_plaintext(markdown_content)
+    compressed_trace_images = markdown_images_compress(markdown_content, max_short_side_pixels=1080)
+
     # Base task prompt
     task = f"""You are a hybrid automaton expert tasked with analyzing and improving hybrid automaton specifications.
+
+Below is the trace data visualization. If there are Images, Images are attached; reference them using their placeholders (e.g. <image_1>, <image_2>).
 
 Instructions:
 1. Carefully analyze the hybrid automaton structure shown in the provided image"""
@@ -253,10 +264,13 @@ System Configuration:
 - System Name: {{{system_name}}}
 - Number of Variables: {{{num_variables}}}
 - Number of Inputs: {{{num_inputs}}}
-\n\n
 """
-    task =  task + system_config_prompt
-    return task
+    task = task + system_config_prompt
+
+    # Add trace data description
+    task += f"\n\nTRACE DATA:\n{trace_data_text}\n"
+
+    return task, compressed_trace_images
 
 
 def parse_args():
@@ -394,8 +408,9 @@ def main():
         tools_to_remove=args.tools_to_remove,
     )
 
-    # Obtain task
-    task = obtain_task(
+    # Obtain task and images
+    task, compressed_trace_images = obtain_task_and_images(
+        input_data_path=args.input_data_path,
         system_name=args.system_name,
         num_variables=args.num_variables,
         num_inputs=args.num_inputs,
@@ -409,8 +424,8 @@ def main():
         f.write(task)
     print(f"Saved task to task.txt")
 
-    # Run the agent
-    managerAgent.run(task)
+    # Run the agent with task and compressed images
+    managerAgent.run(task, images=compressed_trace_images)
 
 
 if __name__ == "__main__":
