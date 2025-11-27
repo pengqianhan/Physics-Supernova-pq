@@ -28,7 +28,7 @@ def test_litellm_with_reasoning_effort():
     #     max_completion_tokens=24576,
     #     num_retries=3,
     #     timeout=1200,
-    #     reasoning_effort="low", # Only works with OpenAI o1/o3 models
+    ##     reasoning_effort="low", # Only works with OpenAI o1/o3 models
     # )
 
     # Create model with reasoning_effort
