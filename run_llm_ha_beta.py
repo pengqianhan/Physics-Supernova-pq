@@ -205,6 +205,7 @@ def obtain_task(system_name: str = "Duffing Oscillator",
     Returns:
         Task prompt string
     '''
+    print("tools_list: ", tools_list)
 
     # Base task prompt
     task = f"""You are a hybrid automaton expert tasked with analyzing and improving hybrid automaton specifications.
@@ -456,6 +457,10 @@ def main():
         managed_agents_list=args.managed_agents_list if hasattr(args, 'managed_agents_list') else None,
         manager_type=args.manager_type,
     )
+    # save the task to a file
+    with open("task.txt", "w") as f:
+        f.write(task)
+    print(f"Saved task to task.txt")
 
     # Run the agent
     managerAgent.run(task)
