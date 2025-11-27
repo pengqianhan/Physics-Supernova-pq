@@ -17,7 +17,7 @@ initial_ha_spec_prompt = """{
         "edge": [
             {
                 "direction": "1 -> 1",  # edge from mode u to mode v, represented as 'u -> v'
-                "condition": "abs(x) <= 0.8",  # transition condition, cannot contain variables that are not defined in var
+                "condition": "abs(x) <= 0.1",  # transition condition, cannot contain variables that are not defined in var
                 "reset": {  # reset mapping for each variable, each variable has a list of reset values
                     "x1": ["","x1[0]"]
                 }
@@ -29,5 +29,5 @@ initial_ha_spec_prompt = """{
         "total_time": 10.0,  # total sampling time
         "dim": 1,  # dimension of ODE in "eq" field
         "need_reset": true, # whether to reset the state of the system when the transition is triggered
-        "non_linear_items": "x[?] ** 3"  # additional nonlinear or cross terms in "eq" field
+        "non_linear_items": "x[?] ** 5"  # additional nonlinear or cross terms in "eq" field
     } }"""
