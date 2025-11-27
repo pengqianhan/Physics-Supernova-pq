@@ -1,4 +1,6 @@
 import os
+import sys
+import json
 import prompts_ha
 # Load environment variables from .env file if it exists
 try:
@@ -277,6 +279,107 @@ System Configuration:
     return task, compressed_trace_images
 
 
+def evaluate_ha_specification(agent_result, input_data_path: str, output_dir: str = None) -> bool:
+    """
+    Evaluate the generated Hybrid Automaton specification against ground truth data.
+
+    Args:
+        agent_result: Result from the agent.run() call (can be dict or str)
+        input_data_path: Path to the directory containing test .npz files
+        output_dir: Directory to save evaluation results (default: './evaluation_results')
+
+    Returns:
+        bool: True if evaluation succeeded, False otherwise
+    """
+    print("\n" + "=" * 80)
+    print("EVALUATION: Testing the generated Hybrid Automaton specification")
+    print("=" * 80)
+
+    # Import HA evaluation module
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'utils', 'Dainarx_code'))
+    from HA_evaluation import HAEvaluator
+
+    # Extract HA specification from agent result
+    ha_specification = None
+
+    # Try to extract HA spec from result (smolagents returns different formats)
+    if isinstance(agent_result, dict):
+        ha_specification = agent_result
+    elif isinstance(agent_result, str):
+        # Try to parse as JSON
+        try:
+            ha_specification = json.loads(agent_result)
+        except:
+            print(f"Warning: Could not parse agent result as JSON. Result type: {type(agent_result)}")
+            print(f"Result content: {agent_result}")
+    else:
+        print(f"Warning: Unexpected result type: {type(agent_result)}")
+        print(f"Result content: {agent_result}")
+
+    # Validate HA specification structure
+    if ha_specification is None or 'automaton' not in ha_specification or 'config' not in ha_specification:
+        print("\nWarning: Could not extract valid HA specification from agent output for evaluation")
+        print("Expected dictionary with 'automaton' and 'config' keys")
+        return False
+
+    print("\nSuccessfully extracted HA specification from agent output")
+    print(f"HA contains {len(ha_specification['automaton'].get('mode', []))} modes and {len(ha_specification['automaton'].get('edge', []))} edges")
+
+    # Find test data file in the input data path
+    test_data_files = [f for f in os.listdir(input_data_path) if f.endswith('.npz')]
+    if not test_data_files:
+        print(f"\nWarning: No .npz test data files found in {input_data_path}")
+        return False
+
+    # Use first test file found
+    npz_file_path = os.path.join(input_data_path, test_data_files[0])
+    print(f"\nUsing test data file: {npz_file_path}")
+
+    # Set up output directory
+    if output_dir is None:
+        output_dir = os.path.join(os.path.dirname(__file__), 'evaluation_results')
+    os.makedirs(output_dir, exist_ok=True)
+
+    try:
+        # Create evaluator
+        evaluator = HAEvaluator(
+            ha_dict=ha_specification,
+            npz_file_path=npz_file_path,
+            dt=ha_specification['config'].get('dt', 0.001),
+            total_time=ha_specification['config'].get('total_time', 10.0)
+        )
+
+        # Run evaluation with overlay plot
+        save_path = os.path.join(output_dir, 'ha_evaluation_comparison.png')
+
+        print("\nRunning HA evaluation...")
+        metrics_text, _ = evaluator(
+            plot_mode='overlay',
+            save_path=save_path,
+            print_metrics=True
+        )
+
+        print(f"\nEvaluation complete! Results saved to: {save_path}")
+
+        # Save metrics and HA specification to file
+        metrics_file = os.path.join(output_dir, 'ha_evaluation_metrics.txt')
+        with open(metrics_file, 'w') as f:
+            f.write("Hybrid Automaton Evaluation Metrics\n")
+            f.write("=" * 80 + "\n\n")
+            f.write(metrics_text)
+            f.write("\n\nHA Specification:\n")
+            f.write(json.dumps(ha_specification, indent=2))
+        print(f"Metrics saved to: {metrics_file}")
+
+        return True
+
+    except Exception as e:
+        print(f"\nError during HA evaluation: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
+
 def parse_args():
     # Get the directory where this script is located
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -436,7 +539,10 @@ def main():
     print(f"Saved task to task.txt")
 
     # Run the agent with task and compressed images
-    managerAgent.run(task, images=compressed_trace_images)
+    result = managerAgent.run(task, images=compressed_trace_images)
+
+    # Evaluate the generated HA specification
+    evaluate_ha_specification(result, args.input_data_path)
 
 
 if __name__ == "__main__":
