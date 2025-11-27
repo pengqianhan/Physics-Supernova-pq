@@ -1,5 +1,5 @@
 import os
-
+import prompts_ha
 # Load environment variables from .env file if it exists
 try:
     from dotenv import load_dotenv
@@ -186,7 +186,7 @@ def create_agent(model_id: str = "gemini/gemini-flash-lite-latest",
 def obtain_task(system_name: str = "Duffing Oscillator",
                num_variables: int = 1,
                num_inputs: int = 1,
-               initial_ha_spec: dict = None,
+               initial_ha_spec: str = None,
                tools_list: List[str] = [],
                managed_agents_list: List[str] = None,
                manager_type: str = "CodeAgent") -> str:
@@ -429,12 +429,7 @@ def main():
     print(f"Running HA Learning Agent with model: {args.manager_model}, tools: {args.tools_list}, data path: {args.input_data_path}")
 
     # Load initial HA spec if provided
-    initial_ha_spec = None
-    if args.initial_ha_spec_file:
-        import json
-        with open(args.initial_ha_spec_file, 'r') as f:
-            initial_ha_spec = json.load(f)
-        print(f"Loaded initial HA specification from {args.initial_ha_spec_file}")
+    initial_ha_spec = prompts_ha.initial_ha_spec_prompt
 
     # Create the agent
     managerAgent = create_agent(
