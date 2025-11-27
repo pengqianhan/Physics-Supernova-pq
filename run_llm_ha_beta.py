@@ -210,11 +210,6 @@ def obtain_task(system_name: str = "Duffing Oscillator",
     # Base task prompt
     task = f"""You are a hybrid automaton expert tasked with analyzing and improving hybrid automaton specifications.
 
-System Configuration:
-- System Name: {{{system_name}}}
-- Number of Variables: {{{num_variables}}}
-- Number of Inputs: {{{num_inputs}}}
-
 Instructions:
 1. Carefully analyze the hybrid automaton structure shown in the provided image"""
 
@@ -302,8 +297,15 @@ PROMPT_HA_v0 = {
 }
 
 # Task
-Analyze the system and generate an appropriate hybrid automaton specification."""
-
+Generate an improved version (v1) based on the analysis."""
+    system_config_prompt = f"""\n\n
+System Configuration:
+- System Name: {{{system_name}}}
+- Number of Variables: {{{num_variables}}}
+- Number of Inputs: {{{num_inputs}}}
+\n\n
+"""
+    task =  task + system_config_prompt
     return task
 
 
