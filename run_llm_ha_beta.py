@@ -57,7 +57,8 @@ def _create_HA_agent(Tools_list: List[type[Tool]],
         max_completion_tokens=24576,
         num_retries=3,
         timeout=1200
-    )# add thinking budget for the agent if needed
+        thinking_level = "low" # high, low
+    )
 
     # tools for the manager agent
     tools = []
