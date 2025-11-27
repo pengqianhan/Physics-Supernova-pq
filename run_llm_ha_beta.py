@@ -34,12 +34,14 @@ from utils.markdown_utils import load_trace_data_from_filepath, markdown_to_plai
 # Import HA-specific tools
 from utils.imgTools_ha import HybridAutomatonImageTool
 from utils.reviewTools_ha import ReviewRequestTool_ha
+from utils.summemoryTools_ha import SummarizeMemoryTool
 
 
 # Tool mapping for HA-specific tools
 TOOLNAME2TOOL = {
     'hybrid_automaton_image_analysis': HybridAutomatonImageTool,
     'ask_review_expert_ha': ReviewRequestTool_ha,
+    'summarize_ha_iterations': SummarizeMemoryTool,
 }
 
 
@@ -69,6 +71,8 @@ def _create_HA_agent(Tools_list: List[type[Tool]],
             tools.append(tool(vision_model_id=kwargs["image_tool_model"]))
         elif tool.__name__ == "ReviewRequestTool_ha" and "review_tool_model" in kwargs:
             tools.append(tool(review_model_id=kwargs["review_tool_model"]))
+        elif tool.__name__ == "SummarizeMemoryTool" and "summarize_tool_model" in kwargs:
+            tools.append(tool(summarize_model_id=kwargs["summarize_tool_model"]))
         else:
             tools.append(tool())
 
@@ -306,7 +310,7 @@ def parse_args():
         "--tools-list",
         type=str,
         nargs='*',
-        default=["hybrid_automaton_image_analysis", "ask_review_expert_ha"],
+        default=["hybrid_automaton_image_analysis", "ask_review_expert_ha", "summarize_ha_iterations"],
         help="List of tool names to use in the agent.",
     )
 
@@ -322,6 +326,12 @@ def parse_args():
         type=str,
         default="gemini-flash-lite-latest",
         help="Model ID to use for the review tool (Gemini API format).",
+    )
+    ap.add_argument(
+        "--summarize-tool-model",
+        type=str,
+        default="gemini/gemini-2.5-flash-lite",
+        help="Model ID to use for the summarize iterations tool (Gemini API format).",
     )
 
     # agent names of managed agents
@@ -402,6 +412,7 @@ def main():
         tools_list=args.tools_list,
         image_tool_model=args.image_tool_model,
         review_tool_model=args.review_tool_model,
+        summarize_tool_model=args.summarize_tool_model,
         managed_agents_list=args.managed_agents_list if hasattr(args, 'managed_agents_list') else None,
         managed_agents_list_model_id=args.managed_agents_list_model if hasattr(args, 'managed_agents_list_model') else None,
         manager_type=args.manager_type,
