@@ -56,7 +56,7 @@ def _create_HA_agent(Tools_list: List[type[Tool]],
         api_key=os.environ.get("GEMINI_API_KEY"),
         max_completion_tokens=24576,
         num_retries=3,
-        timeout=1200
+        timeout=1200,
         thinking_level = "low" # high, low
     )
 
@@ -87,7 +87,7 @@ def _create_HA_agent(Tools_list: List[type[Tool]],
     if kwargs["manager_type"] == "CodeAgent":
         manager_agent_kwargs["additional_authorized_imports"] = [
             "os", "sys", "time", "argparse", "pathlib",
-            "matplotlib.pyplot", "numpy", "pandas", "json"
+            "matplotlib.pyplot", "numpy", "pandas", "json","scipy"
         ]
         managerAgent = CodeAgent(**manager_agent_kwargs)
     elif kwargs["manager_type"] == "ToolCallingAgent":
@@ -136,7 +136,7 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
             model=model,
             name=agent_name,
             additional_authorized_imports=["os", "sys", "time", "argparse", "pathlib",
-                                          "matplotlib.pyplot", "numpy", "pandas", "json"],
+                                          "matplotlib.pyplot", "numpy", "pandas", "json","scipy"],
             description=f"I am a managed agent with name {agent_name}. I can assist with code-related tasks",
             max_steps=80,
             verbosity_level=2,
