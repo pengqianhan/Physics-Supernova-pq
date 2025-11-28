@@ -235,7 +235,7 @@ Instructions:
 
     # Add tool-specific prompts
     HA_IMAGE_TOOL_PROMPT = ", you MUST use the hybrid_automaton_image_analysis tool to analyze the image."
-    REVIEW_TOOL_PROMPT = " When you need expert review of your HA specification, you MUST call the `ask_review_expert_ha` tool."
+    REVIEW_TOOL_PROMPT = " When you need expert review of your hybrid automaton specification, you MUST call the `ask_review_expert_ha` tool."
     if ReviewRequestTool_ha in ToolsList:
         REVIEW_TOOL_PROMPT += "Before you use the `finalize_answer` tool, you MUST use the `ask_review_expert_ha` tool to review your HA specification, to ensure that your HA specification is correct and complete."
 
