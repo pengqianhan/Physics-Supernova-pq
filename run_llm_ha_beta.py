@@ -236,17 +236,15 @@ Instructions:
     # Add tool-specific prompts
     HA_IMAGE_TOOL_PROMPT = ", you MUST use the hybrid_automaton_image_analysis tool to analyze the image."
     REVIEW_TOOL_PROMPT = " When you need expert review of your HA specification, you MUST call the `ask_review_expert_ha` tool."
-    if SummarizeMemoryTool in ToolsList:
-        REVIEW_TOOL_PROMPT += "Before you use the `finalize_part_answer` tool, you MUST use the `ask_review_expert_ha` tool to review your HA specification, to ensure that your HA specification is correct and complete."
-    if HybridAutomatonImageTool in [TOOLNAME2TOOL[x] for x in tools_list]:
-        task += HA_IMAGE_TOOL_PROMPT
+    if ReviewRequestTool_ha in ToolsList:
+        REVIEW_TOOL_PROMPT += "Before you use the `finalize_answer` tool, you MUST use the `ask_review_expert_ha` tool to review your HA specification, to ensure that your HA specification is correct and complete."
+
+    task += HA_IMAGE_TOOL_PROMPT if HybridAutomatonImageTool in ToolsList else ""
+    task += REVIEW_TOOL_PROMPT if ReviewRequestTool_ha in ToolsList else ""
 
     task += """
 2. Identify potential improvements to the "mode"("id","eq"), "edge"("direction","condition","reset")
 3. Generate an improved version that maintains mathematical correctness and physical plausibility"""
-
-    if ReviewRequestTool_ha in [TOOLNAME2TOOL[x] for x in tools_list]:
-        task += REVIEW_TOOL_PROMPT
 
     # Add output requirements
     task += """
