@@ -87,7 +87,7 @@ def _create_HA_agent(Tools_list: List[type[Tool]],
         name="ha_learning_agent",
         description="",
         managed_agents=managed_agents_list,
-        add_base_tools=True  # Add base tools like python_interpreter
+        add_base_tools=False  # False means only use the 
     )
 
     if kwargs["manager_type"] == "CodeAgent":
@@ -112,11 +112,11 @@ def _create_HA_agent(Tools_list: List[type[Tool]],
     # Docs: https://huggingface.co/docs/smolagents/en/tutorials/building_good_agents (agents support dynamic attributes)
     managerAgent.markdown_content_high_res_image = markdown_content
 
-    # Remove unwanted default tools
-    tools_to_remove = kwargs.get("tools_to_remove", ['web_search', 'visit_webpage'])
-    for tool_name in tools_to_remove:
-        if tool_name in managerAgent.tools:
-            del managerAgent.tools[tool_name]
+    # Remove unwanted default tools or make add_base_tools=False in manager_agent_kwargs
+    # tools_to_remove = kwargs.get("tools_to_remove", ['web_search', 'visit_webpage'])
+    # for tool_name in tools_to_remove:
+    #     if tool_name in managerAgent.tools:
+    #         del managerAgent.tools[tool_name]
 
     return managerAgent
 
@@ -218,6 +218,9 @@ def obtain_task_and_images(input_data_path: str = None,
     # Load trace data with high res images
     markdown_content = load_trace_data_from_filepath(input_data_path)
 
+    # create the manager agent
+    ToolsList = [TOOLNAME2TOOL[x] for x in tools_list]
+
     # Get task and images (to parse into agents) from the markdown content
     trace_data_text = markdown_to_plaintext(markdown_content)
     compressed_trace_images = markdown_images_compress(markdown_content, max_short_side_pixels=1080)
@@ -233,7 +236,8 @@ Instructions:
     # Add tool-specific prompts
     HA_IMAGE_TOOL_PROMPT = ", you MUST use the hybrid_automaton_image_analysis tool to analyze the image."
     REVIEW_TOOL_PROMPT = " When you need expert review of your HA specification, you MUST call the `ask_review_expert_ha` tool."
-
+    if SummarizeMemoryTool in ToolsList:
+        REVIEW_TOOL_PROMPT += "Before you use the `finalize_part_answer` tool, you MUST use the `ask_review_expert_ha` tool to review your HA specification, to ensure that your HA specification is correct and complete."
     if HybridAutomatonImageTool in [TOOLNAME2TOOL[x] for x in tools_list]:
         task += HA_IMAGE_TOOL_PROMPT
 

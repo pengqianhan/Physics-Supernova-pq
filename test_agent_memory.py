@@ -8,7 +8,12 @@ from copy import deepcopy
 load_dotenv()
   
 model = LiteLLMModel(model_id="gemini/gemini-flash-lite-latest",api_key=os.environ.get("GEMINI_API_KEY"))
-agent = CodeAgent(tools=[],model=model)
+# agent = CodeAgent(tools=[],model=model,add_base_tools=True)
+agent = CodeAgent(tools=[],model=model)# without base tools
+# print the tools of the agent
+print("Tools of the agent:")
+print(f"- {agent.tools}")
+
 task = "compute the result of 3 + 5"
 agent.run(task)
 
