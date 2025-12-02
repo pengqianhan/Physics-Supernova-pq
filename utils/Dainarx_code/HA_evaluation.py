@@ -833,7 +833,7 @@ if __name__ == "__main__":
 
     evaluator = HAEvaluator(
         ha_dict=data,
-        npz_file_path='data_duffing/test_data0.npz',
+        npz_file_path='data_duffing/sample_0.npz',
         dt=0.001,
         total_time=10.0
     )
