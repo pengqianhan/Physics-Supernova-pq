@@ -12,64 +12,78 @@ from .Dainarx_code.HA_evaluation import HAEvaluator
 
 
 # System prompt for critical hybrid automata review
-HA_REVIEW_SYSTEM_PROMPT = """You are an expert hybrid automata reviewer specializing in dynamical systems modeling. Your job is to critically evaluate hybrid automaton specifications and provide actionable feedback.
+HA_REVIEW_SYSTEM_PROMPT = """# Expert Hybrid Automaton Specification Reviewer
 
-## Your Review Responsibilities:
+You are a **Senior Control Systems Engineer** with deep expertise in hybrid dynamical systems, system identification, and formal verification. Your task is to critically evaluate hybrid automaton (HA) specifications and provide actionable, technically rigorous feedback.
 
-1. **Mode Dynamics Validation**:
-   - Check if the differential equations for each mode correctly model the physical behavior
-   - Verify dimensional consistency in all equations
-   - Look for sign errors, missing terms, or incorrect coefficients
+## Review Framework
 
-2. **Transition Conditions**:
-   - Validate guard conditions for mode switches
-   - Check if transition conditions are physically meaningful
-   - Verify that guards properly capture the switching behavior shown in the data
+### 1. MODE DYNAMICS VALIDATION ("automaton['mode']")
+**Focus Areas ("automaton['mode'][i]['eq'] for i in range(len(automaton['mode']))"):**
+- **ODE Correctness**: Verify differential equations match observed trajectory dynamics
 
-3. **State Variables and Inputs**:
-   - Ensure all state variables are properly defined
-   - Verify input signals are correctly incorporated into dynamics
-   - Check for missing state variables or inputs
+### 2. TRANSITION LOGIC VALIDATION ("automaton['edge']")
+**Guard Conditions ("automaton['edge'][i]['condition'] for i in range(len(automaton['edge']))"):**
 
-4. **Metrics Interpretation**:
-   - The evaluation metrics show how well the HA matches ground truth data
-   - `tc` (change-point error): How accurately mode switches are detected (lower is better)
-   - `max_diff` / `mean_diff`: Maximum and mean state trajectory differences (lower is better)
-   - Use these metrics to identify specific areas needing improvement
+**Reset Maps ("automaton['edge'][i]['reset'] for i in range(len(automaton['edge']))"):**
 
-5. **Visualization Analysis**:
-   - Compare the simulation plot against the ground truth
-   - Identify time regions where the model diverges from data
-   - Note any mode mismatches visible in the trajectories
+**Transition Graph ("edge['direction']"):**
+
+### 3. QUANTITATIVE METRICS INTERPRETATION
+**Evaluation Metrics ("tc", "max_diff", "mean_diff"):**
+- `tc` (Mode switch detection accuracy): < 0.01s is good, < 0.001s is excellent
+- `max_diff` (worst-case trajectory deviation): < 0.02 is good, < 0.001 is excellent
+- `mean_diff` (average trajectory error): < 0.005 is good, < 0.0001 is excellent
+
+
+### 4. VISUALIZATION CROSS-CHECK
+**Simulation vs Ground Truth Plot Analysis:**
 
 ## Output Format:
 Provide structured feedback with:
 - **Critical Errors**: Issues that must be fixed
 - **Warnings**: Potential problems to investigate
 - **Suggestions**: Improvements that could help
-- **Metrics Analysis**: Interpretation of the quantitative evaluation
+- **Metrics Interpretation**: Detailed interpretation of quantitative evaluation results.
 
-Be specific and actionable. Reference the metrics and visualization in your feedback.
+---
+**Remember**: Be specific, cite evidence from metrics/plots, and provide actionable recommendations with concrete values when possible.
 """
 
 
 class ReviewRequestTool_ha(Tool):
-    """Hybrid Automata expert reviewer to provide critical reviews and feedback on HA specifications."""
+    """Expert HA specification reviewer with automated evaluation and structured feedback generation."""
 
     name = "ask_ha_review_expert"
     description = (
-        "Request expert review of your hybrid automaton specification. Provide your HA Python dict and what you want reviewed. "
-        "You should parse-in your current HA Python dict through 'my_ha_solution' input (or the reviewer would not be able to see it). "
-        "The reviewer will provide detailed feedback to help improve your hybrid automaton specification."
+        "**Expert Hybrid Automaton Python dict Specification Review Service**\n\n"
+        "This tool provides comprehensive expert review of your HA specification by:\n"
+        "1. **Automated Evaluation**: Simulates your HA against ground truth data and computes accuracy metrics\n"
+        "2. **Visual Comparison**: Generates overlay plot comparing your simulation to actual trajectory\n"
+        "3. **Expert Analysis**: Senior control systems engineer reviews your spec with structured feedback\n\n"
+        "**HOW TO USE:**\n"
+        "- `my_ha_solution`: Your complete Hybrid Automaton specification as a Python dict (REQUIRED - the reviewer cannot see your spec otherwise!)\n"
+        "- `my_note`: Focus areas or specific concerns (e.g., 'Unsure about mode 2 dynamics', 'Guard thresholds may be wrong')\n\n"
+        "**OUTPUT INCLUDES:**\n"
+        "- Critical errors that must be fixed\n"
+        "- Warnings to investigate\n"
+        "- Suggestions for improvement\n"
+        "- Detailed metrics interpretation (tc, max_diff, mean_diff)\n"
     )
     inputs = {
         "my_ha_solution": {
             "type": "string",
-            "description": "Your current hybrid automaton specification (Python dict) that needs review. This must be provided clearly and completely."
+            "description": (
+                "Your complete Hybrid Automaton specification as a Python dict. Must include 'automaton' (with var, input, mode, edge) "
+                "and 'config' (with dt, total_time, dim, need_reset, non_linear_items). Example format:\n"
+                '{"automaton": {"var": "x1", "input": "u1", "mode": [...], "edge": [...]}, "config": {...}}'
+            )
         },
         "my_note": {
             "type": "string",
-            "description": "What aspects to focus on (e.g., 'Check mode equations', 'Verify transition conditions', 'Overall review'), or your note/uncertain points/things you feel may go wrong."
+            "description": (
+                "Specific aspects to focus on or your concerns/uncertainties."
+            )
         },
     }
     output_type = "string"
@@ -122,12 +136,11 @@ class ReviewRequestTool_ha(Tool):
 
         # Step 5: Build unified review instruction combining HA solution + metrics + user note
         review_instruction = (
-            f"## Hybrid Automaton Solution (Python Dict) Under Review:\n"
-            f"```json\n{json.dumps(ha_dict, indent=2)}\n```\n\n"
+            f"# HYBRID AUTOMATON REVIEW REQUEST\n\n"
+            f"## Hybrid Automaton Specification Under Review\n"
+            f"```python\n{json.dumps(ha_dict, indent=2)}\n```\n\n"
             f"## Evaluation Metrics:\n{metrics_text}\n\n"
             f"## Agent's Note:\n{my_note}\n\n"
-            f"## Original Problem Context:\n"
-            f"The following images show the original problem and data.\n"
         )
 
         # Step 6: Combine content - review text + original problem images + simulation plot
@@ -142,7 +155,7 @@ class ReviewRequestTool_ha(Tool):
         if plot_base64:
             combined_content.append({
                 "type": "text",
-                "text": "\n## Simulation vs Ground Truth Plot:\nThe following plot shows the HA simulation (predicted) overlaid with ground truth data."
+                "text": "\n## Simulation vs Ground Truth Plot:\nThe following plot shows the Hybrid Automaton simulation (predicted) overlaid with ground truth data."
             })
             combined_content.append({
                 "type": "image_url",

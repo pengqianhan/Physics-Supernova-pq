@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import prompts_ha
+from prompts_ha.prompts import HA_SPEC_DOCUMENTATION, initial_ha_spec_prompt
 # Load environment variables from .env file if it exists
 try:
     from dotenv import load_dotenv
@@ -225,58 +226,123 @@ def obtain_task_and_images(input_data_path: str = None,
     trace_data_text = markdown_to_plaintext(markdown_content)
     compressed_trace_images = markdown_images_compress(markdown_content, max_short_side_pixels=1080)
 
-    # Base task prompt
-    task = f"""You are a hybrid automaton expert tasked with analyzing and improving hybrid automaton specifications.
+    # Base task prompt - Professional system identification framing
+    task = f"""# HYBRID AUTOMATON SYSTEM IDENTIFICATION TASK
 
-Below is the trace data visualization. If there are Images, Images are attached; reference them using their placeholders (e.g. <image_1>, <image_2>).
+## Your Role
+You are a control systems engineer specializing in **Hybrid Automaton (HA) system identification**. Your objective is to infer a mathematically precise HA model from observed trajectory data that accurately captures the underlying switched dynamical system behavior.
 
-Instructions:
-1. Carefully analyze the hybrid automaton structure shown in the provided image"""
+## Problem Context
+You are given time-series trajectory data from an unknown hybrid dynamical system. Your task is to:
+1. **Identify discrete modes** (operating regimes with distinct continuous dynamics)
+2. **Infer mode-specific ODEs** (differential equations governing each regime)
+3. **Determine switching conditions** (guard predicates triggering mode transitions)
+4. **Specify reset maps** (state updates upon mode transitions)
+
+## Available Data
+The following trace data visualizations are provided (reference images using placeholders: `<image_0>`, `<image_1>`, etc.):
+- State variable trajectories over time
+- Input signals (if applicable)
+- Potential mode-switch indicators (discontinuities, slope changes)
+
+## Analysis Workflow"""
 
     # Add tool-specific prompts
     HA_IMAGE_TOOL_PROMPT = ", you MUST use the hybrid_automaton_image_analysis tool to analyze the image."
     REVIEW_TOOL_PROMPT = " When you need expert review of your hybrid automaton specification, you MUST call the `ask_review_expert_ha` tool."
     if ReviewRequestTool_ha in ToolsList:
-        REVIEW_TOOL_PROMPT += "Before you use the `finalize_answer` tool, you MUST use the `ask_review_expert_ha` tool to review your HA specification, to ensure that your HA specification is correct and complete."
+        REVIEW_TOOL_PROMPT += """
+**MANDATORY BEFORE FINALIZATION**: You MUST call `ask_review_expert_ha` at least once before submitting your final answer to ensure specification correctness and completeness."""
 
     task += HA_IMAGE_TOOL_PROMPT if HybridAutomatonImageTool in ToolsList else ""
     task += REVIEW_TOOL_PROMPT if ReviewRequestTool_ha in ToolsList else ""
 
     task += """
-2. Identify potential improvements to the "mode"("id","eq"), "edge"("direction","condition","reset")
-3. Generate an improved version that maintains mathematical correctness and physical plausibility"""
 
-    # Add output requirements
+## HA Refinement Guidelines
+Focus your analysis on:
+1. **Mode Dynamics (`mode.eq`)**: Derive ODEs that match observed trajectory slopes and curvatures
+2. **Guard Conditions (`edge.condition`)**: Identify state thresholds where switching occurs
+3. **Transition Structure (`edge.direction`)**: Determine mode connectivity (self-loops, bidirectional, unidirectional)
+4. **Reset Maps (`edge.reset`)**: Specify whether states are continuous or discontinuous across transitions
+
+## Quality Criteria
+Your HA specification will be evaluated on:
+- **Trajectory Matching**: Simulated output should closely follow ground truth data
+- **Mode Detection Accuracy**: Correct identification of switching instants (`tc` metric)
+- **State Error Minimization**: Low `mean_diff` and `max_diff` between predicted and actual states"""
+
+    # Add output requirements with clear format specification
     task += """
 
-Output Requirements:
-- Return ONLY a valid Python dict representing the hybrid automaton specification
-- Do NOT include any explanations, comments, or markdown formatting
-- Ensure all mathematical expressions are syntactically correct"""
+## Output Format Requirements
+Return a **valid Python dictionary** with the following structure:
+```python
+{
+    "automaton": {
+        "var": "x1, x2, ...",      # State variables
+        "input": "u1, u2, ...",    # Input signals
+        "mode": [{"id": 1, "eq": "..."}],  # Mode dynamics
+        "edge": [{"direction": "1 -> 2", "condition": "...", "reset": {...}}]  # Transitions
+    },
+    "config": {
+        "dt": 0.001,
+        "total_time": 10.0,
+        "dim": 1,
+        "need_reset": true,
+        "non_linear_items": "..."
+    }
+}
+```
+**CRITICAL**: Return ONLY the Python dict. No markdown formatting, no explanations, no code blocks in the final answer."""
 
     # Add managed agents prompt
     if managed_agents_list and len(managed_agents_list) > 0:
-        MANAGE_AGENT_PROMPT = f"\n\nYou may use the managed Code Agent: {managed_agents_list} to assist you with code-related tasks."
+        MANAGE_AGENT_PROMPT = f"""
+
+## Computational Resources
+You have access to managed Code Agent(s): `{managed_agents_list}`
+Use them for numerical computations, curve fitting, or complex mathematical derivations."""
         task += MANAGE_AGENT_PROMPT
 
     # Add self code agent prompt
     if manager_type == "CodeAgent":
-        SELF_IS_CODE_AGENT_PROMPT = "\n\nYou can use Python Code to execute programs, which may help with your task-solving process."
+        SELF_IS_CODE_AGENT_PROMPT = "\n\n## Code Execution Capability\nYou can use Python Code to execute programs, which may help with your task-solving process."
         task += SELF_IS_CODE_AGENT_PROMPT
 
-    # Add initial HA specification if provided
-    task += f"""\n\n# Initial Hybrid Automaton Specification (v0)\n{initial_ha_spec}\n\n# Task\nGenerate an improved version (v1) based on the analysis."""
+    # Add HA specification format documentation and initial spec
+    task += f"""
 
-    system_config_prompt = f"""\n\n
-System Configuration:
-- System Name: {{{system_name}}}
-- Number of Variables: {{{num_variables}}}
-- Number of Inputs: {{{num_inputs}}}
+## HA Specification Format Reference
+{HA_SPEC_DOCUMENTATION}
+
+## Initial HA Specification (v0 - Baseline)
+The following is an initial template/guess. Analyze the trace data and refine this into an accurate model:
+
+```python
+{initial_ha_spec_prompt}
+```
+
+## Your Task
+Generate an improved HA specification (v1) that better matches the observed trajectory data. Apply systematic refinement: analyze discrepancies → hypothesize corrections → validate improvements."""
+
+    system_config_prompt = f"""
+
+## Target System Configuration
+| Parameter | Value |
+|-----------|-------|
+| System Name | {system_name} |
+| State Variables | {num_variables} |
+| Input Signals | {num_inputs} |
 """
     task = task + system_config_prompt
 
     # Add trace data description
-    task += f"\n\nTRACE DATA:\n{trace_data_text}\n"
+    task += f"""
+
+## Observed Trace Data
+{trace_data_text}
+"""
 
     return task, compressed_trace_images
 
