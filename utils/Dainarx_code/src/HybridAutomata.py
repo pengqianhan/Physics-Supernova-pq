@@ -71,7 +71,9 @@ class HybridAutomata:
             adj[mode_id] = []
         for edge in info['edge']:
             u_v = re.findall(r'\d+', edge['direction'])
-            fun = eval('lambda ' + info['var'] + ':' + edge['condition'])
+            # 把 x[0] 格式转换成 x（兼容两种格式）
+            condition = re.sub(r'(\w+)\[0\]', r'\1', edge['condition'])
+            fun = eval('lambda ' + info['var'] + ':' + condition)
             reset_val = edge.get("reset", {})
             adj[int(u_v[0])].append((int(u_v[1]), fun, reset_val))
         return cls(mode_list, adj)
