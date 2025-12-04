@@ -38,13 +38,106 @@ from utils.markdown_utils import load_trace_data_from_filepath, markdown_to_plai
 from utils.imgTools_ha import HybridAutomatonImageTool
 from utils.reviewTools_ha import ReviewRequestTool_ha
 from utils.summemoryTools_ha import SummarizeMemoryTool
+from utils.validateTools_ha import ValidateHASpecTool
+import numpy as np
+
+
+def get_data_dimensions(input_data_path: str) -> tuple[int, int]:
+    """
+    Read the .npz data file and extract the number of state variables and inputs.
+    
+    Args:
+        input_data_path: Path to the directory containing .npz files
+        
+    Returns:
+        Tuple of (num_variables, num_inputs)
+    """
+    # Find first .npz file in the directory
+    npz_files = [f for f in os.listdir(input_data_path) if f.endswith('.npz')]
+    if not npz_files:
+        raise FileNotFoundError(f"No .npz files found in {input_data_path}")
+    
+    npz_path = os.path.join(input_data_path, npz_files[0])
+    data = np.load(npz_path, allow_pickle=True)
+    
+    # Extract dimensions from data shape
+    # state: shape=(num_vars, num_steps), input: shape=(num_inputs, num_steps)
+    num_variables = data['state'].shape[0]
+    num_inputs = data['input'].shape[0] if 'input' in data and data['input'].size > 0 else 0
+    
+    print(f"Auto-detected from data: num_variables={num_variables}, num_inputs={num_inputs}")
+    return num_variables, num_inputs
+
+
+def generate_dynamic_ha_template(num_variables: int, num_inputs: int, system_name: str = "Unknown System") -> str:
+    """
+    Generate a dynamic HA specification template with pre-filled var and input fields.
+    
+    Args:
+        num_variables: Number of state variables
+        num_inputs: Number of input variables
+        system_name: Name of the system for comments
+        
+    Returns:
+        JSON string template with correct var and input fields
+    """
+    # Generate variable names: x1, x2, ..., xN
+    var_names = ", ".join([f"x{i+1}" for i in range(num_variables)])
+    
+    # Generate input names: u1, u2, ..., uM (or empty string if no inputs)
+    input_names = ", ".join([f"u{i+1}" for i in range(num_inputs)]) if num_inputs > 0 else ""
+    
+    # Generate placeholder equation based on number of variables
+    if num_variables == 1:
+        # Single variable - use 2nd-order ODE format
+        eq_placeholder = "x1[2] = -0.5 * x1[1] - 5.0 * x1[0]"
+        if num_inputs > 0:
+            eq_placeholder += " + u1"
+        dim = 2  # 2nd-order system
+    else:
+        # Multiple variables - use 1st-order ODE format
+        eq_parts = []
+        for i in range(num_variables):
+            var = f"x{i+1}"
+            # Simple placeholder: dx_i/dt = sum of other variables
+            terms = [f"-0.5 * {var}[0]"]
+            if i < num_variables - 1:
+                terms.append(f"x{i+2}[0]")
+            eq_parts.append(f"{var}[1] = {' + '.join(terms)}")
+        if num_inputs > 0:
+            eq_parts[-1] += " + u1"
+        eq_placeholder = ", ".join(eq_parts)
+        dim = 1  # 1st-order system
+    
+    template = f'''{{
+    "automaton": {{
+        "var": "{var_names}",
+        "input": "{input_names}",
+        "mode": [
+            {{
+                "id": 1,
+                "eq": "{eq_placeholder}"
+            }}
+        ],
+        "edge": []
+    }},
+    "config": {{
+        "dt": 0.001,
+        "total_time": 10.0,
+        "dim": {dim},
+        "need_reset": false,
+        "non_linear_items": ""
+    }}
+}}'''
+    return template
 
 
 # Tool mapping for HA-specific tools
 TOOLNAME2TOOL = {
-    'hybrid_automaton_image_analysis': HybridAutomatonImageTool,
+    'hybrid_automaton_image_analysis': HybridAutomatonImageTool,## if the managerAgent can not input image, use this tool
     'ask_review_expert_ha': ReviewRequestTool_ha,
     'summarize_ha_iterations': SummarizeMemoryTool,
+    'validate_ha_specification': ValidateHASpecTool,
 }
 
 
@@ -248,14 +341,27 @@ The following trace data visualizations are provided (reference images using pla
 ## Analysis Workflow"""
 
     # Add tool-specific prompts
-    HA_IMAGE_TOOL_PROMPT = ", you MUST use the hybrid_automaton_image_analysis tool to analyze the image."
+    if HybridAutomatonImageTool in ToolsList:
+        HA_IMAGE_TOOL_PROMPT = ", you MUST use the hybrid_automaton_image_analysis tool to analyze the image."
     REVIEW_TOOL_PROMPT = " When you need expert review of your hybrid automaton specification, you MUST call the `ask_review_expert_ha` tool."
     if ReviewRequestTool_ha in ToolsList:
         REVIEW_TOOL_PROMPT += """
 **MANDATORY BEFORE FINALIZATION**: You MUST call `ask_review_expert_ha` at least once before submitting your final answer to ensure specification correctness and completeness."""
 
+    VALIDATE_TOOL_PROMPT = ""
+    if ValidateHASpecTool in ToolsList:
+        VALIDATE_TOOL_PROMPT = """
+**VALIDATION TOOL**: Before submitting your final answer, you SHOULD call `validate_ha_specification` to check for syntax errors.
+This tool will:
+- Detect common formatting issues (wrong direction format, missing required fields, etc.)
+- Auto-fix minor issues and normalize the specification
+- Report critical errors that need manual fixing
+
+⚠️ **IMPORTANT**: If validation returns a FIXED specification, use the corrected version in your final answer!"""
+
     task += HA_IMAGE_TOOL_PROMPT if HybridAutomatonImageTool in ToolsList else ""
     task += REVIEW_TOOL_PROMPT if ReviewRequestTool_ha in ToolsList else ""
+    task += VALIDATE_TOOL_PROMPT
 
     task += """
 
@@ -276,14 +382,14 @@ Your HA specification will be evaluated on:
     task += """
 
 ## Output Format Requirements
-Return a **valid Python dictionary** with the following structure:
-```python
+Return a **valid JSON object** with the following structure:
+```json
 {
     "automaton": {
-        "var": "x1, x2, ...",      # State variables
-        "input": "u1, u2, ...",    # Input signals
-        "mode": [{"id": 1, "eq": "..."}],  # Mode dynamics
-        "edge": [{"direction": "1 -> 2", "condition": "...", "reset": {...}}]  # Transitions
+        "var": "x1, x2, ...",
+        "input": "u1, u2, ...",
+        "mode": [{"id": 1, "eq": "..."}],
+        "edge": [{"direction": "1 -> 2", "condition": "...", "reset": {...}}]
     },
     "config": {
         "dt": 0.001,
@@ -294,7 +400,10 @@ Return a **valid Python dictionary** with the following structure:
     }
 }
 ```
-**CRITICAL**: Return ONLY the Python dict. No markdown formatting, no explanations, no code blocks in the final answer."""
+**CRITICAL JSON RULES**:
+- Use `true`/`false` (NOT Python's `True`/`False`)
+- Use double quotes `"key"` (NOT single quotes)
+- Return ONLY the JSON. No markdown formatting, no explanations, no code blocks in the final answer."""
 
     # Add managed agents prompt
     if managed_agents_list and len(managed_agents_list) > 0:
@@ -310,32 +419,46 @@ Use them for numerical computations, curve fitting, or complex mathematical deri
         SELF_IS_CODE_AGENT_PROMPT = "\n\n## Code Execution Capability\nYou can use Python Code to execute programs, which may help with your task-solving process."
         task += SELF_IS_CODE_AGENT_PROMPT
 
+    # Generate dynamic HA template with correct var and input fields pre-filled
+    dynamic_ha_template = generate_dynamic_ha_template(num_variables, num_inputs, system_name)
+    
+    # Generate variable and input names for display
+    var_names = ", ".join([f"x{i+1}" for i in range(num_variables)])
+    input_names = ", ".join([f"u{i+1}" for i in range(num_inputs)]) if num_inputs > 0 else "(none)"
+
     # Add HA specification format documentation and initial spec
     task += f"""
 
 ## HA Specification Format Reference
 {HA_SPEC_DOCUMENTATION}
 
-## Initial HA Specification (v0 - Baseline)
-The following is an initial template/guess. Analyze the trace data and refine this into an accurate model:
-
-```python
-{initial_ha_spec_prompt}
-```
-
-## Your Task
-Generate an improved HA specification (v1) that better matches the observed trajectory data. Apply systematic refinement: analyze discrepancies → hypothesize corrections → validate improvements."""
-
-    system_config_prompt = f"""
-
 ## Target System Configuration
 | Parameter | Value |
 |-----------|-------|
 | System Name | {system_name} |
-| State Variables | {num_variables} |
-| Input Signals | {num_inputs} |
+| State Variables | **{num_variables}** → `var: "{var_names}"` (FIXED, do not change!) |
+| Input Variables | **{num_inputs}** → `input: "{input_names if num_inputs > 0 else ''}"` (FIXED, do not change!) |
+
+### ⚠️ CRITICAL: Variable Count is PRE-DEFINED ⚠️
+The `var` and `input` fields in the template below are **already correctly set** based on the ground truth data.
+- **DO NOT** add or remove variables!
+- **DO NOT** convert to state-space form (e.g., splitting 1 variable into x1, x2)!
+- For single-variable systems: use higher-order ODE notation (e.g., `x1[2] = ...` for 2nd-order)
+- Focus on inferring the **equations** (`eq`), **modes**, and **edge conditions** only!
+
+## Initial HA Specification Template (v0 - with correct dimensions)
+The `var` and `input` fields are pre-filled. Your task is to refine the **equations** and **structure**:
+
+```json
+{dynamic_ha_template}
+```
+
+## Your Task
+Generate an improved HA specification (v1) that better matches the observed trajectory data.
+- **Keep `var: "{var_names}"` and `input: "{input_names if num_inputs > 0 else ''}"` exactly as shown!**
+- Refine mode equations to match observed dynamics
+- Add modes and edges if switching behavior is detected
 """
-    task = task + system_config_prompt
 
     # Add trace data description
     task += f"""
@@ -366,32 +489,32 @@ def evaluate_ha_specification(agent_result, input_data_path: str, output_dir: st
     # Import HA evaluation module
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'utils', 'Dainarx_code'))
     from HA_evaluation import HAEvaluator
+    
+    # Import HA specification validator
+    from utils.ha_spec_validator import preprocess_ha_for_evaluation
 
-    # Extract HA specification from agent result
-    ha_specification = None
+    # Use the validator to extract and fix HA specification
+    print("\n--- HA Specification Validation ---")
+    ha_specification, is_valid, validation_message = preprocess_ha_for_evaluation(agent_result)
+    print(validation_message)
+    
+    if not is_valid:
+        print("\nError: HA specification validation failed")
+        if ha_specification is not None:
+            print(f"Partially extracted spec: {json.dumps(ha_specification, indent=2)[:500]}...")
+        return False
 
-    # Try to extract HA spec from result (smolagents returns different formats)
-    if isinstance(agent_result, dict):
-        ha_specification = agent_result
-    elif isinstance(agent_result, str):
-        # Try to parse as JSON
-        try:
-            ha_specification = json.loads(agent_result)
-        except:
-            print(f"Warning: Could not parse agent result as JSON. Result type: {type(agent_result)}")
-            print(f"Result content: {agent_result}")
-    else:
-        print(f"Warning: Unexpected result type: {type(agent_result)}")
-        print(f"Result content: {agent_result}")
-
-    # Validate HA specification structure
+    # Final structure check (should pass after validation, but double-check)
     if ha_specification is None or 'automaton' not in ha_specification or 'config' not in ha_specification:
         print("\nWarning: Could not extract valid HA specification from agent output for evaluation")
         print("Expected dictionary with 'automaton' and 'config' keys")
         return False
 
-    print("\nSuccessfully extracted HA specification from agent output")
-    print(f"HA contains {len(ha_specification['automaton'].get('mode', []))} modes and {len(ha_specification['automaton'].get('edge', []))} edges")
+    print("\n--- HA Specification Summary ---")
+    print(f"Variables: {ha_specification['automaton'].get('var', 'N/A')}")
+    print(f"Inputs: {ha_specification['automaton'].get('input', 'N/A')}")
+    print(f"Modes: {len(ha_specification['automaton'].get('mode', []))}")
+    print(f"Edges: {len(ha_specification['automaton'].get('edge', []))}")
 
     # Find test data file in the input data path
     test_data_files = [f for f in os.listdir(input_data_path) if f.endswith('.npz')]
@@ -402,6 +525,25 @@ def evaluate_ha_specification(agent_result, input_data_path: str, output_dir: st
     # Use first test file found
     npz_file_path = os.path.join(input_data_path, test_data_files[0])
     print(f"\nUsing test data file: {npz_file_path}")
+
+    # Load ground truth data to check dimensions
+    gt_data = np.load(npz_file_path, allow_pickle=True)
+    gt_num_vars = gt_data['state'].shape[0]
+    
+    # Count variables in HA spec
+    var_str = ha_specification['automaton'].get('var', '')
+    ha_num_vars = len([v.strip() for v in var_str.split(',') if v.strip()])
+    
+    print(f"\n--- Dimension Check ---")
+    print(f"Ground truth state variables: {gt_num_vars}")
+    print(f"HA specification variables: {ha_num_vars} ({var_str})")
+    
+    if ha_num_vars != gt_num_vars:
+        print(f"\n⚠️ ERROR: Variable count mismatch!")
+        print(f"HA spec defines {ha_num_vars} variable(s), but ground truth has {gt_num_vars} variable(s).")
+        print(f"The LLM may have incorrectly converted to state-space form.")
+        print(f"For a {gt_num_vars}-variable system, use higher-order ODEs (e.g., x1[2] = ...) instead of multiple 1st-order ODEs.")
+        return False
 
     # Set up output directory
     if output_dir is None:
@@ -481,7 +623,7 @@ def parse_args():
         "--tools-list",
         type=str,
         nargs='*',
-        default=["hybrid_automaton_image_analysis", "ask_review_expert_ha", "summarize_ha_iterations"],
+        default=["hybrid_automaton_image_analysis", "ask_review_expert_ha", "summarize_ha_iterations", "validate_ha_specification"],
         help="List of tool names to use in the agent.",
     )
 
@@ -573,8 +715,20 @@ def main():
     args = parse_args()
     print(f"Running HA Learning Agent with model: {args.manager_model}, tools: {args.tools_list}, data path: {args.input_data_path}")
 
-    # Load initial HA spec if provided
-    initial_ha_spec = prompts_ha.initial_ha_spec_prompt
+    # Auto-detect dimensions from data file (overrides command-line args if provided)
+    auto_num_variables, auto_num_inputs = get_data_dimensions(args.input_data_path)
+    
+    # Use auto-detected values (can be overridden by explicit command-line args if needed)
+    # If user explicitly provided different values, warn them
+    if args.num_variables != auto_num_variables:
+        print(f"⚠️ Warning: --num-variables={args.num_variables} differs from auto-detected value={auto_num_variables}")
+        print(f"   Using auto-detected value: {auto_num_variables}")
+    if args.num_inputs != auto_num_inputs:
+        print(f"⚠️ Warning: --num-inputs={args.num_inputs} differs from auto-detected value={auto_num_inputs}")
+        print(f"   Using auto-detected value: {auto_num_inputs}")
+    
+    num_variables = auto_num_variables
+    num_inputs = auto_num_inputs
 
     # Create the agent
     managerAgent = create_agent(
@@ -590,13 +744,13 @@ def main():
         tools_to_remove=args.tools_to_remove,
     )
 
-    # Obtain task and images
+    # Obtain task and images with auto-detected dimensions
     task, compressed_trace_images = obtain_task_and_images(
         input_data_path=args.input_data_path,
         system_name=args.system_name,
-        num_variables=args.num_variables,
-        num_inputs=args.num_inputs,
-        initial_ha_spec=initial_ha_spec,
+        num_variables=num_variables,
+        num_inputs=num_inputs,
+        initial_ha_spec=None,  # No longer needed - using dynamic template
         tools_list=args.tools_list,
         managed_agents_list=args.managed_agents_list if hasattr(args, 'managed_agents_list') else None,
         manager_type=args.manager_type,

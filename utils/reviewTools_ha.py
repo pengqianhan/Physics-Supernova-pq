@@ -74,8 +74,9 @@ class ReviewRequestTool_ha(Tool):
         "my_ha_solution": {
             "type": "string",
             "description": (
-                "Your complete Hybrid Automaton specification as a Python dict. Must include 'automaton' (with var, input, mode, edge) "
-                "and 'config' (with dt, total_time, dim, need_reset, non_linear_items). Example format:\n"
+                "Your complete Hybrid Automaton specification as a JSON string. Must include 'automaton' (with var, input, mode, edge) "
+                "and 'config' (with dt, total_time, dim, need_reset, non_linear_items). Use JSON format: true/false (not True/False). "
+                "Example format:\n"
                 '{"automaton": {"var": "x1", "input": "u1", "mode": [...], "edge": [...]}, "config": {...}}'
             )
         },
