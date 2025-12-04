@@ -806,7 +806,7 @@ class HAEvaluator:
 
 if __name__ == "__main__":
     # Test data: Single mode Duffing oscillator
-    data = {
+    data1 = {
         "automaton": {
             "var": "x1",
             "input": "u1",
@@ -825,6 +825,8 @@ if __name__ == "__main__":
             "other_items": ""
         }
     }
+    data=json.load(open('utils/Dainarx_code/automata/non_linear/duffing_simulation.json', 'r'))
+    print(data)
 
 
     # Create evaluator using the new HAEvaluator class
