@@ -92,6 +92,8 @@ def creat_data(json_path: str, data_path: str, dT: float, times: float):
             # save the data
             np.savez(os.path.join(data_path, "sample_" + str(state_id)),
                      state=state_data, mode=mode_data, input=input_data, change_points=change_points)
+            np.savez(os.path.join(data_path, "sample_train_" + str(state_id)),
+                     state=state_data, input=input_data)
             state_id += 1
 
 
