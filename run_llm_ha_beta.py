@@ -366,11 +366,35 @@ This tool will:
     task += """
 
 ## HA Refinement Guidelines
-Focus your analysis on:
-1. **Mode Dynamics (`mode.eq`)**: Derive ODEs that match observed trajectory slopes and curvatures
-2. **Guard Conditions (`edge.condition`)**: Identify state thresholds where switching occurs
-3. **Transition Structure (`edge.direction`)**: Determine mode connectivity (self-loops, bidirectional, unidirectional)
-4. **Reset Maps (`edge.reset`)**: Specify whether states are continuous or discontinuous across transitions
+Adopt a **Parsimonious Modeling Approach** (Occam's Razor) - favor simpler explanations unless the data demands otherwise:
+
+1. **Symbolic Identification**:
+   - **Hypothesize Structure First**: Determine the likely functional form of the equations *before* estimating parameters.
+
+2. **Mode Count Strategy (Less is More)**:
+   - **Iterative Expansion**: Start with **1 Mode**. If a single continuous model fails to fit the entire trajectory (high error), try **2 Modes**, etc.
+   - **Hypothesis Testing**: Increase the number of modes *only* if distinct switching behaviors (sharp changes in dynamics) are observed.
+
+3. **Mode Dynamics**:
+   - **Start Simple**: Attempt to fit **Linear** dynamics first.
+   - **Increase Complexity**: Only introduce **Non-linear** terms (polynomial, trigonometric, etc.) if linear fits fail to capture curvature or key features.
+
+4. **Guard Conditions (Geometric Simplicity)**:
+   - **Single-Variable Thresholds**: The vast majority of physical guards are simple threshold checks on a single variable (e.g., `x1 >= 0`, `x <= 0.5`).
+   - **Avoid Overfitting**: Do not create complex arithmetic guards (e.g., `x1*x2 > 5`) unless the physical interaction explicitly suggests it.
+   - **Operators**: Stick to standard comparison operators (`<=`, `>=`).
+
+5. **Transition Structure**:
+   - **Topology**: Prefer **Sparse** connectivity. Valid transitions are typically few and distinct.
+   - **Flow**: Transitions often follow a logical flow (e.g., cycles, bidirectional switches) rather than random jumps.
+
+6. **Reset Maps**:
+   - **Continuity Default**: Assume physical variables change **Continuously** (`need_reset: false`) over time.
+   - **Exceptions**: Use reset maps (`need_reset: true`) **only** if the data clearly shows instantaneous state jumps at transition points.
+
+7. **Structure Validation**:
+   - Ensure the number of modes matches the distinct behaviors observed.
+   - Ensure guards partition the state space logically (no overlapping active modes usually).
 
 ## Quality Criteria
 Your HA specification will be evaluated on:
