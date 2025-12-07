@@ -213,7 +213,7 @@ class TrajectoryPlotter:
         """
         Plot original and simulated trajectories overlaid on the same axes.
 
-        Original data is shown with thick solid lines and circle markers.
+        Ground truth data is shown with thick solid lines and circle markers.
         Simulated data is shown with thin dash-dot lines and triangle markers.
 
         Returns:
@@ -235,7 +235,7 @@ class TrajectoryPlotter:
         # Plot original state data (thick solid lines with circle markers)
         for idx in range(num_orig_states):
             ax.plot(self.time, self.original_state_data[idx],
-                   label=f"x{idx + 1} (Original)",
+                   label=f"x{idx + 1} (Ground truth)",
                    color=self.cmap(idx),
                    linewidth=DEFAULT_LINEWIDTH_THICK,
                    linestyle='-',
@@ -265,7 +265,7 @@ class TrajectoryPlotter:
         # Configure axis
         ax.set_xlabel('Time (s)', fontsize=DEFAULT_FONT_SIZE)
         ax.set_ylabel('Values', fontsize=DEFAULT_FONT_SIZE)
-        ax.set_title('Comparison: Original vs Simulated Trajectories',
+        ax.set_title('Comparison: Ground truth vs Simulated Trajectories',
                     fontsize=DEFAULT_TITLE_FONT_SIZE, fontweight='bold')
         ax.grid(True, linestyle='--', alpha=0.4)
         ax.legend(loc='best', fontsize=12, ncol=2)
@@ -286,7 +286,7 @@ class TrajectoryPlotter:
             for idx in range(self.original_input_data.shape[0]):
                 series_index = self.num_states + idx
                 ax.plot(self.time, self.original_input_data[idx],
-                       label=f"u{idx + 1} (Original)",
+                       label=f"u{idx + 1} (Ground truth)",
                        linestyle='-',
                        color=self.cmap(series_index),
                        linewidth=DEFAULT_LINEWIDTH_THICK,
@@ -316,7 +316,7 @@ class TrajectoryPlotter:
         Plot original and simulated trajectories in vertically stacked subplots.
 
         Top subplot: Simulated trajectory
-        Bottom subplot: Original trajectory
+        Bottom subplot: Ground truth trajectory
 
         Returns:
             Matplotlib figure object
@@ -338,10 +338,10 @@ class TrajectoryPlotter:
         self._plot_trajectory_on_axis(ax_top, self.state_data, self.input_data,
                                       "Simulated Trajectory")
 
-        # Bottom: Original trajectory
+        # Bottom: Ground truth trajectory
         original_input = self.original_input_data if self.original_input_data is not None else np.array([])
         self._plot_trajectory_on_axis(ax_bottom, self.original_state_data, original_input,
-                                      "Original Trajectory")
+                                      "Ground truth Trajectory")
 
         self.axes = (ax_top, ax_bottom)
         return self.fig
