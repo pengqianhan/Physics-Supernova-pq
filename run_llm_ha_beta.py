@@ -342,7 +342,7 @@ The following trace data visualizations are provided (reference images using pla
 
     # Add tool-specific prompts
     if HybridAutomatonImageTool in ToolsList:
-        HA_IMAGE_TOOL_PROMPT = "You MUST use the hybrid_automaton_image_analysis tool to analyze the image."
+        HA_IMAGE_TOOL_PROMPT = "You MUST use the 'hybrid_automaton_image_analysis' tool to analyze the image."
     REVIEW_TOOL_PROMPT = " When you need expert review of your hybrid automaton specification, you MUST call the `ask_review_expert_ha` tool."
     if ReviewRequestTool_ha in ToolsList:
         REVIEW_TOOL_PROMPT += """
