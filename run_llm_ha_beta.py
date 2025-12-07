@@ -379,31 +379,31 @@ Your HA specification will be evaluated on:
 - **State Error Minimization**: Low `mean_diff` and `max_diff` between predicted and actual states"""
 
     # Add output requirements with clear format specification
-    task += """
+#     task += """
 
-## Output Format Requirements
-Return a **valid JSON object** with the following structure:
-```json
-{
-    "automaton": {
-        "var": "x1, x2, ...",
-        "input": "u1, u2, ...",
-        "mode": [{"id": 1, "eq": "..."}],
-        "edge": [{"direction": "1 -> 2", "condition": "...", "reset": {...}}]
-    },
-    "config": {
-        "dt": 0.001,
-        "total_time": 10.0,
-        "dim": 1,
-        "need_reset": true,
-        "non_linear_items": "..."
-    }
-}
-```
-**CRITICAL JSON RULES**:
-- Use `true`/`false` (NOT Python's `True`/`False`)
-- Use double quotes `"key"` (NOT single quotes)
-- Return ONLY the JSON. No markdown formatting, no explanations, no code blocks in the final answer."""
+# ## Output Format Requirements
+# Return a **valid JSON object** with the following structure:
+# ```json
+# {
+#     "automaton": {
+#         "var": "x1, x2, ...",
+#         "input": "u1, u2, ...",
+#         "mode": [{"id": 1, "eq": "..."}],
+#         "edge": [{"direction": "1 -> 2", "condition": "...", "reset": {...}}]
+#     },
+#     "config": {
+#         "dt": 0.001,
+#         "total_time": 10.0,
+#         "dim": 1,
+#         "need_reset": true,
+#         "non_linear_items": "..."
+#     }
+# }
+# ```
+# **CRITICAL JSON RULES**:
+# - Use `true`/`false` (NOT Python's `True`/`False`)
+# - Use double quotes `"key"` (NOT single quotes)
+# - Return ONLY the JSON. No markdown formatting, no explanations, no code blocks in the final answer."""
 
     # Add managed agents prompt
     if managed_agents_list and len(managed_agents_list) > 0:
@@ -428,16 +428,7 @@ Use them for numerical computations, curve fitting, or complex mathematical deri
 
     # Add HA specification format documentation and initial spec
     task += f"""
-
-## HA Specification Format Reference
 {HA_SPEC_DOCUMENTATION}
-
-## Target System Configuration
-| Parameter | Value |
-|-----------|-------|
-| System Name | {system_name} |
-| State Variables | **{num_variables}** → `var: "{var_names}"` (FIXED, do not change!) |
-| Input Variables | **{num_inputs}** → `input: "{input_names if num_inputs > 0 else ''}"` (FIXED, do not change!) |
 
 ### ⚠️ CRITICAL: Variable Count is PRE-DEFINED ⚠️
 The `var` and `input` fields in the template below are **already correctly set** based on the ground truth data.
@@ -461,11 +452,11 @@ Generate an improved HA specification (v1) that better matches the observed traj
 """
 
     # Add trace data description
-    task += f"""
+#     task += f"""
 
-## Observed Trace Data
-{trace_data_text}
-"""
+# ## Observed Trace Data
+# {trace_data_text}
+# """
 
     return task, compressed_trace_images
 
@@ -756,9 +747,9 @@ def main():
         manager_type=args.manager_type,
     )
     # save the task to a file
-    with open("task.txt", "w") as f:
+    with open("task.md", "w", encoding="utf-8") as f:
         f.write(task)
-    print(f"Saved task to task.txt")
+    print(f"Saved task to task.md")
 
     # Run the agent with task and compressed images
     result = managerAgent.run(task, images=compressed_trace_images)
