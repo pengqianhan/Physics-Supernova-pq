@@ -32,6 +32,31 @@ def count_input_in_json(json_file_path):
         return 0
 
 
+def count_mode_in_json(json_file_path):
+    """
+    统计单个JSON文件中automaton.mode列表的长度
+
+    Args:
+        json_file_path: JSON文件路径
+
+    Returns:
+        int: mode列表的长度，如果不存在则返回0
+    """
+    try:
+        with open(json_file_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+
+        # 检查automaton中是否有mode字段
+        if 'automaton' in data and 'mode' in data['automaton']:
+            mode_list = data['automaton']['mode']
+            if isinstance(mode_list, list):
+                return len(mode_list)
+        return 0
+    except Exception as e:
+        print(f"Error reading {json_file_path}: {e}")
+        return 0
+
+
 def analyze_config_in_json(json_file_path):
     """
     分析单个JSON文件中config字段的配置项
@@ -198,7 +223,7 @@ def find_all_json_files(root_dir):
 
 def generate_markdown_report(automata_dir, json_files, files_with_input, files_without_input,
                             config_stats, order_stats, need_reset_stats, kernel_stats,
-                            all_config_keys, edge_stats=None):
+                            all_config_keys, edge_stats=None, mode_stats=None):
     """
     生成Markdown格式的分析报告
 
@@ -213,6 +238,7 @@ def generate_markdown_report(automata_dir, json_files, files_with_input, files_w
         kernel_stats: kernel参数统计信息
         all_config_keys: 所有出现过的config键集合
         edge_stats: edge条件统计信息
+        mode_stats: mode数量统计信息
     """
     report_path = Path(__file__).parent / "json_analysis_report.md"
 
@@ -416,6 +442,38 @@ def generate_markdown_report(automata_dir, json_files, files_with_input, files_w
         else:
             f.write("*无edge数据*\n\n")
 
+        # Mode统计
+        f.write("## 6. Mode统计\n\n")
+        if mode_stats:
+            total_modes = sum(mode_stats.values())
+            f.write(f"- **包含mode字段的文件数**: {len(mode_stats)}\n")
+            f.write(f"- **Mode的总数**: {total_modes}\n\n")
+            
+            # 按mode数量分组统计
+            mode_count_distribution = {}
+            for file_path, count in mode_stats.items():
+                if count not in mode_count_distribution:
+                    mode_count_distribution[count] = []
+                mode_count_distribution[count].append(file_path)
+            
+            f.write("### 6.1 Mode数量分布\n\n")
+            f.write("| Mode数量 | 文件数 | 文件列表 |\n")
+            f.write("|---------|--------|----------|\n")
+            for count in sorted(mode_count_distribution.keys()):
+                files = mode_count_distribution[count]
+                files_str = ", ".join([f"`{f}`" for f in sorted(files)])
+                f.write(f"| {count} | {len(files)} | {files_str} |\n")
+            f.write("\n")
+            
+            f.write("### 6.2 各文件Mode详情\n\n")
+            f.write("| 文件 | Mode数量 |\n")
+            f.write("|------|---------|\n")
+            for file_path in sorted(mode_stats.keys()):
+                f.write(f"| `{file_path}` | {mode_stats[file_path]} |\n")
+            f.write("\n")
+        else:
+            f.write("*无mode数据*\n\n")
+
     print(f"\n📄 分析报告已保存到: {report_path}")
     return report_path
 
@@ -443,6 +501,7 @@ def main():
     kernel_stats = {}
     all_config_keys = set()
     edge_stats = {}
+    mode_stats = {}  # 统计每个文件的mode数量
 
     for json_file in json_files:
         # 统计input字段
@@ -490,6 +549,11 @@ def main():
         if edge_info:
             edge_stats[rel_path] = edge_info
 
+        # 统计mode数量
+        mode_count = count_mode_in_json(json_file)
+        if mode_count > 0:
+            mode_stats[rel_path] = mode_count
+
     # 打印统计结果
     print("=" * 80)
     print(f"\n统计结果:")
@@ -518,10 +582,19 @@ def main():
     print(f"  使用的操作符: {sorted(all_operators)}")
     print(f"  使用的变量: {sorted(all_variables)}")
 
+    # 打印Mode统计结果
+    print(f"\nMode统计:")
+    print(f"  包含mode字段的文件数: {len(mode_stats)}")
+    total_modes = sum(mode_stats.values())
+    print(f"  Mode的总数: {total_modes}")
+    print(f"  各文件Mode数量:")
+    for file_path, count in sorted(mode_stats.items()):
+        print(f"    {file_path}: {count}")
+
     # 生成Markdown报告
     generate_markdown_report(automata_dir, json_files, files_with_input, files_without_input,
                             config_stats, order_stats, need_reset_stats, kernel_stats,
-                            all_config_keys, edge_stats)
+                            all_config_keys, edge_stats, mode_stats)
 
 
 if __name__ == "__main__":
