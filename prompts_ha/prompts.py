@@ -107,9 +107,9 @@ This defines d²x1/dt² directly. The values x1[0] (position) and x1[1] (velocit
 3. The `dim` in config should match the highest derivative order used
 
 **More Examples:**
-- Mass-spring-damper (2nd order): `"x1[2] = -k*x1[0] - c*x1[1] + F"`
-- Van der Pol (2nd order): `"x1[2] = mu*(1 - x1[0]**2)*x1[1] - x1[0]"`
-- Two coupled 1st-order: `"x1[1] = a*x1[0] + b*x2[0], x2[1] = c*x1[0] + d*x2[0]"`
+- 2nd order: `"x1[2] = -k*x1[0] - c*x1[1] + F"`
+- 2nd order: `"x1[2] = mu*(1 - x1[0]**2)*x1[1] - x1[0]"`
+- 1st-order: `"x1[1] = a*x1[0] + b*x2[0], x2[1] = c*x1[0] + d*x2[0]"`
 
 ### NOTES ON CONDITION FORMAT
 - Both "x1 > 0" and "x1[0] > 0" are supported in conditions (auto-converted internally)
