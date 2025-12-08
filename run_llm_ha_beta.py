@@ -290,7 +290,9 @@ def obtain_task_and_images(input_data_path: str = None,
                            initial_ha_spec: str = None,
                            tools_list: List[str] = [],
                            managed_agents_list: List[str] = None,
-                           manager_type: str = "CodeAgent") -> tuple[str, list]:
+                           manager_type: str = "CodeAgent",
+                           feedback: str = None, # Added feedback parameter
+                           iteration: int = 1) -> tuple[str, list]:
     '''
     Generate task prompt and compressed images for HA learning agent.
 
@@ -303,11 +305,13 @@ def obtain_task_and_images(input_data_path: str = None,
         tools_list: List of tool names
         managed_agents_list: List of managed agent names
         manager_type: Type of manager agent
+        feedback: Feedback string from previous iteration (optional)
+        iteration: Current iteration number (1-indexed)
 
     Returns:
         Tuple of (task prompt string, list of compressed images)
     '''
-    print("tools_list: ", tools_list)
+    print(f"Generating task for iteration {iteration}, tools_list: {tools_list}")
 
     # Load trace data with high res images
     markdown_content = load_trace_data_from_filepath(input_data_path)
@@ -475,6 +479,17 @@ Generate an improved HA specification (v1) that better matches the observed traj
 - Add modes and edges if switching behavior is detected
 """
 
+    # Add feedback from previous iteration if available
+    if feedback:
+        task += f"""
+    
+    ## ⚠️ FEEDBACK FROM PREVIOUS ITERATION (Iteration {iteration-1})
+    The following feedback was generated from evaluating your previous attempt. Use it to guide your next refinement:
+    
+    {feedback}
+    
+    """
+
     # Add trace data description
 #     task += f"""
 
@@ -602,9 +617,107 @@ def evaluate_ha_specification(agent_result, input_data_path: str, output_dir: st
         print(f"\nError during HA evaluation: {e}")
         import traceback
         traceback.print_exc()
-        return False
+        return False, {}, f"Error during evaluation: {str(e)}"
+
+    return True, {}, "Evaluation succeeded but no metrics captured (unexpected path)"
 
 
+def evaluate_ha_specification_with_feedback(agent_result, input_data_path: str, output_dir: str = None) -> tuple[bool, dict, str]:
+    """
+    Evaluate the generated Hybrid Automaton specification and return feedback for the agent.
+
+    Args:
+        agent_result: Result from the agent.run() call
+        input_data_path: Path to the directory containing test .npz files
+        output_dir: Directory to save evaluation results
+
+    Returns:
+        Tuple of (success_bool, metrics_dict, feedback_string)
+    """
+    print("\n" + "=" * 80)
+    print("EVALUATION: Testing the generated Hybrid Automaton specification")
+    print("=" * 80)
+
+    # Import HA evaluation module
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'utils', 'Dainarx_code'))
+    from HA_evaluation import HAEvaluator
+    
+    # Import HA specification validator
+    from utils.ha_spec_validator import preprocess_ha_for_evaluation
+
+    # Use the validator to extract and fix HA specification
+    print("\n--- HA Specification Validation ---")
+    ha_specification, is_valid, validation_message = preprocess_ha_for_evaluation(agent_result)
+    print(validation_message)
+    
+    if not is_valid:
+        error_msg = "HA specification validation failed. " + validation_message
+        if ha_specification is not None:
+             error_msg += f"\nPartially extracted spec: {json.dumps(ha_specification, indent=2)[:500]}..."
+        return False, {}, error_msg
+
+    # Final structure check
+    if ha_specification is None or 'automaton' not in ha_specification or 'config' not in ha_specification:
+        return False, {}, "Could not extract valid HA specification from agent output (missing 'automaton' or 'config')."
+
+    # Find test data file
+    test_data_files = [f for f in os.listdir(input_data_path) if f.endswith('.npz')]
+    if not test_data_files:
+        return False, {}, f"No .npz test data files found in {input_data_path}"
+
+    npz_file_path = os.path.join(input_data_path, test_data_files[0])
+    
+    # Check dimensions
+    gt_data = np.load(npz_file_path, allow_pickle=True)
+    gt_num_vars = gt_data['state'].shape[0]
+    var_str = ha_specification['automaton'].get('var', '')
+    ha_num_vars = len([v.strip() for v in var_str.split(',') if v.strip()])
+    
+    if ha_num_vars != gt_num_vars:
+        msg = f"Variable count mismatch! HA spec has {ha_num_vars}, ground truth has {gt_num_vars}. Check state-space vs higher-order ODE format."
+        return False, {}, msg
+
+    # Set up output directory
+    if output_dir is None:
+        output_dir = os.path.join(os.path.dirname(__file__), 'evaluation_results')
+    os.makedirs(output_dir, exist_ok=True)
+
+    try:
+        # Create evaluator
+        evaluator = HAEvaluator(
+            ha_dict=ha_specification,
+            npz_file_path=npz_file_path,
+            dt=ha_specification['config'].get('dt', 0.001),
+            total_time=ha_specification['config'].get('total_time', 10.0)
+        )
+
+        # Run evaluation
+        save_path = os.path.join(output_dir, f'ha_eval_{os.urandom(4).hex()}.png')
+        metrics_text, plot_base64 = evaluator(
+            plot_mode='overlay',
+            save_path=save_path,
+            print_metrics=True
+        )
+        metrics_dict = evaluator.metrics
+
+        # Save metrics
+        metrics_file = os.path.join(output_dir, f'metrics_{os.urandom(4).hex()}.txt')
+        with open(metrics_file, 'w') as f:
+            f.write(metrics_text)
+            f.write("\n\nHA Specification:\n")
+            f.write(json.dumps(ha_specification, indent=2))
+
+        # Construct feedback string is the same from metrics_file
+        feedback = f"Evaluation Results:\n{metrics_text}\n"
+        feedback += f"Last iteration HA Specification:\n{json.dumps(ha_specification, indent=2)}\n"
+
+
+        return True, metrics_dict, feedback
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return False, {}, f"Error during simulation/evaluation: {str(e)}"
 def parse_args():
     # Get the directory where this script is located
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -707,13 +820,20 @@ def parse_args():
         help="Path to JSON file containing initial HA specification (optional).",
     )
 
-    # Tools to remove
     ap.add_argument(
         "--tools-to-remove",
         type=str,
         nargs='*',
         default=['web_search', 'visit_webpage'],
         help="List of default tools to remove from the agent.",
+    )
+
+    # HA-Scientist Loop parameters
+    ap.add_argument(
+        "--max-iterations",
+        type=int,
+        default=3,
+        help="Maximum number of refinement iterations (HA-Scientist loop). Default: 3",
     )
 
     args = ap.parse_args()
@@ -759,27 +879,92 @@ def main():
         tools_to_remove=args.tools_to_remove,
     )
 
-    # Obtain task and images with auto-detected dimensions
-    task, compressed_trace_images = obtain_task_and_images(
-        input_data_path=args.input_data_path,
-        system_name=args.system_name,
-        num_variables=num_variables,
-        num_inputs=num_inputs,
-        initial_ha_spec=None,  # No longer needed - using dynamic template
-        tools_list=args.tools_list,
-        managed_agents_list=args.managed_agents_list if hasattr(args, 'managed_agents_list') else None,
-        manager_type=args.manager_type,
-    )
-    # save the task to a file
-    with open("task.md", "w", encoding="utf-8") as f:
-        f.write(task)
-    print(f"Saved task to task.md")
+    # HA-Scientist Iterative Loop
+    best_result = None
+    best_error = float('inf')
+    current_feedback = None
 
-    # Run the agent with task and compressed images
-    result = managerAgent.run(task, images=compressed_trace_images)
+    print(f"\nSTARTING SR-SCIENTIST LOOP (Max iterations: {args.max_iterations})")
+    
+    for iteration in range(1, args.max_iterations + 1):
+        print(f"\n{'#'*40}")
+        print(f"ITERATION {iteration}/{args.max_iterations}")
+        print(f"{'#'*40}")
 
-    # Evaluate the generated HA specification
-    evaluate_ha_specification(result, args.input_data_path)
+        # Obtain task and images with feedback from previous iteration
+        task, compressed_trace_images = obtain_task_and_images(
+            input_data_path=args.input_data_path,
+            system_name=args.system_name,
+            num_variables=num_variables,
+            num_inputs=num_inputs,
+            initial_ha_spec=None,
+            tools_list=args.tools_list,
+            managed_agents_list=args.managed_agents_list if hasattr(args, 'managed_agents_list') else None,
+            manager_type=args.manager_type,
+            feedback=current_feedback,
+            iteration=iteration
+        )
+        
+        # save the task to a file
+        task_filename = f"task_iter_{iteration}.md"
+        with open(task_filename, "w", encoding="utf-8") as f:
+            f.write(task)
+        print(f"Saved task to {task_filename}")
+
+        # Run the agent with task and compressed images
+        try:
+            result = managerAgent.run(task, images=compressed_trace_images)
+        except Exception as e:
+            print(f"Agent execution failed: {e}")
+            current_feedback = f"Agent execution failed in previous iteration: {str(e)}. Please try to generate a valid specification."
+            continue
+
+        # Evaluate the generated HA specification
+        success, metrics, feedback_str = evaluate_ha_specification_with_feedback(
+            result, 
+            args.input_data_path,
+            output_dir=os.path.join("evaluation_results", f"iter_{iteration}")
+        )
+        
+        current_feedback = feedback_str # Update feedback for next loop
+
+        # Check if this is the best result so far
+        # We need a metric to minimize. Let's assume 'rmse' or similar is in metrics dict.
+        # If metrics is empty or parsing failed, we treat error as infinite.
+        
+        # Currently HAEvaluator might not return a clean 'error' float in dictionary unless we parse the text or modify HAEvaluator.
+        # For now, we rely on the feedback string being generated. 
+        # But to track "best", we need a scalar.
+        # HAEvaluator returns (text, dict). Let's assume dict has 'mean_diff' or similar.
+        
+        current_error = float('inf')
+        if success and isinstance(metrics, dict):
+            # Try to find an error metric
+            if 'mean_diff' in metrics:
+                current_error = metrics['mean_diff']
+            elif 'rmse' in metrics:
+                current_error = metrics['rmse']
+        
+        print(f"Iteration {iteration} Result Error: {current_error}")
+
+        if current_error < best_error:
+            best_error = current_error
+            best_result = result
+            print(f"New Best Result Found! (Error: {best_error})")
+        
+        # Optional: Early stopping if error is sufficiently low
+        if best_error < 0.01: # Example threshold
+            print("Target accuracy reached. Stopping early.")
+            break
+
+    print("\n" + "="*80)
+    print("HA-SCIENTIST LOOP COMPLETE")
+    print(f"Best Error Achieved: {best_error}")
+    print("="*80)
+
+    # Final Evaluation of the best result (saved to main evaluation folder)
+    if best_result:
+        evaluate_ha_specification_with_feedback(best_result, args.input_data_path, output_dir="evaluation_results")
 
 
 if __name__ == "__main__":

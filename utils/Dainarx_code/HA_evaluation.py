@@ -848,6 +848,7 @@ if __name__ == "__main__":
         print_metrics=True
     )
     print("Metrics text:", metrics_text_str)
+    print("Metrics:", evaluator.metrics)
 
     # Mode 2: Overlay comparison
     print("\n2. Generating overlay comparison plot...")

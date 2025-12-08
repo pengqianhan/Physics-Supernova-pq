@@ -2,6 +2,11 @@
 HA_SPEC_DOCUMENTATION = """
 ## Hybrid Automaton Specification Format
 
+### 🎯 GOAL: PARSIMONIOUS SYSTEM IDENTIFICATION
+Your objective is to identify the **simplest possible** Hybrid Automaton that explains the data.
+- **Penalty**: You will be penalized for adding unnecessary modes or complex nonlinear terms.
+- **Strategy**: Start with a single mode with linear dynamics. Only add complexity (modes/nonlinearity) if the error remains high.
+
 ⚠️ **CRITICAL FORMAT RULES - READ CAREFULLY** ⚠️
 Your output will be parsed using `json.loads()`. You MUST output valid JSON format!
 
@@ -88,6 +93,18 @@ For higher-order ODEs (2nd, 3rd order, etc.), use a SINGLE equation with the hig
 **DO NOT convert to state-space representation!**
 
 Example: For a 2nd-order Duffing oscillator: ẍ + αẋ + βx + γx³ = u
+
+--------------------------------------------------------------------------------
+❌ **WRONG PATTERN (State-Space Form)**
+DO NOT split into system of first order equations.
+"eq": "x1[0] = x1[1], x1[1] = ..."  (Causes: IndexError, Dimension Mismatch)
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+✅ **CORRECT PATTERN (Higher-Order Form)**
+Use ONE equation with the highest derivative on LHS.
+"eq": "x1[2] = ..."                 (System handles the rest automatically)
+--------------------------------------------------------------------------------
 
 ❌ **WRONG (state-space form - causes IndexError!)**:
 ```
