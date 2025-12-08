@@ -617,9 +617,7 @@ def evaluate_ha_specification(agent_result, input_data_path: str, output_dir: st
         print(f"\nError during HA evaluation: {e}")
         import traceback
         traceback.print_exc()
-        return False, {}, f"Error during evaluation: {str(e)}"
-
-    return True, {}, "Evaluation succeeded but no metrics captured (unexpected path)"
+        return False
 
 
 def evaluate_ha_specification_with_feedback(agent_result, input_data_path: str, output_dir: str = None) -> tuple[bool, dict, str]:
@@ -719,6 +717,8 @@ def evaluate_ha_specification_with_feedback(agent_result, input_data_path: str, 
         import traceback
         traceback.print_exc()
         return False, {}, f"Error during simulation/evaluation: {str(e)}"
+
+
 def parse_args():
     # Get the directory where this script is located
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -948,7 +948,7 @@ def main():
         
         print(f"Iteration {iteration} Result Error: {current_error}")
 
-        if current_error < best_error:
+        if success and current_error < best_error:
             best_error = current_error
             best_result = result
             print(f"New Best Result Found! (Error: {best_error})")
