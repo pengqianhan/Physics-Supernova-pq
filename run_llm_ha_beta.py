@@ -640,7 +640,7 @@ def parse_args():
         nargs='*',
         default=["hybrid_automaton_image_analysis", "summarize_hybrid_automaton_iterations", "validate_hybrid_automaton_specification"],
         help="List of tool names to use in the agent.",
-    )
+    )# not include hybrid_automaton_review_expert for fast output final answer
 
     # LLM model ids for the tools
     ap.add_argument(
