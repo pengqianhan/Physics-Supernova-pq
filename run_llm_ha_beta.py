@@ -691,8 +691,9 @@ def evaluate_ha_specification_with_feedback(agent_result, input_data_path: str, 
             total_time=ha_specification['config'].get('total_time', 10.0)
         )
 
-        # Run evaluation
-        save_path = os.path.join(output_dir, f'ha_eval_{os.urandom(4).hex()}.png')
+        # Run evaluation - use absolute path to avoid path conversion in HAEvaluator
+        save_num = os.urandom(4).hex()
+        save_path = os.path.abspath(os.path.join(output_dir, f'ha_eval_{save_num}.png'))
         metrics_text, plot_base64 = evaluator(
             plot_mode='overlay',
             save_path=save_path,
@@ -701,7 +702,7 @@ def evaluate_ha_specification_with_feedback(agent_result, input_data_path: str, 
         metrics_dict = evaluator.metrics
 
         # Save metrics
-        metrics_file = os.path.join(output_dir, f'metrics_{os.urandom(4).hex()}.txt')
+        metrics_file = os.path.join(output_dir, f'metrics_{save_num}.txt')
         with open(metrics_file, 'w') as f:
             f.write(metrics_text)
             f.write("\n\nHA Specification:\n")
