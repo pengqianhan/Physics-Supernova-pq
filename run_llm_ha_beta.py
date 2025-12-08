@@ -465,7 +465,7 @@ The `var` and `input` fields in the template below are **already correctly set**
 - For single-variable systems: use higher-order ODE notation (e.g., `x1[2] = ...` for 2nd-order)
 - Focus on inferring the **equations** (`eq`), **modes**, and **edge conditions** only!
 
-## Initial HA Specification Template (v0 - with correct dimensions)
+## Initial Hybrid Automaton Specification Template (v0 - with correct dimensions)
 The `var` and `input` fields are pre-filled. Your task is to refine the **equations** and **structure**:
 
 ```json
@@ -483,7 +483,7 @@ Generate an improved HA specification (v1) that better matches the observed traj
     if feedback:
         task += f"""
     
-    ## ⚠️ FEEDBACK FROM PREVIOUS ITERATION (Iteration {iteration-1})
+    ## ⚠️ FEEDBACK FROM PREVIOUS ITERATION
     The following feedback was generated from evaluating your previous attempt. Use it to guide your next refinement:
     
     {feedback}
@@ -707,8 +707,9 @@ def evaluate_ha_specification_with_feedback(agent_result, input_data_path: str, 
             f.write(json.dumps(ha_specification, indent=2))
 
         # Construct feedback string is the same from metrics_file
-        feedback = f"Evaluation Results:\n{metrics_text}\n"
-        feedback += f"Last iteration HA Specification:\n{json.dumps(ha_specification, indent=2)}\n"
+        
+        feedback = f"\n{json.dumps(ha_specification, indent=2)}\n"
+        feedback += f"Evaluation Results:\n{metrics_text}\n"
 
 
         return True, metrics_dict, feedback
@@ -883,7 +884,7 @@ def main():
     # HA-Scientist Iterative Loop
     best_result = None
     best_error = float('inf')
-    current_feedback = None
+    current_feedback = ""
 
     print(f"\nSTARTING SR-SCIENTIST LOOP (Max iterations: {args.max_iterations})")
     
@@ -907,7 +908,7 @@ def main():
         )
         
         # save the task to a file
-        task_filename = f"task_iter_{iteration}.md"
+        task_filename = f"task_iter_{iteration-1}.md"
         with open(task_filename, "w", encoding="utf-8") as f:
             f.write(task)
         print(f"Saved task to {task_filename}")
@@ -927,7 +928,7 @@ def main():
             output_dir=os.path.join("evaluation_results", f"iter_{iteration}")
         )
         
-        current_feedback = feedback_str # Update feedback for next loop
+        current_feedback += 'Hybrid Automaton Specification v' + str(iteration) + ':\n' + feedback_str # Update feedback for next loop
 
         # Check if this is the best result so far
         # We need a metric to minimize. Let's assume 'rmse' or similar is in metrics dict.
