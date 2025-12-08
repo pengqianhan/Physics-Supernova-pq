@@ -14,7 +14,7 @@ from .ha_spec_validator import validate_and_fix_ha_spec, validate_equation_synta
 class ValidateHASpecTool(Tool):
     """Tool for validating and fixing Hybrid Automaton specifications before submission."""
 
-    name = "validate_ha_specification"
+    name = "validate_hybrid_automaton_specification"
     description = (
         "**Hybrid Automaton Specification Validator**\n\n"
         "Use this tool to validate your HA specification BEFORE submitting your final answer.\n"

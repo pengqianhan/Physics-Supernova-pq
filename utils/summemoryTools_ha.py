@@ -108,7 +108,7 @@ def summarize_agent_memory(summarize_model: LiteLLMModel,
 class SummarizeMemoryTool(Tool):
     """Tool to summarize the complete Hybrid Automaton learning iteration history from v0 to the latest version."""
 
-    name = "summarize_ha_iterations"
+    name = "summarize_hybrid_automaton_iterations"
 
     description = (
         "When you have completed multiple iterations of Hybrid Automaton specification refinement and want to get a comprehensive summary of ALL versions (v0, v1, v2, ...), call this tool. "

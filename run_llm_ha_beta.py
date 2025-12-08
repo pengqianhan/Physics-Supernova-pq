@@ -135,9 +135,9 @@ def generate_dynamic_ha_template(num_variables: int, num_inputs: int, system_nam
 # Tool mapping for HA-specific tools
 TOOLNAME2TOOL = {
     'hybrid_automaton_image_analysis': HybridAutomatonImageTool,## if the managerAgent can not input image, use this tool
-    'ask_review_expert_ha': ReviewRequestTool_ha,
-    'summarize_ha_iterations': SummarizeMemoryTool,
-    'validate_ha_specification': ValidateHASpecTool,
+    'hybrid_automaton_review_expert': ReviewRequestTool_ha,
+    'summarize_hybrid_automaton_iterations': SummarizeMemoryTool,
+    'validate_hybrid_automaton_specification': ValidateHASpecTool,
 }
 
 
@@ -343,15 +343,15 @@ The following trace data visualizations are provided (reference images using pla
     # Add tool-specific prompts
     if HybridAutomatonImageTool in ToolsList:
         HA_IMAGE_TOOL_PROMPT = "You MUST use the 'hybrid_automaton_image_analysis' tool to analyze the image."
-    REVIEW_TOOL_PROMPT = " When you need expert review of your hybrid automaton specification, you MUST call the `ask_review_expert_ha` tool."
+    REVIEW_TOOL_PROMPT = " When you need expert review of your hybrid automaton specification, you MUST call the `hybrid_automaton_review_expert` tool."
     if ReviewRequestTool_ha in ToolsList:
         REVIEW_TOOL_PROMPT += """
-**MANDATORY BEFORE FINALIZATION**: You MUST call `ask_review_expert_ha` at least once before submitting your final answer to ensure specification correctness and completeness."""
+**MANDATORY BEFORE FINALIZATION**: You MUST call `hybrid_automaton_review_expert` at least once before submitting your final answer to ensure specification correctness and completeness."""
 
     VALIDATE_TOOL_PROMPT = ""
     if ValidateHASpecTool in ToolsList:
         VALIDATE_TOOL_PROMPT = """
-**VALIDATION TOOL**: Before submitting your final answer, you SHOULD call `validate_ha_specification` to check for syntax errors.
+**VALIDATION TOOL**: Before submitting your final answer, you SHOULD call `validate_hybrid_automaton_specification` to check for syntax errors.
 This tool will:
 - Detect common formatting issues (wrong direction format, missing required fields, etc.)
 - Auto-fix minor issues and normalize the specification
@@ -638,7 +638,7 @@ def parse_args():
         "--tools-list",
         type=str,
         nargs='*',
-        default=["hybrid_automaton_image_analysis", "ask_review_expert_ha", "summarize_ha_iterations", "validate_ha_specification"],
+        default=["hybrid_automaton_image_analysis", "summarize_hybrid_automaton_iterations", "validate_hybrid_automaton_specification"],
         help="List of tool names to use in the agent.",
     )
 
@@ -786,4 +786,4 @@ if __name__ == "__main__":
     main()
 
     # Example usage:
-    # python run_llm_ha_beta.py --input-data-path utils/Dainarx_code/data_duffing --manager-type CodeAgent --tools-list hybrid_automaton_image_analysis ask_review_expert_ha
+    # python run_llm_ha_beta.py --input-data-path utils/Dainarx_code/data_duffing --manager-type CodeAgent --tools-list hybrid_automaton_image_analysis hybrid_automaton_review_expert

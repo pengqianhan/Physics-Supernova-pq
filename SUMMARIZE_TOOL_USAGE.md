@@ -2,7 +2,7 @@
 
 ## 概述
 
-`SummarizeMemoryTool` (工具名: `summarize_ha_iterations`) 是一个专门用于Hybrid Automaton学习迭代过程总结的工具。该工具能够从agent的memory中提取完整的HA规范迭代历史，从v0（初始规范）到最新版本。
+`SummarizeMemoryTool` (工具名: `summarize_hybrid_automaton_iterations`) 是一个专门用于Hybrid Automaton学习迭代过程总结的工具。该工具能够从agent的memory中提取完整的HA规范迭代历史，从v0（初始规范）到最新版本。
 
 ## 功能特性
 
@@ -72,7 +72,7 @@
 python run_llm_ha_beta.py \
   --input-data-path utils/Dainarx_code/data_duffing \
   --manager-type CodeAgent \
-  --tools-list hybrid_automaton_image_analysis ask_review_expert_ha summarize_ha_iterations
+  --tools-list hybrid_automaton_image_analysis ask_review_expert_ha summarize_hybrid_automaton_iterations
 ```
 
 ### 2. 配置总结工具使用的模型
@@ -94,15 +94,15 @@ python run_llm_ha_beta.py \
 **标准调用（仅总结，保留memory）：**
 ```python
 # 默认行为：总结所有迭代，memory保持不变
-result = agent.tools['summarize_ha_iterations'].forward()
+result = agent.tools['summarize_hybrid_automaton_iterations'].forward()
 # 或显式指定
-result = agent.tools['summarize_ha_iterations'].forward(reset_memory=False)
+result = agent.tools['summarize_hybrid_automaton_iterations'].forward(reset_memory=False)
 ```
 
 **遗传算法场景（总结并重置memory）：**
 ```python
 # 适用于遗传算法：总结当前代的迭代历史，然后重置memory开始新一代
-result = agent.tools['summarize_ha_iterations'].forward(reset_memory=True)
+result = agent.tools['summarize_hybrid_automaton_iterations'].forward(reset_memory=True)
 ```
 
 **工具会自动：**
@@ -129,7 +129,7 @@ GEMINI_API_KEY=your_api_key_here
 ### 1. utils/summemoryTools_ha.py
 - 更新系统提示词：从物理问题总结改为HA规范迭代总结
 - 修改输出格式：要求包含完整的HA dict及分析
-- 工具名改为 `summarize_ha_iterations`
+- 工具名改为 `summarize_hybrid_automaton_iterations`
 - API配置改为使用Gemini API
 
 ### 2. run_llm_ha_beta.py
@@ -162,7 +162,7 @@ GEMINI_API_KEY=your_api_key_here
        agent.run(task, images=images)
 
        # 总结当前代的所有迭代，并重置memory准备下一代
-       summary = agent.tools['summarize_ha_iterations'].forward(reset_memory=True)
+       summary = agent.tools['summarize_hybrid_automaton_iterations'].forward(reset_memory=True)
 
        # 从总结中提取最终HA规范用于fitness评估
        final_ha = extract_final_version(summary)
@@ -274,7 +274,7 @@ class HAGeneticAlgorithm:
             input_data_path="utils/Dainarx_code/data_duffing",
             tools_list=["hybrid_automaton_image_analysis",
                        "ask_review_expert_ha",
-                       "summarize_ha_iterations"],
+                       "summarize_hybrid_automaton_iterations"],
             manager_type="CodeAgent",
         )
         return agent
@@ -284,7 +284,7 @@ class HAGeneticAlgorithm:
         agent.run(task, images=images)
 
         # 总结该代的所有HA迭代，并重置memory准备下一代
-        summary = agent.tools['summarize_ha_iterations'].forward(reset_memory=True)
+        summary = agent.tools['summarize_hybrid_automaton_iterations'].forward(reset_memory=True)
 
         return summary
 
@@ -326,7 +326,7 @@ class HAGeneticAlgorithm:
             num_inputs=1,
             tools_list=["hybrid_automaton_image_analysis",
                        "ask_review_expert_ha",
-                       "summarize_ha_iterations"],
+                       "summarize_hybrid_automaton_iterations"],
             manager_type="CodeAgent",
         )
 
@@ -417,7 +417,7 @@ if __name__ == "__main__":
 
 ### 关键要点
 
-1. **Memory管理**：每次调用 `summarize_ha_iterations(reset_memory=True)` 后，agent的memory被清空，可以开始全新的迭代
+1. **Memory管理**：每次调用 `summarize_hybrid_automaton_iterations(reset_memory=True)` 后，agent的memory被清空，可以开始全新的迭代
 2. **总结保存**：总结结果包含完整的迭代历史，需要在外部保存用于fitness评估
 3. **岛屿模型**：多个种群隔离进化，避免premature convergence
 4. **迁移策略**：定期在岛屿间迁移优秀个体，保持种群多样性

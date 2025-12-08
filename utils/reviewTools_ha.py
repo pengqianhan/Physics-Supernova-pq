@@ -54,7 +54,7 @@ Provide structured feedback with:
 class ReviewRequestTool_ha(Tool):
     """Expert HA specification reviewer with automated evaluation and structured feedback generation."""
 
-    name = "ask_ha_review_expert"
+    name = "hybrid_automaton_review_expert"
     description = (
         "**Expert Hybrid Automaton Python dict Specification Review Service**\n\n"
         "This tool provides comprehensive expert review of your HA specification by:\n"
