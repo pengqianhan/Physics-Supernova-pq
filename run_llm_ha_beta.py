@@ -709,6 +709,7 @@ def evaluate_ha_specification_with_feedback(agent_result, input_data_path: str, 
         # Construct feedback string is the same from metrics_file
         
         feedback = f"```json\n{json.dumps(ha_specification, indent=2)}\n```\n"
+        # feedback = f"```json\n{agent_result}\n```\n"
         feedback += f"Evaluation Results:\n{metrics_text}\n"
 
 
@@ -717,7 +718,10 @@ def evaluate_ha_specification_with_feedback(agent_result, input_data_path: str, 
     except Exception as e:
         import traceback
         traceback.print_exc()
-        return False, {}, f"Error during simulation/evaluation: {str(e)}"
+        feedback = f"```json\n{json.dumps(ha_specification, indent=2)}\n```\n"
+        # feedback = f"```json\n{agent_result}\n```\n"
+        feedback += f"Evaluation Results:\n{str(e)}\n"
+        return False, {}, feedback
 
 
 def parse_args():
