@@ -806,18 +806,6 @@ def parse_args():
         default="Duffing Oscillator",
         help="Name of the dynamical system.",
     )
-    ap.add_argument(
-        "--num-variables",
-        type=int,
-        default=1,
-        help="Number of state variables.",
-    )
-    ap.add_argument(
-        "--num-inputs",
-        type=int,
-        default=1,
-        help="Number of input variables.",
-    )
 
     # HA specification file (optional)
     ap.add_argument(
@@ -858,20 +846,8 @@ def main():
     print(f"Running HA Learning Agent with model: {args.manager_model}, tools: {args.tools_list}, data path: {args.input_data_path}")
 
     # Auto-detect dimensions from data file (overrides command-line args if provided)
-    auto_num_variables, auto_num_inputs = get_data_dimensions(args.input_data_path)
+    num_variables, num_inputs = get_data_dimensions(args.input_data_path)
     
-    # Use auto-detected values (can be overridden by explicit command-line args if needed)
-    # If user explicitly provided different values, warn them
-    if args.num_variables != auto_num_variables:
-        print(f"⚠️ Warning: --num-variables={args.num_variables} differs from auto-detected value={auto_num_variables}")
-        print(f"   Using auto-detected value: {auto_num_variables}")
-    if args.num_inputs != auto_num_inputs:
-        print(f"⚠️ Warning: --num-inputs={args.num_inputs} differs from auto-detected value={auto_num_inputs}")
-        print(f"   Using auto-detected value: {auto_num_inputs}")
-    
-    num_variables = auto_num_variables
-    num_inputs = auto_num_inputs
-
     # Create the agent
     managerAgent = create_agent(
         model_id=args.manager_model,
