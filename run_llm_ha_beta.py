@@ -1,7 +1,7 @@
 import os
 import sys
 import json
-import prompts_ha
+from datetime import datetime
 from prompts_ha.prompts import HA_SPEC_DOCUMENTATION, initial_ha_spec_prompt
 # Load environment variables from .env file if it exists
 try:
@@ -690,8 +690,9 @@ def evaluate_ha_specification_with_feedback(agent_result, input_data_path: str, 
         )
 
         # Run evaluation - use absolute path to avoid path conversion in HAEvaluator
-        save_num = os.urandom(4).hex()
-        save_path = os.path.abspath(os.path.join(output_dir, f'ha_eval_{save_num}.png'))
+        # save_num = os.urandom(4).hex()
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        save_path = os.path.abspath(os.path.join(output_dir, f'ha_eval_{timestamp}.png'))
         metrics_text, plot_base64 = evaluator(
             plot_mode='overlay',
             save_path=save_path,
@@ -700,7 +701,7 @@ def evaluate_ha_specification_with_feedback(agent_result, input_data_path: str, 
         metrics_dict = evaluator.metrics
 
         # Save metrics
-        metrics_file = os.path.join(output_dir, f'metrics_{save_num}.txt')
+        metrics_file = os.path.join(output_dir, f'metrics_{timestamp}.txt')
         with open(metrics_file, 'w') as f:
             f.write(metrics_text)
             f.write("\n\nHA Specification:\n")
@@ -830,7 +831,7 @@ def parse_args():
         "--tools-to-remove",
         type=str,
         nargs='*',
-        default=['web_search', 'visit_webpage'],
+        default=[],##['web_search', 'visit_webpage']
         help="List of default tools to remove from the agent.",
     )
 
