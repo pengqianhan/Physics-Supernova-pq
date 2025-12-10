@@ -2,7 +2,11 @@ import os
 import sys
 import json
 from datetime import datetime
-from prompts_ha.prompts import HA_SPEC_DOCUMENTATION, initial_ha_spec_prompt
+from prompts_ha.prompts import (
+    HA_SPEC_DOCUMENTATION,
+    HA_SPEC_JSON_SCHEMA_COMPACT,
+    get_ha_spec_documentation_with_schema,
+)
 # Load environment variables from .env file if it exists
 try:
     from dotenv import load_dotenv
@@ -292,7 +296,8 @@ def obtain_task_and_images(input_data_path: str = None,
                            managed_agents_list: List[str] = None,
                            manager_type: str = "CodeAgent",
                            feedback: str = None, # Added feedback parameter
-                           iteration: int = 1) -> tuple[str, list]:
+                           iteration: int = 1,
+                           use_json_schema: bool = True) -> tuple[str, list]:
     '''
     Generate task prompt and compressed images for HA learning agent.
 
@@ -307,6 +312,7 @@ def obtain_task_and_images(input_data_path: str = None,
         manager_type: Type of manager agent
         feedback: Feedback string from previous iteration (optional)
         iteration: Current iteration number (1-indexed)
+        use_json_schema: If True, include JSON Schema in the prompt for structured output
 
     Returns:
         Tuple of (task prompt string, list of compressed images)
@@ -406,32 +412,6 @@ Your HA specification will be evaluated on:
 - **Mode Detection Accuracy**: Correct identification of switching instants (`tc` metric)
 - **State Error Minimization**: Low `mean_diff` and `max_diff` between predicted and actual states"""
 
-    # Add output requirements with clear format specification
-#     task += """
-
-# ## Output Format Requirements
-# Return a **valid JSON object** with the following structure:
-# ```json
-# {
-#     "automaton": {
-#         "var": "x1, x2, ...",
-#         "input": "u1, u2, ...",
-#         "mode": [{"id": 1, "eq": "..."}],
-#         "edge": [{"direction": "1 -> 2", "condition": "...", "reset": {...}}]
-#     },
-#     "config": {
-#         "dt": 0.001,
-#         "total_time": 10.0,
-#         "dim": 1,
-#         "need_reset": true,
-#         "non_linear_items": "..."
-#     }
-# }
-# ```
-# **CRITICAL JSON RULES**:
-# - Use `true`/`false` (NOT Python's `True`/`False`)
-# - Use double quotes `"key"` (NOT single quotes)
-# - Return ONLY the JSON. No markdown formatting, no explanations, no code blocks in the final answer."""
 
     # Add managed agents prompt
     if managed_agents_list and len(managed_agents_list) > 0:
@@ -455,8 +435,14 @@ Use them for numerical computations, curve fitting, or complex mathematical deri
     input_names = ", ".join([f"u{i+1}" for i in range(num_inputs)]) if num_inputs > 0 else "(none)"
 
     # Add HA specification format documentation and initial spec
+    # Use JSON Schema-based documentation for more precise output specification
+    if use_json_schema:
+        ha_spec_docs = get_ha_spec_documentation_with_schema(simplified=True)
+    else:
+        ha_spec_docs = HA_SPEC_DOCUMENTATION
+
     task += f"""
-{HA_SPEC_DOCUMENTATION}
+{ha_spec_docs}
 
 ### ⚠️ CRITICAL: Variable Count is PRE-DEFINED ⚠️
 The `var` and `input` fields in the template below are **already correctly set** based on the ground truth data.
@@ -831,6 +817,20 @@ def parse_args():
         help="Maximum number of refinement iterations (HA-Scientist loop). Default: 3",
     )
 
+    # JSON Schema option
+    ap.add_argument(
+        "--use-json-schema",
+        action="store_true",
+        default=True,
+        help="Include JSON Schema in the task prompt for structured output (default: True)",
+    )
+    ap.add_argument(
+        "--no-json-schema",
+        dest="use_json_schema",
+        action="store_false",
+        help="Disable JSON Schema in the task prompt",
+    )
+
     args = ap.parse_args()
 
     if not args.input_data_path:
@@ -885,7 +885,8 @@ def main():
             managed_agents_list=args.managed_agents_list if hasattr(args, 'managed_agents_list') else None,
             manager_type=args.manager_type,
             feedback=current_feedback,
-            iteration=iteration
+            iteration=iteration,
+            use_json_schema=args.use_json_schema
         )
         
         # save the task to a file

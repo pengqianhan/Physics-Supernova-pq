@@ -1,3 +1,11 @@
+# Import JSON Schema for prompt generation
+try:
+    from utils.ha_json_schema import HA_JSON_SCHEMA, get_schema_for_prompt
+    HAS_SCHEMA = True
+except ImportError:
+    HAS_SCHEMA = False
+    HA_JSON_SCHEMA = None
+
 # HA Specification Format Documentation (for LLM understanding)
 HA_SPEC_DOCUMENTATION = """
 ## Hybrid Automaton Specification Format
@@ -134,15 +142,15 @@ This defines d²x1/dt² directly. The values x1[0] (position) and x1[1] (velocit
 """
 
 # Valid JSON template for HA specification (parsed by json.loads)
-# Example: Bouncing ball with gravity (2 variables: position x1, velocity x2)
-initial_ha_spec_prompt = """{
+# Example: one mode with reset
+one_mode_reset_ha_spec_prompt = """{
     "automaton": {
         "var": "x1, x2",
         "input": "u1",
         "mode": [
             {
                 "id": 1,
-                "eq": "x1[1] = x2[0], x2[1] = -9.8 + u1"
+                "eq": "x1[1] = x2[0], x2[1] = x1[0] + u1"
             }
         ],
         "edge": [
@@ -151,7 +159,7 @@ initial_ha_spec_prompt = """{
                 "condition": "x1 <= 0",
                 "reset": {
                     "x1": [0],
-                    "x2": ["-0.9 * x2[0]"]
+                    "x2": ["-0.1 * x1[0]"]
                 }
             }
         ]
@@ -165,15 +173,15 @@ initial_ha_spec_prompt = """{
     }
 }"""
 
-# Alternative example: Single-mode Duffing oscillator (2nd-order ODE, 1 variable)
-duffing_ha_spec_prompt = """{
+# Example: Single-mode system (2nd-order ODE, 1 variable)
+second_order_ha_spec_prompt = """{
     "automaton": {
         "var": "x1",
         "input": "u1",
         "mode": [
             {
                 "id": 1,
-                "eq": "x1[2] = -0.5 * x1[1] - 5.0 * x1[0] - 0.5 * x1[0]**3 + u1"
+                "eq": "x1[2] = x1[1] + x1[0] + x1[0]**3 + u1"
             }
         ],
         "edge": []
@@ -181,34 +189,34 @@ duffing_ha_spec_prompt = """{
     "config": {
         "dt": 0.001,
         "total_time": 10.0,
-        "dim": 2,
+        "order": 2,
         "need_reset": false,
         "non_linear_items": "x1[0]**3"
     }
 }"""
 
-# Example: Two-mode thermostat system (heating/cooling)
-thermostat_ha_spec_prompt = """{
+# Example: Two-mode system
+two_modes_ha_spec_prompt = """{
     "automaton": {
         "var": "x1",
         "mode": [
             {
                 "id": 1,
-                "eq": "x1[1] = -0.1 * x1[0] + 5"
+                "eq": "x1[1] = x1[0] + 5"
             },
             {
                 "id": 2,
-                "eq": "x1[1] = -0.1 * x1[0] - 3"
+                "eq": "x1[1] = -x1[0] - 3"
             }
         ],
         "edge": [
             {
                 "direction": "1 -> 2",
-                "condition": "x1 >= 25"
+                "condition": "x1 >= 4"
             },
             {
                 "direction": "2 -> 1",
-                "condition": "x1 <= 15"
+                "condition": "x1 <= 9"
             }
         ]
     },
@@ -222,23 +230,108 @@ thermostat_ha_spec_prompt = """{
 }"""
 
 
+# JSON Schema-based documentation for structured output
+def get_ha_spec_documentation_with_schema(simplified: bool = True) -> str:
+    """
+    Generate HA specification documentation that includes the JSON Schema.
+
+    This provides a machine-readable specification that LLMs can follow more precisely.
+
+    Args:
+        simplified: If True, use simplified schema without $ref definitions
+
+    Returns:
+        Documentation string with embedded JSON Schema
+    """
+    schema_str = get_schema_for_prompt(include_definitions=not simplified) if HAS_SCHEMA else "{}"
+
+    return f"""## Hybrid Automaton Specification Format (JSON Schema)
+
+### 🎯 GOAL: PARSIMONIOUS SYSTEM IDENTIFICATION
+Your objective is to identify the **simplest possible** Hybrid Automaton that explains the data.
+- **Penalty**: You will be penalized for adding unnecessary modes or complex nonlinear terms.
+- **Strategy**: Start with a single mode with linear dynamics. Only add complexity if error remains high.
+
+### JSON Schema Definition
+Your output MUST conform to this JSON Schema:
+
+```json
+{schema_str}
+```
+
+
+### Examples
+
+**Single-mode 2nd-order:**
+```json
+{second_order_ha_spec_prompt}
+```
+
+**Two-mode switching:**
+```json
+{two_modes_ha_spec_prompt}
+```
+
+**With reset map:**
+```json
+{one_mode_reset_ha_spec_prompt}
+```
+"""
+
+
+# Compact schema documentation for token efficiency
+HA_SPEC_JSON_SCHEMA_COMPACT = """## HA Specification JSON Schema (Compact)
+
+**Required structure:**
+```json
+{
+  "automaton": {
+    "var": "x1, x2, ...",        // State variables (comma-separated string)
+    "input": "u1, u2, ...",      // Inputs (string, can be "")
+    "mode": [{"id": 1, "eq": "x1[2] = ..."}],  // id: integer, eq: ODE string
+    "edge": [{"direction": "1 -> 2", "condition": "x1 > 0", "reset": {...}}]
+  },
+  "config": {
+    "dt": 0.001,                 // Time step (number > 0)
+    "total_time": 10.0,          // Duration (number > 0)
+    "dim": 2,                    // ODE order (optional)
+    "need_reset": false          // Has resets? (optional)
+  }
+}
+```
+
+**Critical rules:**
+- Mode `id`: integer >= 1 (NOT 1.0)
+- Direction: `"1 -> 2"` with spaces
+- Condition: bare names `x1 > 0` (NOT `x1[0] > 0`)
+- ODE: `x1[2] = ...` for 2nd-order (NOT state-space form)
+- JSON: `true/false/null` (NOT True/False/None)
+"""
+
+
 if __name__ == "__main__":
     print("=" * 60)
     print("HA SPECIFICATION DOCUMENTATION")
     print("=" * 60)
     print(HA_SPEC_DOCUMENTATION)
-    
+
     print("\n" + "=" * 60)
-    print("EXAMPLE 1: Bouncing Ball (with reset)")
+    print("EXAMPLE 1: One mode with reset)")
     print("=" * 60)
-    print(initial_ha_spec_prompt)
-    
+    print(one_mode_reset_ha_spec_prompt)
+
     print("\n" + "=" * 60)
-    print("EXAMPLE 2: Duffing Oscillator (2nd-order, nonlinear)")
+    print("EXAMPLE 2: Second-order ODE")
     print("=" * 60)
-    print(duffing_ha_spec_prompt)
-    
+    print(second_order_ha_spec_prompt)
+
     print("\n" + "=" * 60)
-    print("EXAMPLE 3: Thermostat (two-mode switching)")
+    print("EXAMPLE 3: Two-mode switching")
     print("=" * 60)
-    print(thermostat_ha_spec_prompt)
+    print(two_modes_ha_spec_prompt)
+
+    if HAS_SCHEMA:
+        print("\n" + "=" * 60)
+        print("JSON SCHEMA-BASED DOCUMENTATION")
+        print("=" * 60)
+        print(get_ha_spec_documentation_with_schema())
