@@ -4,7 +4,7 @@ Hybrid Automaton Specification Validation Tool
 This tool allows the agent to validate its HA specification before submitting
 the final answer. It checks syntax and structure, and attempts to fix common issues.
 
-Uses both traditional validation and JSON Schema validation for comprehensive checking.
+Uses JSON Schema validation as the primary validation mechanism.
 """
 
 import json
@@ -13,11 +13,11 @@ from smolagents.default_tools import Tool
 
 # Support both relative imports (when used as package) and absolute imports (when run directly)
 try:
-    from .ha_spec_validator import validate_and_fix_ha_spec, validate_equation_syntax, validate_condition_syntax
+    from .ha_spec_validator import extract_and_fix_ha_spec
 except ImportError:
-    from ha_spec_validator import validate_and_fix_ha_spec, validate_equation_syntax, validate_condition_syntax
+    from ha_spec_validator import extract_and_fix_ha_spec
 
-# Import JSON Schema validation
+# Import JSON Schema validation (primary validation)
 try:
     from .ha_json_schema import validate_ha_with_schema, format_validation_errors, HAS_JSONSCHEMA
 except ImportError:
@@ -84,35 +84,37 @@ class ValidateHASpecTool(Tool):
             Validation result with status, messages, and fixed specification if applicable
         """
 
-        # Step 1: Run traditional validation and auto-fix
-        ha_dict, is_valid, messages = validate_and_fix_ha_spec(ha_spec_json, auto_fix=True)
+        # Step 1: Extract and auto-fix the specification
+        ha_dict, fix_messages = extract_and_fix_ha_spec(ha_spec_json, auto_fix=True)
 
-        # Step 2: Run JSON Schema validation if available
-        schema_result = True
-        if HAS_JSONSCHEMA and validate_ha_with_schema is not None and ha_dict is not None:
-            schema_result = validate_ha_with_schema(ha_dict, auto_extract=False)
-
-        # Step 3: Build response
+        # Build response
         response_parts = []
 
         if ha_dict is None:
             response_parts.append("❌ **STATUS: INVALID - EXTRACTION FAILED**")
             response_parts.append("\nCould not extract a valid dictionary from your input.")
             response_parts.append("\n**Errors:**")
-            for msg in messages:
+            for msg in fix_messages:
                 response_parts.append(f"  - {msg}")
             response_parts.append("\n**Action Required:** Please provide a valid Python dictionary with 'automaton' and 'config' keys.")
             return "\n".join(response_parts)
 
+        # Step 2: Run JSON Schema validation (primary validation)
+        if not HAS_JSONSCHEMA or validate_ha_with_schema is None:
+            response_parts.append("⚠️ **WARNING: jsonschema library not installed**")
+            response_parts.append("\nCannot perform full validation. Install with: pip install jsonschema")
+            response_parts.append(f"\n**Extracted Specification:**\n```json\n{json.dumps(ha_dict, indent=2)}\n```")
+            return "\n".join(response_parts)
+
+        schema_result = validate_ha_with_schema(ha_dict, auto_extract=False)
+
         # Check if any fixes were applied
-        fixes_applied = [msg for msg in messages if msg.startswith("Fixed:")]
-        errors_remaining = [msg for msg in messages if msg.startswith("Remaining error:") or msg.startswith("Error:")]
+        fixes_applied = [msg for msg in fix_messages if msg.startswith("Fixed:")]
 
-        # Combine validation results
-        schema_valid = schema_result['valid'] if schema_result else True
-        overall_valid = is_valid and schema_valid
+        # Use schema validation result as the primary validation result
+        is_valid = schema_result['valid']
 
-        if overall_valid:
+        if is_valid:
             if fixes_applied:
                 response_parts.append("✅ **STATUS: FIXED - USE CORRECTED SPECIFICATION**")
                 response_parts.append("\nYour specification had issues that were auto-corrected.")
@@ -123,7 +125,7 @@ class ValidateHASpecTool(Tool):
                 response_parts.append("✅ **STATUS: VALID - READY FOR SUBMISSION**")
                 response_parts.append("\nYour HA specification passed all validation checks.")
 
-            # Additional syntax validation details
+            # Validation summary
             response_parts.append("\n**Validation Summary:**")
             automaton = ha_dict.get('automaton', {})
             var_list = [v.strip() for v in automaton.get('var', '').split(',') if v.strip()]
@@ -133,9 +135,7 @@ class ValidateHASpecTool(Tool):
             response_parts.append(f"  - Inputs: {input_list}")
             response_parts.append(f"  - Modes: {len(automaton.get('mode', []))}")
             response_parts.append(f"  - Edges: {len(automaton.get('edge', []))}")
-
-            if schema_result:
-                response_parts.append(f"  - Schema validation: ✅ Passed")
+            response_parts.append(f"  - Schema validation: ✅ Passed")
 
             # Provide the corrected specification
             response_parts.append("\n**Corrected Specification (use this for final answer):**")
@@ -150,25 +150,18 @@ class ValidateHASpecTool(Tool):
                 for fix in fixes_applied:
                     response_parts.append(f"  - {fix.replace('Fixed: ', '')}")
 
-            response_parts.append("\n**Remaining Errors (must fix manually):**")
-            for err in errors_remaining:
-                response_parts.append(f"  - {err.replace('Remaining error: ', '').replace('Error: ', '')}")
-
-            # Add schema validation errors if any
-            if schema_result and not schema_result['valid']:
-                response_parts.append("\n**JSON Schema Validation Errors:**")
-                for err in schema_result.get('errors', [])[:5]:  # Limit to first 5
-                    response_parts.append(f"  - [{err['path']}] {err['message']}")
-                if len(schema_result.get('errors', [])) > 5:
-                    response_parts.append(f"  ... and {len(schema_result['errors']) - 5} more errors")
+            # Show validation errors from JSON Schema
+            response_parts.append("\n**Validation Errors:**")
+            for err in schema_result.get('errors', [])[:10]:  # Limit to first 10
+                response_parts.append(f"  - [{err['path']}] {err['message']}")
+            if len(schema_result.get('errors', [])) > 10:
+                response_parts.append(f"  ... and {len(schema_result['errors']) - 10} more errors")
 
             # Provide detailed error analysis
             response_parts.append("\n**Common Issues & Solutions:**")
 
             # Check for specific error patterns and provide targeted help
-            all_error_text = " ".join(errors_remaining).lower()
-            if schema_result:
-                all_error_text += " " + " ".join(str(e) for e in schema_result.get('errors', []))
+            all_error_text = " ".join(str(e) for e in schema_result.get('errors', [])).lower()
 
             if "mode" in all_error_text and ("id" in all_error_text or "missing" in all_error_text or "integer" in all_error_text):
                 response_parts.append("  📌 Mode ID issue: Ensure each mode has 'id': 1, 'id': 2, etc. (integers, not floats like 1.0)")
@@ -184,13 +177,12 @@ class ValidateHASpecTool(Tool):
             if "direction" in all_error_text:
                 response_parts.append("  📌 Edge direction: Use exact format '1 -> 2' (with spaces around arrow)")
 
-            if "minItems" in all_error_text or "empty" in all_error_text.lower():
+            if "minitems" in all_error_text or "empty" in all_error_text:
                 response_parts.append("  📌 Empty array: 'mode' must have at least one mode defined")
 
             # Show partial spec for reference
-            if ha_dict:
-                response_parts.append("\n**Partially Parsed Specification:**")
-                response_parts.append(f"```json\n{json.dumps(ha_dict, indent=2)}\n```")
+            response_parts.append("\n**Partially Parsed Specification:**")
+            response_parts.append(f"```json\n{json.dumps(ha_dict, indent=2)}\n```")
 
         return "\n".join(response_parts)
 
@@ -206,13 +198,23 @@ def quick_validate(ha_spec: Any) -> tuple[bool, str]:
     Returns:
         Tuple of (is_valid, brief_message)
     """
-    ha_dict, is_valid, messages = validate_and_fix_ha_spec(ha_spec, auto_fix=True)
+    # Extract and fix
+    ha_dict, _ = extract_and_fix_ha_spec(ha_spec, auto_fix=True)
     
-    if is_valid:
+    if ha_dict is None:
+        return False, "Failed to extract specification"
+    
+    # Validate with JSON Schema
+    if not HAS_JSONSCHEMA or validate_ha_with_schema is None:
+        return True, "Specification extracted (schema validation unavailable)"
+    
+    result = validate_ha_with_schema(ha_dict, auto_extract=False)
+    
+    if result['valid']:
         return True, "Specification is valid"
     else:
-        errors = [m for m in messages if "error" in m.lower()]
-        return False, f"Invalid: {'; '.join(errors[:3])}"
+        errors = [e['message'] for e in result.get('errors', [])[:3]]
+        return False, f"Invalid: {'; '.join(errors)}"
 
 
 if __name__ == "__main__":
