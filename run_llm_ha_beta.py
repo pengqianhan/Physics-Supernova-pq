@@ -350,27 +350,24 @@ The following trace data visualizations are provided (reference images using pla
 
 ## Analysis Workflow \n"""
 
-    # Add tool-specific prompts
+    # Add tool-specific prompts (unified style: init empty -> conditionally set -> unconditionally append)
+    HA_IMAGE_TOOL_PROMPT = ""
     if HybridAutomatonImageTool in ToolsList:
-        HA_IMAGE_TOOL_PROMPT = "You MUST use the 'hybrid_automaton_image_analysis' tool to analyze the image."
-    REVIEW_TOOL_PROMPT = " When you need expert review of your hybrid automaton specification, you MUST call the `hybrid_automaton_review_expert` tool."
+        HA_IMAGE_TOOL_PROMPT = "You MUST use the `hybrid_automaton_image_analysis` tool to analyze the image."
+
+    REVIEW_TOOL_PROMPT = ""
     if ReviewRequestTool_ha in ToolsList:
-        REVIEW_TOOL_PROMPT += """
-**MANDATORY BEFORE FINALIZATION**: You MUST call `hybrid_automaton_review_expert` at least once before submitting your final answer to ensure specification correctness and completeness."""
+        REVIEW_TOOL_PROMPT = """
+        **MANDATORY BEFORE FINALIZATION**: You MUST call the `hybrid_automaton_review_expert` tool at least once before submitting your final answer to ensure specification correctness and completeness."""
 
     VALIDATE_TOOL_PROMPT = ""
     if ValidateHASpecTool in ToolsList:
         VALIDATE_TOOL_PROMPT = """
-**VALIDATION TOOL**: Before submitting your final answer, you SHOULD call `validate_hybrid_automaton_specification` to check for syntax errors.
-This tool will:
-- Detect common formatting issues (wrong direction format, missing required fields, etc.)
-- Auto-fix minor issues and normalize the specification
-- Report critical errors that need manual fixing
-
+**VALIDATION TOOL**: Before submitting your final answer, you MUST call the `validate_hybrid_automaton_specification` tool to check for syntax and semantic errors.
 ⚠️ **IMPORTANT**: If validation returns a FIXED specification, use the corrected version in your final answer!"""
 
-    task += HA_IMAGE_TOOL_PROMPT if HybridAutomatonImageTool in ToolsList else ""
-    task += REVIEW_TOOL_PROMPT if ReviewRequestTool_ha in ToolsList else ""
+    task += HA_IMAGE_TOOL_PROMPT
+    task += REVIEW_TOOL_PROMPT
     task += VALIDATE_TOOL_PROMPT
 
     task += """
@@ -409,8 +406,8 @@ Adopt a **Parsimonious Modeling Approach** (Occam's Razor) - favor simpler expla
 ## Quality Criteria
 Your HA specification will be evaluated on:
 - **Trajectory Matching**: Simulated output should closely follow ground truth data
-- **Mode Detection Accuracy**: Correct identification of switching instants (`tc` metric)
-- **State Error Minimization**: Low `mean_diff` and `max_diff` between predicted and actual states"""
+- **Mode Detection Accuracy**: Correct identification of switching instants (TC (Change-Point Error) < 0.01s is good, <= 0.001s is excellent)
+- **State Error Minimization**: Low Mean Difference (Mean Difference) and Maximum Difference (Max Difference) between predicted and actual states (Max Difference < 0.005 is good, < 0.0001 is excellent)"""
 
 
     # Add managed agents prompt
@@ -461,8 +458,8 @@ The `var` and `input` fields are pre-filled. Your task is to refine the **equati
 ## Your Task
 Generate an improved HA specification (v1) that better matches the observed trajectory data.
 - **Keep `var: "{var_names}"` and `input: "{input_names if num_inputs > 0 else ''}"` exactly as shown!**
-- Refine mode equations to match observed dynamics
-- Add modes and edges if switching behavior is detected
+- Make sure the HA specification is valid and complete.
+- Refine the HA specification to improve trajectory matching and reduce TC (Change-Point Error), Mean Difference, and Maximum Difference.
 """
 
     # Add feedback from previous iteration if available
