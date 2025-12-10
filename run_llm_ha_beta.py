@@ -824,12 +824,6 @@ def parse_args():
         default=True,
         help="Include JSON Schema in the task prompt for structured output (default: True)",
     )
-    ap.add_argument(
-        "--no-json-schema",
-        dest="use_json_schema",
-        action="store_false",
-        help="Disable JSON Schema in the task prompt",
-    )
 
     args = ap.parse_args()
 
