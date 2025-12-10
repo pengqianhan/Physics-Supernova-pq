@@ -867,7 +867,7 @@ def main():
     best_error = float('inf')
     current_feedback = ""
 
-    print(f"\ncTARTING HA-SCIENTIST LOOP (Max iterations: {args.max_iterations})")
+    print(f"\nSTARTING HA-SCIENTIST LOOP (Max iterations: {args.max_iterations})")
     
     for iteration in range(1, args.max_iterations + 1):
         print(f"\n{'#'*40}")
