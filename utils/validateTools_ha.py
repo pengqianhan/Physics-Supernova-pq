@@ -88,7 +88,7 @@ class ValidateHASpecTool(Tool):
         ha_dict, is_valid, messages = validate_and_fix_ha_spec(ha_spec_json, auto_fix=True)
 
         # Step 2: Run JSON Schema validation if available
-        schema_result = None
+        schema_result = True
         if HAS_JSONSCHEMA and validate_ha_with_schema is not None and ha_dict is not None:
             schema_result = validate_ha_with_schema(ha_dict, auto_extract=False)
 
