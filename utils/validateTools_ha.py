@@ -3,12 +3,30 @@ Hybrid Automaton Specification Validation Tool
 
 This tool allows the agent to validate its HA specification before submitting
 the final answer. It checks syntax and structure, and attempts to fix common issues.
+
+Uses both traditional validation and JSON Schema validation for comprehensive checking.
 """
 
 import json
 from typing import Any, Dict
 from smolagents.default_tools import Tool
-from .ha_spec_validator import validate_and_fix_ha_spec, validate_equation_syntax, validate_condition_syntax
+
+# Support both relative imports (when used as package) and absolute imports (when run directly)
+try:
+    from .ha_spec_validator import validate_and_fix_ha_spec, validate_equation_syntax, validate_condition_syntax
+except ImportError:
+    from ha_spec_validator import validate_and_fix_ha_spec, validate_equation_syntax, validate_condition_syntax
+
+# Import JSON Schema validation
+try:
+    from .ha_json_schema import validate_ha_with_schema, format_validation_errors, HAS_JSONSCHEMA
+except ImportError:
+    try:
+        from ha_json_schema import validate_ha_with_schema, format_validation_errors, HAS_JSONSCHEMA
+    except ImportError:
+        HAS_JSONSCHEMA = False
+        validate_ha_with_schema = None
+        format_validation_errors = None
 
 
 class ValidateHASpecTool(Tool):
@@ -58,20 +76,25 @@ class ValidateHASpecTool(Tool):
     def forward(self, ha_spec_json: str) -> str:  # type: ignore[override]
         """
         Validate and optionally fix the HA specification.
-        
+
         Args:
             ha_spec_json: HA specification as a JSON string
-            
+
         Returns:
             Validation result with status, messages, and fixed specification if applicable
         """
-        
-        # Step 1: Run validation and auto-fix
+
+        # Step 1: Run traditional validation and auto-fix
         ha_dict, is_valid, messages = validate_and_fix_ha_spec(ha_spec_json, auto_fix=True)
-        
-        # Step 2: Build response
+
+        # Step 2: Run JSON Schema validation if available
+        schema_result = None
+        if HAS_JSONSCHEMA and validate_ha_with_schema is not None and ha_dict is not None:
+            schema_result = validate_ha_with_schema(ha_dict, auto_extract=False)
+
+        # Step 3: Build response
         response_parts = []
-        
+
         if ha_dict is None:
             response_parts.append("❌ **STATUS: INVALID - EXTRACTION FAILED**")
             response_parts.append("\nCould not extract a valid dictionary from your input.")
@@ -80,12 +103,16 @@ class ValidateHASpecTool(Tool):
                 response_parts.append(f"  - {msg}")
             response_parts.append("\n**Action Required:** Please provide a valid Python dictionary with 'automaton' and 'config' keys.")
             return "\n".join(response_parts)
-        
+
         # Check if any fixes were applied
         fixes_applied = [msg for msg in messages if msg.startswith("Fixed:")]
         errors_remaining = [msg for msg in messages if msg.startswith("Remaining error:") or msg.startswith("Error:")]
-        
-        if is_valid:
+
+        # Combine validation results
+        schema_valid = schema_result['valid'] if schema_result else True
+        overall_valid = is_valid and schema_valid
+
+        if overall_valid:
             if fixes_applied:
                 response_parts.append("✅ **STATUS: FIXED - USE CORRECTED SPECIFICATION**")
                 response_parts.append("\nYour specification had issues that were auto-corrected.")
@@ -95,60 +122,76 @@ class ValidateHASpecTool(Tool):
             else:
                 response_parts.append("✅ **STATUS: VALID - READY FOR SUBMISSION**")
                 response_parts.append("\nYour HA specification passed all validation checks.")
-            
+
             # Additional syntax validation details
             response_parts.append("\n**Validation Summary:**")
             automaton = ha_dict.get('automaton', {})
             var_list = [v.strip() for v in automaton.get('var', '').split(',') if v.strip()]
             input_list = [v.strip() for v in automaton.get('input', '').split(',') if v.strip()]
-            
+
             response_parts.append(f"  - Variables: {var_list}")
             response_parts.append(f"  - Inputs: {input_list}")
             response_parts.append(f"  - Modes: {len(automaton.get('mode', []))}")
             response_parts.append(f"  - Edges: {len(automaton.get('edge', []))}")
-            
+
+            if schema_result:
+                response_parts.append(f"  - Schema validation: ✅ Passed")
+
             # Provide the corrected specification
             response_parts.append("\n**Corrected Specification (use this for final answer):**")
             response_parts.append(f"```json\n{json.dumps(ha_dict, indent=2)}\n```")
-            
+
         else:
             response_parts.append("❌ **STATUS: INVALID - CRITICAL ERRORS FOUND**")
             response_parts.append("\nYour specification has errors that could not be auto-fixed.")
-            
+
             if fixes_applied:
                 response_parts.append("\n**Fixes Applied (partial):**")
                 for fix in fixes_applied:
                     response_parts.append(f"  - {fix.replace('Fixed: ', '')}")
-            
+
             response_parts.append("\n**Remaining Errors (must fix manually):**")
             for err in errors_remaining:
                 response_parts.append(f"  - {err.replace('Remaining error: ', '').replace('Error: ', '')}")
-            
+
+            # Add schema validation errors if any
+            if schema_result and not schema_result['valid']:
+                response_parts.append("\n**JSON Schema Validation Errors:**")
+                for err in schema_result.get('errors', [])[:5]:  # Limit to first 5
+                    response_parts.append(f"  - [{err['path']}] {err['message']}")
+                if len(schema_result.get('errors', [])) > 5:
+                    response_parts.append(f"  ... and {len(schema_result['errors']) - 5} more errors")
+
             # Provide detailed error analysis
             response_parts.append("\n**Common Issues & Solutions:**")
-            
+
             # Check for specific error patterns and provide targeted help
-            error_text = " ".join(errors_remaining).lower()
-            
-            if "mode" in error_text and ("id" in error_text or "missing" in error_text):
-                response_parts.append("  📌 Mode ID issue: Ensure each mode has 'id': 1, 'id': 2, etc. (integers, not floats)")
-            
-            if "eq" in error_text or "equation" in error_text:
+            all_error_text = " ".join(errors_remaining).lower()
+            if schema_result:
+                all_error_text += " " + " ".join(str(e) for e in schema_result.get('errors', []))
+
+            if "mode" in all_error_text and ("id" in all_error_text or "missing" in all_error_text or "integer" in all_error_text):
+                response_parts.append("  📌 Mode ID issue: Ensure each mode has 'id': 1, 'id': 2, etc. (integers, not floats like 1.0)")
+
+            if "eq" in all_error_text or "equation" in all_error_text:
                 response_parts.append("  📌 Equation syntax: Use format 'x1[2] = -0.5 * x1[1] - 5.0 * x1[0] + u1'")
                 response_parts.append("     - LHS: variable[order] (highest derivative)")
                 response_parts.append("     - RHS: valid Python expression with x1[0], x1[1], u1, etc.")
-            
-            if "condition" in error_text:
-                response_parts.append("  📌 Guard condition: Ensure valid Python comparison, e.g., 'x1 > 0' or 'x1 <= 0 and x2 > 1'")
-            
-            if "direction" in error_text:
+
+            if "condition" in all_error_text:
+                response_parts.append("  📌 Guard condition: Use bare variable names (x1 > 0), NOT indexed (x1[0] > 0)")
+
+            if "direction" in all_error_text:
                 response_parts.append("  📌 Edge direction: Use exact format '1 -> 2' (with spaces around arrow)")
-            
+
+            if "minItems" in all_error_text or "empty" in all_error_text.lower():
+                response_parts.append("  📌 Empty array: 'mode' must have at least one mode defined")
+
             # Show partial spec for reference
             if ha_dict:
                 response_parts.append("\n**Partially Parsed Specification:**")
                 response_parts.append(f"```json\n{json.dumps(ha_dict, indent=2)}\n```")
-        
+
         return "\n".join(response_parts)
 
 
