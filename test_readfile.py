@@ -52,7 +52,8 @@ def main():
     )
     
     # 数据文件路径
-    data_file_path = "utils/Dainarx_code/data_duffing/sample_train_0.npz"
+    data_file_path = os.path.join(os.path.dirname(__file__), "utils", "Dainarx_code", "data_duffing", "sample_train_0.npz")
+    # data_file_path = "utils/Dainarx_code/data_duffing/sample_train_0.npz"
     
     # 验证文件是否存在
     if os.path.exists(data_file_path):

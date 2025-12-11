@@ -234,6 +234,10 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
             num_retries=3,
             timeout=1200
         )
+
+        # trace file path
+        trace_file_path = os.path.join(os.path.dirname(__file__), "utils", "Dainarx_code", "data_duffing", "sample_train_0.npz")
+        
         # managed agent
         managed_agent = CodeAgent(
             tools=[],
@@ -241,10 +245,11 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
             name=agent_name,
             additional_authorized_imports=["os", "sys", "time", "argparse", "pathlib",
                                           "matplotlib.pyplot", "numpy", "pandas", "json","scipy"],
-            description=f"I am a managed agent with name {agent_name}. I can assist with code-related tasks",
+            description=f"I am a managed agent with name {agent_name}. I can assist with code-related tasks. The data file path is {trace_file_path}",
             max_steps=80,
             verbosity_level=2,
         )
+        managed_agent.python_executor.state["DATA_FILE_PATH"] = trace_file_path
         managed_agents.append(managed_agent)
 
     return managed_agents
