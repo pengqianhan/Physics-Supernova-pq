@@ -6,4 +6,4 @@
  - [x] check if the prompt is tell the agent what number means good about the evaluation performance.
  - [ ]  which can use the Gradient-Free-Optimizers to find the best parameters to make the result close to the ground truth and 
  - [x] add managed agent data_analysis_expert, which has access to the trace data.
- - [ ] for current_feedback only choose the top k feedbacks(evaluation and HA specification) to be used in the next iteration.
+ - [ ] for current_feedback only choose the top k feedbacks(evaluation and HA specification) to be used in the next iteration. maybe need to create a pool of feedbacks and choose the top k from the pool.
