@@ -46,7 +46,7 @@ class HybridAutomatonImageTool(Tool):
         Returns:
             Image bytes from markdown content or None if not found
         """
-        image_ref ="<image_0>" ##TODO: remove this after testing
+        # image_ref ="<image_0>" ##TODO: remove this after testing
         if not self.worker_agent or not hasattr(self.worker_agent, "markdown_content_high_res_image"):
             return None
         md: MarkdownMessage = self.worker_agent.markdown_content_high_res_image
