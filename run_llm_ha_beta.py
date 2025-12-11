@@ -770,7 +770,7 @@ def parse_args():
         "--managed-agents-list",
         type=str,
         nargs='*',
-        default=[],
+        default=['data_analysis_expert'],
         help="List of managed agents to use in the agent.",
     )
 
@@ -891,7 +891,7 @@ def main():
             result = managerAgent.run(task, images=compressed_trace_images)
         except Exception as e:
             print(f"Agent execution failed: {e}")
-            current_feedback = f"Agent execution failed in previous iteration: {str(e)}. Please try to generate a valid specification."
+            current_feedback += f"\nHybrid Automaton Specification v{iteration} (FAILED):\nAgent execution failed: {str(e)}. Please try to generate a valid specification.\n"
             continue
 
         # Evaluate the generated HA specification
