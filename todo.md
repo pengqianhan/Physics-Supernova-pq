@@ -4,4 +4,5 @@
  - [x] read and test the utils/validateTools_ha.py
  - [x] check if the prompt is encouraging the agent to improve the HA specification and the evaluation performance.
  - [x] check if the prompt is tell the agent what number means good about the evaluation performance.
- - [ ] add managed agent data_analysis_expert, which can use the Gradient-Free-Optimizers to find the best parameters to make the result close to the ground truth and have access to the trace data.
+ - [ ]  which can use the Gradient-Free-Optimizers to find the best parameters to make the result close to the ground truth and 
+ - [x] add managed agent data_analysis_expert, which has access to the trace data.
