@@ -2,9 +2,10 @@ import os
 import sys
 import json
 from datetime import datetime
+from collections import defaultdict
+from dataclasses import dataclass, field
 from prompts_ha.prompts import (
     HA_SPEC_DOCUMENTATION,
-    HA_SPEC_JSON_SCHEMA_COMPACT,
     get_ha_spec_documentation_with_schema,
 )
 # Load environment variables from .env file if it exists
@@ -25,7 +26,7 @@ except Exception:
 import argparse
 
 # for type hints
-from typing import List
+from typing import List, Dict, Tuple, Optional
 from smolagents.default_tools import Tool
 from smolagents import (
     MultiStepAgent,
@@ -44,6 +45,178 @@ from utils.reviewTools_ha import ReviewRequestTool_ha
 from utils.summemoryTools_ha import SummarizeMemoryTool
 from utils.validateTools_ha import ValidateHASpecTool
 import numpy as np
+
+
+# =============================================================================
+# Data Structures for Result Tracking (inspired by reference_code.py Branch pattern)
+# =============================================================================
+
+@dataclass
+class IterationResult:
+    """Tracks results from a single iteration of the HA-Scientist loop."""
+    iteration: int
+    ha_specification: Optional[Dict] = None
+    metrics: Dict = field(default_factory=dict)
+    feedback: str = ""
+    success: bool = False
+    error_value: float = float('inf')
+    timestamp: str = field(default_factory=lambda: datetime.now().strftime('%Y%m%d_%H%M%S'))
+
+
+class ResultsAggregator:
+    """
+    Aggregates results across iterations for intelligent feedback selection.
+    Inspired by reference_code.py's _create_previous_turn_context pattern.
+    """
+    def __init__(self, top_k: int = 3, min_gap: float = 0.005):
+        """
+        Initialize the results aggregator.
+
+        Args:
+            top_k: Maximum number of distinct results to include in feedback
+            min_gap: Minimum error gap between selected results for diversity
+        """
+        self.results: List[IterationResult] = []
+        self.top_k = top_k
+        self.min_gap = min_gap
+        self.best_result: Optional[IterationResult] = None
+        self.best_error: float = float('inf')
+
+    def add_result(self, result: IterationResult) -> None:
+        """Add a new iteration result and update best tracking."""
+        self.results.append(result)
+
+        if result.success and result.error_value < self.best_error:
+            self.best_error = result.error_value
+            self.best_result = result
+            print(f"  [Aggregator] New best result! Error: {self.best_error:.6f}")
+
+    def get_top_k_feedback(self) -> str:
+        """
+        Generate feedback context from top-k diverse, best-performing specifications.
+
+        Uses minimum gap filtering to ensure diverse examples (from reference_code.py pattern).
+
+        Returns:
+            Formatted feedback string with sorted, distinct results
+        """
+        # Filter successful results with valid error values
+        valid_results = [
+            r for r in self.results
+            if r.success and r.error_value is not None and r.error_value < float('inf')
+        ]
+
+        if not valid_results:
+            return ""
+
+        # Sort by error value (ascending - best first)
+        sorted_results = sorted(valid_results, key=lambda x: x.error_value)
+
+        # Select distinct results with minimum gap (diversity filtering)
+        distinct_results: List[IterationResult] = []
+        last_accepted_error = float('-inf')
+
+        for result in sorted_results:
+            if result.error_value - last_accepted_error >= self.min_gap:
+                distinct_results.append(result)
+                last_accepted_error = result.error_value
+                if len(distinct_results) >= self.top_k:
+                    break
+
+        if not distinct_results:
+            return ""
+
+        # Build structured feedback context
+        context_lines = [
+            "\n\n## Previously Explored HA Specifications",
+            "The following specifications have been explored in previous iterations.",
+            "Performance is ranked from best (lowest error) to worst. Use these as inspiration.",
+            "\n--- Explored Specifications (Ranked) ---"
+        ]
+
+        for i, result in enumerate(distinct_results, 1):
+            ha_spec_str = json.dumps(result.ha_specification, indent=2) if result.ha_specification else "N/A"
+            # Truncate if too long
+            if len(ha_spec_str) > 1500:
+                ha_spec_str = ha_spec_str[:1500] + "\n... (truncated)"
+
+            context_lines.append(f"\n### Rank {i} (Iteration {result.iteration})")
+            context_lines.append(f"**Error**: {result.error_value:.6f}")
+            context_lines.append(f"```json\n{ha_spec_str}\n```")
+
+            # Include key metrics if available
+            if result.metrics:
+                metrics_summary = ", ".join([
+                    f"{k}: {v:.4f}" if isinstance(v, float) else f"{k}: {v}"
+                    for k, v in result.metrics.items()
+                    if k in ['mean_diff', 'max_diff', 'TC', 'rmse']
+                ])
+                if metrics_summary:
+                    context_lines.append(f"**Metrics**: {metrics_summary}")
+
+        context_lines.append("\n-----------------------------------------\n")
+        return "\n".join(context_lines)
+
+    def get_latest_feedback(self) -> str:
+        """Get feedback from the most recent iteration only."""
+        if not self.results:
+            return ""
+        return self.results[-1].feedback
+
+    def should_early_stop(self,
+                          target_error: float = 0.01,
+                          min_iterations: int = 2,
+                          no_improvement_patience: int = 3) -> Tuple[bool, str]:
+        """
+        Determine if early stopping criteria are met.
+
+        Inspired by reference_code.py's early termination logic.
+
+        Args:
+            target_error: Stop if best error falls below this threshold
+            min_iterations: Minimum iterations before allowing early stop
+            no_improvement_patience: Stop if no improvement for this many iterations
+
+        Returns:
+            Tuple of (should_stop, reason)
+        """
+        if len(self.results) < min_iterations:
+            return False, ""
+
+        # Check target achieved
+        if self.best_error < target_error:
+            return True, f"Target error achieved: {self.best_error:.6f} < {target_error}"
+
+        # Check for very low error (near-perfect fit)
+        if self.best_error < 0.0001:
+            return True, f"Near-perfect fit achieved: {self.best_error:.6e}"
+
+        # Check for no improvement patience
+        if len(self.results) >= no_improvement_patience:
+            recent_errors = [r.error_value for r in self.results[-no_improvement_patience:]]
+            if all(e >= self.best_error for e in recent_errors):
+                # Check if we've plateaued
+                error_range = max(recent_errors) - min(recent_errors)
+                if error_range < 0.001:  # Less than 0.1% variation
+                    return True, f"No improvement for {no_improvement_patience} iterations"
+
+        return False, ""
+
+    def get_dynamic_error_threshold(self) -> float:
+        """
+        Calculate dynamic error threshold based on current best.
+
+        Inspired by reference_code.py's adaptive MAPE target adjustment.
+        """
+        if self.best_error >= float('inf') or self.best_error <= 0:
+            return 0.1  # Default threshold
+
+        # Set next target to one order of magnitude below current best
+        next_target = 10 ** np.floor(np.log10(self.best_error))
+        if next_target >= self.best_error:
+            next_target /= 10.0
+
+        return max(next_target, 1e-8)  # Floor at 1e-8
 
 
 def get_data_dimensions(input_data_path: str) -> tuple[int, int]:
@@ -470,9 +643,8 @@ Generate an improved HA specification (v1) that better matches the observed traj
     # Add feedback from previous iteration if available
     if feedback:
         task += f"""
-    
-    ## ⚠️ FEEDBACK FROM PREVIOUS ITERATION
-    The following feedback was generated from evaluating your previous attempt. Use it to guide your next refinement:
+## ⚠️ FEEDBACK FROM PREVIOUS ITERATION
+The following feedback was generated from evaluating your previous attempt. Use it to guide your next refinement:
     
     {feedback}
     
@@ -608,7 +780,7 @@ def evaluate_ha_specification(agent_result, input_data_path: str, output_dir: st
         return False
 
 
-def evaluate_ha_specification_with_feedback(agent_result, input_data_path: str, output_dir: str = None) -> tuple[bool, dict, str]:
+def evaluate_ha_specification_with_feedback(agent_result, input_data_path: str, output_dir: str = None) -> Tuple[bool, Dict, str, Optional[Dict]]:
     """
     Evaluate the generated Hybrid Automaton specification and return feedback for the agent.
 
@@ -618,7 +790,8 @@ def evaluate_ha_specification_with_feedback(agent_result, input_data_path: str, 
         output_dir: Directory to save evaluation results
 
     Returns:
-        Tuple of (success_bool, metrics_dict, feedback_string)
+        Tuple of (success_bool, metrics_dict, feedback_string, ha_specification_dict)
+        The ha_specification_dict is the extracted/validated HA spec (None if extraction failed)
     """
     print("\n" + "=" * 80)
     print("EVALUATION: Testing the generated Hybrid Automaton specification")
@@ -640,16 +813,16 @@ def evaluate_ha_specification_with_feedback(agent_result, input_data_path: str, 
         error_msg = "HA specification validation failed. " + validation_message
         if ha_specification is not None:
              error_msg += f"\nPartially extracted spec: {json.dumps(ha_specification, indent=2)[:500]}..."
-        return False, {}, error_msg
+        return False, {}, error_msg, ha_specification
 
     # Final structure check
     if ha_specification is None or 'automaton' not in ha_specification or 'config' not in ha_specification:
-        return False, {}, "Could not extract valid HA specification from agent output (missing 'automaton' or 'config')."
+        return False, {}, "Could not extract valid HA specification from agent output (missing 'automaton' or 'config').", None
 
     # Find test data file
     test_data_files = [f for f in os.listdir(input_data_path) if f.endswith('.npz')]
     if not test_data_files:
-        return False, {}, f"No .npz test data files found in {input_data_path}"
+        return False, {}, f"No .npz test data files found in {input_data_path}", ha_specification
 
     npz_file_path = os.path.join(input_data_path, test_data_files[0])
     
@@ -661,7 +834,7 @@ def evaluate_ha_specification_with_feedback(agent_result, input_data_path: str, 
     
     if ha_num_vars != gt_num_vars:
         msg = f"Variable count mismatch! HA spec has {ha_num_vars}, ground truth has {gt_num_vars}. Check state-space vs higher-order ODE format."
-        return False, {}, msg
+        return False, {}, msg, ha_specification
 
     # Set up output directory
     if output_dir is None:
@@ -678,10 +851,9 @@ def evaluate_ha_specification_with_feedback(agent_result, input_data_path: str, 
         )
 
         # Run evaluation - use absolute path to avoid path conversion in HAEvaluator
-        # save_num = os.urandom(4).hex()
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         save_path = os.path.abspath(os.path.join(output_dir, f'ha_eval_{timestamp}.png'))
-        metrics_text, plot_base64 = evaluator(
+        metrics_text, _ = evaluator(
             plot_mode='overlay',
             save_path=save_path,
             print_metrics=True
@@ -702,7 +874,7 @@ def evaluate_ha_specification_with_feedback(agent_result, input_data_path: str, 
         feedback += f"Evaluation Results:\n{metrics_text}\n"
 
 
-        return True, metrics_dict, feedback
+        return True, metrics_dict, feedback, ha_specification
 
     except Exception as e:
         import traceback
@@ -710,7 +882,7 @@ def evaluate_ha_specification_with_feedback(agent_result, input_data_path: str, 
         feedback = f"```json\n{json.dumps(ha_specification, indent=2)}\n```\n"
         # feedback = f"```json\n{agent_result}\n```\n"
         feedback += f"Evaluation Results:\n{str(e)}\n"
-        return False, {}, feedback
+        return False, {}, feedback, ha_specification
 
 
 def parse_args():
@@ -819,6 +991,35 @@ def parse_args():
         help="Maximum number of refinement iterations (HA-Scientist loop). Default: 3",
     )
 
+    # Feedback selection parameters (inspired by reference_code.py)
+    ap.add_argument(
+        "--feedback-top-k",
+        type=int,
+        default=3,
+        help="Number of top-performing diverse specs to include in feedback context. Default: 3",
+    )
+
+    ap.add_argument(
+        "--feedback-min-gap",
+        type=float,
+        default=0.005,
+        help="Minimum error gap between selected feedback specs for diversity. Default: 0.005",
+    )
+
+    ap.add_argument(
+        "--target-error",
+        type=float,
+        default=0.01,
+        help="Target error threshold for early stopping. Default: 0.01",
+    )
+
+    ap.add_argument(
+        "--no-improvement-patience",
+        type=int,
+        default=3,
+        help="Stop if no improvement for this many iterations. Default: 3",
+    )
+
     # JSON Schema option
     ap.add_argument(
         "--use-json-schema",
@@ -843,7 +1044,7 @@ def main():
 
     # Auto-detect dimensions from data file (overrides command-line args if provided)
     num_variables, num_inputs = get_data_dimensions(args.input_data_path)
-    
+
     # Create the agent
     managerAgent = create_agent(
         model_id=args.manager_model,
@@ -858,17 +1059,44 @@ def main():
         tools_to_remove=args.tools_to_remove,
     )
 
-    # HA-Scientist Iterative Loop
-    best_result = None
-    best_error = float('inf')
-    current_feedback = ""
+    # ========================================================================
+    # HA-Scientist Iterative Loop (Enhanced with ResultsAggregator)
+    # Inspired by reference_code.py's multi-turn adaptive loop pattern
+    # ========================================================================
+
+    # Initialize results aggregator for intelligent feedback selection
+    results_aggregator = ResultsAggregator(
+        top_k=args.feedback_top_k,
+        min_gap=args.feedback_min_gap
+    )
 
     print(f"\nSTARTING HA-SCIENTIST LOOP (Max iterations: {args.max_iterations})")
-    
+    print(f"  - Top-K feedback selection: {results_aggregator.top_k}")
+    print(f"  - Diversity gap threshold: {results_aggregator.min_gap}")
+    print(f"  - Target error for early stop: {args.target_error}")
+    print(f"  - No-improvement patience: {args.no_improvement_patience}")
+
     for iteration in range(1, args.max_iterations + 1):
         print(f"\n{'#'*40}")
         print(f"ITERATION {iteration}/{args.max_iterations}")
         print(f"{'#'*40}")
+
+        # Generate feedback context using intelligent top-k selection
+        # For first iteration, no feedback available
+        if iteration == 1:
+            current_feedback = ""
+        else:
+            # Use top-k diverse feedback instead of raw concatenation
+            current_feedback = results_aggregator.get_top_k_feedback()
+
+            # Also include latest iteration's feedback for recency
+            latest_feedback = results_aggregator.get_latest_feedback()
+            if latest_feedback and latest_feedback not in current_feedback:
+                current_feedback += f"\n\n## Most Recent Attempt (Iteration {iteration - 1}):\n{latest_feedback}"
+
+            # Show dynamic target if available
+            dynamic_target = results_aggregator.get_dynamic_error_threshold()
+            print(f"  [Aggregator] Dynamic error target: {dynamic_target:.6f}")
 
         # Obtain task and images with feedback from previous iteration
         task, compressed_trace_images = obtain_task_and_images(
@@ -884,7 +1112,7 @@ def main():
             iteration=iteration,
             use_json_schema=args.use_json_schema
         )
-        
+
         # save the task to a file
         task_filename = f"task_iter_{iteration-1}.md"
         with open(task_filename, "w", encoding="utf-8") as f:
@@ -896,55 +1124,91 @@ def main():
             result = managerAgent.run(task, images=compressed_trace_images)
         except Exception as e:
             print(f"Agent execution failed: {e}")
-            current_feedback += f"\nHybrid Automaton Specification v{iteration} (FAILED):\nAgent execution failed: {str(e)}. Please try to generate a valid specification.\n"
+            # Create failed iteration result
+            failed_result = IterationResult(
+                iteration=iteration,
+                ha_specification=None,
+                metrics={},
+                feedback=f"Agent execution failed: {str(e)}",
+                success=False,
+                error_value=float('inf')
+            )
+            results_aggregator.add_result(failed_result)
             continue
 
         # Evaluate the generated HA specification
-        success, metrics, feedback_str = evaluate_ha_specification_with_feedback(
-            result, 
+        success, metrics, feedback_str, ha_spec = evaluate_ha_specification_with_feedback(
+            result,
             args.input_data_path,
             output_dir=os.path.join("evaluation_results", f"iter_{iteration}")
         )
-        
-        current_feedback += 'Hybrid Automaton Specification v' + str(iteration) + ':\n' + feedback_str # Update feedback for next loop
 
-        # Check if this is the best result so far
-        # We need a metric to minimize. Let's assume 'rmse' or similar is in metrics dict.
-        # If metrics is empty or parsing failed, we treat error as infinite.
-        
-        # Currently HAEvaluator might not return a clean 'error' float in dictionary unless we parse the text or modify HAEvaluator.
-        # For now, we rely on the feedback string being generated. 
-        # But to track "best", we need a scalar.
-        # HAEvaluator returns (text, dict). Let's assume dict has 'mean_diff' or similar.
-        
+        # Extract error value from metrics
         current_error = float('inf')
         if success and isinstance(metrics, dict):
-            # Try to find an error metric
+            # Priority order for error metrics
             if 'mean_diff' in metrics:
                 current_error = metrics['mean_diff']
             elif 'rmse' in metrics:
                 current_error = metrics['rmse']
-        
+            elif 'max_diff' in metrics:
+                current_error = metrics['max_diff']
+
         print(f"Iteration {iteration} Result Error: {current_error}")
 
-        if success and current_error < best_error:
-            best_error = current_error
-            best_result = result
-            print(f"New Best Result Found! (Error: {best_error})")
-        
-        # Optional: Early stopping if error is sufficiently low
-        if best_error < 0.01: # Example threshold
-            print("Target accuracy reached. Stopping early.")
+        # Create and store iteration result
+        iter_result = IterationResult(
+            iteration=iteration,
+            ha_specification=ha_spec,
+            metrics=metrics if isinstance(metrics, dict) else {},
+            feedback=feedback_str,
+            success=success,
+            error_value=current_error
+        )
+        results_aggregator.add_result(iter_result)
+
+        # Check for early stopping (enhanced logic from reference_code.py)
+        should_stop, stop_reason = results_aggregator.should_early_stop(
+            target_error=args.target_error,
+            min_iterations=2,
+            no_improvement_patience=args.no_improvement_patience
+        )
+
+        if should_stop:
+            print(f"\n[Early Stop] {stop_reason}")
             break
 
+    # ========================================================================
+    # Final Summary
+    # ========================================================================
     print("\n" + "="*80)
     print("HA-SCIENTIST LOOP COMPLETE")
-    print(f"Best Error Achieved: {best_error}")
     print("="*80)
 
+    if results_aggregator.best_result:
+        print(f"Best Error Achieved: {results_aggregator.best_error:.6f}")
+        print(f"Best Iteration: {results_aggregator.best_result.iteration}")
+
+        # Print summary of all iterations
+        print("\n--- Iteration Summary ---")
+        for res in results_aggregator.results:
+            status = "✓" if res.success else "✗"
+            error_str = f"{res.error_value:.6f}" if res.error_value < float('inf') else "N/A"
+            best_marker = " (BEST)" if res == results_aggregator.best_result else ""
+            print(f"  Iter {res.iteration}: [{status}] Error={error_str}{best_marker}")
+    else:
+        print("No successful results achieved.")
+        print(f"Total iterations attempted: {len(results_aggregator.results)}")
+
     # Final Evaluation of the best result (saved to main evaluation folder)
-    if best_result:
-        evaluate_ha_specification_with_feedback(best_result, args.input_data_path, output_dir="evaluation_results")
+    if results_aggregator.best_result and results_aggregator.best_result.ha_specification:
+        print("\n--- Final Evaluation of Best Result ---")
+        # Save the best HA specification to a JSON file
+        best_spec_path = os.path.join("evaluation_results", "best_ha_specification.json")
+        os.makedirs("evaluation_results", exist_ok=True)
+        with open(best_spec_path, "w", encoding="utf-8") as f:
+            json.dump(results_aggregator.best_result.ha_specification, f, indent=2)
+        print(f"Best HA specification saved to: {best_spec_path}")
 
 
 if __name__ == "__main__":
