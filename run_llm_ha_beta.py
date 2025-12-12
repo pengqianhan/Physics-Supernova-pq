@@ -556,9 +556,10 @@ Adopt a **Parsimonious Modeling Approach** (Occam's Razor) - favor simpler expla
 1. **Symbolic Identification**:
    - **Hypothesize Structure First**: Determine the likely functional form of the equations *before* estimating parameters.
 
-2. **Mode Count Strategy (Less is More)**:
-   - **Iterative Expansion**: Start with **1 Mode**. If a single continuous model fails to fit the entire trajectory (high error), try **2 Modes**, etc.
-   - **Hypothesis Testing**: Increase the number of modes *only* if distinct switching behaviors (sharp changes in dynamics) are observed.
+2. **Mode Count Strategy (Adaptive Complexity)**:
+   - **Start Simple, but Explore**: Start with **1 Mode**, BUT if the trajectory shows sharp changes, discontinuities, or if a single mode yields high error, you **MUST** consider **2+ Modes**.
+   - **Iterative Correction**: If you are in Iteration > 1 and the previous 1-Mode model had high error, do NOT repeat the same mistake. **Attempt a 2-Mode or 3-Mode solution immediately.**
+   - **Hypothesis Testing**: Curve fitting a complex non-linear function to a switched linear system is a common trap. If different linear models fit different segments well, prefer a **Switched Linear System** (multiple modes) over a single complex non-linear ODE.
 
 3. **Mode Dynamics**:
    - **Start Simple**: Attempt to fit **Linear** dynamics first.
@@ -881,7 +882,7 @@ def evaluate_ha_specification_with_feedback(agent_result, input_data_path: str, 
         traceback.print_exc()
         feedback = f"```json\n{json.dumps(ha_specification, indent=2)}\n```\n"
         # feedback = f"```json\n{agent_result}\n```\n"
-        feedback += f"Evaluation Results:\n{str(e)}\n"
+        feedback += f"Evaluation Results:\nThe HA specification is not valid. Please try to generate a valid specification. Here is the error message: {str(e)}"
         return False, {}, feedback, ha_specification
 
 
@@ -1061,7 +1062,7 @@ def main():
 
     # ========================================================================
     # HA-Scientist Iterative Loop (Enhanced with ResultsAggregator)
-    # Inspired by reference_code.py's multi-turn adaptive loop pattern
+    # Inspired by SR-Scientist\inference\infer\inference.py's multi-turn adaptive loop pattern
     # ========================================================================
 
     # Initialize results aggregator for intelligent feedback selection
@@ -1137,24 +1138,24 @@ def main():
             continue
 
         # Evaluate the generated HA specification
-        success, metrics, feedback_str, ha_spec = evaluate_ha_specification_with_feedback(
-            result,
-            args.input_data_path,
-            output_dir=os.path.join("evaluation_results", f"iter_{iteration}")
-        )
+        # success, metrics, feedback_str, ha_spec = evaluate_ha_specification_with_feedback(
+        #     result,
+        #     args.input_data_path,
+        #     output_dir=os.path.join("evaluation_results", f"iter_{iteration}")
+        # )
 
-        # Extract error value from metrics
-        current_error = float('inf')
-        if success and isinstance(metrics, dict):
-            # Priority order for error metrics
-            if 'mean_diff' in metrics:
-                current_error = metrics['mean_diff']
-            elif 'rmse' in metrics:
-                current_error = metrics['rmse']
-            elif 'max_diff' in metrics:
-                current_error = metrics['max_diff']
+        # # Extract error value from metrics
+        # current_error = float('inf')
+        # if success and isinstance(metrics, dict):
+        #     # Priority order for error metrics
+        #     if 'mean_diff' in metrics:
+        #         current_error = metrics['mean_diff']
+        #     elif 'rmse' in metrics:
+        #         current_error = metrics['rmse']
+        #     elif 'max_diff' in metrics:
+        #         current_error = metrics['max_diff']
 
-        print(f"Iteration {iteration} Result Error: {current_error}")
+        # print(f"Iteration {iteration} Result Error: {current_error}")
 
         # Create and store iteration result
         iter_result = IterationResult(
