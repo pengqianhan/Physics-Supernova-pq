@@ -52,6 +52,105 @@ import numpy as np
 # =============================================================================
 
 @dataclass
+class HAHyperparameters:
+    """Stores hyperparameters for HA learning experiments."""
+    # Manager agent configuration
+    manager_model: str = ""
+    manager_type: str = "CodeAgent"
+
+    # Managed agents configuration
+    managed_agents_count: int = 0
+    managed_agents_list: List[str] = field(default_factory=list)
+    managed_agents_model: str = ""
+
+    # Tools configuration
+    tools_list: List[str] = field(default_factory=list)
+    image_tool_model: str = ""
+    review_tool_model: str = ""
+    summarize_tool_model: str = ""
+
+    # Iteration and feedback configuration
+    max_iterations: int = 3
+    feedback_top_k: int = 3
+    feedback_min_gap: float = 0.005
+    target_error: float = 0.01
+    no_improvement_patience: int = 3
+
+    # Data configuration
+    input_data_path: str = ""
+    system_name: str = ""
+    num_variables: int = 0
+    num_inputs: int = 0
+
+    # Other configuration
+    use_json_schema: bool = True
+
+    def to_string(self) -> str:
+        """Convert hyperparameters to a formatted string for logging."""
+        lines = [
+            "Experiment Hyperparameters",
+            "=" * 60,
+            "",
+            "--- Manager Agent ---",
+            f"Model: {self.manager_model}",
+            f"Type: {self.manager_type}",
+            "",
+            "--- Managed Agents ---",
+            f"Count: {self.managed_agents_count}",
+            f"Agent Names: {', '.join(self.managed_agents_list) if self.managed_agents_list else 'None'}",
+            f"Model: {self.managed_agents_model if self.managed_agents_model else 'N/A'}",
+            "",
+            "--- Tools ---",
+            f"Tools List: {', '.join(self.tools_list) if self.tools_list else 'None'}",
+            f"Image Tool Model: {self.image_tool_model if self.image_tool_model else 'N/A'}",
+            f"Review Tool Model: {self.review_tool_model if self.review_tool_model else 'N/A'}",
+            f"Summarize Tool Model: {self.summarize_tool_model if self.summarize_tool_model else 'N/A'}",
+            "",
+            "--- Iteration Configuration ---",
+            f"Max Iterations: {self.max_iterations}",
+            f"Feedback Top-K: {self.feedback_top_k}",
+            f"Feedback Min Gap: {self.feedback_min_gap}",
+            f"Target Error: {self.target_error}",
+            f"No Improvement Patience: {self.no_improvement_patience}",
+            "",
+            "--- Data Configuration ---",
+            f"Input Data Path: {self.input_data_path}",
+            f"System Name: {self.system_name}",
+            f"Num Variables: {self.num_variables}",
+            f"Num Inputs: {self.num_inputs}",
+            "",
+            "--- Other ---",
+            f"Use JSON Schema: {self.use_json_schema}",
+            "=" * 60,
+        ]
+        return "\n".join(lines)
+
+    def to_dict(self) -> Dict:
+        """Convert hyperparameters to a dictionary."""
+        return {
+            "manager_model": self.manager_model,
+            "manager_type": self.manager_type,
+            "managed_agents_count": self.managed_agents_count,
+            "managed_agents_list": self.managed_agents_list,
+            "managed_agents_model": self.managed_agents_model,
+            "tools_list": self.tools_list,
+            "image_tool_model": self.image_tool_model,
+            "review_tool_model": self.review_tool_model,
+            "summarize_tool_model": self.summarize_tool_model,
+            "max_iterations": self.max_iterations,
+            "feedback_top_k": self.feedback_top_k,
+            "feedback_min_gap": self.feedback_min_gap,
+            "target_error": self.target_error,
+            "no_improvement_patience": self.no_improvement_patience,
+            "input_data_path": self.input_data_path,
+            "system_name": self.system_name,
+            "num_variables": self.num_variables,
+            "num_inputs": self.num_inputs,
+            "use_json_schema": self.use_json_schema,
+        }
+
+
+@dataclass
 class IterationResult:
     """Tracks results from a single iteration of the HA-Scientist loop."""
     iteration: int
@@ -627,7 +726,7 @@ The `var` and `input` fields in the template below are **already correctly set**
 - For single-variable systems: use higher-order ODE notation (e.g., `x1[2] = ...` for 2nd-order)
 - Focus on inferring the **equations** (`eq`), **modes**, and **edge conditions** only!
 
-## Initial Hybrid Automaton Specification Template (v0 - with correct dimensions)
+## Initial Hybrid Automaton Specification (v0)
 The `var` and `input` fields are pre-filled. Your task is to refine the **equations** and **structure**:
 
 ```json
@@ -781,7 +880,13 @@ def evaluate_ha_specification(agent_result, input_data_path: str, output_dir: st
         return False
 
 
-def evaluate_ha_specification_with_feedback(agent_result, input_data_path: str, output_dir: str = None) -> Tuple[bool, Dict, str, Optional[Dict]]:
+def evaluate_ha_specification_with_feedback(
+    agent_result,
+    input_data_path: str,
+    output_dir: str = None,
+    hyperparameters: HAHyperparameters = None,
+    iteration: int = 1
+) -> Tuple[bool, Dict, str, Optional[Dict]]:
     """
     Evaluate the generated Hybrid Automaton specification and return feedback for the agent.
 
@@ -789,6 +894,8 @@ def evaluate_ha_specification_with_feedback(agent_result, input_data_path: str, 
         agent_result: Result from the agent.run() call
         input_data_path: Path to the directory containing test .npz files
         output_dir: Directory to save evaluation results
+        hyperparameters: HAHyperparameters instance containing experiment configuration
+        iteration: Current iteration number (for logging)
 
     Returns:
         Tuple of (success_bool, metrics_dict, feedback_string, ha_specification_dict)
@@ -861,12 +968,19 @@ def evaluate_ha_specification_with_feedback(agent_result, input_data_path: str, 
         )
         metrics_dict = evaluator.metrics
 
-        # Save metrics
-        metrics_file = os.path.join(output_dir, f'metrics_{timestamp}.txt')
+        # Save metrics and hyperparameters to ha_evaluation_metrics.txt
+        metrics_file = os.path.join(output_dir, f'hyperparameters_{timestamp}.txt')
         with open(metrics_file, 'w') as f:
-            f.write(metrics_text)
-            f.write("\n\nHA Specification:\n")
-            f.write(json.dumps(ha_specification, indent=2))
+            f.write("Hybrid Automaton Evaluation Results\n")
+            f.write("=" * 80 + "\n")
+            f.write(f"Timestamp: {timestamp}\n")
+            f.write(f"Iteration: {iteration}\n\n")
+
+            # Write hyperparameters if provided
+            if hyperparameters is not None:
+                f.write(hyperparameters.to_string())
+                f.write("\n\n")
+
 
         # Construct feedback string is the same from metrics_file
         
@@ -1046,6 +1160,30 @@ def main():
     # Auto-detect dimensions from data file (overrides command-line args if provided)
     num_variables, num_inputs = get_data_dimensions(args.input_data_path)
 
+    # Create hyperparameters instance to track experiment configuration
+    managed_agents = args.managed_agents_list if hasattr(args, 'managed_agents_list') and args.managed_agents_list else []
+    hyperparameters = HAHyperparameters(
+        manager_model=args.manager_model,
+        manager_type=args.manager_type,
+        managed_agents_count=len(managed_agents),
+        managed_agents_list=managed_agents,
+        managed_agents_model=args.managed_agents_list_model if hasattr(args, 'managed_agents_list_model') else "",
+        tools_list=args.tools_list if args.tools_list else [],
+        image_tool_model=args.image_tool_model,
+        review_tool_model=args.review_tool_model,
+        summarize_tool_model=args.summarize_tool_model,
+        max_iterations=args.max_iterations,
+        feedback_top_k=args.feedback_top_k,
+        feedback_min_gap=args.feedback_min_gap,
+        target_error=args.target_error,
+        no_improvement_patience=args.no_improvement_patience,
+        input_data_path=args.input_data_path,
+        system_name=args.system_name,
+        num_variables=num_variables,
+        num_inputs=num_inputs,
+        use_json_schema=args.use_json_schema,
+    )
+
     # Create the agent
     managerAgent = create_agent(
         model_id=args.manager_model,
@@ -1138,24 +1276,26 @@ def main():
             continue
 
         # Evaluate the generated HA specification
-        # success, metrics, feedback_str, ha_spec = evaluate_ha_specification_with_feedback(
-        #     result,
-        #     args.input_data_path,
-        #     output_dir=os.path.join("evaluation_results", f"iter_{iteration}")
-        # )
+        success, metrics, feedback_str, ha_spec = evaluate_ha_specification_with_feedback(
+            result,
+            args.input_data_path,
+            output_dir=os.path.join("evaluation_results", f"iter_{iteration}"),
+            hyperparameters=hyperparameters,
+            iteration=iteration
+        )
 
-        # # Extract error value from metrics
-        # current_error = float('inf')
-        # if success and isinstance(metrics, dict):
-        #     # Priority order for error metrics
-        #     if 'mean_diff' in metrics:
-        #         current_error = metrics['mean_diff']
-        #     elif 'rmse' in metrics:
-        #         current_error = metrics['rmse']
-        #     elif 'max_diff' in metrics:
-        #         current_error = metrics['max_diff']
+        # Extract error value from metrics
+        current_error = float('inf')
+        if success and isinstance(metrics, dict):
+            # Priority order for error metrics
+            if 'mean_diff' in metrics:
+                current_error = metrics['mean_diff']
+            elif 'rmse' in metrics:
+                current_error = metrics['rmse']
+            elif 'max_diff' in metrics:
+                current_error = metrics['max_diff']
 
-        # print(f"Iteration {iteration} Result Error: {current_error}")
+        print(f"Iteration {iteration} Result Error: {current_error}")
 
         # Create and store iteration result
         iter_result = IterationResult(
