@@ -149,7 +149,7 @@ TOOLNAME2TOOL = {
 
 def _create_HA_agent(Tools_list: List[type[Tool]],
                      markdown_content: MarkdownMessage,
-                     model_id: str = "gemini/gemini-flash-lite-latest",
+                     model_id: str = "gemini/gemini-flash-latest",
                      managed_agents_list: List[MultiStepAgent] = None,
                      max_steps: int = 80,
                      **kwargs) -> ToolCallingAgent | CodeAgent:
@@ -193,7 +193,14 @@ def _create_HA_agent(Tools_list: List[type[Tool]],
     if kwargs["manager_type"] == "CodeAgent":
         manager_agent_kwargs["additional_authorized_imports"] = [
             "os", "sys", "time", "argparse", "pathlib",
-            "matplotlib.pyplot", "numpy", "pandas", "json","scipy"
+            "matplotlib.pyplot", "matplotlib", "pandas", "json",
+            # numpy and all common submodules
+            "numpy", "numpy.linalg", "numpy.fft", "numpy.random", 
+            "numpy.polynomial", "numpy.ma", "numpy.lib",
+            # scipy and all common submodules
+            "scipy", "scipy.linalg", "scipy.optimize", "scipy.interpolate",
+            "scipy.integrate", "scipy.stats", "scipy.signal", "scipy.fft",
+            "scipy.sparse", "scipy.ndimage", "scipy.special"
         ]
         managerAgent = CodeAgent(**manager_agent_kwargs)
     elif kwargs["manager_type"] == "ToolCallingAgent":
@@ -239,14 +246,22 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
 
         # trace file path
         trace_file_path = os.path.join(os.path.dirname(__file__), "utils", "Dainarx_code", "data_duffing", "sample_train_0.npz")
-        
         # managed agent
         managed_agent = CodeAgent(
             tools=[],
             model=model,
             name=agent_name,
-            additional_authorized_imports=["os", "sys", "time", "argparse", "pathlib",
-                                          "matplotlib.pyplot", "numpy", "pandas", "json","scipy"],
+            additional_authorized_imports=[
+            "os", "sys", "time", "argparse", "pathlib",
+            "matplotlib.pyplot", "matplotlib", "pandas", "json",
+            # numpy and all common submodules
+            "numpy", "numpy.linalg", "numpy.fft", "numpy.random", 
+            "numpy.polynomial", "numpy.ma", "numpy.lib",
+            # scipy and all common submodules
+            "scipy", "scipy.linalg", "scipy.optimize", "scipy.interpolate",
+            "scipy.integrate", "scipy.stats", "scipy.signal", "scipy.fft",
+            "scipy.sparse", "scipy.ndimage", "scipy.special"
+        ],
             description=f"I am a managed agent with name {agent_name}. I can assist with code-related tasks. The data file path is {trace_file_path}",
             max_steps=80,
             verbosity_level=2,
@@ -258,7 +273,7 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
 
 
 # create the agent
-def create_agent(model_id: str = "gemini/gemini-flash-lite-latest",
+def create_agent(model_id: str = "gemini/gemini-flash-latest",
                 input_data_path: str = None,
                 tools_list: List[str] = [],
                 managed_agents_list: List[str] = None,
@@ -625,7 +640,7 @@ def parse_args():
     ap.add_argument(
         "--manager-model",
         type=str,
-        default="gemini/gemini-flash-lite-latest",
+        default="gemini/gemini-flash-latest",
         help="Model ID to use for the agent.",
     )
 
@@ -651,13 +666,13 @@ def parse_args():
     ap.add_argument(
         "--image-tool-model",
         type=str,
-        default="gemini-flash-lite-latest",
+        default="gemini-flash-latest",
         help="Model ID to use for the image analysis tool (Gemini API format).",
     )
     ap.add_argument(
         "--review-tool-model",
         type=str,
-        default="gemini-flash-lite-latest",
+        default="gemini-flash-latest",
         help="Model ID to use for the review tool (Gemini API format).",
     )
     ap.add_argument(
@@ -680,7 +695,7 @@ def parse_args():
     ap.add_argument(
         "--managed-agents-list-model",
         type=str,
-        default="gemini/gemini-flash-lite-latest",
+        default="gemini/gemini-flash-latest",
         help="Model ID to use for managed agents.",
     )
 
@@ -712,7 +727,7 @@ def parse_args():
     ap.add_argument(
         "--max-iterations",
         type=int,
-        default=3,
+        default=10,
         help="Maximum number of refinement iterations (HA-Scientist loop). Default: 3",
     )
 
@@ -898,12 +913,15 @@ def main():
         current_error = float('inf')
         if success and isinstance(metrics, dict):
             # Priority order for error metrics
-            if 'mean_diff' in metrics:
+            if 'max_diff' in metrics:
+                current_error = metrics['max_diff']
+            elif 'mean_diff' in metrics:
                 current_error = metrics['mean_diff']
+            elif 'tc' in metrics:
+                current_error = metrics['tc']
             elif 'rmse' in metrics:
                 current_error = metrics['rmse']
-            elif 'max_diff' in metrics:
-                current_error = metrics['max_diff']
+            
 
         print(f"Iteration {iteration} Result Error: {current_error}")
 
