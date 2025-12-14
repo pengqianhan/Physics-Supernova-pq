@@ -370,29 +370,26 @@ The following trace data visualizations are provided (reference images using pla
 - Input signals (if applicable)
 - Potential mode-switch indicators (discontinuities, slope changes)
 
-## Analysis Workflow \n"""
+## Analysis Workflow
+1. **Visual Mode Analysis (MANDATORY)**:
+   - **Step 1**: Use the `hybrid_automaton_image_analysis` tool to inspect the trajectory images.
+   - **Question to ask**: "How many distinct dynamical regimes (modes) are present? Are there sharp corners, discontinuities, or sudden changes in slope? Return the estimated number of modes and their approximate time intervals."
+   - **Decision**: If the image expert reports multiple modes (e.g., "2 regimes", "sharp change at t=5"), you **MUST** proceed with a multi-mode HA structure.
 
-    # Add tool-specific prompts (unified style: init empty -> conditionally set -> unconditionally append)
-    HA_IMAGE_TOOL_PROMPT = ""
-    if HybridAutomatonImageTool in ToolsList:
-        HA_IMAGE_TOOL_PROMPT = "You MUST use the `hybrid_automaton_image_analysis` tool to analyze the image."
+2. **Numerical/Residual Check (Critical for Smooth Systems)**:
+   - **Warning**: Some hybrid systems have **smooth trajectories** (no sharp corners) but switch parameters (e.g., stiffness/damping changes). Visual inspection alone may miss this.
+   - **Action**: Use the managed agent (if available) or your own Python code to specificially check for changing dynamics.
+   - **Logic**: If a single fitted equation has high error in specific time segments, or if the frequency/amplitude decay rate changes noticeably, **you MUST assume multiple modes** even if the curve looks smooth.
 
-    REVIEW_TOOL_PROMPT = ""
-    if ReviewRequestTool_ha in ToolsList:
-        REVIEW_TOOL_PROMPT = """
-        **MANDATORY BEFORE FINALIZATION**: You MUST call the `hybrid_automaton_review_expert` tool at least once before submitting your final answer to ensure specification correctness and completeness."""
+3. **Structure Definition**:
+   - based on Step 1 & 2, define the number of modes.
+   - If >1 mode, define the switching logic (Guards/Transitions).
 
-    VALIDATE_TOOL_PROMPT = ""
-    if ValidateHASpecTool in ToolsList:
-        VALIDATE_TOOL_PROMPT = """
-**VALIDATION TOOL**: Before submitting your final answer, you MUST call the `validate_hybrid_automaton_specification` tool to check for syntax and semantic errors.
-⚠️ **IMPORTANT**: If validation returns a FIXED specification, use the corrected version in your final answer!"""
+4. **Parameter Estimation**:
+   - Estimate parameters for the ODEs in each mode.
 
-    task += HA_IMAGE_TOOL_PROMPT
-    task += REVIEW_TOOL_PROMPT
-    task += VALIDATE_TOOL_PROMPT
-
-    task += """
+5. **Validation**:
+   - Use the `validate_hybrid_automaton_specification` tool to check for syntax errors.
 
 ## HA Refinement Guidelines
 Adopt a **Parsimonious Modeling Approach** (Occam's Razor) - favor simpler explanations unless the data demands otherwise:
@@ -401,9 +398,10 @@ Adopt a **Parsimonious Modeling Approach** (Occam's Razor) - favor simpler expla
    - **Hypothesize Structure First**: Determine the likely functional form of the equations *before* estimating parameters.
 
 2. **Mode Count Strategy (Adaptive Complexity)**:
-   - **Start Simple, but Explore**: Start with **1 Mode**, BUT if the trajectory shows sharp changes, discontinuities, or if a single mode yields high error, you **MUST** consider **2+ Modes**.
-   - **Iterative Correction**: If you are in Iteration > 1 and the previous 1-Mode model had high error, do NOT repeat the same mistake. **Attempt a 2-Mode or 3-Mode solution immediately.**
-   - **Hypothesis Testing**: Curve fitting a complex non-linear function to a switched linear system is a common trap. If different linear models fit different segments well, prefer a **Switched Linear System** (multiple modes) over a single complex non-linear ODE.
+   - **Visual Evidence Rules**: If the visual analysis (Step 1) detects sharp changes or discontinuities, you **MUST** use multiple modes (2 or more).
+   - **Smooth but Hybrid**: If the trajectory is smooth but complex (e.g., varying frequency or damping), prefer a **Switched System** (2+ modes) over a single overly-complex nonlinear equation.
+   - **Do NOT Force Single Mode**: Do not attempt to fit a single smooth ODE to data that clearly changes behavior. It is better to have 2 simple linear modes than 1 complex failing non-linear mode.
+   - **Template Expansion**: The provided template below is for **1 Mode**. If you detect N modes, you **MUST copy/paste** the mode object to create Mode 2, Mode 3, ... Mode N in your JSON.
 
 3. **Mode Dynamics**:
    - **Start Simple**: Attempt to fit **Linear** dynamics first.
@@ -431,6 +429,26 @@ Your HA specification will be evaluated on:
 - **Trajectory Matching**: Simulated output should closely follow ground truth data
 - **Mode Detection Accuracy**: Correct identification of switching instants (TC (Change-Point Error) < 0.01s is good, <= 0.001s is excellent)
 - **State Error Minimization**: Low Mean Difference (Mean Difference) and Maximum Difference (Max Difference) between predicted and actual states (Max Difference < 0.005 is good, < 0.0001 is excellent)"""
+
+    # Add tool-specific prompts (unified style: init empty -> conditionally set -> unconditionally append)
+    HA_IMAGE_TOOL_PROMPT = ""
+    if HybridAutomatonImageTool in ToolsList:
+        HA_IMAGE_TOOL_PROMPT = "\n\nYou MUST use the `hybrid_automaton_image_analysis` tool to analyze the image."
+
+    REVIEW_TOOL_PROMPT = ""
+    if ReviewRequestTool_ha in ToolsList:
+        REVIEW_TOOL_PROMPT = """
+        **MANDATORY BEFORE FINALIZATION**: You MUST call the `hybrid_automaton_review_expert` tool at least once before submitting your final answer to ensure specification correctness and completeness."""
+
+    VALIDATE_TOOL_PROMPT = ""
+    if ValidateHASpecTool in ToolsList:
+        VALIDATE_TOOL_PROMPT = """
+**VALIDATION TOOL**: Before submitting your final answer, you MUST call the `validate_hybrid_automaton_specification` tool to check for syntax and semantic errors.
+⚠️ **IMPORTANT**: If validation returns a FIXED specification, use the corrected version in your final answer!"""
+
+    task += HA_IMAGE_TOOL_PROMPT
+    task += REVIEW_TOOL_PROMPT
+    task += VALIDATE_TOOL_PROMPT
 
 
     # Add managed agents prompt
