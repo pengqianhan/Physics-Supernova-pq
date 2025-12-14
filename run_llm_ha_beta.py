@@ -879,11 +879,11 @@ def main():
             use_json_schema=args.use_json_schema
         )
 
-        # save the task to a file
-        task_filename = f"task_iter_{iteration-1}.md"
+        # save the task to a file and set up output directory
+        task_filename = os.path.join(os.path.dirname(__file__), 'task_prompts', f'iter_{iteration}_task.md')
+        os.makedirs(os.path.dirname(task_filename), exist_ok=True)
         with open(task_filename, "w", encoding="utf-8") as f:
             f.write(task)
-        print(f"Saved task to {task_filename}")
 
         # Run the agent with task and compressed images
         try:
