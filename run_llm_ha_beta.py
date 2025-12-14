@@ -149,7 +149,7 @@ TOOLNAME2TOOL = {
 
 def _create_HA_agent(Tools_list: List[type[Tool]],
                      markdown_content: MarkdownMessage,
-                     model_id: str = "gemini/gemini-flash-latest",
+                     model_id: str = "gemini/gemini-flash-lite-latest",
                      managed_agents_list: List[MultiStepAgent] = None,
                      max_steps: int = 80,
                      **kwargs) -> ToolCallingAgent | CodeAgent:
@@ -273,7 +273,7 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
 
 
 # create the agent
-def create_agent(model_id: str = "gemini/gemini-flash-latest",
+def create_agent(model_id: str = "gemini/gemini-flash-lite-latest",
                 input_data_path: str = None,
                 tools_list: List[str] = [],
                 managed_agents_list: List[str] = None,
@@ -594,12 +594,14 @@ def evaluate_ha_specification_with_feedback(
         metrics_dict = evaluator.metrics
 
         # Save metrics and hyperparameters to ha_evaluation_metrics.txt
-        metrics_file = os.path.join(output_dir, f'hyperparameters_{timestamp}.txt')
+        metrics_file = os.path.join(output_dir, f'ha_eval_{timestamp}.txt')
         with open(metrics_file, 'w') as f:
             f.write("Hybrid Automaton Evaluation Results\n")
             f.write("=" * 80 + "\n")
             f.write(f"Timestamp: {timestamp}\n")
             f.write(f"Iteration: {iteration}\n\n")
+            f.write(f"Metrics: \n {metrics_text}\n\n")
+            f.write(f"HA Specification: \n{json.dumps(ha_specification, indent=2)}\n\n")
 
             # Write hyperparameters if provided
             if hyperparameters is not None:
@@ -640,7 +642,7 @@ def parse_args():
     ap.add_argument(
         "--manager-model",
         type=str,
-        default="gemini/gemini-flash-latest",
+        default="gemini/gemini-flash-lite-latest",
         help="Model ID to use for the agent.",
     )
 
@@ -666,13 +668,13 @@ def parse_args():
     ap.add_argument(
         "--image-tool-model",
         type=str,
-        default="gemini-flash-latest",
+        default="gemini-flash-lite-latest",
         help="Model ID to use for the image analysis tool (Gemini API format).",
     )
     ap.add_argument(
         "--review-tool-model",
         type=str,
-        default="gemini-flash-latest",
+        default="gemini-flash-lite-latest",
         help="Model ID to use for the review tool (Gemini API format).",
     )
     ap.add_argument(
@@ -695,7 +697,7 @@ def parse_args():
     ap.add_argument(
         "--managed-agents-list-model",
         type=str,
-        default="gemini/gemini-flash-latest",
+        default="gemini/gemini-flash-lite-latest",
         help="Model ID to use for managed agents.",
     )
 
@@ -727,7 +729,7 @@ def parse_args():
     ap.add_argument(
         "--max-iterations",
         type=int,
-        default=10,
+        default=3,
         help="Maximum number of refinement iterations (HA-Scientist loop). Default: 3",
     )
 

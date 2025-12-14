@@ -204,7 +204,7 @@ class ResultsAggregator:
                 metrics_summary = ", ".join([
                     f"{k}: {v:.4f}" if isinstance(v, float) else f"{k}: {v}"
                     for k, v in result.metrics.items()
-                    if k in ['mean_diff', 'max_diff', 'TC', 'rmse']
+                    if k in ['mean_diff', 'max_diff', 'tc', 'rmse']
                 ])
                 if metrics_summary:
                     context_lines.append(f"**Metrics**: {metrics_summary}")
