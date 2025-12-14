@@ -247,6 +247,18 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
         # trace file path
         trace_file_path = os.path.join(os.path.dirname(__file__), "utils", "Dainarx_code", "data_duffing", "sample_train_0.npz")
         # managed agent
+        managed_agent_description = f"""I am a managed agent with name {agent_name}. I can assist with code-related tasks. The data file path is {trace_file_path}.
+
+CAPABILITIES:
+1. **Numerical Analysis**: I can load .npz data and perform numpy/scipy operations.
+2. **Curve Fitting**: I can fit linear/nonlinear models to data segments.
+3. **Windowed Error Analysis (Mode Detection)**: I can detect hidden mode switches in smooth data using this workflow:
+   - Define a window size (e.g., 10 steps).
+   - Slide the window across the trajectory.
+   - In each window, fit a simple local model (e.g., linear dx/dt = Ax).
+   - Plot/analyze the fitting residual (error) or parameter variation over time.
+   - **Insight**: Spikes in residual or jumps in parameters indicate a MODE SWITCH, even if the curve looks smooth.
+"""
         managed_agent = CodeAgent(
             tools=[],
             model=model,
@@ -262,7 +274,7 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
             "scipy.integrate", "scipy.stats", "scipy.signal", "scipy.fft",
             "scipy.sparse", "scipy.ndimage", "scipy.special"
         ],
-            description=f"I am a managed agent with name {agent_name}. I can assist with code-related tasks. The data file path is {trace_file_path}",
+            description=managed_agent_description,
             max_steps=80,
             verbosity_level=2,
         )
