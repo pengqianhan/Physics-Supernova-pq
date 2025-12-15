@@ -259,8 +259,10 @@ CAPABILITIES:
    - Plot/analyze the fitting residual (error) or parameter variation over time.
    - **Insight**: Spikes in residual or jumps in parameters indicate a MODE SWITCH, even if the curve looks smooth.
 """
+        use_e2b = bool(os.environ.get("E2B_API_KEY"))
         managed_agent = CodeAgent(
             tools=[],
+            executor_type="e2b" if use_e2b else "python",
             model=model,
             name=agent_name,
             additional_authorized_imports=[
@@ -278,7 +280,20 @@ CAPABILITIES:
             max_steps=80,
             verbosity_level=2,
         )
-        managed_agent.python_executor.state["DATA_FILE_PATH"] = trace_file_path
+        if use_e2b:
+            print("使用 E2B 云沙盒执行器，正在上传数据文件...")
+            # 上传文件到 E2B 沙盒
+            with open(trace_file_path, "rb") as f:
+                file_content = f.read()
+            # E2B 沙盒中的目标路径
+            sandbox_file_path = "/tmp/sample_train_0.npz"
+            managed_agent.python_executor.sandbox.files.write(sandbox_file_path, file_content)
+            print(f"✓ 文件已上传到 E2B 沙盒: {sandbox_file_path}")
+            # 更新数据文件路径为沙盒中的路径
+            trace_file_path = sandbox_file_path
+        else:
+            # 本地执行器：将数据文件路径注入到 agent 的状态中
+            managed_agent.python_executor.state["DATA_FILE_PATH"] = trace_file_path
         managed_agents.append(managed_agent)
 
     return managed_agents
