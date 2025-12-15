@@ -1,0 +1,21 @@
+{
+  "automaton": {
+    "var": "x1",
+    "input": "u1",
+    "mode": [
+      {
+        "id": 1,
+        "eq": "x1[2] = -0.5 * x1[1] - 5.0 * x1[0] - 0.5 * x1[0]**3"
+      }
+    ],
+    "edge": []
+  },
+  "config": {
+    "dt": 0.001,
+    "total_time": 10.0,
+    "dim": 2,
+    "need_reset": false,
+    "non_linear_items": "x1[0]**3",
+    "need_bias": false
+  }
+}
