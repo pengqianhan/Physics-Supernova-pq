@@ -1,6 +1,5 @@
 __pycache__/
 output*/
-*.txt
 *.pth
 *.pt
 output/
@@ -14,3 +13,6 @@ batchrun_copy2.py
 .env
 #
 utils/Dainarx_code/data*
+
+# output files
+evaluation_results/

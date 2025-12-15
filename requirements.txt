@@ -1,0 +1,14 @@
+tenacity                # retry logic for LiteLLM-backed models
+openai                  # for OpenAI API
+smolagents              # for the base package
+smolagents[litellm]     # includes the base package
+loguru
+python-dotenv
+numpy
+scipy
+matplotlib
+pandas
+seaborn
+scikit-learn
+networkx
+smolagents[e2b] #sandbox environment
