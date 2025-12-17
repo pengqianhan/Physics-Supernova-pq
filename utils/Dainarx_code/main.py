@@ -93,7 +93,7 @@ def main(json_path: str, data_path='data', need_creat=None, need_plot=True):
     if need_creat:
         print("Data being generated!")
         creat_data(json_path, data_path, config['dt'], config['total_time'])
-        save_hash_code(hash_code, data_path)
+        # save_hash_code(hash_code, data_path)
 
     mode_list = []
     data = []
@@ -111,12 +111,15 @@ def main(json_path: str, data_path='data', need_creat=None, need_plot=True):
         for file in sorted(files, key=lambda x: int(re.search(r'(\d+)', x).group())):
             if re.search(r"(.)*\.npz", file) is None:
                 continue
+            # Skip sample_train_X.npz files as they don't contain 'mode' data
+            if 'sample_train_' in file:
+                continue
             npz_file = np.load(os.path.join(root, file))# e.g. test_data14.npz
-            print("npz_file.keys(): ", npz_file.keys()) # ['state', 'mode', 'input', 'change_points']
-            print("npz_file['state'].shape: ", npz_file['state'].shape) # (1, 10001)
-            print("npz_file['mode'].shape: ", npz_file['mode'].shape) # (10001, 1)
-            print("npz_file['input'].shape: ", npz_file['input'].shape) # (1, 10001)
-            print("npz_file['change_points'].shape: ", npz_file['change_points'].shape) # (23,)
+            # print("npz_file.keys(): ", npz_file.keys()) # ['state', 'mode', 'input', 'change_points']
+            # print("npz_file['state'].shape: ", npz_file['state'].shape) # (1, 10001)
+            # print("npz_file['mode'].shape: ", npz_file['mode'].shape) # (10001, 1)
+            # print("npz_file['input'].shape: ", npz_file['input'].shape) # (1, 10001)
+            # print("npz_file['change_points'].shape: ", npz_file['change_points'].shape) # (23,)
             state_data_temp, mode_data_temp = npz_file['state'], npz_file['mode']
             change_point_list = npz_file.get('change_points', get_ture_chp(mode_data_temp))
             gt_list.append(change_point_list)
