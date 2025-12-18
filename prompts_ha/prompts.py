@@ -71,7 +71,7 @@ Your output will be parsed using `json.loads()`. You MUST output valid JSON form
 ### CONFIG SECTION
 - `dt`: Integration time step in seconds (number, typical: 0.001 or 0.01)
 - `total_time`: Total simulation duration in seconds (number)
-- `dim`: Order of the ODE system (1=first-order, 2=second-order, etc.)
+- `order`: Order of the ODE system (1=first-order, 2=second-order, etc.)
 - `need_reset`: Boolean to enable state resets on mode transitions (true if edges have reset maps)
 - `non_linear_items`: Nonlinear/cross terms in dynamics for reference (e.g., "x1[0]**3", "x1[0]*x2[0]")
 
@@ -129,7 +129,7 @@ This defines d²x1/dt² directly. The values x1[0] (position) and x1[1] (velocit
 **Key Rules:**
 1. ONE variable with n-th order derivative → use `x1[n] = ...` (NOT n separate equations)
 2. MULTIPLE variables with 1st-order derivatives → use `x1[1] = ..., x2[1] = ...`
-3. The `dim` in config should match the highest derivative order used
+3. The `order` in config should match the highest derivative order used
 
 **More Examples:**
 - 2nd order: `"x1[2] = -k*x1[0] - c*x1[1] + F"`
@@ -167,7 +167,7 @@ one_mode_reset_ha_spec_prompt = """{
     "config": {
         "dt": 0.001,
         "total_time": 10.0,
-        "dim": 1,
+        "order": 1,
         "need_reset": true,
         "non_linear_items": ""
     }
@@ -181,7 +181,7 @@ second_order_ha_spec_prompt = """{
         "mode": [
             {
                 "id": 1,
-                "eq": "x1[2] = x1[1] + x1[0] + x1[0]**3 + u1"
+                "eq": "x1[2] = x1[1] + x1[0] + x1[0] ** 2 + u1"
             }
         ],
         "edge": []
@@ -191,7 +191,7 @@ second_order_ha_spec_prompt = """{
         "total_time": 10.0,
         "order": 2,
         "need_reset": false,
-        "non_linear_items": "x1[0]**3"
+        "non_linear_items": "x1[?] ** 2"
     }
 }"""
 
@@ -223,7 +223,7 @@ two_modes_ha_spec_prompt = """{
     "config": {
         "dt": 0.01,
         "total_time": 20.0,
-        "dim": 1,
+        "order": 1,
         "need_reset": false,
         "non_linear_items": ""
     }
@@ -294,7 +294,7 @@ HA_SPEC_JSON_SCHEMA_COMPACT = """## HA Specification JSON Schema (Compact)
   "config": {
     "dt": 0.001,                 // Time step (number > 0)
     "total_time": 10.0,          // Duration (number > 0)
-    "dim": 2,                    // ODE order (optional)
+    "order": 2,                    // ODE order (optional)
     "need_reset": false          // Has resets? (optional)
   }
 }
