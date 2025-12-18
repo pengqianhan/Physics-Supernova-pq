@@ -4,7 +4,7 @@ from .imgTools_ha import HybridAutomatonImageTool  # Image analysis tool for hyb
 from .reviewTools_ha import ReviewRequestTool_ha  # Expert review tool for hybrid automaton
 from .summemoryTools_ha import SummarizeMemoryTool  # Memory summarization tool for hybrid automaton
 from .validateTools_ha import ValidateHASpecTool  # Validation tool for hybrid automaton
-from utils import *
+from .dainarxTools import DainarxEvaluationTool, evaluate_ha_specification  # Dainarx evaluation tool
 # Dependency check: make sure tenacity is installed, as LiteLLMModel uses it for retrying logic
 try:
     import tenacity

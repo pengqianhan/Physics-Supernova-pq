@@ -111,7 +111,7 @@ HA_JSON_SCHEMA = {
                 },
                 "non_linear_items": {
                     "type": "string",
-                    "description": "Nonlinear/cross terms in dynamics (e.g., 'x1[0]**3', 'x1[0]*x2[0]')",
+                    "description": "Nonlinear/cross terms in dynamics (e.g., 'x1[?]**3', 'x1[?]*x2[?]')",
                     "default": ""
                 },
                 "self_loop": {
