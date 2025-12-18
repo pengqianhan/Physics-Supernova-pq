@@ -3,7 +3,7 @@ import os
 import re
 import time
 import logging
-
+import re
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -342,6 +342,9 @@ def get_config_from_dict(ha_dict: dict, evaluation: Evaluation):
     # Note: Remaining keys in json_config are intentionally ignored
     # We only extract keys specified in key_list
 
+    #加一个正则表达式，如果other_items中包含形如x1[?]，那么转换为x[?]
+    config['other_items'] = re.sub(r'x\d+\[\?\]', 'x[?]', config['other_items'])
+
     return config, get_hash_code(ha_load_dict, config)
 
 
@@ -532,24 +535,24 @@ if __name__ == "__main__":
     if not os.path.exists(result_path):
         os.makedirs(result_path)
     ha_dict = {
-    "automaton": {
-        "var": "x1",
-        "input": "u1",
-        "mode": [
-            {
-                "id": 1,
-                "eq": "x1[2] = -0.5 * x1[1] - 5.0 * x1[0] + 1.0 * x1[0]**3 + u1"
-            }
-        ],
-        "edge": []
-    },
-    "config": {
-        "dt": 0.001,
-        "total_time": 10.0,
-        "order": 2,
-        "need_reset": False,
-        "non_linear_items": "x[?]**3"
-    }
+  "automaton": {
+    "var": "x1",
+    "input": "u1",
+    "mode": [
+      {
+        "id": 1,
+        "eq": "x1[2] = -0.1 * x1[1] - 10.0 * x1[0] - 1.0 * x1[0] ** 3 + u1"
+      }
+    ],
+    "edge": []
+  },
+  "config": {
+    "dt": 0.001,
+    "total_time": 10.0,
+    "order": 2,
+    "need_reset": False,
+    "non_linear_items": "x1[?] ** 3"
+  }
 }
     # eval_log = main_from_dictv0(ha_dict, data_path='data', need_creat=False, need_plot=False)
     eval_log = main_from_dict(ha_dict, data_path='data', need_creat=False, need_plot=False)

@@ -111,7 +111,7 @@ HA_JSON_SCHEMA = {
                 },
                 "non_linear_items": {
                     "type": "string",
-                    "description": "Nonlinear/cross terms in dynamics (e.g., 'x1[?]**3', 'x1[?]*x2[?]') in ODEs, which is eq in mode. The nonlinear/cross terms MUST be consistent with the 'eq' in mode.",
+                    "description": "Nonlinear/cross terms in dynamics (e.g., 'x1[?]**3'). CRITICAL: This field MUST exactly match the nonlinear terms used in 'eq'. If 'eq' contains 'x1[0]**3', this field MUST contain 'x1[?]**3'. If multiple terms, comma-separate them. If 'eq' is linear, this MUST be empty.",
                     "default": ""
                 },
                 "self_loop": {
