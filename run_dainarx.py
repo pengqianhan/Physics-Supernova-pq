@@ -373,10 +373,10 @@ The following trace data visualizations are provided (reference images using pla
 3. **Use Dainarx Feedback**: The `dainarx_evaluate_ha` tool gives you exact error metrics
 4. **Guard Conditions**: Use simple thresholds (e.g., `x1 >= 0`, `x1 <= 0.5`)
 
-## Quality Criteria (from Dainarx metrics)
-- **TC (Change-Point Error)**: < 0.01s is good, < 0.001s is excellent
-- **Max Difference**: < 0.005 is good, < 0.0001 is excellent
-- **Mean Difference**: Lower is better"""
+## Quality Criteria (Lower is better)
+- **TC (Change-Point Error)**: < 0.01s is good, <= 0.001s is final destination
+- **Max Difference**: < 0.005 is good, <= 0.0001 is final destination
+- **Mean Difference**: < 0.005 is good, <= 0.00001 is final destination"""
 
     # Add tool-specific prompts
     HA_IMAGE_TOOL_PROMPT = ""

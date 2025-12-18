@@ -106,12 +106,12 @@ HA_JSON_SCHEMA = {
                 },
                 "need_reset": {
                     "type": "boolean",
-                    "description": "Whether state resets occur on mode transitions",
+                    "description": "Whether variable resets occur on mode transitions, if there are more than 2 modes, the reset is required",
                     "default": False
                 },
                 "non_linear_items": {
                     "type": "string",
-                    "description": "Nonlinear/cross terms in dynamics (e.g., 'x1[?]**3', 'x1[?]*x2[?]')",
+                    "description": "Nonlinear/cross terms in dynamics (e.g., 'x1[?]**3', 'x1[?]*x2[?]') in ODEs, which is eq in mode. The nonlinear/cross terms MUST be consistent with the 'eq' in mode.",
                     "default": ""
                 },
                 "self_loop": {
@@ -144,8 +144,7 @@ HA_JSON_SCHEMA = {
                     "minLength": 1,
                     "examples": [
                         "x1[1] = -2 * x1[0] + u1",
-                        "x1[2] = -0.5 * x1[1] - 5.0 * x1[0] + u1",
-                        "x1[1] = x2[0], x2[1] = -9.8 + u1"
+                        "x1[2] = x1[1] - x1[0] ** 2 + u1"
                     ]
                 }
             },
@@ -167,7 +166,6 @@ HA_JSON_SCHEMA = {
                     "minLength": 1,
                     "examples": [
                         "x1 > 0.5",
-                        "x2 <= 4",
                         "x1 <= 0 and x2 > 1",
                         "abs(x1) >= 1.2"
                     ]
