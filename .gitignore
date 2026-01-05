@@ -16,3 +16,6 @@ utils/Dainarx_code/data*
 
 # output files
 evaluation_results/
+
+# data files
+data_all/

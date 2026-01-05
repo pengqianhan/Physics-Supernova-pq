@@ -12,3 +12,4 @@ seaborn
 scikit-learn
 networkx
 smolagents[e2b] #sandbox environment
+matplotlib
