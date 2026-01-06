@@ -19,3 +19,4 @@ evaluation_results/
 
 # data files
 data_all/
+data_*/
