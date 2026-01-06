@@ -878,7 +878,7 @@ def parse_args():
     ap.add_argument(
         "--summarize-tool-model",
         type=str,
-        default="gemini/gemini-2.5-flash-lite",
+        default="gemini-flash-lite-latest",
         help="Model ID to use for the summarize iterations tool (Gemini API format).",
     )
 
