@@ -828,7 +828,7 @@ def parse_args():
 
 def main():
     args = parse_args()
-    print(f"Running HA Learning Agent with model: {args.manager_model}, tools: {args.tools_list}, data path: {args.input_data_path}")
+    print(f"Running HA Learning Agent with model: {args.manager_model}, tools: {args.tools_list},managed agents: {args.managed_agents_list}, data path: {args.input_data_path}")
 
     # Auto-detect dimensions from data file (overrides command-line args if provided)
     num_variables, num_inputs = get_data_dimensions(args.input_data_path)
