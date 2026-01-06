@@ -263,7 +263,7 @@ CAPABILITIES:
         use_e2b = False
         managed_agent = CodeAgent(
             tools=[],
-            executor_type="e2b" if use_e2b else "python",
+            executor_type="e2b" if use_e2b else "local",
             model=model,
             name=agent_name,
             additional_authorized_imports=[
