@@ -412,7 +412,8 @@ CAPABILITIES:
    - Plot/analyze the fitting residual (error) or parameter variation over time.
    - **Insight**: Spikes in residual or jumps in parameters indicate a MODE SWITCH, even if the curve looks smooth.
 """
-        use_e2b = bool(os.environ.get("E2B_API_KEY"))
+        # use_e2b = bool(os.environ.get("E2B_API_KEY"))
+        use_e2b = False
         managed_agent = CodeAgent(
             tools=[],
             executor_type="e2b" if use_e2b else "python",
