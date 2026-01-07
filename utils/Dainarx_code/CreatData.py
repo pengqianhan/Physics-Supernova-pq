@@ -90,7 +90,7 @@ def creat_data(json_path: str, data_path: str, dT: float, times: float):
             plotter.close()
 
             # save the data
-            np.savez(os.path.join(data_path, "sample_ground_truth_" + str(state_id)),
+            np.savez(os.path.join(data_path, "ground_truth_" + str(state_id)),
                      state=state_data, mode=mode_data, input=input_data, change_points=change_points)
             np.savez(os.path.join(data_path, "sample_" + str(state_id)),
                      state=state_data, input=input_data)
