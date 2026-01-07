@@ -9,7 +9,7 @@ class MockWorkerAgent:
     def __init__(self):
         # Create a proper MarkdownMessage object (not just a string)
         # The content should be a list of dicts with "type" and "text"/"image_url" keys
-        self.markdown_content_high_res_image = load_trace_data_from_filepath("utils/Dainarx_code/data_duffing")
+        self.markdown_content_high_res_image = load_trace_data_from_filepath("data_all/non_linear/duffing/sample_0.png")
 # Set high res images in the agent, for the AskImageTool to use
 # Dynamically add custom attribute to agent for data sharing with tools
 # Docs: https://huggingface.co/docs/smolagents/en/tutorials/building_good_agents (agents support dynamic attributes)
