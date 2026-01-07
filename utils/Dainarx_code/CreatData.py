@@ -90,9 +90,9 @@ def creat_data(json_path: str, data_path: str, dT: float, times: float):
             plotter.close()
 
             # save the data
-            np.savez(os.path.join(data_path, "sample_" + str(state_id)),
+            np.savez(os.path.join(data_path, "sample_ground_truth_" + str(state_id)),
                      state=state_data, mode=mode_data, input=input_data, change_points=change_points)
-            np.savez(os.path.join(data_path, "sample_train_" + str(state_id)),
+            np.savez(os.path.join(data_path, "sample_" + str(state_id)),
                      state=state_data, input=input_data)
             state_id += 1
 
@@ -152,8 +152,10 @@ def creat_all_data(automata_dir: str = None, output_dir: str = None, default_dt:
 
             # Get dt and total_time from config, use defaults if not present
             config = data.get('config', {})
-            dt = config.get('dt', default_dt)
-            total_time = config.get('total_time', default_total_time)
+            # dt = config.get('dt', default_dt)
+            dt = 0.001
+            # total_time = config.get('total_time', default_total_time)
+            total_time = 10.0
 
             print(f"\nProcessing: {rel_path}")
             print(f"  Output: {os.path.relpath(data_output_path, project_root)}")
@@ -172,9 +174,9 @@ def creat_all_data(automata_dir: str = None, output_dir: str = None, default_dt:
 
 if __name__ == "__main__":
     # Example: create data for a single automaton
-    creat_data('automata/non_linear/duffing.json', 'data_duffing', 0.001, 10)
+    # creat_data('automata/non_linear/duffing.json', 'data_duffing', 0.001, 10)
     # creat_data('automata/ATVA/ball.json', 'data_ball', 0.001, 10)
     # creat_data('automata/non_linear/lander.json', 'data_lander', 0.01, 10)
 
     # Create data for all automata
-    # creat_all_data()
+    creat_all_data()
