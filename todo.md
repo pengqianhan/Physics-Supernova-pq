@@ -7,3 +7,7 @@
  - [ ]  which can use the Gradient-Free-Optimizers to find the best parameters to make the result close to the ground truth and 
  - [x] add managed agent data_analysis_expert, which has access to the trace data.
  - [ ] for current_feedback only choose the top k feedbacks(evaluation and HA specification) to be used in the next iteration. maybe need to create a pool of feedbacks and choose the top k from the pool.
+ - [ ] 验证数据路径加载流程是否正确,使用 --input-data-path 参数来指定数据路径。
+ - [ ] 分析image 的工具是否能正确分析图片,捋一遍图片的处理流程
+ - [ ] 添加 use-e2b 参数来指定是否使用 e2b 云沙盒执行器。
+ - [ ] system_name 删除这个变量,来让agent对系统辨识任务跟系统名称无关。
