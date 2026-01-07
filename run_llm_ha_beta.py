@@ -229,7 +229,8 @@ def _create_HA_agent(Tools_list: List[type[Tool]],
 
 
 def get_managed_agents_list(managed_agents_list: List[str] = None,
-                            managed_agents_list_model_id: str = None) -> List[MultiStepAgent]:
+                            managed_agents_list_model_id: str = None,
+                            input_data_path: str = None) -> List[MultiStepAgent]:
     if managed_agents_list is None:
         return []
 
@@ -245,7 +246,7 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
         )
 
         # trace file path
-        trace_file_path = os.path.join(os.path.dirname(__file__), "utils", "Dainarx_code", "data_duffing", "sample_train_0.npz")
+        trace_file_path = os.path.join(input_data_path, f"sample_0.npz")
         # managed agent
         managed_agent_description = f"""I am a managed agent with name {agent_name}. I can assist with code-related tasks. The data file path is {trace_file_path}.
 
@@ -330,7 +331,7 @@ def create_agent(model_id: str = "gemini/gemini-flash-lite-latest",
         Tools_list=ToolsList,
         markdown_content=markdown_content,
         model_id=model_id,
-        managed_agents_list=get_managed_agents_list(managed_agents_list, managed_agents_list_model_id),
+        managed_agents_list=get_managed_agents_list(managed_agents_list, managed_agents_list_model_id,input_data_path),
         **kwargs
     )
     return haAgent
@@ -399,25 +400,45 @@ The following trace data visualizations are provided (reference images using pla
 - Potential mode-switch indicators (discontinuities, slope changes)
 
 ## Analysis Workflow
-1. **Visual Mode Analysis (MANDATORY)**:
-   - **Step 1**: Use the `hybrid_automaton_image_analysis` tool to inspect the trajectory images.
-   - **Question to ask**: "How many distinct dynamical regimes (modes) are present? Are there sharp corners, discontinuities, or sudden changes in slope? Return the estimated number of modes and their approximate time intervals."
-   - **Decision**: If the image expert reports multiple modes (e.g., "2 regimes", "sharp change at t=5"), you **MUST** proceed with a multi-mode HA structure.
 
-2. **Numerical/Residual Check (Critical for Smooth Systems)**:
-   - **Warning**: Some hybrid systems have **smooth trajectories** (no sharp corners) but switch parameters (e.g., stiffness/damping changes). Visual inspection alone may miss this.
-   - **Action**: Use the managed agent (if available) or your own Python code to specificially check for changing dynamics.
-   - **Logic**: If a single fitted equation has high error in specific time segments, or if the frequency/amplitude decay rate changes noticeably, **you MUST assume multiple modes** even if the curve looks smooth.
+### Phase 1: Visual Hypothesis Generation (Qualitative)
+**Tool**: `hybrid_automaton_image_analysis`
+**Goal**: Formulate initial hypotheses about the system's structure and dynamics.
+1.  **Analyze the Image**: Look at the trajectory shapes and relationships between variables.
+2.  **Propose Hypotheses**:
+    *   **Dynamics**:
+        *   "Periodic/Wavy" -> Suggests trigonometric terms (sin, cos).
+        *   "Decay/Growth" -> Suggests damping/unstable terms (negative/positive feedback).
+        *   "Straight Lines" -> Suggests constant velocity or simple linear dynamics.
+    *   **Structure (Modes & Switching)**:
+        *   "Sharp Kinks/Corners" -> Suggests **Mode Switches** (change in vector field).
+        *   "Jumps/Discontinuities" -> Suggests **Resets** (instantaneous state change).
+        *   "Smooth but Complex" -> Could be nonlinear or a smooth switch (hidden mode).
+3.  **Output**: Write down your hypotheses (e.g., "H1: System has 2 modes. H2: Switch occurs when x1 hits top/bottom. H3: Mode 1 is a damped oscillator.")
 
-3. **Structure Definition**:
-   - based on Step 1 & 2, define the number of modes.
-   - If >1 mode, define the switching logic (Guards/Transitions).
+### Phase 2: Data-Driven Verification & Refinement (Quantitative)
+**Tool**: Managed Agent (Code) or Python Code Interpreter
+**Goal**: Verify hypotheses and extract precise parameters using the `.npz` data.
+1.  **Load Data**: Access the raw numerical data from the `.npz` file.
+2.  **Verify & Refine Hypotheses**:
+    *   *Refine Switch Points*: If Phase 1 suggested a switch at "peaks", use code to find the exact state values where this happens. Is it exactly x=1.0 or x=0.98?
+    *   *Verify Dynamics*:
+        *   If H3 was "damped oscillator", try to fit a standard damped harmonic oscillator model to the data segment.
+        *   Check the **residuals**. If the fit is bad, revise the hypothesis (e.g., add a nonlinear term like x^3).
+    *   *Detect Subtle Modes*: Use "Windowed Error Analysis" (sliding window fit) to find mode switches that are invisible to the eye (smooth transitions).
+3.  **Parameter Estimation**: Perform regression (e.g., `scipy.optimize.curve_fit` or Least Squares) on the segmented data to get the exact ODE coefficients.
 
-4. **Parameter Estimation**:
-   - Estimate parameters for the ODEs in each mode.
+### Phase 3: Specification Construction
+**Goal**: Synthesize findings into the JSON format.
+1.  **Define Modes**: Create a mode entry for each distinct behavior identified.
+2.  **Define Transitions (Edges)**:
+    *   Use the precise guard conditions found in Phase 2 (e.g., `x1 >= 0.5`).
+    *   Define resets if "Jumps" were confirmed in Phase 2.
+3.  **Define Equations**: Use the estimated parameters to write the ODEs.
 
-5. **Validation**:
-   - Use the `validate_hybrid_automaton_specification` tool to check for syntax errors.
+### Phase 4: Final Validation
+**Tool**: `validate_hybrid_automaton_specification`
+**Goal**: Ensure the generated JSON is syntactically and semantically correct before submission.
 
 ## HA Refinement Guidelines
 Adopt a **Parsimonious Modeling Approach** (Occam's Razor) - favor simpler explanations unless the data demands otherwise:
@@ -485,7 +506,8 @@ Your HA specification will be evaluated on:
 
 ## Computational Resources
 You have access to managed Code Agent(s): `{managed_agents_list}`
-Use them for numerical computations, curve fitting, or complex mathematical derivations."""
+Use them for numerical computations, curve fitting, or complex mathematical derivations.
+You MUST use the managed agents to verify your analysis and hypotheses about the system from the hybrid_automaton_image_analysis tool."""
         task += MANAGE_AGENT_PROMPT
 
     # Add self code agent prompt
@@ -675,14 +697,14 @@ def evaluate_ha_specification_with_feedback(
 
 def parse_args():
     # Get the directory where this script is located
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    default_data_path = os.path.join(script_dir, "utils", "Dainarx_code", "data_duffing")
+    # script_dir = os.path.dirname(os.path.abspath(__file__))
+    # default_data_path = os.path.join(script_dir, "utils", "Dainarx_code", "data_duffing")
 
     ap = argparse.ArgumentParser(description="Run the HA Learning Agent with specified tools and model.")
     ap.add_argument(
         "--input-data-path",
         type=str,
-        default=default_data_path,
+        default='data_all/non_linear/duffing',
         help="Path to the trace data directory.",
     )
     ap.add_argument(
@@ -1032,4 +1054,4 @@ if __name__ == "__main__":
     main()
 
     # Example usage:
-    # python run_llm_ha_beta.py --input-data-path utils/Dainarx_code/data_duffing --manager-type CodeAgent --tools-list hybrid_automaton_image_analysis summarize_hybrid_automaton_iterations validate_hybrid_automaton_specification
+    # python run_llm_ha_beta.py --input-data-path data_all/non_linear/duffing --manager-type CodeAgent --tools-list hybrid_automaton_image_analysis summarize_hybrid_automaton_iterations validate_hybrid_automaton_specification
