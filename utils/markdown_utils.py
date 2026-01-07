@@ -226,8 +226,7 @@ def load_trace_data_from_filepath(file_path: str = "data_all/non_linear/duffing"
             raise FileNotFoundError(f"Directory not found: {file_path}")
         
         # Find all sample IDs by looking for sample_X.png or sample_X.npz files
-        all_files = glob.glob(str(dir_path / "sample_*"))
-        
+        all_files = sorted(glob.glob(str(dir_path / "sample_*")))
         # Extract unique sample IDs using regex
         sample_ids = set()
         pattern = re.compile(r'sample_(\d+)\.(png|npz)$')
