@@ -15,16 +15,13 @@ import json
 import base64
 import io
 
-# Handle both package and direct script execution
-# Add Dainarx_code directory to sys.path to ensure src modules can be imported
+
+# Add Dainarx_code directory to sys.path so we can import from src
 _current_dir = os.path.dirname(os.path.abspath(__file__))
-_dainarx_code_dir = _current_dir if os.path.basename(_current_dir) == 'Dainarx_code' else os.path.join(os.path.dirname(_current_dir), 'Dainarx_code')
+if _current_dir not in sys.path:
+    sys.path.insert(0, _current_dir)
 
-# Ensure Dainarx_code is in path so that "from src.X import Y" works
-if os.path.exists(_dainarx_code_dir) and _dainarx_code_dir not in sys.path:
-    sys.path.insert(0, _dainarx_code_dir)
-
-# Now import from src directly (this will work because Dainarx_code is in sys.path)
+# Now import from src directly
 from src.HybridAutomata import HybridAutomata
 from src.Evaluation import Evaluation, max_min_abs_diff
 
@@ -443,9 +440,6 @@ class HAEvaluator:
             total_time: Total simulation time in seconds
         """
         self.ha_dict = ha_dict
-        # Convert relative path to absolute path based on this file's location
-        if not os.path.isabs(npz_file_path):
-            npz_file_path = os.path.join(_dainarx_code_dir, npz_file_path)
         self.npz_file_path = npz_file_path
         self.total_time = total_time
 
@@ -726,8 +720,8 @@ class HAEvaluator:
         # Save if requested
         if save_path is not None:
             # Convert relative path to absolute path based on this file's location
-            if not os.path.isabs(save_path):
-                save_path = os.path.join(_dainarx_code_dir, save_path)
+            # if not os.path.isabs(save_path):
+            #     save_path = os.path.join(_dainarx_code_dir, save_path)
             plotter.save(save_path)
             if print_metrics:
                 print(f"Plot saved to: {save_path}")
@@ -825,7 +819,7 @@ if __name__ == "__main__":
             "other_items": ""
         }
     }
-    data=json.load(open('utils/Dainarx_code/automata/non_linear/duffing_simulation.json', 'r'))
+    data=json.load(open('utils/Dainarx_code/automata/non_linear/duffing.json', 'r'))
     print(data)
 
 
@@ -835,7 +829,7 @@ if __name__ == "__main__":
 
     evaluator = HAEvaluator(
         ha_dict=data,
-        npz_file_path='data_duffing/sample_0.npz',
+        npz_file_path='data_all/non_linear/duffing/sample_0.npz',
         dt=0.001,
         total_time=10.0
     )
