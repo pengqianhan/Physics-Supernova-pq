@@ -204,14 +204,14 @@ def load_markdown_from_filepath(file_path: str) -> MarkdownMessage:
                 "text": f"Error parsing markdown file: {str(e)}"
             }], str(file_path))
             
-def load_trace_data_from_filepath(file_path: str = "utils/Dainarx_code/data_duffing") -> MarkdownMessage:
+def load_trace_data_from_filepath(file_path: str = "data_all/non_linear/duffing") -> MarkdownMessage:
     """
     Load trace data from a directory containing images and npz files.
     Returns OpenAI-compatible message content (same as load_markdown_from_filepath).
     
     Args:
         file_path: Path to directory containing sample_X.png and sample_X.npz files.
-                   Default is 'utils/Dainarx_code/data_duffing'.
+                   Default is 'data_all/non_linear/duffing'.
     
     Returns:
         MarkdownMessage with all samples combined (text descriptions + embedded images).
