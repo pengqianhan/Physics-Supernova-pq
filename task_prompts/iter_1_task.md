@@ -11,7 +11,7 @@ You are a control systems engineer specializing in **Hybrid Automaton (HA) syste
 
 ## Available Data
 The following data sources are provided:
-- **Trace visualizations**: `<image_0>`, `<image_1>`, `<image_2>` (state variable trajectories, input signals, mode-switch indicators)
+- **Trace visualizations**: `<image_0>`, `<image_1>`, `<image_2>`
 - **Raw data files**: `sample_0_npz`, `sample_1_npz`, `sample_2_npz` (NPZ files that can be read and analyzed by `managed_agent` for quantitative analysis)
 
 ## Analysis Workflow
