@@ -247,9 +247,10 @@ def load_trace_data_from_filepath(file_path: str = "data_all/non_linear/duffing"
         # Collect all text parts and image mappings
         all_text_parts = []
         all_images = {}
+        all_npz_data = {}
         
         # Load png and npz files for each sample using a for loop
-        for sample_id in sample_ids[:1]:
+        for sample_id in sample_ids[:3]:
             # Define file paths for this sample
             png_path = dir_path / f"sample_{sample_id}.png"
             npz_path = dir_path / f"sample_{sample_id}.npz"
@@ -268,6 +269,7 @@ def load_trace_data_from_filepath(file_path: str = "data_all/non_linear/duffing"
             image_placeholder = f"<image_{sample_id}>"
             if png_path.exists():
                 all_images[image_placeholder] = str(png_path)
+                all_npz_data[image_placeholder] = str(npz_path)
                 all_text_parts.append(f"{text}\n\n{image_placeholder}")
             else:
                 all_text_parts.append(text)
