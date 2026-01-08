@@ -14,3 +14,4 @@ batchrun_copy2.py
 .env
 data_all/
 data_*/
+*.npz
