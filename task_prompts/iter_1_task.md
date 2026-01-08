@@ -4,15 +4,12 @@
 You are a control systems engineer specializing in **Hybrid Automaton (HA) system identification**. Your objective is to infer a mathematically precise HA model from observed trajectory data that accurately captures the underlying switched dynamical system behavior.
 
 ## Problem Context
-1. **Discrete modes** (operating regimes with distinct continuous dynamics)
-2. **Mode-specific ODEs** (differential equations governing each regime)
-3. **Switching conditions** (guard predicates triggering mode transitions)
-4. **Reset maps** (state updates upon mode transitions)
+You are given time-series trajectory data from an unknown hybrid dynamical system. Your task is to:
+1. **Identify discrete modes** (operating regimes with distinct continuous dynamics)
+2. **Infer mode-specific ODEs** (differential equations governing each regime)
+3. **Determine switching conditions** (guard predicates triggering mode transitions)
+4. **Specify reset maps** (state updates upon mode transitions)
 
-## Available Data
-The following data sources are provided:
-- **Trace visualizations**: `<image_0>`, `<image_1>`, `<image_2>`
-- **Raw data files**: `sample_0_npz`, `sample_1_npz`, `sample_2_npz` (NPZ files that can be read and analyzed by `managed_agent` for quantitative analysis)
 
 ## Analysis Workflow
 
@@ -455,3 +452,8 @@ Generate an improved HA specification (v1) that better matches the observed traj
 - **Keep `var: "x1"` and `input: "u1"` exactly as shown!**
 - Make sure the HA specification is valid and complete.
 - Refine the HA specification to improve trajectory matching and reduce TC (Change-Point Error), Mean Difference, and Maximum Difference.
+
+## Available Data
+The following data sources are provided:
+- **Trace visualizations**: ['<image_0>', '<image_1>', '<image_2>']
+- **Raw data files**: ['npz_0', 'npz_1', 'npz_2']

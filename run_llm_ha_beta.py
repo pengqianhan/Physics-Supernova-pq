@@ -403,6 +403,10 @@ def obtain_task_and_images(input_data_path: str = None,
 
     # Load trace data with high res images
     markdown_content = load_trace_data_from_filepath(input_data_path)
+    image_paths = markdown_content.image_paths## list(image_paths.keys())
+    image_paths_list = list(image_paths.keys())
+    npz_paths = markdown_content.npz_paths## list(npz_paths.keys())
+    npz_paths_list = list(npz_paths.keys())
 
     # create the manager agent
     ToolsList = [TOOLNAME2TOOL[x] for x in tools_list]
@@ -424,11 +428,6 @@ You are given time-series trajectory data from an unknown hybrid dynamical syste
 3. **Determine switching conditions** (guard predicates triggering mode transitions)
 4. **Specify reset maps** (state updates upon mode transitions)
 
-## Available Data
-The following trace data visualizations are provided (reference images using placeholders: `<image_0>`, `<image_1>`, etc.):
-- State variable trajectories over time
-- Input signals (if applicable)
-- Potential mode-switch indicators (discontinuities, slope changes)
 
 ## Analysis Workflow
 
@@ -582,6 +581,11 @@ Generate an improved HA specification (v1) that better matches the observed traj
 - **Keep `var: "{var_names}"` and `input: "{input_names if num_inputs > 0 else ''}"` exactly as shown!**
 - Make sure the HA specification is valid and complete.
 - Refine the HA specification to improve trajectory matching and reduce TC (Change-Point Error), Mean Difference, and Maximum Difference.
+
+## Available Data
+The following data sources are provided:
+- **Trace visualizations**: {image_paths_list}
+- **Raw data files**: {npz_paths_list}
 """
 
     # Add feedback from previous iteration if available
