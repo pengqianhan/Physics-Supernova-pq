@@ -422,11 +422,10 @@ def obtain_task_and_images(input_data_path: str = None,
 You are a control systems engineer specializing in **Hybrid Automaton (HA) system identification**. Your objective is to infer a mathematically precise HA model from observed trajectory data that accurately captures the underlying switched dynamical system behavior.
 
 ## Problem Context
-You are given time-series trajectory data from an unknown hybrid dynamical system. Your task is to:
-1. **Identify discrete modes** (operating regimes with distinct continuous dynamics)
-2. **Infer mode-specific ODEs** (differential equations governing each regime)
-3. **Determine switching conditions** (guard predicates triggering mode transitions)
-4. **Specify reset maps** (state updates upon mode transitions)
+1. **Discrete modes** (operating regimes with distinct continuous dynamics)
+2. **Mode-specific ODEs** (differential equations governing each regime)
+3. **Switching conditions** (guard predicates triggering mode transitions)
+4. **Reset maps** (state updates upon mode transitions)
 
 
 ## Analysis Workflow
