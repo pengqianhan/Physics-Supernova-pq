@@ -96,7 +96,7 @@ def generate_dynamic_ha_template(num_variables: int, num_inputs: int, system_nam
     # Generate placeholder equation based on number of variables
     if num_variables == 1:
         # Single variable - use 2nd-order ODE format
-        eq_placeholder = "x1[2] = -0.5 * x1[1] - 5.0 * x1[0]"
+        eq_placeholder = "x1[2] = x1[1] + x1[0]"
         if num_inputs > 0:
             eq_placeholder += " + u1"
         dim = 2  # 2nd-order system
@@ -597,12 +597,6 @@ The following feedback was generated from evaluating your previous attempt. Use 
     
     """
 
-    # Add trace data description
-#     task += f"""
-
-# ## Observed Trace Data
-# {trace_data_text}
-# """
 
     return task, compressed_trace_images
 

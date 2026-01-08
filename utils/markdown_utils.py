@@ -271,7 +271,7 @@ def load_trace_data_from_filepath(file_path: str = "data_all/non_linear/duffing"
             
             # Create image placeholder and add to images dict if png exists
             image_placeholder = f"<image_{sample_id}>"
-            npz_placeholder = f"npz_{sample_id}"
+            npz_placeholder = f"<npz_{sample_id}>"
             if png_path.exists():
                 all_images[image_placeholder] = str(png_path)
                 all_npz_data[npz_placeholder] = str(npz_path)
