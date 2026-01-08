@@ -8,9 +8,13 @@ from base64 import b64decode
 
 class MarkdownMessage:
     """Custom data type to hold OpenAI-compatible message content with embedded images."""
-    def __init__(self, content: List[Dict[str, Any]], filename: str = ""):
+    def __init__(self, content: List[Dict[str, Any]], filename: str = "",
+                 image_paths: Dict[str, str] = None, npz_paths: Dict[str, str] = None):
         self.content = content
         self.filename = filename
+        # Mapping from placeholder (e.g., "<image_0>") to file paths
+        self.image_paths = image_paths or {}
+        self.npz_paths = npz_paths or {}
         
     def __str__(self):
         """Return a manager-friendly summary (small, no base64)."""
@@ -279,9 +283,14 @@ def load_trace_data_from_filepath(file_path: str = "data_all/non_linear/duffing"
         
         # Create OpenAI-compatible message content
         message_content = create_openai_message_content(combined_text, all_images)
-        
-        return MarkdownMessage(message_content, str(dir_path))
-        
+
+        return MarkdownMessage(
+            message_content,
+            str(dir_path),
+            image_paths=all_images,
+            npz_paths=all_npz_data
+        )
+
     except Exception as e:
         # Return error as MarkdownMessage
         return MarkdownMessage([{

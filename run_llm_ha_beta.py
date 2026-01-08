@@ -230,9 +230,22 @@ def _create_HA_agent(Tools_list: List[type[Tool]],
 
 def get_managed_agents_list(managed_agents_list: List[str] = None,
                             managed_agents_list_model_id: str = None,
-                            input_data_path: str = None) -> List[MultiStepAgent]:
+                            input_data_path: str = None,
+                            markdown_content: MarkdownMessage = None) -> List[MultiStepAgent]:
     if managed_agents_list is None:
         return []
+
+    # Load trace data to get NPZ paths if not provided
+    if markdown_content is None:
+        markdown_content = load_trace_data_from_filepath(input_data_path)
+
+    # Get NPZ file paths from markdown_content
+    # npz_paths is a dict like {"<image_0>": "/path/to/sample_0.npz", ...}
+    npz_paths_list = list(markdown_content.npz_paths.values()) if markdown_content.npz_paths else []
+
+    # Fallback to default path if no npz files found
+    if not npz_paths_list:
+        npz_paths_list = [os.path.join(input_data_path, "sample_0.npz")]
 
     managed_agents = []
     for agent_name in managed_agents_list:
@@ -245,15 +258,37 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
             timeout=1200
         )
 
-        # trace file path
-        trace_file_path = os.path.join(input_data_path, f"sample_0.npz")
-        # managed agent
-        managed_agent_description = f"""I am a managed agent with name {agent_name}. I can assist with code-related tasks. The data file path is {trace_file_path}.
+        # Build file paths description for prompt
+        npz_files_description = "\n".join([f"  - `{path}`" for path in npz_paths_list])
 
-CAPABILITIES:
+        # managed agent description with all available files
+        managed_agent_description = f"""I am a managed agent with name {agent_name}. I can assist with code-related tasks.
+
+## AVAILABLE DATA FILES
+You have access to the following NPZ data files (pre-loaded in state variables):
+{npz_files_description}
+
+**Quick Access via State Variables:**
+- `DATA_FILE_PATHS`: List of all available NPZ file paths
+- `DATA_FILE_PATH`: Path to the first/primary data file (for convenience)
+
+**Example Usage:**
+```python
+import numpy as np
+# Load a specific file
+data = np.load(DATA_FILE_PATHS[0])
+# Or use the primary file
+data = np.load(DATA_FILE_PATH)
+# Access data arrays
+state = data['state']  # shape: (num_vars, num_steps)
+input_data = data['input']  # shape: (num_inputs, num_steps)
+```
+
+## CAPABILITIES
 1. **Numerical Analysis**: I can load .npz data and perform numpy/scipy operations.
 2. **Curve Fitting**: I can fit linear/nonlinear models to data segments.
-3. **Windowed Error Analysis (Mode Detection)**: I can detect hidden mode switches in smooth data using this workflow:
+3. **Multi-Sample Analysis**: I can compare patterns across multiple trajectory samples.
+4. **Windowed Error Analysis (Mode Detection)**: I can detect hidden mode switches in smooth data using this workflow:
    - Define a window size (e.g., 10 steps).
    - Slide the window across the trajectory.
    - In each window, fit a simple local model (e.g., linear dx/dt = Ax).
@@ -284,18 +319,22 @@ CAPABILITIES:
         )
         if use_e2b:
             print("使用 E2B 云沙盒执行器，正在上传数据文件...")
-            # 上传文件到 E2B 沙盒
-            with open(trace_file_path, "rb") as f:
-                file_content = f.read()
-            # E2B 沙盒中的目标路径
-            sandbox_file_path = "/tmp/sample_train_0.npz"
-            managed_agent.python_executor.sandbox.files.write(sandbox_file_path, file_content)
-            print(f"✓ 文件已上传到 E2B 沙盒: {sandbox_file_path}")
-            # 更新数据文件路径为沙盒中的路径
-            trace_file_path = sandbox_file_path
+            # 上传所有文件到 E2B 沙盒
+            sandbox_file_paths = []
+            for i, npz_path in enumerate(npz_paths_list):
+                with open(npz_path, "rb") as f:
+                    file_content = f.read()
+                sandbox_file_path = f"/tmp/sample_{i}.npz"
+                managed_agent.python_executor.sandbox.files.write(sandbox_file_path, file_content)
+                sandbox_file_paths.append(sandbox_file_path)
+                print(f"✓ 文件已上传到 E2B 沙盒: {sandbox_file_path}")
+            # 注入所有文件路径到 agent 状态
+            managed_agent.python_executor.state["DATA_FILE_PATHS"] = sandbox_file_paths
+            managed_agent.python_executor.state["DATA_FILE_PATH"] = sandbox_file_paths[0] if sandbox_file_paths else ""
         else:
-            # 本地执行器：将数据文件路径注入到 agent 的状态中
-            managed_agent.python_executor.state["DATA_FILE_PATH"] = trace_file_path
+            # 本地执行器：将所有数据文件路径注入到 agent 的状态中
+            managed_agent.python_executor.state["DATA_FILE_PATHS"] = npz_paths_list
+            managed_agent.python_executor.state["DATA_FILE_PATH"] = npz_paths_list[0] if npz_paths_list else ""
         managed_agents.append(managed_agent)
 
     return managed_agents
@@ -331,7 +370,12 @@ def create_agent(model_id: str = "gemini/gemini-flash-lite-latest",
         Tools_list=ToolsList,
         markdown_content=markdown_content,
         model_id=model_id,
-        managed_agents_list=get_managed_agents_list(managed_agents_list, managed_agents_list_model_id,input_data_path),
+        managed_agents_list=get_managed_agents_list(
+            managed_agents_list,
+            managed_agents_list_model_id,
+            input_data_path,
+            markdown_content=markdown_content  # Pass markdown_content to reuse loaded npz paths
+        ),
         **kwargs
     )
     return haAgent
