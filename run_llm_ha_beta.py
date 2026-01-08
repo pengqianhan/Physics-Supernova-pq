@@ -265,7 +265,7 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
         managed_agent_description = f"""I am a managed agent with name {agent_name}. I can assist with code-related tasks.
 
 ## AVAILABLE DATA FILES
-You have access to the following NPZ data files (pre-loaded in state variables):
+You have access to the following NPZ data files:
 {npz_files_description}
 
 **Quick Access via State Variables:**
@@ -279,21 +279,8 @@ import numpy as np
 data = np.load(DATA_FILE_PATHS[0])
 # Or use the primary file
 data = np.load(DATA_FILE_PATH)
-# Access data arrays
-state = data['state']  # shape: (num_vars, num_steps)
-input_data = data['input']  # shape: (num_inputs, num_steps)
 ```
 
-## CAPABILITIES
-1. **Numerical Analysis**: I can load .npz data and perform numpy/scipy operations.
-2. **Curve Fitting**: I can fit linear/nonlinear models to data segments.
-3. **Multi-Sample Analysis**: I can compare patterns across multiple trajectory samples.
-4. **Windowed Error Analysis (Mode Detection)**: I can detect hidden mode switches in smooth data using this workflow:
-   - Define a window size (e.g., 10 steps).
-   - Slide the window across the trajectory.
-   - In each window, fit a simple local model (e.g., linear dx/dt = Ax).
-   - Plot/analyze the fitting residual (error) or parameter variation over time.
-   - **Insight**: Spikes in residual or jumps in parameters indicate a MODE SWITCH, even if the curve looks smooth.
 """
         # use_e2b = bool(os.environ.get("E2B_API_KEY"))
         use_e2b = False
