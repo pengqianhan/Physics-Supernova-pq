@@ -10,6 +10,13 @@ A Hybrid Automaton models a system with:
 3. **Switching conditions** (guard predicates triggering mode transitions)
 4. **Reset maps** (state updates upon mode transitions)
 
+## Interaction Protocol (Mandatory Structure)
+You must structure your response in the following sections:
+1.  **Phase 1: Visual Analysis**: Observations from `hybrid_automaton_image_analysis`.
+2.  **Phase 2: Quantitative Verification**: Python code execution to estimate parameters and verify switches.
+3.  **Phase 3: Refinement Logic**: Explanation of the constructed modes and guards.
+4.  **Phase 4: Validation**: Output from `validate_hybrid_automaton_specification`.
+5.  **Final Answer**: The complete, valid JSON specification.
 
 ## Analysis Workflow
 
@@ -19,26 +26,25 @@ A Hybrid Automaton models a system with:
 1.  **Analyze the Image**: Look at the trajectory shapes and relationships between variables.
 2.  **Propose Hypotheses**:
     *   **Dynamics**:
-        *   "Periodic/Wavy" -> Suggests trigonometric terms (sin, cos).
-        *   "Decay/Growth" -> Suggests damping/unstable terms (negative/positive feedback).
+        *   "Periodic/Wavy" -> Suggests trigonometric terms (sin, cos) or harmonic oscillator.
+        *   "Decay/Growth" -> Suggests damping/unstable terms.
         *   "Straight Lines" -> Suggests constant velocity or simple linear dynamics.
     *   **Structure (Modes & Switching)**:
         *   "Sharp Kinks/Corners" -> Suggests **Mode Switches** (change in vector field).
         *   "Jumps/Discontinuities" -> Suggests **Resets** (instantaneous state change).
         *   "Smooth but Complex" -> Could be nonlinear or a smooth switch (hidden mode).
-3.  **Output**: Write down your hypotheses (e.g., "H1: System has 2 modes. H2: Switch occurs when x1 hits top/bottom. H3: Mode 1 is a damped oscillator.")
+3.  **Deliverable**: A list of hypotheses (e.g., "H1: 2 modes. H2: Switch at x>0.")
 
 ### Phase 2: Data-Driven Verification & Refinement (Quantitative)
 **Tool**: Managed Agent (`data_analysis_expert`) or Python Code Interpreter
 **Goal**: Verify hypotheses and extract precise parameters using the `.npz` data.
 1.  **Load Data**: Access the raw numerical data from the `.npz` file.
-2.  **Verify & Refine Hypotheses**:
-    *   *Refine Switch Points*: If Phase 1 suggested a switch at "peaks", use code to find the exact state values where this happens. Is it exactly x=1.0 or x=0.98?
-    *   *Verify Dynamics*:
-        *   If H3 was "damped oscillator", try to fit a standard damped harmonic oscillator model to the data segment.
-        *   Check the **residuals**. If the fit is bad, revise the hypothesis (e.g., add a nonlinear term like x^3).
-    *   *Detect Subtle Modes*: Use "Windowed Error Analysis" (sliding window fit) to find mode switches that are invisible to the eye (smooth transitions).
-3.  **Parameter Estimation**: Perform regression (e.g., `scipy.optimize.curve_fit` or Least Squares) on the segmented data to get the exact ODE coefficients.
+2.  **Segment & Fit**:
+    *   *Refine Switch Points*: Use code to find the exact indices/values where behavior changes (e.g., `np.where(np.abs(np.diff(state)) > threshold)`).
+    *   *Parameter Estimation*:
+        *   **Tip**: Use `scipy.optimize.curve_fit` or `np.linalg.lstsq`.
+        *   **Strategy**: Split the data based on your hypothesized guard (e.g., `mask = state[0] > 0`). Fit Model A to `data[mask]` and Model B to `data[~mask]`.
+    *   *Check Residuals*: If a linear fit has high residuals that look "wavy" or "parabolic", introduce nonlinear terms (`x^2`, `sin(x)`).
 
 ### Phase 3: Specification Construction
 **Goal**: Synthesize findings into the JSON format.
@@ -47,55 +53,32 @@ A Hybrid Automaton models a system with:
     *   Use the precise guard conditions found in Phase 2 (e.g., `x1 >= 0.5`).
     *   Define resets if "Jumps" were confirmed in Phase 2.
 3.  **Define Equations**: Use the estimated parameters to write the ODEs.
-    *   Ensure the equations are in **higher-order form** (e.g., `x1[2] = ...` for 2nd order), NOT state-space form.
+    *   Ensure the equations are in **higher-order form** (e.g., `x1[2] = ...` for 2nd order).
 
 ### Phase 4: Final Validation
 **Tool**: `validate_hybrid_automaton_specification`
 **Goal**: Ensure the generated JSON is syntactically and semantically correct before submission.
+**Constraint**: If the validation tool returns a fixed JSON, you **MUST** use that fixed version.
 
-## HA Refinement Guidelines
-Adopt a **Parsimonious Modeling Approach** (Occam's Razor) - favor simpler explanations unless the data demands otherwise:
+## HA Refinement Guidelines (Occam's Razor)
 
-1. **Symbolic Identification**:
-   - **Hypothesize Structure First**: Determine the likely functional form of the equations *before* estimating parameters.
+1. **Parsimony**: Start with **Linear** dynamics and **Fewest** modes. Only add complexity (non-linearity, extra modes) if the fit error is high.
+2. **Mode Count Strategy**:
+   - **Visual Evidence**: Sharp corners = Multiple Modes.
+   - **Smooth but Hybrid**: If a single nonlinear ODE fails to fit, try 2 simpler linear modes.
+   - **Template Expansion**: The template provides 1 mode. You must copy/paste to create Mode 2, Mode 3, etc., if needed.
+3. **Guard Conditions**:
+   - Prefer single-variable thresholds (e.g., `x1 >= 0`).
+   - Avoid complex arithmetic guards unless necessary.
+4. **Reset Maps**:
+   - Default: `need_reset: false` (Continuous state evolution).
+   - Only use `need_reset: true` if you see vertical jumps in the state-time plot.
 
-2. **Mode Count Strategy (Adaptive Complexity)**:
-   - **Visual Evidence Rules**: If the visual analysis (Step 1) detects sharp changes or discontinuities, you **MUST** use multiple modes (2 or more).
-   - **Smooth but Hybrid**: If the trajectory is smooth but complex (e.g., varying frequency or damping), prefer a **Switched System** (2+ modes) over a single overly-complex nonlinear equation.
-   - **Do NOT Force Single Mode**: Do not attempt to fit a single smooth ODE to data that clearly changes behavior. It is better to have 2 simple linear modes than 1 complex failing non-linear mode.
-   - **Template Expansion**: The provided template below is for **1 Mode**. If you detect N modes, you **MUST copy/paste** the mode object to create Mode 2, Mode 3, ... Mode N in your JSON.
-
-3. **Mode Dynamics**:
-   - **Start Simple**: Attempt to fit **Linear** dynamics first.
-   - **Increase Complexity**: Only introduce **Non-linear** terms (polynomial, trigonometric, etc.) if linear fits fail to capture curvature or key features.
-
-4. **Guard Conditions (Geometric Simplicity)**:
-   - **Single-Variable Thresholds**: The vast majority of physical guards are simple threshold checks on a single variable (e.g., `x1 >= 0`, `x <= 0.5`).
-   - **Avoid Overfitting**: Do not create complex arithmetic guards (e.g., `x1*x2 > 5`) unless the physical interaction explicitly suggests it.
-   - **Operators**: Stick to standard comparison operators (`<=`, `>=`).
-
-5. **Transition Structure**:
-   - **Topology**: Prefer **Sparse** connectivity. Valid transitions are typically few and distinct.
-   - **Flow**: Transitions often follow a logical flow (e.g., cycles, bidirectional switches) rather than random jumps.
-
-6. **Reset Maps**:
-   - **Continuity Default**: Assume physical variables change **Continuously** (`need_reset: false`) over time.
-   - **Exceptions**: Use reset maps (`need_reset: true`) **only** if the data clearly shows instantaneous state jumps at transition points.
-   - **Format**: Reset arrays correspond to derivatives `[0th, 1st, ..., (order-1)th]`. `x[0]` is position, `x[1]` is velocity.
-
-7. **Structure Validation**:
-   - Ensure the number of modes matches the distinct behaviors observed.
-   - Ensure guards partition the state space logically (no overlapping active modes usually).
-
-## Quality Criteria
-Your HA specification will be evaluated on:
-- **Trajectory Matching**: Simulated output should closely follow ground truth data
-- **Mode Detection Accuracy**: Correct identification of switching instants (TC (Change-Point Error) < 0.01s is good, <= 0.001s is excellent)
-- **State Error Minimization**: Low Mean Difference (Mean Difference) and Maximum Difference (Max Difference) between predicted and actual states (Max Difference < 0.005 is good, < 0.0001 is excellent)
-
-You MUST use the `hybrid_automaton_image_analysis` tool to analyze the image.
-**VALIDATION TOOL**: Before submitting your final answer, you MUST call the `validate_hybrid_automaton_specification` tool to check for syntax and semantic errors.
-⚠️ **IMPORTANT**: If validation returns a FIXED specification, use the corrected version in your final answer!
+## ⛔ Negative Constraints (Do NOT do this)
+*   **Do NOT change variable names**: Use exactly `x1`, `u1` as provided.
+*   **Do NOT use state-space splitting**: If the system is 2nd order, use `x1[2]`, NOT `x1` and `x2`.
+*   **Do NOT guess coefficients**: You must calculate them using the provided data.
+*   **Do NOT hallucinate inputs**: If `input` is empty, do not use `u1` in equations.
 
 ## Computational Resources
 You have access to managed Code Agent(s): `['data_analysis_expert']`
@@ -104,12 +87,11 @@ You MUST use the managed agents to verify your analysis and hypotheses about the
 
 ## Code Execution Capability
 You can use Python Code to execute programs, which may help with your task-solving process.
+
 ## Hybrid Automaton Specification Format (JSON Schema)
 
 ### 🎯 GOAL: PARSIMONIOUS SYSTEM IDENTIFICATION
 Your objective is to identify the **simplest possible** Hybrid Automaton that explains the data.
-- **Penalty**: You will be penalized for adding unnecessary modes or complex nonlinear terms.
-- **Strategy**: Start with a single mode with linear dynamics. Only add complexity if error remains high.
 
 ### JSON Schema Definition
 Your output MUST conform to this JSON Schema:
@@ -137,7 +119,7 @@ Your output MUST conform to this JSON Schema:
         "var": {
           "type": "string",
           "description": "Comma-separated list of state variable names (e.g., 'x1' or 'x1, x2')",
-          "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*(\\s*,\\s*[a-zA-Z_][a-zA-Z0-9_]*)*$",
+          "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*(\s*,\s*[a-zA-Z_][a-zA-Z0-9_]*)*$",
           "minLength": 1,
           "examples": [
             "x1",
@@ -148,7 +130,7 @@ Your output MUST conform to this JSON Schema:
         "input": {
           "type": "string",
           "description": "Comma-separated list of input variable names (e.g., 'u1' or 'u1, u2'). Empty string if no inputs.",
-          "pattern": "^([a-zA-Z_][a-zA-Z0-9_]*(\\s*,\\s*[a-zA-Z_][a-zA-Z0-9_]*)*)?$",
+          "pattern": "^([a-zA-Z_][a-zA-Z0-9_]*(\s*,\s*[a-zA-Z_][a-zA-Z0-9_]*)*)?$",
           "default": "",
           "examples": [
             "",
@@ -320,7 +302,6 @@ Your output MUST conform to this JSON Schema:
 }
 ```
 
-
 ### Examples
 
 **Single-mode 2nd-order:**
@@ -400,8 +381,12 @@ Your output MUST conform to this JSON Schema:
                 "direction": "1 -> 1",
                 "condition": "x1 <= 0",
                 "reset": {
-                    "x1": [0],
-                    "x2": ["-0.1 * x1[0]"]
+                    "x1": [
+                        0
+                    ],
+                    "x2": [
+                        "-0.1 * x1[0]"
+                    ]
                 }
             }
         ]
@@ -415,6 +400,7 @@ Your output MUST conform to this JSON Schema:
     }
 }
 ```
+
 
 ### ⚠️ CRITICAL: Variable Count is PRE-DEFINED ⚠️
 The `var` and `input` fields in the template below are **already correctly set** based on the ground truth data.
@@ -459,3 +445,10 @@ Generate an improved HA specification (v1) that better matches the observed traj
 The following data sources are provided:
 - **Trace visualizations**: ['<image_0>', '<image_1>', '<image_2>']
 - **Raw data files**: ['<npz_0>', '<npz_1>', '<npz_2>']
+
+
+
+You MUST use the `hybrid_automaton_image_analysis` tool to analyze the image.
+
+**VALIDATION TOOL**: Before submitting your final answer, you MUST call the `validate_hybrid_automaton_specification` tool to check for syntax and semantic errors.
+⚠️ **IMPORTANT**: If validation returns a FIXED specification, use the corrected version in your final answer!
