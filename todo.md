@@ -13,3 +13,4 @@
  - [ ] system_name 删除这个变量,来让agent对系统辨识任务跟系统名称无关。
  - [ ] 学习原始的提示词,精简task 里的提示词
  - [ ] 每一次的输出结果 JSON 和 指标 都要被reviewer review 并添加comments 和 rating 来评价输出结果的质量。JSON, 评估指标 和 comments 一起构成feedback。
+ - [ ] LLM agent 直接生成 python class 来实现 HA specification,这样可以避免些很多JSON schema 来占用context length。
