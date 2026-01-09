@@ -17,4 +17,4 @@
       - [ ] 定义初始的python class 的结构,包括变量、方法、属性等。
       - [ ] 修改和精简提示词,来适应python class 的输出
       - [ ] 修改evaluate 的代码，尽量用现成的库来实现 hybrid automaton 的simulation(例如数值积分算法，或者可以直接采用差分方程的形式来描述eq of the mode，这样不用计算数值积分),然后计算评估指标。
-      - [ ] 
+      - [ ] python class simulate 的时候 initial state 从测试数据中选取，input data 直接用测试数据中的input data。
