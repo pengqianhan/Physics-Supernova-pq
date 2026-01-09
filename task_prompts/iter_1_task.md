@@ -16,18 +16,11 @@ Your HA specification will be evaluated on:
 - **Trajectory Matching**: Simulated output should closely follow ground truth data
 - **Mode Detection Accuracy**: Correct identification of switching instants (TC (Change-Point Error) < 0.01s is good, <= 0.001s is excellent)
 - **State Error Minimization**: Low Mean Difference (Mean Difference) and Maximum Difference (Max Difference) between predicted and actual states (Max Difference < 0.005 is good, < 0.0001 is excellent)
-
 ## Tool and Sub-Agents Resources:
 
+You MUST use the `hybrid_automaton_image_analysis` tool to analyze the image if you want to obtain more detailed information about the system.Before submitting your final answer, you MUST call the `validate_hybrid_automaton_specification` tool to check for syntax and semantic errors. If validation returns a FIXED specification, use the corrected version in your final answer!
 
-You MUST use the `hybrid_automaton_image_analysis` tool to analyze the image if you want to obtain more detailed information about the system.
-**VALIDATION TOOL**: Before submitting your final answer, you MUST call the `validate_hybrid_automaton_specification` tool to check for syntax and semantic errors.
-⚠️ **IMPORTANT**: If validation returns a FIXED specification, use the corrected version in your final answer!
-**Sub-Agents Resources:**
-- You have access to managed Code Agent(s): `['data_analysis_expert']`
-- Use them for analyzing the npz data files.
-- You MUST use the managed agents to verify your analysis and hypotheses about the system from the hybrid_automaton_image_analysis tool.
-
+**Sub-Agents Resources:** You have access to managed Code Agent(s): `['data_analysis_expert']`. The `['data_analysis_expert']` have access to the npz data files and can be used to analyze the data.
 ## Code Execution Capability
 You can use Python Code to execute programs, which may help with your task-solving process.
 ## Hybrid Automaton Specification Format (JSON Schema)

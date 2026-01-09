@@ -435,40 +435,32 @@ Your HA specification will be evaluated on:
 - **Mode Detection Accuracy**: Correct identification of switching instants (TC (Change-Point Error) < 0.01s is good, <= 0.001s is excellent)
 - **State Error Minimization**: Low Mean Difference (Mean Difference) and Maximum Difference (Max Difference) between predicted and actual states (Max Difference < 0.005 is good, < 0.0001 is excellent)"""
 
-    task += "\n\n## Tool and Sub-Agents Resources:\n"
+    task += "\n## Tool and Sub-Agents Resources:\n"
     # Add tool-specific prompts (unified style: init empty -> conditionally set -> unconditionally append)
     HA_IMAGE_TOOL_PROMPT = ""
     if HybridAutomatonImageTool in ToolsList:
-        HA_IMAGE_TOOL_PROMPT = "\n\nYou MUST use the `hybrid_automaton_image_analysis` tool to analyze the image if you want to obtain more detailed information about the system."
+        HA_IMAGE_TOOL_PROMPT = "\nYou MUST use the `hybrid_automaton_image_analysis` tool to analyze the image if you want to obtain more detailed information about the system."
 
     REVIEW_TOOL_PROMPT = ""
     if ReviewRequestTool_ha in ToolsList:
-        REVIEW_TOOL_PROMPT = """
-        **MANDATORY BEFORE FINALIZATION**: You MUST call the `hybrid_automaton_review_expert` tool at least once before submitting your final answer to ensure specification correctness and completeness."""
+        REVIEW_TOOL_PROMPT = """You MUST call the `hybrid_automaton_review_expert` tool at least once before submitting your final answer to ensure specification correctness and completeness."""
 
     VALIDATE_TOOL_PROMPT = ""
     if ValidateHASpecTool in ToolsList:
-        VALIDATE_TOOL_PROMPT = """
-**VALIDATION TOOL**: Before submitting your final answer, you MUST call the `validate_hybrid_automaton_specification` tool to check for syntax and semantic errors.
-⚠️ **IMPORTANT**: If validation returns a FIXED specification, use the corrected version in your final answer!"""
+        VALIDATE_TOOL_PROMPT = """Before submitting your final answer, you MUST call the `validate_hybrid_automaton_specification` tool to check for syntax and semantic errors. If validation returns a FIXED specification, use the corrected version in your final answer!"""
 
     task += HA_IMAGE_TOOL_PROMPT
     task += REVIEW_TOOL_PROMPT
     task += VALIDATE_TOOL_PROMPT
-
-
     # Add managed agents prompt
     if managed_agents_list and len(managed_agents_list) > 0:
         MANAGE_AGENT_PROMPT = f"""
-**Sub-Agents Resources:**
-- You have access to managed Code Agent(s): `{managed_agents_list}`
-- Use them for analyzing the npz data files.
-- You MUST use the managed agents to verify your analysis and hypotheses about the system from the hybrid_automaton_image_analysis tool."""
+\n**Sub-Agents Resources:** You have access to managed Code Agent(s): `{managed_agents_list}`. The `{managed_agents_list}` have access to the npz data files and can be used to analyze the data."""
         task += MANAGE_AGENT_PROMPT
 
     # Add self code agent prompt
     if manager_type == "CodeAgent":
-        SELF_IS_CODE_AGENT_PROMPT = "\n\n## Code Execution Capability\nYou can use Python Code to execute programs, which may help with your task-solving process."
+        SELF_IS_CODE_AGENT_PROMPT = "\n## Code Execution Capability\nYou can use Python Code to execute programs, which may help with your task-solving process."
         task += SELF_IS_CODE_AGENT_PROMPT
 
     # Generate dynamic HA template with correct var and input fields pre-filled
@@ -1184,7 +1176,7 @@ def main():
             # Also include latest iteration's feedback for recency
             latest_feedback = results_aggregator.get_latest_feedback()
             if latest_feedback and latest_feedback not in current_feedback:
-                current_feedback += f"\n\n## Most Recent Attempt (Iteration {iteration - 1}):\n{latest_feedback}"
+                current_feedback += f"\n## Most Recent Attempt (Iteration {iteration - 1}):\n{latest_feedback}"
 
             # Show dynamic target if available
             dynamic_target = results_aggregator.get_dynamic_error_threshold()
