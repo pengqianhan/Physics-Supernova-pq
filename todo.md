@@ -10,7 +10,11 @@
  - [x] 验证数据路径加载流程是否正确,使用 --input-data-path 参数来指定数据路径。
  - [x] 分析image 的工具是否能正确分析图片,捋一遍图片的处理流程
  - [ ] 添加 use-e2b 参数来指定是否使用 e2b 云沙盒执行器。
- - [ ] system_name 删除这个变量,来让agent对系统辨识任务跟系统名称无关。
- - [ ] 学习原始的提示词,精简task 里的提示词
+ - [x] system_name 删除这个变量,来让agent对系统辨识任务跟系统名称无关。
+ - [x] 学习原始的提示词,精简task 里的提示词
  - [ ] 每一次的输出结果 JSON 和 指标 都要被reviewer review 并添加comments 和 rating 来评价输出结果的质量。JSON, 评估指标 和 comments 一起构成feedback。
  - [ ] LLM agent 直接生成 python class 来实现 HA specification,这样可以避免些很多JSON schema 来占用context length。
+      - [ ] 定义初始的python class 的结构,包括变量、方法、属性等。
+      - [ ] 修改和精简提示词,来适应python class 的输出
+      - [ ] 修改evaluate 的代码，尽量用现成的库来实现 hybrid automaton 的simulation(例如数值积分算法，或者可以直接采用差分方程的形式来描述eq of the mode，这样不用计算数值积分),然后计算评估指标。
+      - [ ] 
