@@ -75,14 +75,13 @@ def get_data_dimensions(input_data_path: str) -> tuple[int, int]:
     return num_variables, num_inputs
 
 
-def generate_dynamic_ha_template(num_variables: int, num_inputs: int, system_name: str = "Unknown System") -> str:
+def generate_dynamic_ha_template(num_variables: int, num_inputs: int) -> str:
     """
     Generate a dynamic HA specification template with pre-filled var and input fields.
     
     Args:
         num_variables: Number of state variables
         num_inputs: Number of input variables
-        system_name: Name of the system for comments
         
     Returns:
         JSON string template with correct var and input fields
@@ -370,7 +369,6 @@ def create_agent(model_id: str = "gemini/gemini-flash-lite-latest",
 
 # obtain task string and images for the agent to run
 def obtain_task_and_images(input_data_path: str = None,
-                           system_name: str = "Duffing Oscillator",
                            num_variables: int = 1,
                            num_inputs: int = 1,
                            initial_ha_spec: str = None,
@@ -385,7 +383,6 @@ def obtain_task_and_images(input_data_path: str = None,
 
     Args:
         input_data_path: Path to the trace data directory
-        system_name: Name of the dynamical system
         num_variables: Number of state variables
         num_inputs: Number of input variables
         initial_ha_spec: Initial HA specification dictionary (optional)
@@ -464,7 +461,7 @@ Your HA specification will be evaluated on:
         task += SELF_IS_CODE_AGENT_PROMPT
 
     # Generate dynamic HA template with correct var and input fields pre-filled
-    dynamic_ha_template = generate_dynamic_ha_template(num_variables, num_inputs, system_name)
+    dynamic_ha_template = generate_dynamic_ha_template(num_variables, num_inputs)
     
     # Generate variable and input names for display
     var_names = ", ".join([f"x{i+1}" for i in range(num_variables)])
@@ -1019,14 +1016,6 @@ def parse_args():
         help="Model ID to use for managed agents.",
     )
 
-    # System configuration parameters
-    ap.add_argument(
-        "--system-name",
-        type=str,
-        default="Duffing Oscillator",
-        help="Name of the dynamical system.",
-    )
-
     # HA specification file (optional)
     ap.add_argument(
         "--initial-ha-spec-file",
@@ -1123,7 +1112,6 @@ def main():
         target_error=args.target_error,
         no_improvement_patience=args.no_improvement_patience,
         input_data_path=args.input_data_path,
-        system_name=args.system_name,
         num_variables=num_variables,
         num_inputs=num_inputs,
         use_json_schema=args.use_json_schema,
@@ -1185,7 +1173,6 @@ def main():
         # Obtain task and images with feedback from previous iteration
         task, compressed_trace_images = obtain_task_and_images(
             input_data_path=args.input_data_path,
-            system_name=args.system_name,
             num_variables=num_variables,
             num_inputs=num_inputs,
             initial_ha_spec=None,
