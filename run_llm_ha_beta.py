@@ -377,7 +377,8 @@ def obtain_task_and_images(input_data_path: str = None,
                            manager_type: str = "CodeAgent",
                            feedback: str = None, # Added feedback parameter
                            iteration: int = 1,
-                           use_json_schema: bool = True) -> tuple[str, list]:
+                           use_json_schema: bool = True,
+                           use_python_class_format: bool = False) -> tuple[str, list]:
     '''
     Generate task prompt and compressed images for HA learning agent.
 
@@ -392,6 +393,7 @@ def obtain_task_and_images(input_data_path: str = None,
         feedback: Feedback string from previous iteration (optional)
         iteration: Current iteration number (1-indexed)
         use_json_schema: If True, include JSON Schema in the prompt for structured output
+        use_python_class_format: If True, use Python class format instead of JSON
 
     Returns:
         Tuple of (task prompt string, list of compressed images)
@@ -468,9 +470,15 @@ Your HA specification will be evaluated on:
     input_names = ", ".join([f"u{i+1}" for i in range(num_inputs)]) if num_inputs > 0 else "(none)"
 
     # Add HA specification format documentation and initial spec
-    # Use JSON Schema-based documentation for more precise output specification
-    # We use the explicit schema and examples to ensure consistency with the improved task prompt
-    ha_spec_docs = """## Hybrid Automaton Specification Format (JSON Schema)
+    # Conditionally use Python class or JSON format based on use_python_class_format flag
+    if use_python_class_format:
+        # Import Python class documentation
+        from prompts_ha.prompts_class import get_ha_class_documentation
+        ha_spec_docs = get_ha_class_documentation()
+    else:
+        # Use JSON Schema-based documentation for more precise output specification
+        # We use the explicit schema and examples to ensure consistency with the improved task prompt
+        ha_spec_docs = """## Hybrid Automaton Specification Format (JSON Schema)
 
 ### JSON Schema Definition
 Your output MUST conform to this JSON Schema:
@@ -777,7 +785,33 @@ Your output MUST conform to this JSON Schema:
 }
 ```"""
 
-    task += f"""
+    # Build task prompt with format-specific instructions
+    if use_python_class_format:
+        task += f"""
+{ha_spec_docs}
+
+## ⚠️ CRITICAL: Variable Count is PRE-DEFINED ⚠️
+The `var` and `input` fields in your Python class are **already correctly set** based on the ground truth data.
+- **DO NOT** add or remove variables!
+- **DO NOT** convert to state-space form (e.g., splitting 1 variable into x1, x2)!
+- For single-variable systems: use higher-order ODE notation (e.g., `x1[2] = ...` for 2nd-order)
+- Focus on inferring the **equations**, **modes**, **guard conditions**, and **reset maps**!
+
+## Expected Output Format
+Generate a complete Python class following the structure shown above with:
+- **State variables**: `self.var = "{var_names}"`
+- **Input variables**: `self.input = "{input_names if num_inputs > 0 else ''}"`
+- **Parameters**: `self.params = [...]` (initial guesses, will be optimized)
+- **Complete methods**: `num_modes()`, `mode_dynamics()`, `guard_condition()`, `reset_map()`, `to_json()`
+
+## Your Task
+Generate a Python class-based HA specification (v1) that models the observed trajectory data.
+- **Keep `self.var = "{var_names}"` and `self.input = "{input_names if num_inputs > 0 else ''}"` exactly as shown!**
+- Provide reasonable initial parameter values in `self.params` (they will be optimized)
+- Make sure all required methods are implemented correctly
+"""
+    else:
+        task += f"""
 {ha_spec_docs}
 
 ## ⚠️ CRITICAL: Variable Count is PRE-DEFINED ⚠️
@@ -799,7 +833,10 @@ Generate an improved HA specification (v1) that better matches the observed traj
 - **Keep `var: "{var_names}"` and `input: "{input_names if num_inputs > 0 else ''}"` exactly as shown!**
 - Make sure the HA specification is valid and complete.
 - Refine the HA specification to improve trajectory matching and reduce TC (Change-Point Error), Mean Difference, and Maximum Difference.
+"""
 
+    # Add available data section (common to both formats)
+    task += f"""
 ## Available Data
 The following data sources are provided:
 - **Trace visualizations**: {image_paths_list}
@@ -825,8 +862,11 @@ def evaluate_ha_specification_with_feedback(
     input_data_path: str,
     output_dir: str = None,
     hyperparameters: HAHyperparameters = None,
-    iteration: int = 1
-) -> Tuple[bool, Dict, str, Optional[Dict]]:
+    iteration: int = 1,
+    use_python_class_format: bool = False,
+    optimization_iters: int = 100,
+    optimizer_type: str = "simulated_annealing"
+) -> Tuple[bool, Dict, str, Optional[Dict], Optional[str], Optional[np.ndarray]]:
     """
     Evaluate the generated Hybrid Automaton specification and return feedback for the agent.
 
@@ -836,53 +876,134 @@ def evaluate_ha_specification_with_feedback(
         output_dir: Directory to save evaluation results
         hyperparameters: HAHyperparameters instance containing experiment configuration
         iteration: Current iteration number (for logging)
+        use_python_class_format: If True, expect Python class format and optimize parameters
+        optimization_iters: Number of iterations for parameter optimization
+        optimizer_type: Type of optimizer ('simulated_annealing' or 'hill_climbing')
 
     Returns:
-        Tuple of (success_bool, metrics_dict, feedback_string, ha_specification_dict)
-        The ha_specification_dict is the extracted/validated HA spec (None if extraction failed)
+        Tuple of (success_bool, metrics_dict, feedback_string, ha_specification_dict, class_code, optimized_params)
+        - success_bool: Whether evaluation succeeded
+        - metrics_dict: Evaluation metrics
+        - feedback_string: Feedback for next iteration
+        - ha_specification_dict: JSON HA spec (None if extraction failed)
+        - class_code: Python class code (None if JSON format)
+        - optimized_params: Optimized parameters array (None if JSON format)
     """
     print("\n" + "=" * 80)
     print("EVALUATION: Testing the generated Hybrid Automaton specification")
     print("=" * 80)
 
-    # Import HA evaluation module
+    # Import required modules
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'utils', 'Dainarx_code'))
     from HA_evaluation import HAEvaluator
-    
-    # Import HA specification validator
     from utils.ha_spec_validator import preprocess_ha_for_evaluation
 
-    # Use the validator to extract and fix HA specification
-    print("\n--- HA Specification Validation ---")
-    ha_specification, is_valid, validation_message = preprocess_ha_for_evaluation(agent_result)
-    print(validation_message)
-    
-    if not is_valid:
-        error_msg = "HA specification validation failed. " + validation_message
-        if ha_specification is not None:
-             error_msg += f"\nPartially extracted spec: {json.dumps(ha_specification, indent=2)[:500]}..."
-        return False, {}, error_msg, ha_specification
+    # Initialize variables for tracking Python class format
+    class_code = None
+    optimized_params = None
+
+    # Detect format and handle accordingly
+    is_python_class = 'class HybridAutomaton' in str(agent_result)
+
+    if use_python_class_format and is_python_class:
+        print("\n--- Python Class Format Detected ---")
+        print("Extracting and validating Python class...")
+
+        # Import Python class utilities
+        from utils.ha_class_validator import extract_python_class_from_text, validate_python_class_syntax
+        from utils.ha_class_optimizer import optimize_ha_params
+        from utils.ha_class_to_json import convert_python_class_to_json
+
+        # Extract class from text
+        class_code = extract_python_class_from_text(str(agent_result))
+        if not class_code:
+            return False, {}, "Failed to extract Python class from agent output", None, None, None
+
+        # Validate class syntax
+        is_valid, errors = validate_python_class_syntax(class_code)
+        if not is_valid:
+            error_msg = f"Python class validation failed:\n" + "\n".join(errors)
+            return False, {}, error_msg, None, class_code, None
+
+        print("✓ Python class validated successfully")
+
+        # Find test data file for optimization
+        test_data_files = [f for f in os.listdir(input_data_path) if f.endswith('.npz')]
+        if not test_data_files:
+            return False, {}, f"No .npz test data files found in {input_data_path}", None, class_code, None
+
+        npz_file_path = os.path.join(input_data_path, test_data_files[0])
+
+        # Optimize parameters
+        print(f"\n--- Parameter Optimization ({optimization_iters} iterations) ---")
+        try:
+            optimized_class_code, optimized_params, opt_metrics = optimize_ha_params(
+                class_code=class_code,
+                npz_file_path=npz_file_path,
+                n_iter=optimization_iters,
+                optimizer_type=optimizer_type
+            )
+
+            print(f"✓ Optimization complete!")
+            print(f"  Initial error: {opt_metrics.get('initial_error', 'N/A'):.6f}")
+            print(f"  Final error: {opt_metrics.get('final_error', 'N/A'):.6f}")
+            print(f"  Improvement: {opt_metrics.get('improvement_percentage', 'N/A'):.2f}%")
+
+            # Update class_code to optimized version
+            class_code = optimized_class_code
+
+        except Exception as e:
+            print(f"⚠ Optimization failed: {e}")
+            print("  Continuing with initial parameters...")
+            # optimized_params remains None, will use initial params
+
+        # Convert to JSON for evaluation
+        print("\n--- Converting to JSON for Evaluation ---")
+        try:
+            ha_specification = convert_python_class_to_json(class_code, optimized_params)
+            print("✓ Converted to JSON successfully")
+            is_valid = True
+            validation_message = "✓ Python class format validated and converted to JSON"
+        except Exception as e:
+            error_msg = f"Failed to convert Python class to JSON: {e}"
+            return False, {}, error_msg, None, class_code, optimized_params
+
+    else:
+        # JSON format path (existing logic)
+        print("\n--- HA Specification Validation (JSON Format) ---")
+        ha_specification, is_valid, validation_message = preprocess_ha_for_evaluation(agent_result)
+        print(validation_message)
+
+        if not is_valid:
+            error_msg = "HA specification validation failed. " + validation_message
+            if ha_specification is not None:
+                error_msg += f"\nPartially extracted spec: {json.dumps(ha_specification, indent=2)[:500]}..."
+            return False, {}, error_msg, ha_specification, None, None
 
     # Final structure check
     if ha_specification is None or 'automaton' not in ha_specification or 'config' not in ha_specification:
-        return False, {}, "Could not extract valid HA specification from agent output (missing 'automaton' or 'config').", None
+        return False, {}, "Could not extract valid HA specification from agent output (missing 'automaton' or 'config').", None, class_code, optimized_params
 
-    # Find test data file
-    test_data_files = [f for f in os.listdir(input_data_path) if f.endswith('.npz')]
-    if not test_data_files:
-        return False, {}, f"No .npz test data files found in {input_data_path}", ha_specification
+    # Find test data file (skip if already found during optimization)
+    if use_python_class_format and is_python_class:
+        # Already found npz_file_path during optimization
+        pass
+    else:
+        test_data_files = [f for f in os.listdir(input_data_path) if f.endswith('.npz')]
+        if not test_data_files:
+            return False, {}, f"No .npz test data files found in {input_data_path}", ha_specification, class_code, optimized_params
 
-    npz_file_path = os.path.join(input_data_path, test_data_files[0])
-    
+        npz_file_path = os.path.join(input_data_path, test_data_files[0])
+
     # Check dimensions
     gt_data = np.load(npz_file_path, allow_pickle=True)
     gt_num_vars = gt_data['state'].shape[0]
     var_str = ha_specification['automaton'].get('var', '')
     ha_num_vars = len([v.strip() for v in var_str.split(',') if v.strip()])
-    
+
     if ha_num_vars != gt_num_vars:
         msg = f"Variable count mismatch! HA spec has {ha_num_vars}, ground truth has {gt_num_vars}. Check state-space vs higher-order ODE format."
-        return False, {}, msg, ha_specification
+        return False, {}, msg, ha_specification, class_code, optimized_params
 
     # Set up output directory
     if output_dir is None:
@@ -924,22 +1045,37 @@ def evaluate_ha_specification_with_feedback(
                 f.write("\n\n")
 
 
-        # Construct feedback string is the same from metrics_file
-        
-        feedback = f"```json\n{json.dumps(ha_specification, indent=2)}\n```\n"
-        # feedback = f"```json\n{agent_result}\n```\n"
+        # Construct feedback string with format-specific details
+        if use_python_class_format and class_code:
+            # Python class format feedback
+            feedback = f"```python\n{class_code}\n```\n"
+            if optimized_params is not None:
+                params_str = np.array2string(optimized_params, precision=4, separator=', ')
+                feedback += f"\n**Optimized Parameters**: {params_str}\n"
+                feedback += f"**Optimization Metrics**: Initial error: {opt_metrics.get('initial_error', 'N/A'):.6f}, Final error: {opt_metrics.get('final_error', 'N/A'):.6f}, Improvement: {opt_metrics.get('improvement_percentage', 'N/A'):.2f}%\n"
+            feedback += f"\n**Converted JSON (for reference)**:\n```json\n{json.dumps(ha_specification, indent=2)}\n```\n"
+        else:
+            # JSON format feedback (original)
+            feedback = f"```json\n{json.dumps(ha_specification, indent=2)}\n```\n"
+
         feedback += f"Evaluation Results:\n{metrics_text}\n"
 
-
-        return True, metrics_dict, feedback, ha_specification
+        return True, metrics_dict, feedback, ha_specification, class_code, optimized_params
 
     except Exception as e:
         import traceback
         traceback.print_exc()
-        feedback = f"```json\n{json.dumps(ha_specification, indent=2)}\n```\n"
-        # feedback = f"```json\n{agent_result}\n```\n"
+
+        # Format-specific error feedback
+        if use_python_class_format and class_code:
+            feedback = f"```python\n{class_code}\n```\n"
+            if optimized_params is not None:
+                feedback += f"Optimized Parameters: {optimized_params}\n"
+        else:
+            feedback = f"```json\n{json.dumps(ha_specification, indent=2)}\n```\n"
+
         feedback += f"Evaluation Results:\nThe HA specification is not valid. Please try to generate a valid specification. Here is the error message: {str(e)}"
-        return False, {}, feedback, ha_specification
+        return False, {}, feedback, ha_specification, class_code, optimized_params
 
 
 def parse_args():
@@ -1077,6 +1213,29 @@ def parse_args():
         help="Include JSON Schema in the task prompt for structured output (default: True)",
     )
 
+    # NEW: Python class format and optimization parameters
+    ap.add_argument(
+        "--use-python-class-format",
+        action="store_true",
+        default=False,
+        help="Use Python class format instead of JSON format for HA specifications (default: False)",
+    )
+
+    ap.add_argument(
+        "--optimization-iters",
+        type=int,
+        default=100,
+        help="Number of iterations for parameter optimization (only used with Python class format). Default: 100",
+    )
+
+    ap.add_argument(
+        "--optimizer-type",
+        type=str,
+        default="simulated_annealing",
+        choices=["simulated_annealing", "hill_climbing"],
+        help="Type of gradient-free optimizer to use (only used with Python class format). Default: simulated_annealing",
+    )
+
     args = ap.parse_args()
 
     if not args.input_data_path:
@@ -1181,7 +1340,8 @@ def main():
             manager_type=args.manager_type,
             feedback=current_feedback,
             iteration=iteration,
-            use_json_schema=args.use_json_schema
+            use_json_schema=args.use_json_schema,
+            use_python_class_format=args.use_python_class_format if hasattr(args, 'use_python_class_format') else False
         )
 
         # save the task to a file and set up output directory
@@ -1208,12 +1368,15 @@ def main():
             continue
 
         # Evaluate the generated HA specification
-        success, metrics, feedback_str, ha_spec = evaluate_ha_specification_with_feedback(
+        success, metrics, feedback_str, ha_spec, class_code, optimized_params = evaluate_ha_specification_with_feedback(
             result,
             args.input_data_path,
             output_dir=os.path.join("evaluation_results", f"iter_{iteration}"),
             hyperparameters=hyperparameters,
-            iteration=iteration
+            iteration=iteration,
+            use_python_class_format=args.use_python_class_format if hasattr(args, 'use_python_class_format') else False,
+            optimization_iters=args.optimization_iters if hasattr(args, 'optimization_iters') else 100,
+            optimizer_type=args.optimizer_type if hasattr(args, 'optimizer_type') else "simulated_annealing"
         )
 
         # Extract error value from metrics
@@ -1239,7 +1402,9 @@ def main():
             metrics=metrics if isinstance(metrics, dict) else {},
             feedback=feedback_str,
             success=success,
-            error_value=current_error
+            error_value=current_error,
+            class_code=class_code,
+            optimized_params=optimized_params
         )
         results_aggregator.add_result(iter_result)
 
@@ -1279,12 +1444,25 @@ def main():
     # Final Evaluation of the best result (saved to main evaluation folder)
     if results_aggregator.best_result and results_aggregator.best_result.ha_specification:
         print("\n--- Final Evaluation of Best Result ---")
-        # Save the best HA specification to a JSON file
+
+        # Save the best HA specification to JSON file
         best_spec_path = os.path.join("evaluation_results", "best_ha_specification.json")
         os.makedirs("evaluation_results", exist_ok=True)
         with open(best_spec_path, "w", encoding="utf-8") as f:
             json.dump(results_aggregator.best_result.ha_specification, f, indent=2)
-        print(f"Best HA specification saved to: {best_spec_path}")
+        print(f"Best HA specification (JSON) saved to: {best_spec_path}")
+
+        # If Python class format was used, also save the class code and optimized params
+        if results_aggregator.best_result.class_code:
+            best_class_path = os.path.join("evaluation_results", "best_ha_class.py")
+            with open(best_class_path, "w", encoding="utf-8") as f:
+                f.write(results_aggregator.best_result.class_code)
+            print(f"Best HA class (Python) saved to: {best_class_path}")
+
+            if results_aggregator.best_result.optimized_params is not None:
+                best_params_path = os.path.join("evaluation_results", "best_params.npy")
+                np.save(best_params_path, results_aggregator.best_result.optimized_params)
+                print(f"Best optimized parameters saved to: {best_params_path}")
 
 
 if __name__ == "__main__":

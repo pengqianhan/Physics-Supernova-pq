@@ -386,7 +386,8 @@ Performance is ranked from best (lowest error) to worst. Use these as inspiratio
 --- Explored Specifications (Ranked) ---
 
 ### Rank 1 (Iteration 1)
-**Error**: 1.617991
+**Error**: 0.966037
+**Format**: JSON
 ```json
 {
   "automaton": {
@@ -395,10 +396,23 @@ Performance is ranked from best (lowest error) to worst. Use these as inspiratio
     "mode": [
       {
         "id": 1,
-        "eq": "x1[2] = -0.00388 * x1[1] - 0.00388 * x1[0] - 0.062 * x1[0]**3"
+        "eq": "x1[2] = -0.5 * x1[1] - 1.0 * x1[0] - 1.0 * x1[0]**3"
+      },
+      {
+        "id": 2,
+        "eq": "x1[2] = -1.0 * x1[1] - 1.0 * x1[0] - 1.0 * x1[0]**3"
       }
     ],
-    "edge": []
+    "edge": [
+      {
+        "direction": "2 -> 1",
+        "condition": "x1 >= 0"
+      },
+      {
+        "direction": "1 -> 2",
+        "condition": "x1 < 0"
+      }
+    ]
   },
   "config": {
     "dt": 0.001,
@@ -409,7 +423,7 @@ Performance is ranked from best (lowest error) to worst. Use these as inspiratio
   }
 }
 ```
-**Metrics**: tc: 0.0000, max_diff: 1.6180, mean_diff: 0.6869
+**Metrics**: tc: 1.1100, max_diff: 0.9660, mean_diff: 0.3175
 
 -----------------------------------------
 
@@ -418,24 +432,24 @@ Performance is ranked from best (lowest error) to worst. Use these as inspiratio
 {
   "automaton": {
     "var": "x1",
-    "input": "u1",
+    "input": "",
     "mode": [
       {
         "id": 1,
-        "eq": "x1[2] = -0.01 * x1[1] - 0.00388 * x1[0] - 0.062 * x1[0]**3"
+        "eq": "x1[2] = -0.5 * x1[1] - 1.0 * x1[0] - 1.0 * x1[0]**3"
       },
       {
         "id": 2,
-        "eq": "x1[2] = -0.001 * x1[1] - 0.00388 * x1[0] - 0.062 * x1[0]**3"
+        "eq": "x1[2] = -1.0 * x1[1] - 1.0 * x1[0] - 1.0 * x1[0]**3"
       }
     ],
     "edge": [
       {
-        "direction": "1 -> 2",
+        "direction": "2 -> 1",
         "condition": "x1 < 0"
       },
       {
-        "direction": "2 -> 1",
+        "direction": "1 -> 2",
         "condition": "x1 >= 0"
       }
     ]
@@ -450,9 +464,6 @@ Performance is ranked from best (lowest error) to worst. Use these as inspiratio
 }
 ```
 Evaluation Results:
-  TC (Change-Point Error):4.948000 seconds
-  Max Difference:1.618208
-  Mean Difference:0.683930
-
+The HA specification is not valid. Please try to generate a valid specification. Here is the error message: <lambda>() takes 1 positional argument but 2 were given
     
     

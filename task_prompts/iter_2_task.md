@@ -386,7 +386,8 @@ Performance is ranked from best (lowest error) to worst. Use these as inspiratio
 --- Explored Specifications (Ranked) ---
 
 ### Rank 1 (Iteration 1)
-**Error**: 1.617991
+**Error**: 0.966037
+**Format**: JSON
 ```json
 {
   "automaton": {
@@ -395,10 +396,23 @@ Performance is ranked from best (lowest error) to worst. Use these as inspiratio
     "mode": [
       {
         "id": 1,
-        "eq": "x1[2] = -0.00388 * x1[1] - 0.00388 * x1[0] - 0.062 * x1[0]**3"
+        "eq": "x1[2] = -0.5 * x1[1] - 1.0 * x1[0] - 1.0 * x1[0]**3"
+      },
+      {
+        "id": 2,
+        "eq": "x1[2] = -1.0 * x1[1] - 1.0 * x1[0] - 1.0 * x1[0]**3"
       }
     ],
-    "edge": []
+    "edge": [
+      {
+        "direction": "2 -> 1",
+        "condition": "x1 >= 0"
+      },
+      {
+        "direction": "1 -> 2",
+        "condition": "x1 < 0"
+      }
+    ]
   },
   "config": {
     "dt": 0.001,
@@ -409,7 +423,7 @@ Performance is ranked from best (lowest error) to worst. Use these as inspiratio
   }
 }
 ```
-**Metrics**: tc: 0.0000, max_diff: 1.6180, mean_diff: 0.6869
+**Metrics**: tc: 1.1100, max_diff: 0.9660, mean_diff: 0.3175
 
 -----------------------------------------
 
@@ -422,10 +436,23 @@ Performance is ranked from best (lowest error) to worst. Use these as inspiratio
     "mode": [
       {
         "id": 1,
-        "eq": "x1[2] = -0.00388 * x1[1] - 0.00388 * x1[0] - 0.062 * x1[0]**3"
+        "eq": "x1[2] = -0.5 * x1[1] - 1.0 * x1[0] - 1.0 * x1[0]**3"
+      },
+      {
+        "id": 2,
+        "eq": "x1[2] = -1.0 * x1[1] - 1.0 * x1[0] - 1.0 * x1[0]**3"
       }
     ],
-    "edge": []
+    "edge": [
+      {
+        "direction": "2 -> 1",
+        "condition": "x1 >= 0"
+      },
+      {
+        "direction": "1 -> 2",
+        "condition": "x1 < 0"
+      }
+    ]
   },
   "config": {
     "dt": 0.001,
@@ -437,9 +464,9 @@ Performance is ranked from best (lowest error) to worst. Use these as inspiratio
 }
 ```
 Evaluation Results:
-  TC (Change-Point Error):0.000000 seconds
-  Max Difference:1.617991
-  Mean Difference:0.686895
+  TC (Change-Point Error):1.110000 seconds
+  Max Difference:0.966037
+  Mean Difference:0.317519
 
     
     

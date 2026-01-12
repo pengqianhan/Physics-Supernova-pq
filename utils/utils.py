@@ -116,6 +116,9 @@ class IterationResult:
     success: bool = False
     error_value: float = float('inf')
     timestamp: str = field(default_factory=lambda: datetime.now().strftime('%Y%m%d_%H%M%S'))
+    # New fields for Python class-based format
+    class_code: Optional[str] = None  # Python class code (if class format used)
+    optimized_params: Optional[np.ndarray] = None  # Optimized parameters (if optimization applied)
 
 
 class ResultsAggregator:
@@ -190,14 +193,28 @@ class ResultsAggregator:
         ]
 
         for i, result in enumerate(distinct_results, 1):
-            ha_spec_str = json.dumps(result.ha_specification, indent=2) if result.ha_specification else "N/A"
-            # Truncate if too long
-            if len(ha_spec_str) > 1500:
-                ha_spec_str = ha_spec_str[:1500] + "\n... (truncated)"
-
             context_lines.append(f"\n### Rank {i} (Iteration {result.iteration})")
             context_lines.append(f"**Error**: {result.error_value:.6f}")
-            context_lines.append(f"```json\n{ha_spec_str}\n```")
+
+            # Show Python class code if available, otherwise JSON
+            if result.class_code:
+                # Python class format
+                class_code_str = result.class_code if len(result.class_code) <= 1500 else result.class_code[:1500] + "\n... (truncated)"
+                context_lines.append(f"**Format**: Python class")
+                context_lines.append(f"```python\n{class_code_str}\n```")
+
+                # Show optimized params if available
+                if result.optimized_params is not None:
+                    params_str = str(result.optimized_params.tolist()[:5]) + "..." if len(result.optimized_params) > 5 else str(result.optimized_params.tolist())
+                    context_lines.append(f"**Optimized Params**: {params_str}")
+            else:
+                # JSON format
+                ha_spec_str = json.dumps(result.ha_specification, indent=2) if result.ha_specification else "N/A"
+                # Truncate if too long
+                if len(ha_spec_str) > 1500:
+                    ha_spec_str = ha_spec_str[:1500] + "\n... (truncated)"
+                context_lines.append(f"**Format**: JSON")
+                context_lines.append(f"```json\n{ha_spec_str}\n```")
 
             # Include key metrics if available
             if result.metrics:

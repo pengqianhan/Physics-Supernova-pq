@@ -10,6 +10,18 @@ load_dotenv()
 # Import evaluation module
 from .Dainarx_code.HA_evaluation import HAEvaluator
 
+# Import Python class conversion utilities
+try:
+    from .ha_class_to_json import convert_python_class_to_json
+    from .ha_class_validator import extract_initial_params_from_class
+except ImportError:
+    try:
+        from ha_class_to_json import convert_python_class_to_json
+        from ha_class_validator import extract_initial_params_from_class
+    except ImportError:
+        convert_python_class_to_json = None
+        extract_initial_params_from_class = None
+
 
 # System prompt for critical hybrid automata review
 HA_REVIEW_SYSTEM_PROMPT = """# Expert Hybrid Automaton Specification Reviewer
@@ -56,13 +68,16 @@ class ReviewRequestTool_ha(Tool):
 
     name = "hybrid_automaton_review_expert"
     description = (
-        "**Expert Hybrid Automaton Python dict Specification Review Service**\n\n"
+        "**Expert Hybrid Automaton Specification Review Service**\n\n"
         "This tool provides comprehensive expert review of your HA specification by:\n"
         "1. **Automated Evaluation**: Simulates your HA against ground truth data and computes accuracy metrics\n"
         "2. **Visual Comparison**: Generates overlay plot comparing your simulation to actual trajectory\n"
         "3. **Expert Analysis**: Senior control systems engineer reviews your spec with structured feedback\n\n"
+        "**SUPPORTED FORMATS:**\n"
+        "- Python class: class HybridAutomaton with params array\n"
+        "- JSON dict: {\"automaton\": {...}, \"config\": {...}}\n\n"
         "**HOW TO USE:**\n"
-        "- `my_ha_solution`: Your complete Hybrid Automaton specification as a Python dict (REQUIRED - the reviewer cannot see your spec otherwise!)\n"
+        "- `my_ha_solution`: Your complete HA specification as Python class OR JSON dict (REQUIRED)\n"
         "- `my_note`: Focus areas or specific concerns (e.g., 'Unsure about mode 2 dynamics', 'Guard thresholds may be wrong')\n\n"
         "**OUTPUT INCLUDES:**\n"
         "- Critical errors that must be fixed\n"
@@ -74,10 +89,10 @@ class ReviewRequestTool_ha(Tool):
         "my_ha_solution": {
             "type": "string",
             "description": (
-                "Your complete Hybrid Automaton specification as a JSON string. Must include 'automaton' (with var, input, mode, edge) "
-                "and 'config' (with dt, total_time, dim, need_reset, non_linear_items). Use JSON format: true/false (not True/False). "
-                "Example format:\n"
-                '{"automaton": {"var": "x1", "input": "u1", "mode": [...], "edge": [...]}, "config": {...}}'
+                "Your complete Hybrid Automaton specification as EITHER:\n"
+                "1. Python class code: class HybridAutomaton with params array\n"
+                "2. JSON string: {\"automaton\": {...}, \"config\": {...}}\n\n"
+                "Both formats will be automatically converted for evaluation."
             )
         },
         "my_note": {
@@ -108,11 +123,27 @@ class ReviewRequestTool_ha(Tool):
             # return "Error: No markdown content available."
             print("Error: No markdown content available.")
 
-        # Step 2: Parse HA solution JSON string to dict
-        try:
-            ha_dict: Dict[str, Any] = json.loads(my_ha_solution)
-        except json.JSONDecodeError as e:
-            return f"Error: Failed to parse HA solution as JSON: {e}"
+        # Step 2: Detect format and convert to JSON dict if needed
+        is_python_class = 'class HybridAutomaton' in my_ha_solution
+
+        if is_python_class:
+            # Convert Python class to JSON
+            if convert_python_class_to_json is None:
+                return "Error: Python class conversion not available. Please use JSON format instead."
+
+            try:
+                # Extract initial params from class
+                params = extract_initial_params_from_class(my_ha_solution)
+                # Convert to JSON
+                ha_dict: Dict[str, Any] = convert_python_class_to_json(my_ha_solution, params)
+            except Exception as e:
+                return f"Error: Failed to convert Python class to JSON: {e}"
+        else:
+            # Parse JSON string to dict
+            try:
+                ha_dict: Dict[str, Any] = json.loads(my_ha_solution)
+            except json.JSONDecodeError as e:
+                return f"Error: Failed to parse HA solution as JSON: {e}"
 
         # Step 3: Run HAEvaluator to get metrics and simulation plot
         try:

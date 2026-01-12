@@ -4,23 +4,32 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This repository combines **Physics Supernova** (an AI agent for physics problems) with **Hybrid Automaton Learning** capabilities. The codebase has two main components:
+This repository implements **HA-Scientist** (Hybrid Automaton System Identification Agent), an agentic workflow for autonomously identifying Hybrid Automaton (HA) models from time-series trajectory data. The codebase evolved from **Physics Supernova** architecture and has two main components:
 
-1. **Physics Supernova Agent**: AI system for solving IPhO-level physics problems using multi-agent architecture with specialized tools
-2. **Hybrid Automaton Learning** (Dainarx_code): System for learning hybrid automaton specifications from trajectory data
+1. **HA-Scientist Agent** (`run_llm_ha_beta.py`): Iterative "Scientist-Critic" loop for HA model identification with visual and numerical fusion
+2. **Traditional HA Learning** (Dainarx_code): Classical system identification using clustering, SVM-based guard learning, and ODE fitting
+3. **Physics Supernova Agent** (legacy): AI system for solving IPhO-level physics problems
 
 ## Architecture Overview
 
-### Two Main Entry Points
+### Main Entry Points
 
-**1. Physics Problem Solving**
+**1. HA-Scientist Iterative Loop (Primary)**
+- `run_llm_ha_beta.py` - **Main entry point** for iterative HA model identification
+  - Implements "Scientist-Critic" loop with feedback aggregation
+  - Uses ResultsAggregator for intelligent top-k feedback selection
+  - Includes early stopping based on error thresholds and patience
+  - Auto-detects data dimensions from `.npz` files
+  - Generates dynamic HA templates with pre-filled variables
+
+**2. Traditional HA Learning**
+- `utils/Dainarx_code/main.py` - Classical HA learning from trajectory data
+- `utils/Dainarx_code/HA_evaluation.py` - Evaluation framework for HA specifications
+
+**3. Physics Problem Solving (Legacy)**
 - `run.py` - General physics agent (supports OpenRouter, various models)
 - `run_gemini.py` - Gemini-specific physics agent
-- `run_llm_ha_alpha.py` - LLM agent for hybrid automaton learning/improvement
-
-**2. Hybrid Automaton Learning**
-- `utils/Dainarx_code/main.py` - Traditional HA learning from trajectory data
-- `utils/Dainarx_code/HA_evaluation.py` - Evaluation framework for HA specifications
+- `run_llm_ha_alpha.py` - Early LLM-based HA learning (superseded by beta)
 
 ### Agent System Architecture
 
@@ -48,10 +57,23 @@ Tools can access parent agent via `self.worker_agent` to retrieve:
 - Other agent state/context as needed
 
 **Available Tools:**
+
+*For HA Learning:*
+1. `HybridAutomatonImageTool` (`utils/imgTools_ha.py`) - Vision-based trajectory analysis
+   - Analyzes trajectory plots to detect mode switches, oscillations, discontinuities
+   - Uses vision models (Gemini) for qualitative system behavior insights
+2. `ValidateHASpecTool` (`utils/validateTools_ha.py`) - JSON Schema validation
+   - Validates HA specification syntax and semantics
+   - Auto-fixes common errors before submission
+3. `SummarizeMemoryTool` (`utils/summemoryTools_ha.py`) - Iteration summarization
+   - Summarizes previous iterations for context management
+4. `ReviewRequestTool_ha` (`utils/reviewTools_ha.py`) - HA spec review
+   - Post-hoc checking of HA specifications for completeness
+
+*For Physics Problems (Legacy):*
 1. `WolframAlphaTool` - Mathematical computation, unit conversion
-2. `AskImageTool` / `HybridAutomatonImageTool` - Image analysis with vision models
-3. `ReviewRequestTool` / `ReviewRequestTool_ha` - Post-hoc answer checking
-4. `SummarizeMemoryTool` - Memory/answer summarization for long problems
+2. `AskImageTool` - Image analysis with vision models
+3. `ReviewRequestTool` - Post-hoc answer checking
 
 ### Hybrid Automaton System
 
@@ -95,16 +117,16 @@ When evaluating HA:
 ### Environment Setup
 
 ```bash
-# Install dependencies
+# Install dependencies (use requirements.txt)
 python -m pip install -U pip
-pip install tenacity
-pip install smolagents
-pip install smolagents[litellm]
-pip install loguru
-pip install python-dotenv
+pip install -r requirements.txt
 
-# Required for HA learning
-pip install numpy scipy matplotlib
+# Or install manually
+pip install tenacity smolagents[litellm] loguru python-dotenv
+pip install numpy scipy matplotlib pandas seaborn scikit-learn networkx
+
+# Optional: E2B sandbox environment
+pip install smolagents[e2b]
 ```
 
 ### API Key Configuration
@@ -118,7 +140,45 @@ WOLFRAM_APP_ID=...                # For WolframAlpha tool
 HF_TOKEN=hf_...                   # If using HF models
 ```
 
-### Running Physics Agent
+### Running HA-Scientist (Primary Use Case)
+
+**Basic usage:**
+```bash
+python run_llm_ha_beta.py \
+  --input-data-path data_all/non_linear/duffing \
+  --manager-model gemini/gemini-flash-lite-latest \
+  --manager-type CodeAgent \
+  --max-iterations 3 \
+  --tools-list hybrid_automaton_image_analysis summarize_hybrid_automaton_iterations validate_hybrid_automaton_specification
+```
+
+**With managed agents for data analysis:**
+```bash
+python run_llm_ha_beta.py \
+  --input-data-path data_all/non_linear/duffing \
+  --manager-model gemini/gemini-flash-lite-latest \
+  --managed-agents-list data_analysis_expert \
+  --managed-agents-list-model gemini/gemini-flash-lite-latest \
+  --max-iterations 5 \
+  --target-error 0.01
+```
+
+**Key Arguments:**
+- `--input-data-path`: Directory with `.npz` trace data files
+- `--manager-model`: LLM for main agent (e.g., `gemini/gemini-flash-lite-latest`)
+- `--manager-type`: `CodeAgent` (can execute Python) or `ToolCallingAgent`
+- `--max-iterations`: Maximum refinement iterations (default: 3)
+- `--target-error`: Early stop threshold (default: 0.01)
+- `--feedback-top-k`: Number of top specs in feedback (default: 3)
+- `--managed-agents-list`: Sub-agents like `data_analysis_expert`
+
+**Output:**
+- `evaluation_results/iter_N/ha_eval_*.png` - Trajectory comparison plots
+- `evaluation_results/iter_N/ha_eval_*.txt` - Metrics and HA spec
+- `evaluation_results/best_ha_specification.json` - Best result across iterations
+- `task_prompts/iter_N_task.md` - Generated task prompts
+
+### Running Physics Agent (Legacy)
 
 **Single problem:**
 ```bash
@@ -126,37 +186,18 @@ python run.py \
   --input-markdown-file examples/Problems/example/example1problem.md \
   --manager-model openrouter/google/gemini-2.5-pro \
   --manager-type CodeAgent \
-  --tools-list wolfram_alpha_query ask_image_expert ask_review_expert finalize_part_answer \
-  --image-tool-model openrouter/google/gemini-2.5-pro \
-  --review-tool-model openrouter/google/gemini-2.5-pro
+  --tools-list wolfram_alpha_query ask_image_expert ask_review_expert finalize_part_answer
 ```
 
-**Batch execution:**
-```bash
-# Edit run_scripts/batchrun.py to configure MAX_THREADS and ARGS_LIST
-python run_scripts/batchrun.py
+### Running Traditional HA Learning
 
-# IPhO problems
-python run_scripts/batchrun_IPhO.py
-
-# Wolfram QA tasks
-python run_scripts/batchrun_wolftask.py
-```
-
-### Running HA Learning
-
-**Traditional HA learning:**
+**Classical HA learning (clustering + SVM guards):**
 ```bash
 cd utils/Dainarx_code
 python main.py  # Uses automata/non_linear/duffing.json by default
 ```
 
-**LLM-based HA learning:**
-```bash
-python run_llm_ha_alpha.py
-```
-
-**Evaluate HA specification:**
+**Evaluate any HA specification:**
 ```python
 import sys
 sys.path.insert(0, 'utils/Dainarx_code')
@@ -400,43 +441,122 @@ Physics-Supernova-pq/
 └── learning_notes/                            # Documentation/examples
 ```
 
-## LLM-Based HA Learning (LLM-LEx)
+## HA-Scientist Iterative Loop Architecture
 
-This project implements LLM-based hybrid automaton learning using iterative refinement:
+The main workflow (`run_llm_ha_beta.py`) implements an iterative refinement pattern:
 
-**Method** (from `.cursor/rules/method.mdc`):
-- Uses experience buffer with island-based populations
-- Generates HA hypotheses via LLM prompting
-- Evaluates against trajectory data
-- Samples high-quality examples for in-context learning
-- Periodically resets worst-performing islands
+### Core Components
 
-**Key hyperparameters:**
-- `b = 4` equation programs per generation
-- `e = 4` parallel evaluators
-- `m = 10` islands for diversity
-- `τ = 0.8` generation temperature
-- Max 10 parameters per equation
-- 30s timeout, 2GB memory limit per evaluation
+**1. ResultsAggregator** (`utils/utils.py`):
+- Tracks all iteration results with metrics
+- Selects top-k diverse specifications for feedback (diversity via min_gap filtering)
+- Implements early stopping logic:
+  - Target error threshold reached
+  - No improvement for N iterations (patience)
+  - Near-perfect fit achieved (error < 0.0001)
+- Provides dynamic error thresholds
 
-## Important Caveats
+**2. Feedback Generation** (`obtain_task_and_images()`):
+- First iteration: No feedback (cold start)
+- Later iterations:
+  - Top-k diverse specs ranked by error
+  - Most recent iteration feedback
+  - Metrics from previous evaluations (TC, max_diff, mean_diff)
 
-1. **Agent Step Limits**: Agents default to `max_steps=80`. Long problems may hit this limit.
+**3. HA Specification Validation** (`utils/ha_spec_validator.py`):
+- Extracts JSON from agent output (handles markdown code blocks)
+- Validates against JSON Schema
+- Auto-fixes common errors (missing fields, type mismatches)
+- Returns preprocessed spec for evaluation
 
-2. **Image Resolution**: Tools receive compressed images (~1080px) in initial prompt, but can access high-res via `worker_agent.markdown_content_high_res_image`.
+**4. Evaluation with Feedback** (`evaluate_ha_specification_with_feedback()`):
+- Simulates HA against ground truth `.npz` data
+- Computes metrics: TC (change-point error), max_diff, mean_diff, RMSE
+- Generates plots: overlay (HA vs GT), separate subplots
+- Returns structured feedback for next iteration
 
-3. **Input Time Indexing**: In HA evaluation, `input_array[i]` corresponds to time `(i+1)*dt`, not `i*dt`. The `analyticalInput()` function handles this automatically.
+### Key Design Patterns
 
-4. **Mode Numbering**: HA modes are 1-indexed (not 0-indexed). Ground truth mode IDs should match learned mode IDs after bipartite matching.
+**Dynamic Template Generation**:
+```python
+# Auto-detects num_variables and num_inputs from .npz file
+num_variables, num_inputs = get_data_dimensions(input_data_path)
+# Generates HA template with pre-filled var and input fields
+dynamic_ha_template = generate_dynamic_ha_template(num_variables, num_inputs)
+```
 
-5. **Tool Injection Timing**: Always inject `worker_agent` reference **after** agent creation but **before** calling `agent.run()`.
+**Managed Agent State Injection**:
+```python
+# NPZ file paths are injected into managed agent state
+managed_agent.python_executor.state["DATA_FILE_PATHS"] = npz_paths_list
+managed_agent.python_executor.state["DATA_FILE_PATH"] = npz_paths_list[0]
+```
 
-6. **API Key Precedence**: Scripts load from `.env` file. Ensure correct API base is set for the model provider being used.
+**Top-K Diverse Feedback Selection**:
+```python
+# From utils/utils.py ResultsAggregator.get_top_k_feedback()
+# Sorts by error, then filters by minimum gap for diversity
+for result in sorted_results:
+    if result.error_value - last_accepted_error >= self.min_gap:
+        distinct_results.append(result)
+```
+
+## Important Caveats and Common Pitfalls
+
+### HA-Scientist Specific
+
+1. **Variable Count Mismatch**: The most common error is LLMs incorrectly converting higher-order ODEs to state-space form.
+   - Ground truth has 1 variable → Use `x1[2] = ...` (2nd-order ODE)
+   - LLM incorrectly outputs 2 variables → `x1[1] = x2[0], x2[1] = ...` ❌
+   - Fix: Pre-filled `var` and `input` fields in dynamic template prevent this
+
+2. **Input Time Indexing**: In HA evaluation, `input_array[i]` corresponds to time `(i+1)*dt`, not `i*dt`. The `analyticalInput()` function in `ODE_System.py:38-89` handles this automatically.
+
+3. **Mode Numbering**: HA modes are 1-indexed (not 0-indexed). Mode IDs must be `>= 1`.
+
+4. **Feedback Loop Design**:
+   - `feedback_top_k`: Too high → context overflow; too low → insufficient examples
+   - `feedback_min_gap`: Too small → redundant specs; too large → skip good examples
+   - Recommended: `top_k=3`, `min_gap=0.005` for most systems
+
+5. **Early Stopping**: The loop stops early if:
+   - Best error < `target_error` (default 0.01)
+   - No improvement for `no_improvement_patience` iterations (default 3)
+   - Near-perfect fit: error < 0.0001
+
+### General Agent Issues
+
+6. **Agent Step Limits**: Agents default to `max_steps=80`. Increase for complex tasks.
+
+7. **Image Resolution**: Tools receive compressed images (~1080px) in initial prompt, but can access high-res via `worker_agent.markdown_content_high_res_image`.
+
+8. **Tool Injection Timing**: Always inject `worker_agent` reference **after** agent creation but **before** calling `agent.run()`:
+   ```python
+   for toolName in agent.tools:
+       agent.tools[toolName].worker_agent = agent
+   ```
+
+9. **API Key Precedence**: Scripts load from `.env` file. Ensure correct API base is set:
+   - Gemini: `https://generativelanguage.googleapis.com/v1beta/openai/`
+   - OpenRouter: `https://openrouter.ai/api/v1`
+
+10. **Managed Agent File Access**:
+    - E2B sandbox: Files must be uploaded to sandbox first
+    - Local executor: Use absolute paths or inject via `state` dict
 
 ## Related Documentation
 
-- `README.md` - User-facing documentation, IPhO results
+**HA-Scientist:**
+- `README.md` - Project overview and usage instructions
 - `utils/Dainarx_code/HA_evaluation_README.md` - Detailed HA evaluation API
 - `utils/Dainarx_code/automata/json_readme.md` - HA JSON format specification
-- `.cursor/rules/method.mdc` - LLM-SR algorithm details
+- `prompts_ha/prompts.py` - HA specification documentation and JSON Schema
+- `task_prompts/iter_N_task.md` - Generated task prompts (auto-created during runs)
+
+**Physics Supernova (Legacy):**
 - Paper: [Physics Supernova ArXiv](https://arxiv.org/abs/2509.01659)
+- `GEMINI.md` - Gemini-specific configuration notes
+
+**Learning Notes:**
+- `learning_notes/` - Internal documentation and examples
+- `utils/Dainarx_code/error_analysis.md` - Error analysis for HA learning
