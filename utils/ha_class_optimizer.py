@@ -75,13 +75,34 @@ def inject_params_into_class(class_code: str, optimized_params: np.ndarray) -> s
     # Convert params to list format
     params_str = str(optimized_params.tolist())
 
-    # Pattern to match self.params = [...] assignment
-    pattern = r'(self\.params\s*=\s*)\[[^\]]*\]'
+    # Find the self.params = [ line and replace the entire array
+    # We need to handle multi-line arrays with comments containing brackets
+    lines = class_code.split('\n')
+    result_lines = []
+    in_params = False
+    bracket_count = 0
+    params_injected = False
 
-    # Replace with optimized params
-    updated_code = re.sub(pattern, rf'\1{params_str}', class_code, count=1)
+    for i, line in enumerate(lines):
+        if 'self.params' in line and '=' in line and not params_injected:
+            # Found the params assignment
+            in_params = True
+            bracket_count = line.count('[') - line.count(']')
+            # Replace with optimized params
+            result_lines.append(f"        self.params = {params_str}")
+            params_injected = True
+            if bracket_count == 0:
+                in_params = False
+        elif in_params:
+            # Skip lines that are part of the old params array
+            bracket_count += line.count('[') - line.count(']')
+            if bracket_count == 0:
+                in_params = False
+            # Don't append this line (it's part of the old params)
+        else:
+            result_lines.append(line)
 
-    return updated_code
+    return '\n'.join(result_lines)
 
 
 def optimize_ha_params(
@@ -206,7 +227,7 @@ def optimize_ha_params(
     if verbose:
         print(f"\n[Step 4/5] Running {optimizer_type} optimization ({n_iter} iterations)...")
 
-    search_space = auto_scale_search_space(initial_params, scale_factor=10.0)
+    search_space = auto_scale_search_space(initial_params, scale_factor=3.0)
 
     if optimizer_type == 'simulated_annealing':
         optimizer = SimulatedAnnealingOptimizer(search_space)
@@ -219,8 +240,7 @@ def optimize_ha_params(
     try:
         optimizer.search(
             objective_function,
-            n_iter=n_iter,
-            initialize={'warm_start': [initial_params_dict]}  # Start from initial guess
+            n_iter=n_iter
         )
     except Exception as e:
         raise ValueError(f"Optimization failed: {str(e)}\n{traceback.format_exc()}")

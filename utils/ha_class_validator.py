@@ -49,24 +49,33 @@ def extract_python_class_from_text(text: str) -> Optional[str]:
         return class_matches[0].strip()
 
     # Fallback: Search for class definition directly in text (no markdown)
-    pattern_direct = r'(class HybridAutomaton.*?)(?=\n(?:class\s|\Z))'
+    # Match until we hit final_answer, next class, or end of string
+    pattern_direct = r'(class HybridAutomaton.*?)(?=\n*(?:final_answer|class\s|\Z))'
     match_direct = re.search(pattern_direct, text, re.DOTALL)
 
     if match_direct:
-        return match_direct.group(1).strip()
+        code = match_direct.group(1).strip()
+        # Clean up any trailing whitespace or partial lines
+        lines = code.split('\n')
+        # Remove empty trailing lines
+        while lines and not lines[-1].strip():
+            lines.pop()
+        return '\n'.join(lines)
 
     return None
 
 
 def validate_python_class_syntax(class_code: str) -> Tuple[bool, List[str]]:
     """
-    Validate Python class syntax and structure.
+    Validate Python class syntax and structure (Pure Python workflow).
 
     Checks:
     1. Code compiles without syntax errors
     2. Class 'HybridAutomaton' is defined
-    3. Required methods exist: __init__, num_modes, mode_dynamics, guard_condition, reset_map, to_json
+    3. Required methods exist: __init__, num_modes, mode_dynamics, guard_condition, reset_map
     4. Method signatures are correct
+
+    Note: to_json() is NOT required for pure Python workflow (no JSON conversion needed).
 
     Args:
         class_code: Python class code as a string
@@ -111,14 +120,14 @@ def validate_python_class_syntax(class_code: str) -> Tuple[bool, List[str]]:
         errors.append("No 'HybridAutomaton' class found in code")
         return False, errors
 
-    # Check 3: Required methods
+    # Check 3: Required methods (PURE PYTHON - no to_json needed)
     required_methods = {
         '__init__': 1,      # 1 argument (self)
         'num_modes': 1,     # 1 argument (self)
         'mode_dynamics': 4, # 4 arguments (self, mode_id, x, u)
         'guard_condition': 5, # 5 arguments (self, source_mode, target_mode, x, u)
         'reset_map': 5,     # 5 arguments (self, source_mode, target_mode, x, u)
-        'to_json': 1        # 1 argument (self)
+        # Note: to_json is NOT required for pure Python workflow
     }
 
     # Extract method names from class
