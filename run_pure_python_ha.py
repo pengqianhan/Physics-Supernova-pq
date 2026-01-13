@@ -33,10 +33,14 @@ except ImportError:
 from smolagents import CodeAgent, LiteLLMModel
 
 # Local imports
-from utils.pure_python_workflow import generate_pure_python_task
+from utils.pure_python_workflow import generate_pure_python_task, IterationFeedback
 from utils.evaluate_pure_python_ha import evaluate_python_ha_class
 from utils.utils import IterationResult, ResultsAggregator
-from utils.ha_class_validator import extract_python_class_from_text, validate_python_class_syntax
+from utils.ha_class_validator import (
+    validate_python_class_syntax,
+    extract_structured_result
+)
+from utils.llm_evaluator import generate_llm_critique
 from utils.imgTools_ha import HybridAutomatonImageTool
 from utils.validateTools_ha import ValidateHASpecTool
 
@@ -150,23 +154,62 @@ def main():
         print(f"ITERATION {iteration}/{args.max_iterations}")
         print("#"*80 + "\n")
 
-        # Generate feedback from previous iterations
+        # Generate structured feedback from previous iterations
         if iteration == 1:
-            feedback = ""
+            feedback_list = None
         else:
-            feedback = aggregator.get_top_k_feedback()
-            latest = aggregator.get_latest_feedback()
-            if latest and latest not in feedback:
-                feedback += f"\n## Most Recent (Iter {iteration-1}):\n{latest}"
+            # Build IterationFeedback list from ALL previous results
+            # Include both successful and failed iterations for learning
+            feedback_list = []
+            included_iterations = set()
+
+            # First, add top-k successful results (ranked by error)
+            for res in aggregator.get_top_k_results():
+                feedback_list.append(IterationFeedback(
+                    iteration=res.iteration,
+                    analysis_process=res.analysis_process or "",
+                    class_code=res.class_code or "",
+                    metrics=res.metrics,
+                    llm_critique=res.llm_critique or "",
+                    error_value=res.error_value
+                ))
+                included_iterations.add(res.iteration)
+
+            # Then, add failed iterations (valuable for learning what NOT to do)
+            for res in aggregator.results:
+                if res.iteration not in included_iterations:
+                    # Include failed results with their error feedback
+                    error_critique = res.llm_critique or res.feedback or "(Failed iteration)"
+                    feedback_list.append(IterationFeedback(
+                        iteration=res.iteration,
+                        analysis_process=res.analysis_process or "",
+                        class_code=res.class_code or "",
+                        metrics=res.metrics,
+                        llm_critique=f"[FAILED] {error_critique}",
+                        error_value=res.error_value if res.error_value < float('inf') else -1.0  # Mark as failed
+                    ))
+                    included_iterations.add(res.iteration)
+
+            # Sort by iteration number for chronological order
+            feedback_list.sort(key=lambda x: x.iteration)
 
         # Generate task
         print(f"[{iteration}/4] Generating task...")
+        if feedback_list:
+            print(f"  Including feedback from {len(feedback_list)} previous iteration(s)")
+            for fb in feedback_list:
+                status = "FAILED" if fb.error_value < 0 or fb.llm_critique.startswith("[FAILED]") else "OK"
+                error_str = "N/A" if fb.error_value < 0 else f"{fb.error_value:.6f}"
+                print(f"    - Iter {fb.iteration} [{status}]: error={error_str}, analysis={len(fb.analysis_process)} chars")
+        else:
+            print(f"  No feedback available (first iteration)")
+
         task, images = generate_pure_python_task(
             input_data_path=args.input_data_path,
             num_variables=num_vars,
             num_inputs=num_inputs,
             iteration=iteration,
-            feedback=feedback,
+            feedback=feedback_list,
             tools_list=args.tools_list,
             manager_type="CodeAgent"
         )
@@ -177,7 +220,9 @@ def main():
         with open(os.path.join(task_dir, "task.md"), "w") as f:
             f.write(task)
 
-        print(f"✓ Task generated ({len(task)} chars)")
+        # Debug: verify feedback is in task
+        has_feedback_section = "## Previous Iterations" in task
+        print(f"✓ Task generated ({len(task)} chars, feedback_section={has_feedback_section})")
 
         # Run agent
         print(f"\n[{iteration}/4] Running agent...")
@@ -197,33 +242,42 @@ def main():
             ))
             continue
 
-        # Extract Python class
-        print(f"\n[{iteration}/4] Extracting Python class...")
+        # Extract structured result (analysis_process + class_code)
+        print(f"\n[{iteration}/4] Extracting structured result...")
 
-        # Try extracting from result string
         result_str = str(result)
         print(f"  Debug: result type = {type(result)}, result = {result_str[:100]}...")
-        class_code = extract_python_class_from_text(result_str)
-        if class_code:
-            print("  ✓ Extracted from result string")
-        else:
-            print(f"  ✗ Failed to extract from result (length={len(result_str)})")
 
-        # Fallback 1: Try extracting from agent logs (look for code execution steps)
+        # Use structured extraction
+        structured = extract_structured_result(result_str)
+        class_code = structured.class_code
+        analysis_process = structured.analysis_process
+
+        if class_code:
+            print("  ✓ Extracted class_code from result")
+        if analysis_process:
+            print(f"  ✓ Extracted analysis_process ({len(analysis_process)} chars)")
+
+        # Fallback 1: Try extracting from agent logs if no class_code
         if not class_code and hasattr(agent, 'logs'):
             print(f"  Trying fallback: extracting from agent logs ({len(agent.logs)} logs)...")
             for log in reversed(agent.logs):
-                # Check full log as string
                 log_str = str(log)
-                class_code = extract_python_class_from_text(log_str)
-                if class_code:
+                log_structured = extract_structured_result(log_str)
+                if log_structured.class_code:
+                    class_code = log_structured.class_code
+                    if not analysis_process and log_structured.analysis_process:
+                        analysis_process = log_structured.analysis_process
                     print("  ✓ Found code in log content")
                     break
 
                 # Check LLM output
                 if hasattr(log, 'llm_output') and log.llm_output:
-                    class_code = extract_python_class_from_text(str(log.llm_output))
-                    if class_code:
+                    llm_structured = extract_structured_result(str(log.llm_output))
+                    if llm_structured.class_code:
+                        class_code = llm_structured.class_code
+                        if not analysis_process and llm_structured.analysis_process:
+                            analysis_process = llm_structured.analysis_process
                         print("  ✓ Found code in LLM output")
                         break
 
@@ -232,8 +286,9 @@ def main():
                     for tool_call in log.tool_calls:
                         if hasattr(tool_call, 'arguments'):
                             args_str = str(tool_call.arguments)
-                            class_code = extract_python_class_from_text(args_str)
-                            if class_code:
+                            tool_structured = extract_structured_result(args_str)
+                            if tool_structured.class_code:
+                                class_code = tool_structured.class_code
                                 print("  ✓ Found code in tool call arguments")
                                 break
                     if class_code:
@@ -243,14 +298,13 @@ def main():
         if not class_code and hasattr(agent, 'python_executor'):
             print("  Trying fallback 2: extracting from executor state...")
             if hasattr(agent.python_executor, '_globals'):
-                # Try to get the source from the class object
                 if 'HybridAutomaton' in agent.python_executor._globals:
                     try:
                         class_obj = agent.python_executor._globals['HybridAutomaton']
                         class_code = inspect.getsource(class_obj)
                         print("  ✓ Extracted source using inspect.getsource()")
                     except (OSError, TypeError):
-                        pass  # Class was defined in exec(), no source available
+                        pass
 
         if not class_code:
             print("✗ Failed to extract Python class from agent output or logs")
@@ -260,7 +314,9 @@ def main():
                 metrics={},
                 feedback="Could not extract Python class from output",
                 success=False,
-                error_value=float('inf')
+                error_value=float('inf'),
+                analysis_process=analysis_process,
+                llm_critique="(Extraction failed - no class code found)"
             ))
             continue
 
@@ -275,11 +331,15 @@ def main():
                 feedback=f"Syntax errors: {errors}",
                 success=False,
                 error_value=float('inf'),
-                class_code=class_code
+                class_code=class_code,
+                analysis_process=analysis_process,
+                llm_critique=f"(Syntax validation failed: {errors})"
             ))
             continue
 
         print("✓ Python class extracted and validated")
+        if analysis_process:
+            print(f"  Analysis ({len(analysis_process)} chars): {analysis_process[:100]}...")
 
         # Evaluate
         print(f"\n[{iteration}/4] Evaluating...")
@@ -298,7 +358,21 @@ def main():
         print(f"\n{'✓' if success else '✗'} Evaluation {'succeeded' if success else 'failed'}")
         print(f"Error: {error_val:.6f}")
 
-        # Store result
+        # Generate LLM critique
+        print(f"\n[{iteration}/4] Generating LLM critique...")
+        if success:
+            llm_critique = generate_llm_critique(
+                class_code=opt_class,
+                metrics=metrics,
+                analysis_process=analysis_process,
+                model_id=args.manager_model
+            )
+            print(f"✓ Critique generated ({len(llm_critique)} chars)")
+        else:
+            llm_critique = f"Evaluation failed: {feedback_str}"
+            print(f"  (Skipped critique - evaluation failed)")
+
+        # Store result with all structured fields
         aggregator.add_result(IterationResult(
             iteration=iteration,
             ha_specification=None,  # No JSON in pure Python workflow
@@ -307,7 +381,9 @@ def main():
             success=success,
             error_value=error_val,
             class_code=opt_class,
-            optimized_params=opt_params
+            optimized_params=opt_params,
+            analysis_process=analysis_process,
+            llm_critique=llm_critique
         ))
 
         # Check early stopping

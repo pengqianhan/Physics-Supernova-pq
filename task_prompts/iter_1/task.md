@@ -178,7 +178,7 @@ Use this to refine your class in the next iteration!
 **Code Execution**: You can execute Python code to analyze data or test ideas
 
 ## Data Sources
-- **Trajectory plots**: 3 visualization(s) available
+- **Trajectory plots**: ['<image_0>', '<image_1>', '<image_2>']
 - **Raw data files**: ['<npz_0>', '<npz_1>', '<npz_2>']
 
 ## Starting Template (v0)
@@ -278,4 +278,23 @@ Generate a **complete, executable Python class** that:
 - Keep `self.input = "u1"` FIXED
 - Provide reasonable initial guesses for `self.params` (they will be auto-optimized)
 
-Output only the Python class code, no explanations before or after.
+
+## Required Output Format
+
+Your response MUST follow this exact structure:
+
+### Analysis Process
+[Write ~200 words explaining your analysis:
+- What patterns you observed in the trajectory data
+- How you determined the number of modes
+- What dynamics equations you inferred and why
+- Key assumptions or uncertainties]
+
+### Python Class
+```python
+class HybridAutomaton:
+    ...
+```
+
+IMPORTANT: Do not add any other sections. Output ONLY the analysis and the Python class.
+

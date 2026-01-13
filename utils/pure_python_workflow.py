@@ -5,8 +5,62 @@ Completely removes JSON dependency - direct Python class generation and iteratio
 """
 
 import os
-from typing import Tuple, List
+from typing import Tuple, List, Optional
+from dataclasses import dataclass
 from utils.markdown_utils import load_trace_data_from_filepath, markdown_to_plaintext, markdown_images_compress
+
+
+@dataclass
+class IterationFeedback:
+    """Structured feedback from one iteration."""
+    iteration: int
+    analysis_process: str
+    class_code: str
+    metrics: dict
+    llm_critique: str
+    error_value: float
+
+
+def format_iteration_feedback(fb: IterationFeedback) -> str:
+    """Format single iteration feedback for inclusion in task."""
+    # Check if this is a failed iteration
+    is_failed = fb.error_value < 0 or fb.llm_critique.startswith("[FAILED]")
+
+    # Format header based on success/failure
+    if is_failed:
+        header = f"### Iteration {fb.iteration} [FAILED]"
+    else:
+        header = f"### Iteration {fb.iteration} (Error: {fb.error_value:.6f})"
+
+    # Format metrics
+    metrics_str = ", ".join([
+        f"{k}: {v:.4f}" if isinstance(v, float) else f"{k}: {v}"
+        for k, v in fb.metrics.items()
+        if k in ['max_diff', 'mean_diff', 'tc', 'rmse']
+    ]) or "(No metrics - evaluation failed)"
+
+    # Truncate analysis and code
+    analysis_truncated = fb.analysis_process[:300] + "..." if len(fb.analysis_process) > 300 else fb.analysis_process
+    if not analysis_truncated:
+        analysis_truncated = "(No analysis provided)"
+
+    code_truncated = fb.class_code[:1000] + "\n# ... (truncated)" if len(fb.class_code) > 1000 else fb.class_code
+    if not code_truncated:
+        code_truncated = "# (No code extracted)"
+
+    return f"""{header}
+
+**Analysis**: {analysis_truncated}
+
+**Code**:
+```python
+{code_truncated}
+```
+
+**Metrics**: {metrics_str}
+
+**Expert Critique**: {fb.llm_critique}
+"""
 
 
 def generate_pure_python_task(
@@ -14,7 +68,7 @@ def generate_pure_python_task(
     num_variables: int,
     num_inputs: int,
     iteration: int = 1,
-    feedback: str = "",
+    feedback: Optional[List[IterationFeedback]] = None,
     tools_list: List[str] = None,
     manager_type: str = "CodeAgent"
 ) -> Tuple[str, list]:
@@ -28,7 +82,7 @@ def generate_pure_python_task(
         num_variables: Number of state variables
         num_inputs: Number of input variables
         iteration: Current iteration number
-        feedback: Feedback from previous iteration
+        feedback: List of IterationFeedback from previous iterations
         tools_list: Available tools
         manager_type: Type of agent
 
@@ -36,13 +90,16 @@ def generate_pure_python_task(
         task: Task prompt string
         images: Compressed trajectory images
     """
-    from prompts_ha.prompts_pure_python import get_python_class_task_prefix, get_feedback_section
+    from prompts_ha.prompts_pure_python import (
+        get_python_class_task_prefix,
+        STRUCTURED_OUTPUT_FORMAT
+    )
     from utils.ha_class_template import get_simple_ha_template
 
     # Load trace data
     markdown_content = load_trace_data_from_filepath(input_data_path)
-    image_paths_list = list(markdown_content.image_paths.keys())
-    npz_paths_list = list(markdown_content.npz_paths.keys())
+    image_placeholder_list = list(markdown_content.image_paths.keys())
+    npz_placeholder_list = list(markdown_content.npz_paths.keys())
 
     # Get compressed images for LLM
     compressed_trace_images = markdown_images_compress(markdown_content, max_short_side_pixels=1080)
@@ -63,8 +120,8 @@ def generate_pure_python_task(
 
     # Add data sources
     task += f"""## Data Sources
-- **Trajectory plots**: {len(image_paths_list)} visualization(s) available
-- **Raw data files**: {npz_paths_list}
+- **Trajectory plots**: {image_placeholder_list}
+- **Raw data files**: {npz_placeholder_list}
 
 """
 
@@ -87,11 +144,18 @@ Here's a minimal template with the correct structure. Your job is to fill in the
 
 """
 
-    # Add feedback from previous iteration
-    if feedback:
-        task += get_feedback_section(feedback)
+    # Add feedback from previous iterations (with LLM critique)
+    if feedback and len(feedback) > 0:
+        task += "\n## Previous Iterations (with Expert Critique)\n\n"
+        task += "Learn from these previous attempts and their expert critiques:\n\n"
+        for fb in feedback:
+            task += format_iteration_feedback(fb)
+            task += "\n---\n\n"
+        task += "Use the critiques above to improve your next attempt!\n\n"
 
-    # Final instructions
+    # Final instructions with structured output format
+    var_str = ', '.join([f'x{i+1}' for i in range(num_variables)])
+    input_str = ', '.join([f'u{i+1}' for i in range(num_inputs)]) if num_inputs > 0 else ''
     task += f"""
 ## Your Output
 
@@ -101,11 +165,11 @@ Generate a **complete, executable Python class** that:
 3. Implements all required methods (`__init__`, `num_modes`, `mode_dynamics`, `guard_condition`, `reset_map`)
 
 **Important**:
-- Keep `self.var = "{', '.join([f'x{i+1}' for i in range(num_variables)])}"` FIXED
-- Keep `self.input = "{', '.join([f'u{i+1}' for i in range(num_inputs)]) if num_inputs > 0 else ''}"` FIXED
+- Keep `self.var = "{var_str}"` FIXED
+- Keep `self.input = "{input_str}"` FIXED
 - Provide reasonable initial guesses for `self.params` (they will be auto-optimized)
 
-Output only the Python class code, no explanations before or after.
+{STRUCTURED_OUTPUT_FORMAT}
 """
 
     return task, compressed_trace_images

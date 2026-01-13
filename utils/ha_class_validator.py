@@ -8,7 +8,64 @@ and validation of class syntax and structure.
 import re
 import ast
 from typing import Tuple, List, Optional
+from dataclasses import dataclass
 import inspect
+
+
+@dataclass
+class StructuredAgentResult:
+    """Structured result from agent containing analysis and code."""
+    analysis_process: str
+    class_code: str
+    raw_output: str
+
+
+def extract_structured_result(text: str) -> StructuredAgentResult:
+    """
+    Extract analysis_process and class_code from agent output.
+
+    Expected format:
+    ### Analysis Process
+    [analysis text]
+
+    ### Python Class
+    ```python
+    class HybridAutomaton:
+        ...
+    ```
+
+    Args:
+        text: Raw text output from agent
+
+    Returns:
+        StructuredAgentResult with analysis_process and class_code
+    """
+    text_str = str(text)
+
+    # Extract analysis section (handles both ## and ### headers)
+    analysis_pattern = r'#{2,3}\s*Analysis\s*Process\s*\n(.*?)(?=#{2,3}\s*Python\s*Class|```python|$)'
+    analysis_match = re.search(analysis_pattern, text_str, re.DOTALL | re.IGNORECASE)
+    analysis_process = analysis_match.group(1).strip() if analysis_match else ""
+
+    # Fallback: Look for analysis without header (first paragraph before code)
+    if not analysis_process:
+        # Try to get text before the first code block
+        pre_code_pattern = r'^(.*?)(?=```python|class\s+HybridAutomaton)'
+        pre_code_match = re.search(pre_code_pattern, text_str, re.DOTALL)
+        if pre_code_match:
+            potential_analysis = pre_code_match.group(1).strip()
+            # Only use if it looks like analysis (> 50 chars, not just headers)
+            if len(potential_analysis) > 50 and not potential_analysis.startswith('#'):
+                analysis_process = potential_analysis
+
+    # Extract class code (reuse existing function)
+    class_code = extract_python_class_from_text(text_str) or ""
+
+    return StructuredAgentResult(
+        analysis_process=analysis_process,
+        class_code=class_code,
+        raw_output=text_str
+    )
 
 
 def extract_python_class_from_text(text: str) -> Optional[str]:

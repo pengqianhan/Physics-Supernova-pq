@@ -5,6 +5,28 @@ No JSON Schema, no conversion - direct Python class generation and iteration.
 Inspired by SR-Scientist's approach.
 """
 
+# Structured output format specification
+STRUCTURED_OUTPUT_FORMAT = """
+## Required Output Format
+
+Your response MUST follow this exact structure:
+
+### Analysis Process
+[Write ~200 words explaining your analysis:
+- What patterns you observed in the trajectory data
+- How you determined the number of modes
+- What dynamics equations you inferred and why
+- Key assumptions or uncertainties]
+
+### Python Class
+```python
+class HybridAutomaton:
+    ...
+```
+
+IMPORTANT: Do not add any other sections. Output ONLY the analysis and the Python class.
+"""
+
 # Concise documentation focused on Python class structure
 HA_PYTHON_CLASS_DOCS = """# Hybrid Automaton Python Class Specification
 

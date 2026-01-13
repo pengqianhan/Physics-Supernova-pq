@@ -116,9 +116,12 @@ class IterationResult:
     success: bool = False
     error_value: float = float('inf')
     timestamp: str = field(default_factory=lambda: datetime.now().strftime('%Y%m%d_%H%M%S'))
-    # New fields for Python class-based format
+    # Fields for Python class-based format
     class_code: Optional[str] = None  # Python class code (if class format used)
     optimized_params: Optional[np.ndarray] = None  # Optimized parameters (if optimization applied)
+    # Structured output fields
+    analysis_process: Optional[str] = None  # ~200 word analysis from agent
+    llm_critique: Optional[str] = None  # LLM-generated critique based on metrics
 
 
 class ResultsAggregator:
@@ -234,6 +237,30 @@ class ResultsAggregator:
         if not self.results:
             return ""
         return self.results[-1].feedback
+
+    def get_top_k_results(self) -> List[IterationResult]:
+        """
+        Get top-k diverse results as IterationResult objects.
+
+        Returns list of top-k best results with minimum gap diversity filtering.
+        """
+        valid_results = [
+            r for r in self.results
+            if r.success and r.error_value is not None and r.error_value < float('inf')
+        ]
+        sorted_results = sorted(valid_results, key=lambda x: x.error_value)
+
+        distinct_results: List[IterationResult] = []
+        last_error = float('-inf')
+
+        for result in sorted_results:
+            if result.error_value - last_error >= self.min_gap:
+                distinct_results.append(result)
+                last_error = result.error_value
+                if len(distinct_results) >= self.top_k:
+                    break
+
+        return distinct_results
 
     def should_early_stop(self,
                           target_error: float = 0.01,
