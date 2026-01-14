@@ -42,6 +42,7 @@ except ImportError:
 from smolagents import CodeAgent, LiteLLMModel
 
 from utils.pure_python_workflow import generate_pure_python_task, IterationFeedback
+from utils.markdown_utils import load_trace_data_from_filepath
 from utils.evaluate_pure_python_ha import evaluate_python_ha_class
 from utils.utils import IterationResult, ResultsAggregator
 from utils.ha_class_validator import validate_python_class_syntax, extract_structured_result
@@ -63,8 +64,15 @@ def get_data_dimensions(input_data_path: str) -> Tuple[int, int]:
     return num_vars, num_inputs
 
 
-def create_agent(model_id: str, tools_list: Optional[List[str]] = None) -> CodeAgent:
-    """Create CodeAgent with specified tools and base class in execution namespace."""
+def create_agent(model_id: str, tools_list: Optional[List[str]] = None, 
+                 input_data_path: Optional[str] = None) -> CodeAgent:
+    """Create CodeAgent with specified tools and base class in execution namespace.
+    
+    Args:
+        model_id: LLM model identifier
+        tools_list: List of tool names to include
+        input_data_path: Path to trace data directory (required for image analysis tool)
+    """
     model = LiteLLMModel(
         model_id=model_id,
         api_key=os.environ.get("GEMINI_API_KEY"),
@@ -92,6 +100,11 @@ def create_agent(model_id: str, tools_list: Optional[List[str]] = None) -> CodeA
     # This allows the agent to define classes that inherit from HybridAutomatonBase
     if hasattr(agent, 'python_executor') and hasattr(agent.python_executor, 'state'):
         agent.python_executor.state['HybridAutomatonBase'] = HybridAutomatonBase
+
+    # Set markdown_content_high_res_image for HybridAutomatonImageTool
+    # The tool extracts images from this attribute when called
+    if input_data_path:
+        agent.markdown_content_high_res_image = load_trace_data_from_filepath(input_data_path)
 
     for tool in agent.tools.values():
         if hasattr(tool, 'worker_agent'):
@@ -341,7 +354,7 @@ def main():
     num_vars, num_inputs = get_data_dimensions(args.input_data_path)
     print(f"Detected: {num_vars} var(s), {num_inputs} input(s)")
 
-    agent = create_agent(args.manager_model, args.tools_list)
+    agent = create_agent(args.manager_model, args.tools_list, args.input_data_path)
     aggregator = ResultsAggregator(top_k=args.feedback_top_k, min_gap=0.005)
 
     for iteration in range(1, args.max_iterations + 1):
