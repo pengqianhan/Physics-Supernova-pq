@@ -13,7 +13,7 @@ load_dotenv()
 class HybridAutomatonImageTool(Tool):
     """Image expert to analyse the plot of the data collected from the system. You MUST call this tool when you need to measure quantities from an image."""
 
-    name = "hybrid_automaton_image_analysis_tool"
+    name = "hybrid_automaton_image_analysis"
     description = (
         "Given an image reference (placeholder like <image_10>) and a question, "
         "return the image expert's answer about that image."
