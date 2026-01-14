@@ -20,7 +20,7 @@ class HybridAutomatonImageTool(Tool):
         "When you need to measure quantities from an image, you MUST call this tool for Accurate Measurements: measuring youself alone is not accurate enough and could lead to errors!"
     )
     inputs = {
-        "image_ref": {"type": "string", "description": "Placeholder identifying the image (e.g. <image_N>)"},
+        "image_ref": {"type": "string", "description": "Placeholder identifying the image (e.g. <image_0>, <image_1>, ...)"},
         "question": {"type": "string", "description": "Question to ask about the image"},
     }
     output_type = "string"
@@ -41,7 +41,7 @@ class HybridAutomatonImageTool(Tool):
         """Extract image bytes from markdown content using image reference like <image_1>.
 
         Args:
-            image_ref: Image reference placeholder (e.g. <image_N> or plain number)
+            image_ref: Image reference placeholder (e.g. <image_0>, <image_1>, ...)
 
         Returns:
             Image bytes from markdown content or None if not found
