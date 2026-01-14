@@ -7,7 +7,24 @@ Completely removes JSON dependency - direct Python class generation and iteratio
 import os
 from typing import Tuple, List, Optional
 from dataclasses import dataclass
+from PIL import Image
 from utils.markdown_utils import load_trace_data_from_filepath, markdown_to_plaintext, markdown_images_compress
+
+
+def load_and_compress_image(image_path: str, max_short_side_pixels: int = 1080) -> Optional[Image.Image]:
+    """Load an image from path and compress it if needed."""
+    if not image_path or not os.path.exists(image_path):
+        return None
+    try:
+        img = Image.open(image_path)
+        short_side = min(img.size)
+        if short_side > max_short_side_pixels:
+            scale = max_short_side_pixels / short_side
+            new_size = (int(img.size[0] * scale), int(img.size[1] * scale))
+            img = img.resize(new_size, Image.LANCZOS)
+        return img
+    except Exception:
+        return None
 
 
 @dataclass
@@ -19,6 +36,7 @@ class IterationFeedback:
     metrics: dict
     llm_critique: str
     error_value: float
+    plot_path: str = ""  # Path to visualization plot for this iteration
 
 
 def format_iteration_feedback(fb: IterationFeedback) -> str:
@@ -48,6 +66,12 @@ def format_iteration_feedback(fb: IterationFeedback) -> str:
     if not code_truncated:
         code_truncated = "# (No code extracted)"
 
+    # Format visualization reference with image placeholder
+    visualization_str = ""
+    if fb.plot_path:
+        # Use placeholder that will be replaced with actual image
+        visualization_str = f"\n**Visualization** (HA simulation vs ground truth): <eval_plot_iter_{fb.iteration}>"
+
     return f"""{header}
 
 **Analysis**: {analysis_truncated}
@@ -57,7 +81,7 @@ def format_iteration_feedback(fb: IterationFeedback) -> str:
 {code_truncated}
 ```
 
-**Metrics**: {metrics_str}
+**Metrics**: {metrics_str}{visualization_str}
 
 **Expert Critique**: {fb.llm_critique}
 """
@@ -145,13 +169,25 @@ Here's a minimal template with the correct structure. Your job is to fill in the
 """
 
     # Add feedback from previous iterations (with LLM critique)
+    # Also collect evaluation plot images to pass to LLM
+    eval_plot_images = []
     if feedback and len(feedback) > 0:
         task += "\n## Previous Iterations (with Expert Critique)\n\n"
         task += "Learn from these previous attempts and their expert critiques:\n\n"
+        task += "**Note**: Each iteration includes a visualization plot showing the HA simulation (colored lines) vs ground truth (black dashed lines). Use these plots to identify where your model diverges from the data.\n\n"
         for fb in feedback:
             task += format_iteration_feedback(fb)
             task += "\n---\n\n"
-        task += "Use the critiques above to improve your next attempt!\n\n"
+            # Load evaluation plot image if available
+            if fb.plot_path:
+                eval_img = load_and_compress_image(fb.plot_path)
+                if eval_img:
+                    eval_plot_images.append(eval_img)
+        task += "Use the critiques and visualization plots above to improve your next attempt!\n\n"
+
+    # Combine trace images with evaluation plot images
+    # Order: trace images first, then evaluation plots (matching placeholder order in task)
+    all_images = compressed_trace_images + eval_plot_images
 
     # Final instructions with structured output format
     var_str = ', '.join([f'x{i+1}' for i in range(num_variables)])
@@ -172,7 +208,7 @@ Generate a **complete, executable Python class** that:
 {STRUCTURED_OUTPUT_FORMAT}
 """
 
-    return task, compressed_trace_images
+    return task, all_images
 
 
 # Quick test

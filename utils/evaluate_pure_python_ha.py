@@ -51,11 +51,11 @@ def evaluate_python_ha_class(
     iteration: int = 1,
     optimization_iters: int = 100,
     optimizer_type: str = "simulated_annealing"
-) -> Tuple[bool, Dict, str, str, Optional[np.ndarray]]:
+) -> Tuple[bool, Dict, str, str, Optional[np.ndarray], Optional[str]]:
     """
     Evaluate Python class-based HA specification.
 
-    Returns: (success, metrics, feedback, optimized_class_code, optimized_params)
+    Returns: (success, metrics, feedback, optimized_class_code, optimized_params, plot_path)
     """
     print(f"\n{'='*60}\nEVALUATION (iter {iteration})\n{'='*60}")
 
@@ -66,12 +66,12 @@ def evaluate_python_ha_class(
     except Exception as e:
         import traceback
         traceback.print_exc()
-        return False, {}, f"Execution failed: {e}", class_code, None
+        return False, {}, f"Execution failed: {e}", class_code, None, None
 
     # Find NPZ file
     test_files = [f for f in os.listdir(input_data_path) if f.endswith('.npz')]
     if not test_files:
-        return False, {}, f"No .npz files in {input_data_path}", class_code, None
+        return False, {}, f"No .npz files in {input_data_path}", class_code, None, None
     npz_path = os.path.join(input_data_path, test_files[0])
 
     # Step 2: Optimize
@@ -110,7 +110,7 @@ def evaluate_python_ha_class(
     except Exception as e:
         import traceback
         traceback.print_exc()
-        return False, {}, f"Simulation failed: {e}", optimized_class_code, optimized_params
+        return False, {}, f"Simulation failed: {e}", optimized_class_code, optimized_params, None
 
     # Step 4: Generate feedback
     feedback = f"""## Iteration {iteration} Results
@@ -136,7 +136,7 @@ def evaluate_python_ha_class(
         f.write(feedback)
 
     print(f"Results saved to: {output_dir}")
-    return True, metrics, feedback, optimized_class_code, optimized_params
+    return True, metrics, feedback, optimized_class_code, optimized_params, plot_path
 
 
 # Test
@@ -149,7 +149,7 @@ if __name__ == "__main__":
     print("Testing evaluation with simple template:")
     print("="*80)
 
-    success, metrics, feedback, opt_class, opt_params = evaluate_python_ha_class(
+    success, metrics, feedback, opt_class, opt_params, plot_path = evaluate_python_ha_class(
         class_code=test_class,
         input_data_path="data_all/non_linear/duffing",
         output_dir="test_eval",
@@ -160,5 +160,6 @@ if __name__ == "__main__":
     if success:
         print("\n✓ Evaluation succeeded!")
         print(f"Metrics: {metrics}")
+        print(f"Plot saved to: {plot_path}")
     else:
         print(f"\n✗ Evaluation failed: {feedback}")

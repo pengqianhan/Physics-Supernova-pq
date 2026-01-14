@@ -125,7 +125,8 @@ def build_feedback_list(aggregator: ResultsAggregator) -> List[IterationFeedback
             class_code=res.class_code or "",
             metrics=res.metrics,
             llm_critique=res.llm_critique or "",
-            error_value=res.error_value
+            error_value=res.error_value,
+            plot_path=res.plot_path or ""
         ))
         included.add(res.iteration)
 
@@ -139,7 +140,8 @@ def build_feedback_list(aggregator: ResultsAggregator) -> List[IterationFeedback
                 class_code=res.class_code or "",
                 metrics=res.metrics,
                 llm_critique=f"[FAILED] {critique}",
-                error_value=-1.0 if res.error_value >= float('inf') else res.error_value
+                error_value=-1.0 if res.error_value >= float('inf') else res.error_value,
+                plot_path=res.plot_path or ""
             ))
 
     feedback_list.sort(key=lambda x: x.iteration)
@@ -158,7 +160,8 @@ def record_failure(aggregator: ResultsAggregator, iteration: int, reason: str,
         error_value=float('inf'),
         analysis_process=analysis,
         class_code=class_code,
-        llm_critique=f"({reason})"
+        llm_critique=f"({reason})",
+        plot_path=None
     ))
 
 
@@ -239,7 +242,7 @@ def main():
 
         # Evaluate
         print(f"[3/4] Evaluating...")
-        success, metrics, feedback_str, opt_class, opt_params = evaluate_python_ha_class(
+        success, metrics, feedback_str, opt_class, opt_params, plot_path = evaluate_python_ha_class(
             class_code=class_code,
             input_data_path=args.input_data_path,
             output_dir=os.path.join("evaluation_results", f"iter_{iteration}"),
@@ -268,7 +271,8 @@ def main():
             class_code=opt_class,
             optimized_params=opt_params,
             analysis_process=analysis,
-            llm_critique=llm_critique
+            llm_critique=llm_critique,
+            plot_path=plot_path
         ))
 
         # Early stopping check

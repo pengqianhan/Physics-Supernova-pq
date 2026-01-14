@@ -82,6 +82,8 @@ class IterationResult:
     # Structured output fields
     analysis_process: Optional[str] = None  # ~200 word analysis from agent
     llm_critique: Optional[str] = None  # LLM-generated critique based on metrics
+    # Visualization feedback
+    plot_path: Optional[str] = None  # Path to evaluation visualization plot
 
 
 class ResultsAggregator:
