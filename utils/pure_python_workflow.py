@@ -41,49 +41,29 @@ class IterationFeedback:
 
 def format_iteration_feedback(fb: IterationFeedback) -> str:
     """Format single iteration feedback for inclusion in task."""
-    # Check if this is a failed iteration
     is_failed = fb.error_value < 0 or fb.llm_critique.startswith("[FAILED]")
+    status = "FAILED" if is_failed else f"error={fb.error_value:.4f}"
 
-    # Format header based on success/failure
-    if is_failed:
-        header = f"### Iteration {fb.iteration} [FAILED]"
-    else:
-        header = f"### Iteration {fb.iteration} (Error: {fb.error_value:.6f})"
-
-    # Format metrics
+    # Key metrics only
     metrics_str = ", ".join([
-        f"{k}: {v:.4f}" if isinstance(v, float) else f"{k}: {v}"
+        f"{k}={v:.4f}" if isinstance(v, float) else f"{k}={v}"
         for k, v in fb.metrics.items()
-        if k in ['max_diff', 'mean_diff', 'tc', 'rmse']
-    ]) or "(No metrics - evaluation failed)"
+        if k in ['max_diff', 'mean_diff', 'tc']
+    ]) or "N/A"
 
-    # Truncate analysis and code
-    analysis_truncated = fb.analysis_process[:300] + "..." if len(fb.analysis_process) > 300 else fb.analysis_process
-    if not analysis_truncated:
-        analysis_truncated = "(No analysis provided)"
-
-    code_truncated = fb.class_code[:1000] + "\n# ... (truncated)" if len(fb.class_code) > 1000 else fb.class_code
+    # Truncate code more aggressively
+    code_truncated = fb.class_code[:600] + "\n# ..." if len(fb.class_code) > 600 else fb.class_code
     if not code_truncated:
-        code_truncated = "# (No code extracted)"
+        code_truncated = "# (No code)"
 
-    # Format visualization reference with image placeholder
-    visualization_str = ""
-    if fb.plot_path:
-        # Use placeholder that will be replaced with actual image
-        visualization_str = f"\n**Visualization** (HA simulation vs ground truth): <eval_plot_iter_{fb.iteration}>"
+    # Visualization reference
+    viz_str = f" | Plot: <iter_{fb.iteration}_plot>" if fb.plot_path else ""
 
-    return f"""{header}
-
-**Analysis**: {analysis_truncated}
-
-**Code**:
+    return f"""### Iter {fb.iteration} [{status}] {metrics_str}{viz_str}
 ```python
 {code_truncated}
 ```
-
-**Metrics**: {metrics_str}{visualization_str}
-
-**Expert Critique**: {fb.llm_critique}
+**Critique**: {fb.llm_critique}
 """
 
 
@@ -131,79 +111,49 @@ def generate_pure_python_task(
     # Build task prompt
     task = get_python_class_task_prefix(num_variables, num_inputs, iteration)
 
-    # Add tool/agent information
-    task += "\n## Available Resources\n"
-
-    if tools_list and len(tools_list) > 0:
-        task += f"**Tools**: You have access to: {', '.join(tools_list)}\n"
-        task += "- Use `hybrid_automaton_image_analysis` to get vision model insights on trajectory patterns\n"
-        task += "- Use `validate_hybrid_automaton_specification` to check your class syntax before submission\n\n"
-
-    if manager_type == "CodeAgent":
-        task += "**Code Execution**: You can execute Python code to analyze data or test ideas\n\n"
-
-    # Add data sources
-    task += f"""## Data Sources
-- **Trajectory plots**: {image_placeholder_list}
-- **Raw data files**: {npz_placeholder_list}
+    # Add data and tools info (concise)
+    task += f"""## Data
+- Plots: {image_placeholder_list}
+- NPZ files: {npz_placeholder_list}
 
 """
+    if tools_list:
+        task += f"**Tools**: {', '.join(tools_list)}\n\n"
 
     # Add initial template for first iteration
     if iteration == 1:
         initial_template = get_simple_ha_template(num_variables, num_inputs)
-        task += f"""## Starting Template (v0)
-
-Here's a minimal template with the correct structure. Your job is to fill in the correct:
-- Number of modes (`num_modes()`)
-- Dynamics equations (`mode_dynamics()`)
-- Guard conditions (`guard_condition()`)
-- Reset logic (`reset_map()` if needed)
+        task += f"""## Template
+Fill in: `num_modes()`, `mode_dynamics()`, `guard_condition()`, `reset_map()`
 
 ```python
 {initial_template}
 ```
 
-**Replace the TODO placeholders with your inferred dynamics!**
-
 """
 
-    # Add feedback from previous iterations (with LLM critique)
-    # Also collect evaluation plot images to pass to LLM
+    # Add feedback from previous iterations
     eval_plot_images = []
     if feedback and len(feedback) > 0:
-        task += "\n## Previous Iterations (with Expert Critique)\n\n"
-        task += "Learn from these previous attempts and their expert critiques:\n\n"
-        task += "**Note**: Each iteration includes a visualization plot showing the HA simulation (colored lines) vs ground truth (black dashed lines). Use these plots to identify where your model diverges from the data.\n\n"
+        task += "## Previous Attempts\n\n"
         for fb in feedback:
             task += format_iteration_feedback(fb)
-            task += "\n---\n\n"
-            # Load evaluation plot image if available
+            task += "\n"
             if fb.plot_path:
                 eval_img = load_and_compress_image(fb.plot_path)
                 if eval_img:
                     eval_plot_images.append(eval_img)
-        task += "Use the critiques and visualization plots above to improve your next attempt!\n\n"
 
     # Combine trace images with evaluation plot images
     # Order: trace images first, then evaluation plots (matching placeholder order in task)
     all_images = compressed_trace_images + eval_plot_images
 
-    # Final instructions with structured output format
+    # Final instructions
     var_str = ', '.join([f'x{i+1}' for i in range(num_variables)])
     input_str = ', '.join([f'u{i+1}' for i in range(num_inputs)]) if num_inputs > 0 else ''
     task += f"""
-## Your Output
-
-Generate a **complete, executable Python class** that:
-1. Accurately models the observed dynamics
-2. Uses `self.params` for all tunable numerical values
-3. Implements all required methods (`__init__`, `num_modes`, `mode_dynamics`, `guard_condition`, `reset_map`)
-
-**Important**:
-- Keep `self.var = "{var_str}"` FIXED
-- Keep `self.input = "{input_str}"` FIXED
-- Provide reasonable initial guesses for `self.params` (they will be auto-optimized)
+## Output
+Generate complete Python class. Keep `self.var = "{var_str}"` and `self.input = "{input_str}"` FIXED.
 
 {STRUCTURED_OUTPUT_FORMAT}
 """

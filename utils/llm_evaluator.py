@@ -37,30 +37,15 @@ def create_critique_prompt(
     # Truncate code if too long
     code_display = class_code[:2000] + "\n# ... (truncated)" if len(class_code) > 2000 else class_code
 
-    return f"""You are an expert in Hybrid Automaton system identification.
+    return f"""Evaluate this Hybrid Automaton class and provide ~50 words of actionable feedback.
 
-## Task
-Evaluate the following Hybrid Automaton Python class and provide constructive feedback.
+**Metrics**: {metrics_str}
 
-## Original Analysis (by the generating agent)
-{analysis_process if analysis_process else "(Not provided)"}
-
-## Python Class Code
 ```python
 {code_display}
 ```
 
-## Evaluation Metrics
-{metrics_str}
-
-## Your Critique (~100-150 words)
-Provide specific, actionable feedback on:
-1. **Dynamics accuracy**: Are the ODE equations likely correct based on metrics?
-2. **Mode structure**: Is the number of modes appropriate?
-3. **Parameter choices**: Are initial parameter values reasonable?
-4. **Improvement suggestions**: What specific changes could reduce error?
-
-Focus on actionable improvements. Be concise and specific. Do NOT repeat the code or metrics.
+Focus on: dynamics accuracy, mode count, parameter values, specific improvements to reduce error.
 """
 
 
