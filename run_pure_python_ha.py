@@ -70,7 +70,7 @@ def create_agent(model_id: str, tools_list: Optional[List[str]] = None) -> CodeA
 
     tool_map = {
         "hybrid_automaton_image_analysis": lambda: HybridAutomatonImageTool(
-            worker_agent=None, vision_model_id="gemini/gemini-2.5-flash-lite"
+            worker_agent=None, vision_model_id="gemini/gemini-flash-latest"
         ),
         "validate_hybrid_automaton_specification": ValidateHASpecTool
     }
