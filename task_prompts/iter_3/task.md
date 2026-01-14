@@ -6,7 +6,7 @@ You are a control systems engineer identifying a Hybrid Automaton from trajector
 ## System Information
 - **State variables**: x1, x2 (2 variables)
 - **Inputs**: (none) (0 input)
-- **Iteration**: 1
+- **Iteration**: 3
 
 ## Objective
 Generate a complete Python class implementing a Hybrid Automaton that accurately reproduces the observed dynamics.
@@ -181,88 +181,44 @@ Use this to refine your class in the next iteration!
 - **Trajectory plots**: ['<image_0>', '<image_1>', '<image_2>']
 - **Raw data files**: ['<npz_0>', '<npz_1>', '<npz_2>']
 
-## Starting Template (v0)
 
-Here's a minimal template with the correct structure. Your job is to fill in the correct:
-- Number of modes (`num_modes()`)
-- Dynamics equations (`mode_dynamics()`)
-- Guard conditions (`guard_condition()`)
-- Reset logic (`reset_map()` if needed)
+## Previous Iterations (with Expert Critique)
 
+Learn from these previous attempts and their expert critiques:
+
+**Note**: Each iteration includes a visualization plot showing the HA simulation (colored lines) vs ground truth (black dashed lines). Use these plots to identify where your model diverges from the data.
+
+### Iteration 1 [FAILED]
+
+**Analysis**: (No analysis provided)
+
+**Code**:
 ```python
-class HybridAutomaton:
-    """
-    Hybrid Automaton specification.
-
-    TODO: Infer the correct dynamics, modes, and switching conditions from data.
-    """
-
-    def __init__(self):
-        # Numerical parameters (tune these to fit the data)
-        self.params = [
-            0.0,  # params[0]: placeholder
-            0.0,  # params[1]: placeholder
-            0.0,  # params[2]: placeholder
-            0.0,  # params[3]: placeholder
-            0.0,  # params[4]: placeholder
-            0.0, 0.0, 0.0, 0.0, 0.0  # params[5-9]: unused
-        ]
-
-        # System structure (FIXED - do not change these)
-        self.var = "x1, x2"
-        self.input = ""
-        self.dt = 0.001
-        self.total_time = 10.0
-        self.order = 1
-
-    def num_modes(self) -> int:
-        """Return number of discrete modes."""
-        # TODO: Determine correct number of modes from data
-        return 1
-
-    def mode_dynamics(self, mode_id: int, x: dict, u: dict) -> str:
-        """
-        Return ODE equation string for the given mode.
-
-        Args:
-            mode_id: Mode identifier (1-indexed)
-            x: State dict {var_name: [x[0], x[1], ...]}
-            u: Input dict {input_name: value}
-
-        Returns:
-            ODE equation string (e.g., "x1[2] = params[0]*x1[1] + params[1]*x1[0] + u1")
-        """
-        if mode_id == 1:
-            # TODO: Replace with correct dynamics
-            # For order=1 system, left side should be highest derivative
-            return f"x1[1] = {self.params[0]}*x1[0], x2[1] = {self.params[1]}*x2[0]"  # Coupled dynamics
-        else:
-            raise ValueError(f"Unknown mode_id: {mode_id}")
-
-    def guard_condition(self, source_mode: int, target_mode: int, x: dict, u: dict) -> bool:
-        """
-        Evaluate guard condition for mode transition.
-
-        Returns True if transition should occur.
-        """
-        # TODO: Add switching conditions if multiple modes exist
-        # Example: if source_mode == 1 and target_mode == 2:
-        #              return x['x1'][0] >= self.params[3]
-        return False
-
-    def reset_map(self, source_mode: int, target_mode: int, x: dict, u: dict):
-        """
-        Apply state reset on transition (modifies x in-place).
-
-        Leave empty if no resets needed.
-        """
-        # TODO: Add reset logic if needed
-        # Example: x['x1'][0] = -0.9 * x['x1'][0]
-        pass
-
+# (No code extracted)
 ```
 
-**Replace the TODO placeholders with your inferred dynamics!**
+**Metrics**: (No metrics - evaluation failed)
+
+**Expert Critique**: [FAILED] (Could not extract Python class)
+
+---
+
+### Iteration 2 [FAILED]
+
+**Analysis**: (No analysis provided)
+
+**Code**:
+```python
+# (No code extracted)
+```
+
+**Metrics**: (No metrics - evaluation failed)
+
+**Expert Critique**: [FAILED] (Could not extract Python class)
+
+---
+
+Use the critiques and visualization plots above to improve your next attempt!
 
 
 ## Your Output
