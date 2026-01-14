@@ -21,6 +21,17 @@ try:
 except ImportError:
     pass
 
+# === Agent 运行监控 (Phoenix - 免费本地方案) ===
+try:
+    from phoenix.otel import register
+    from openinference.instrumentation.smolagents import SmolagentsInstrumentor
+    register()
+    SmolagentsInstrumentor().instrument()
+    print("[Telemetry] Phoenix 监控已启用 - 访问 http://localhost:6006")
+except ImportError:
+    print("[Telemetry] Phoenix 未安装，跳过监控。安装: pip install arize-phoenix openinference-instrumentation-smolagents")
+# =============================================
+
 from smolagents import CodeAgent, LiteLLMModel
 
 from utils.pure_python_workflow import generate_pure_python_task, IterationFeedback
