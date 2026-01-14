@@ -1,15 +1,9 @@
-"""
-Validation utilities for Python class-based Hybrid Automaton specifications.
-
-This module handles extraction of Python classes from LLM output (markdown code blocks)
-and validation of class syntax and structure.
-"""
+"""Validation utilities for Python class-based Hybrid Automaton specifications."""
 
 import re
 import ast
 from typing import Tuple, List, Optional
 from dataclasses import dataclass
-import inspect
 
 
 @dataclass
@@ -20,309 +14,131 @@ class StructuredAgentResult:
     raw_output: str
 
 
+def extract_python_class_from_text(text: str) -> Optional[str]:
+    """Extract Python class code from text, handling markdown code blocks."""
+    # Try markdown code blocks first
+    for pattern in [r'```python\s*\n(.*?)```', r'```\s*\n(.*?)```']:
+        for match in re.findall(pattern, text, re.DOTALL):
+            if 'class HybridAutomaton' in match:
+                return match.strip()
+
+    # Fallback: direct class definition
+    match = re.search(r'(class HybridAutomaton.*?)(?=\n*(?:final_answer|class\s|\Z))', text, re.DOTALL)
+    if match:
+        lines = match.group(1).strip().split('\n')
+        while lines and not lines[-1].strip():
+            lines.pop()
+        return '\n'.join(lines)
+    return None
+
+
 def extract_structured_result(text: str) -> StructuredAgentResult:
-    """
-    Extract analysis_process and class_code from agent output.
-
-    Expected format:
-    ### Analysis Process
-    [analysis text]
-
-    ### Python Class
-    ```python
-    class HybridAutomaton:
-        ...
-    ```
-
-    Args:
-        text: Raw text output from agent
-
-    Returns:
-        StructuredAgentResult with analysis_process and class_code
-    """
+    """Extract analysis_process and class_code from agent output."""
     text_str = str(text)
 
-    # Extract analysis section (handles both ## and ### headers)
-    analysis_pattern = r'#{2,3}\s*Analysis\s*Process\s*\n(.*?)(?=#{2,3}\s*Python\s*Class|```python|$)'
-    analysis_match = re.search(analysis_pattern, text_str, re.DOTALL | re.IGNORECASE)
-    analysis_process = analysis_match.group(1).strip() if analysis_match else ""
+    # Extract analysis section
+    analysis = ""
+    match = re.search(r'#{2,3}\s*Analysis\s*Process\s*\n(.*?)(?=#{2,3}\s*Python|```python|$)',
+                      text_str, re.DOTALL | re.IGNORECASE)
+    if match:
+        analysis = match.group(1).strip()
 
-    # Fallback: Look for analysis without header (first paragraph before code)
-    if not analysis_process:
-        # Try to get text before the first code block
-        pre_code_pattern = r'^(.*?)(?=```python|class\s+HybridAutomaton)'
-        pre_code_match = re.search(pre_code_pattern, text_str, re.DOTALL)
-        if pre_code_match:
-            potential_analysis = pre_code_match.group(1).strip()
-            # Only use if it looks like analysis (> 50 chars, not just headers)
-            if len(potential_analysis) > 50 and not potential_analysis.startswith('#'):
-                analysis_process = potential_analysis
-
-    # Extract class code (reuse existing function)
-    class_code = extract_python_class_from_text(text_str) or ""
+    # Fallback: text before code block
+    if not analysis:
+        match = re.search(r'^(.*?)(?=```python|class\s+HybridAutomaton)', text_str, re.DOTALL)
+        if match:
+            potential = match.group(1).strip()
+            if len(potential) > 50 and not potential.startswith('#'):
+                analysis = potential
 
     return StructuredAgentResult(
-        analysis_process=analysis_process,
-        class_code=class_code,
+        analysis_process=analysis,
+        class_code=extract_python_class_from_text(text_str) or "",
         raw_output=text_str
     )
 
 
-def extract_python_class_from_text(text: str) -> Optional[str]:
-    """
-    Extract Python class code from text, handling markdown code blocks.
-
-    Searches for:
-    1. Code blocks with ```python or ``` markers
-    2. Class definitions starting with 'class HybridAutomaton'
-
-    Args:
-        text: Input text containing Python code (may include markdown)
-
-    Returns:
-        Extracted Python class code as a string, or None if not found
-
-    Examples:
-        >>> text = '```python\\nclass HybridAutomaton:\\n    pass\\n```'
-        >>> extract_python_class_from_text(text)
-        'class HybridAutomaton:\\n    pass'
-    """
-    # Pattern 1: Look for code blocks with python marker
-    pattern_python = r'```python\s*\n(.*?)```'
-    matches_python = re.findall(pattern_python, text, re.DOTALL)
-
-    # Pattern 2: Look for generic code blocks
-    pattern_generic = r'```\s*\n(.*?)```'
-    matches_generic = re.findall(pattern_generic, text, re.DOTALL)
-
-    # Combine all matches
-    all_matches = matches_python + matches_generic
-
-    # Filter for blocks containing 'class HybridAutomaton'
-    class_matches = [m for m in all_matches if 'class HybridAutomaton' in m]
-
-    if class_matches:
-        # Return the first match containing the class definition
-        return class_matches[0].strip()
-
-    # Fallback: Search for class definition directly in text (no markdown)
-    # Match until we hit final_answer, next class, or end of string
-    pattern_direct = r'(class HybridAutomaton.*?)(?=\n*(?:final_answer|class\s|\Z))'
-    match_direct = re.search(pattern_direct, text, re.DOTALL)
-
-    if match_direct:
-        code = match_direct.group(1).strip()
-        # Clean up any trailing whitespace or partial lines
-        lines = code.split('\n')
-        # Remove empty trailing lines
-        while lines and not lines[-1].strip():
-            lines.pop()
-        return '\n'.join(lines)
-
-    return None
+REQUIRED_METHODS = {
+    '__init__': 1, 'num_modes': 1, 'mode_dynamics': 4,
+    'guard_condition': 5, 'reset_map': 5
+}
 
 
 def validate_python_class_syntax(class_code: str) -> Tuple[bool, List[str]]:
-    """
-    Validate Python class syntax and structure (Pure Python workflow).
-
-    Checks:
-    1. Code compiles without syntax errors
-    2. Class 'HybridAutomaton' is defined
-    3. Required methods exist: __init__, num_modes, mode_dynamics, guard_condition, reset_map
-    4. Method signatures are correct
-
-    Note: to_json() is NOT required for pure Python workflow (no JSON conversion needed).
-
-    Args:
-        class_code: Python class code as a string
-
-    Returns:
-        Tuple of (is_valid, error_messages)
-        - is_valid: True if all checks pass
-        - error_messages: List of error messages (empty if valid)
-
-    Examples:
-        >>> code = "class HybridAutomaton:\\n    def __init__(self): pass"
-        >>> is_valid, errors = validate_python_class_syntax(code)
-        >>> is_valid
-        False
-        >>> 'num_modes' in ' '.join(errors)
-        True
-    """
+    """Validate Python class syntax and structure."""
     errors = []
 
-    # Check 1: Syntax - Try to compile
-    try:
-        compile(class_code, '<string>', 'exec')
-    except SyntaxError as e:
-        errors.append(f"Syntax error at line {e.lineno}: {e.msg}")
-        return False, errors
-
-    # Check 2: Parse AST to find class definition
+    # Syntax check
     try:
         tree = ast.parse(class_code)
-    except Exception as e:
-        errors.append(f"Failed to parse code: {str(e)}")
-        return False, errors
+    except SyntaxError as e:
+        return False, [f"Syntax error at line {e.lineno}: {e.msg}"]
 
-    # Find HybridAutomaton class
-    ha_class = None
-    for node in ast.walk(tree):
-        if isinstance(node, ast.ClassDef) and node.name == 'HybridAutomaton':
-            ha_class = node
-            break
+    # Find class
+    ha_class = next((n for n in ast.walk(tree)
+                     if isinstance(n, ast.ClassDef) and n.name == 'HybridAutomaton'), None)
+    if not ha_class:
+        return False, ["No 'HybridAutomaton' class found"]
 
-    if ha_class is None:
-        errors.append("No 'HybridAutomaton' class found in code")
-        return False, errors
+    # Check methods
+    methods = {item.name: len(item.args.args)
+               for item in ha_class.body if isinstance(item, ast.FunctionDef)}
 
-    # Check 3: Required methods (PURE PYTHON - no to_json needed)
-    required_methods = {
-        '__init__': 1,      # 1 argument (self)
-        'num_modes': 1,     # 1 argument (self)
-        'mode_dynamics': 4, # 4 arguments (self, mode_id, x, u)
-        'guard_condition': 5, # 5 arguments (self, source_mode, target_mode, x, u)
-        'reset_map': 5,     # 5 arguments (self, source_mode, target_mode, x, u)
-        # Note: to_json is NOT required for pure Python workflow
-    }
+    for name, expected in REQUIRED_METHODS.items():
+        if name not in methods:
+            errors.append(f"Missing: {name}()")
+        elif methods[name] != expected:
+            errors.append(f"{name}() has {methods[name]} args, expected {expected}")
 
-    # Extract method names from class
-    class_methods = {}
-    for item in ha_class.body:
-        if isinstance(item, ast.FunctionDef):
-            # Count arguments (including self)
-            num_args = len(item.args.args)
-            class_methods[item.name] = num_args
-
-    # Check for missing methods
-    for method_name, expected_args in required_methods.items():
-        if method_name not in class_methods:
-            errors.append(f"Missing required method: {method_name}()")
-        elif class_methods[method_name] != expected_args:
-            errors.append(
-                f"Method {method_name}() has {class_methods[method_name]} arguments, "
-                f"expected {expected_args}"
-            )
-
-    # Check 4: __init__ should define params attribute
-    init_method = None
-    for item in ha_class.body:
-        if isinstance(item, ast.FunctionDef) and item.name == '__init__':
-            init_method = item
-            break
-
-    if init_method:
-        # Check if self.params is assigned
-        has_params = False
-        for node in ast.walk(init_method):
-            if isinstance(node, ast.Assign):
-                for target in node.targets:
-                    if isinstance(target, ast.Attribute) and target.attr == 'params':
-                        has_params = True
-                        break
-
+    # Check params attribute
+    init = next((item for item in ha_class.body
+                 if isinstance(item, ast.FunctionDef) and item.name == '__init__'), None)
+    if init:
+        has_params = any(isinstance(n, ast.Assign) and
+                        any(isinstance(t, ast.Attribute) and t.attr == 'params'
+                            for t in n.targets)
+                        for n in ast.walk(init))
         if not has_params:
-            errors.append("__init__() method must define self.params attribute")
+            errors.append("__init__() must define self.params")
 
-    # Return validation result
-    is_valid = len(errors) == 0
-    return is_valid, errors
+    return len(errors) == 0, errors
 
 
 def auto_fix_common_class_issues(class_code: str) -> str:
-    """
-    Automatically fix common issues in Python class code.
+    """Fix common issues: tuple→list for params, add to_json stub."""
+    code = re.sub(r'(self\.params\s*=\s*)\((.*?)\)', r'\1[\2]', class_code, flags=re.DOTALL)
 
-    Fixes:
-    1. self.params = (...) → self.params = [...] (tuple to list)
-    2. Missing to_json() method → add stub
-    3. Inconsistent indentation
-
-    Args:
-        class_code: Python class code as a string
-
-    Returns:
-        Fixed class code as a string
-    """
-    fixed_code = class_code
-
-    # Fix 1: Convert params tuple to list
-    # Pattern: self.params = (val1, val2, ...)
-    pattern_tuple = r'(self\.params\s*=\s*)\((.*?)\)'
-    if re.search(pattern_tuple, fixed_code, re.DOTALL):
-        fixed_code = re.sub(pattern_tuple, r'\1[\2]', fixed_code, flags=re.DOTALL)
-
-    # Fix 2: Check if to_json() method exists
-    if 'def to_json(' not in fixed_code:
-        # Add stub to_json() method at the end of the class
-        # Find the last method and add after it
-        lines = fixed_code.split('\n')
-
-        # Find class indentation
-        class_line_idx = -1
-        for i, line in enumerate(lines):
-            if 'class HybridAutomaton' in line:
-                class_line_idx = i
-                break
-
-        if class_line_idx >= 0:
-            # Determine method indentation (typically 4 spaces)
-            method_indent = "    "
-
-            # Add to_json stub
-            stub = f'''
-{method_indent}def to_json(self):
-{method_indent}    """Convert to JSON format for compatibility with HybridAutomata.from_json()."""
-{method_indent}    # TODO: Implement JSON conversion
-{method_indent}    raise NotImplementedError("to_json() method not implemented")
+    if 'def to_json(' not in code:
+        stub = '''
+    def to_json(self):
+        raise NotImplementedError("to_json() not implemented")
 '''
-            # Append to end of class
-            lines.append(stub)
-            fixed_code = '\n'.join(lines)
+        code = code.rstrip() + stub
 
-    return fixed_code
+    return code
 
 
 def extract_initial_params_from_class(class_code: str) -> List[float]:
-    """
-    Extract the initial parameter values from the class's __init__ method.
-
-    Args:
-        class_code: Python class code as a string
-
-    Returns:
-        List of initial parameter values
-
-    Raises:
-        ValueError: If params cannot be extracted
-    """
-    # Execute class code in isolated namespace
+    """Extract initial parameter values from class's __init__ method."""
     namespace = {}
     try:
         exec(class_code, namespace)
     except Exception as e:
-        raise ValueError(f"Failed to execute class code: {str(e)}")
+        raise ValueError(f"Failed to execute: {e}")
 
-    # Instantiate and get params
     if 'HybridAutomaton' not in namespace:
         raise ValueError("No HybridAutomaton class found")
 
     try:
-        ha_instance = namespace['HybridAutomaton']()
+        ha = namespace['HybridAutomaton']()
     except Exception as e:
-        raise ValueError(f"Failed to instantiate class: {str(e)}")
+        raise ValueError(f"Failed to instantiate: {e}")
 
-    if not hasattr(ha_instance, 'params'):
-        raise ValueError("Class instance has no 'params' attribute")
+    if not hasattr(ha, 'params'):
+        raise ValueError("No 'params' attribute")
 
-    params = ha_instance.params
-    if isinstance(params, list):
-        return params
-    elif hasattr(params, 'tolist'):  # numpy array
-        return params.tolist()
-    else:
-        raise ValueError(f"params must be list or array, got {type(params)}")
+    params = ha.params
+    return params.tolist() if hasattr(params, 'tolist') else list(params)
 
 
 if __name__ == "__main__":

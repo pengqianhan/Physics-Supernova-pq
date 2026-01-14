@@ -2,7 +2,7 @@ import numpy as np
 import json
 from datetime import datetime
 from typing import List, Dict, Tuple, Optional
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
 import sys
 import os
 
@@ -10,100 +10,60 @@ import os
 @dataclass
 class HAHyperparameters:
     """Stores hyperparameters for HA learning experiments."""
-    # Manager agent configuration
     manager_model: str = ""
     manager_type: str = "CodeAgent"
-
-    # Managed agents configuration
     managed_agents_count: int = 0
     managed_agents_list: List[str] = field(default_factory=list)
     managed_agents_model: str = ""
-
-    # Tools configuration
     tools_list: List[str] = field(default_factory=list)
     image_tool_model: str = ""
     review_tool_model: str = ""
     summarize_tool_model: str = ""
-
-    # Iteration and feedback configuration
     max_iterations: int = 3
     feedback_top_k: int = 3
     feedback_min_gap: float = 0.005
     target_error: float = 0.01
     no_improvement_patience: int = 3
-
-    # Data configuration
     input_data_path: str = ""
     system_name: str = ""
     num_variables: int = 0
     num_inputs: int = 0
-
-    # Other configuration
     use_json_schema: bool = True
 
     def to_string(self) -> str:
         """Convert hyperparameters to a formatted string for logging."""
-        lines = [
-            "Experiment Hyperparameters",
-            "=" * 60,
-            "",
-            "--- Manager Agent ---",
-            f"Model: {self.manager_model}",
-            f"Type: {self.manager_type}",
-            "",
-            "--- Managed Agents ---",
-            f"Count: {self.managed_agents_count}",
-            f"Agent Names: {', '.join(self.managed_agents_list) if self.managed_agents_list else 'None'}",
-            f"Model: {self.managed_agents_model if self.managed_agents_model else 'N/A'}",
-            "",
-            "--- Tools ---",
-            f"Tools List: {', '.join(self.tools_list) if self.tools_list else 'None'}",
-            f"Image Tool Model: {self.image_tool_model if self.image_tool_model else 'N/A'}",
-            f"Review Tool Model: {self.review_tool_model if self.review_tool_model else 'N/A'}",
-            f"Summarize Tool Model: {self.summarize_tool_model if self.summarize_tool_model else 'N/A'}",
-            "",
-            "--- Iteration Configuration ---",
-            f"Max Iterations: {self.max_iterations}",
-            f"Feedback Top-K: {self.feedback_top_k}",
-            f"Feedback Min Gap: {self.feedback_min_gap}",
-            f"Target Error: {self.target_error}",
-            f"No Improvement Patience: {self.no_improvement_patience}",
-            "",
-            "--- Data Configuration ---",
-            f"Input Data Path: {self.input_data_path}",
-            f"System Name: {self.system_name}",
-            f"Num Variables: {self.num_variables}",
-            f"Num Inputs: {self.num_inputs}",
-            "",
-            "--- Other ---",
-            f"Use JSON Schema: {self.use_json_schema}",
-            "=" * 60,
+        sections = [
+            ("Manager Agent", [("Model", self.manager_model), ("Type", self.manager_type)]),
+            ("Managed Agents", [
+                ("Count", self.managed_agents_count),
+                ("Names", ', '.join(self.managed_agents_list) or 'None'),
+                ("Model", self.managed_agents_model or 'N/A')
+            ]),
+            ("Tools", [
+                ("List", ', '.join(self.tools_list) or 'None'),
+                ("Image Model", self.image_tool_model or 'N/A'),
+                ("Review Model", self.review_tool_model or 'N/A'),
+                ("Summarize Model", self.summarize_tool_model or 'N/A')
+            ]),
+            ("Iteration", [
+                ("Max", self.max_iterations), ("Top-K", self.feedback_top_k),
+                ("Min Gap", self.feedback_min_gap), ("Target Error", self.target_error),
+                ("Patience", self.no_improvement_patience)
+            ]),
+            ("Data", [
+                ("Path", self.input_data_path), ("System", self.system_name),
+                ("Variables", self.num_variables), ("Inputs", self.num_inputs)
+            ])
         ]
+        lines = ["Experiment Hyperparameters", "=" * 60]
+        for title, items in sections:
+            lines.extend(["", f"--- {title} ---"])
+            lines.extend(f"{k}: {v}" for k, v in items)
+        lines.extend(["", f"Use JSON Schema: {self.use_json_schema}", "=" * 60])
         return "\n".join(lines)
 
     def to_dict(self) -> Dict:
-        """Convert hyperparameters to a dictionary."""
-        return {
-            "manager_model": self.manager_model,
-            "manager_type": self.manager_type,
-            "managed_agents_count": self.managed_agents_count,
-            "managed_agents_list": self.managed_agents_list,
-            "managed_agents_model": self.managed_agents_model,
-            "tools_list": self.tools_list,
-            "image_tool_model": self.image_tool_model,
-            "review_tool_model": self.review_tool_model,
-            "summarize_tool_model": self.summarize_tool_model,
-            "max_iterations": self.max_iterations,
-            "feedback_top_k": self.feedback_top_k,
-            "feedback_min_gap": self.feedback_min_gap,
-            "target_error": self.target_error,
-            "no_improvement_patience": self.no_improvement_patience,
-            "input_data_path": self.input_data_path,
-            "system_name": self.system_name,
-            "num_variables": self.num_variables,
-            "num_inputs": self.num_inputs,
-            "use_json_schema": self.use_json_schema,
-        }
+        return asdict(self)
 
 
 @dataclass
@@ -125,18 +85,9 @@ class IterationResult:
 
 
 class ResultsAggregator:
-    """
-    Aggregates results across iterations for intelligent feedback selection.
-    Inspired by reference_code.py's _create_previous_turn_context pattern.
-    """
-    def __init__(self, top_k: int = 3, min_gap: float = 0.005):
-        """
-        Initialize the results aggregator.
+    """Aggregates results across iterations for intelligent feedback selection."""
 
-        Args:
-            top_k: Maximum number of distinct results to include in feedback
-            min_gap: Minimum error gap between selected results for diversity
-        """
+    def __init__(self, top_k: int = 3, min_gap: float = 0.005):
         self.results: List[IterationResult] = []
         self.top_k = top_k
         self.min_gap = min_gap
@@ -146,176 +97,95 @@ class ResultsAggregator:
     def add_result(self, result: IterationResult) -> None:
         """Add a new iteration result and update best tracking."""
         self.results.append(result)
-
         if result.success and result.error_value < self.best_error:
             self.best_error = result.error_value
             self.best_result = result
-            print(f"  [Aggregator] New best result! Error: {self.best_error:.6f}")
 
-    def get_top_k_feedback(self) -> str:
-        """
-        Generate feedback context from top-k diverse, best-performing specifications.
+    def _select_diverse_results(self) -> List[IterationResult]:
+        """Select top-k diverse results with minimum gap filtering."""
+        valid = [r for r in self.results
+                 if r.success and r.error_value is not None and r.error_value < float('inf')]
+        if not valid:
+            return []
 
-        Uses minimum gap filtering to ensure diverse examples (from reference_code.py pattern).
-
-        Returns:
-            Formatted feedback string with sorted, distinct results
-        """
-        # Filter successful results with valid error values
-        valid_results = [
-            r for r in self.results
-            if r.success and r.error_value is not None and r.error_value < float('inf')
-        ]
-
-        if not valid_results:
-            return ""
-
-        # Sort by error value (ascending - best first)
-        sorted_results = sorted(valid_results, key=lambda x: x.error_value)
-
-        # Select distinct results with minimum gap (diversity filtering)
-        distinct_results: List[IterationResult] = []
-        last_accepted_error = float('-inf')
-
-        for result in sorted_results:
-            if result.error_value - last_accepted_error >= self.min_gap:
-                distinct_results.append(result)
-                last_accepted_error = result.error_value
-                if len(distinct_results) >= self.top_k:
-                    break
-
-        if not distinct_results:
-            return ""
-
-        # Build structured feedback context
-        context_lines = [
-            "\n\n## Previously Explored HA Specifications",
-            "The following specifications have been explored in previous iterations.",
-            "Performance is ranked from best (lowest error) to worst. Use these as inspiration.",
-            "\n--- Explored Specifications (Ranked) ---"
-        ]
-
-        for i, result in enumerate(distinct_results, 1):
-            context_lines.append(f"\n### Rank {i} (Iteration {result.iteration})")
-            context_lines.append(f"**Error**: {result.error_value:.6f}")
-
-            # Show Python class code if available, otherwise JSON
-            if result.class_code:
-                # Python class format
-                class_code_str = result.class_code if len(result.class_code) <= 1500 else result.class_code[:1500] + "\n... (truncated)"
-                context_lines.append(f"**Format**: Python class")
-                context_lines.append(f"```python\n{class_code_str}\n```")
-
-                # Show optimized params if available
-                if result.optimized_params is not None:
-                    params_str = str(result.optimized_params.tolist()[:5]) + "..." if len(result.optimized_params) > 5 else str(result.optimized_params.tolist())
-                    context_lines.append(f"**Optimized Params**: {params_str}")
-            else:
-                # JSON format
-                ha_spec_str = json.dumps(result.ha_specification, indent=2) if result.ha_specification else "N/A"
-                # Truncate if too long
-                if len(ha_spec_str) > 1500:
-                    ha_spec_str = ha_spec_str[:1500] + "\n... (truncated)"
-                context_lines.append(f"**Format**: JSON")
-                context_lines.append(f"```json\n{ha_spec_str}\n```")
-
-            # Include key metrics if available
-            if result.metrics:
-                metrics_summary = ", ".join([
-                    f"{k}: {v:.4f}" if isinstance(v, float) else f"{k}: {v}"
-                    for k, v in result.metrics.items()
-                    if k in ['mean_diff', 'max_diff', 'tc', 'rmse']
-                ])
-                if metrics_summary:
-                    context_lines.append(f"**Metrics**: {metrics_summary}")
-
-        context_lines.append("\n-----------------------------------------\n")
-        return "\n".join(context_lines)
-
-    def get_latest_feedback(self) -> str:
-        """Get feedback from the most recent iteration only."""
-        if not self.results:
-            return ""
-        return self.results[-1].feedback
-
-    def get_top_k_results(self) -> List[IterationResult]:
-        """
-        Get top-k diverse results as IterationResult objects.
-
-        Returns list of top-k best results with minimum gap diversity filtering.
-        """
-        valid_results = [
-            r for r in self.results
-            if r.success and r.error_value is not None and r.error_value < float('inf')
-        ]
-        sorted_results = sorted(valid_results, key=lambda x: x.error_value)
-
-        distinct_results: List[IterationResult] = []
+        sorted_results = sorted(valid, key=lambda x: x.error_value)
+        selected = []
         last_error = float('-inf')
 
-        for result in sorted_results:
-            if result.error_value - last_error >= self.min_gap:
-                distinct_results.append(result)
-                last_error = result.error_value
-                if len(distinct_results) >= self.top_k:
+        for r in sorted_results:
+            if r.error_value - last_error >= self.min_gap:
+                selected.append(r)
+                last_error = r.error_value
+                if len(selected) >= self.top_k:
                     break
+        return selected
 
-        return distinct_results
+    def get_top_k_results(self) -> List[IterationResult]:
+        """Get top-k diverse results as IterationResult objects."""
+        return self._select_diverse_results()
 
-    def should_early_stop(self,
-                          target_error: float = 0.01,
-                          min_iterations: int = 2,
+    def get_top_k_feedback(self) -> str:
+        """Generate feedback context from top-k diverse specifications."""
+        results = self._select_diverse_results()
+        if not results:
+            return ""
+
+        lines = [
+            "\n\n## Previously Explored HA Specifications",
+            "Performance ranked from best to worst.\n"
+        ]
+
+        for i, r in enumerate(results, 1):
+            lines.append(f"### Rank {i} (Iteration {r.iteration}) - Error: {r.error_value:.6f}")
+
+            if r.class_code:
+                code = r.class_code[:1500] + "\n..." if len(r.class_code) > 1500 else r.class_code
+                lines.append(f"```python\n{code}\n```")
+                if r.optimized_params is not None:
+                    params = r.optimized_params.tolist()
+                    lines.append(f"Params: {params[:5]}{'...' if len(params) > 5 else ''}")
+            elif r.ha_specification:
+                spec = json.dumps(r.ha_specification, indent=2)
+                spec = spec[:1500] + "\n..." if len(spec) > 1500 else spec
+                lines.append(f"```json\n{spec}\n```")
+
+            if r.metrics:
+                m = ", ".join(f"{k}: {v:.4f}" if isinstance(v, float) else f"{k}: {v}"
+                             for k, v in r.metrics.items() if k in ['mean_diff', 'max_diff', 'tc', 'rmse'])
+                if m:
+                    lines.append(f"Metrics: {m}\n")
+
+        return "\n".join(lines)
+
+    def get_latest_feedback(self) -> str:
+        """Get feedback from the most recent iteration."""
+        return self.results[-1].feedback if self.results else ""
+
+    def should_early_stop(self, target_error: float = 0.01, min_iterations: int = 2,
                           no_improvement_patience: int = 3) -> Tuple[bool, str]:
-        """
-        Determine if early stopping criteria are met.
-
-        Inspired by reference_code.py's early termination logic.
-
-        Args:
-            target_error: Stop if best error falls below this threshold
-            min_iterations: Minimum iterations before allowing early stop
-            no_improvement_patience: Stop if no improvement for this many iterations
-
-        Returns:
-            Tuple of (should_stop, reason)
-        """
+        """Determine if early stopping criteria are met."""
         if len(self.results) < min_iterations:
             return False, ""
 
-        # Check target achieved
         if self.best_error < target_error:
-            return True, f"Target error achieved: {self.best_error:.6f} < {target_error}"
+            return True, f"Target achieved: {self.best_error:.6f} < {target_error}"
 
-        # Check for very low error (near-perfect fit)
         if self.best_error < 0.0001:
-            return True, f"Near-perfect fit achieved: {self.best_error:.6e}"
+            return True, f"Near-perfect fit: {self.best_error:.6e}"
 
-        # Check for no improvement patience
         if len(self.results) >= no_improvement_patience:
-            recent_errors = [r.error_value for r in self.results[-no_improvement_patience:]]
-            if all(e >= self.best_error for e in recent_errors):
-                # Check if we've plateaued
-                error_range = max(recent_errors) - min(recent_errors)
-                if error_range < 0.001:  # Less than 0.1% variation
-                    return True, f"No improvement for {no_improvement_patience} iterations"
+            recent = [r.error_value for r in self.results[-no_improvement_patience:]]
+            if all(e >= self.best_error for e in recent) and max(recent) - min(recent) < 0.001:
+                return True, f"No improvement for {no_improvement_patience} iterations"
 
         return False, ""
 
     def get_dynamic_error_threshold(self) -> float:
-        """
-        Calculate dynamic error threshold based on current best.
-
-        Inspired by reference_code.py's adaptive MAPE target adjustment.
-        """
+        """Calculate dynamic error threshold based on current best."""
         if self.best_error >= float('inf') or self.best_error <= 0:
-            return 0.1  # Default threshold
-
-        # Set next target to one order of magnitude below current best
-        next_target = 10 ** np.floor(np.log10(self.best_error))
-        if next_target >= self.best_error:
-            next_target /= 10.0
-
-        return max(next_target, 1e-8)  # Floor at 1e-8
+            return 0.1
+        target = 10 ** np.floor(np.log10(self.best_error))
+        return max(target / 10.0 if target >= self.best_error else target, 1e-8)
 
 def evaluate_ha_specification(agent_result, input_data_path: str, output_dir: str = None) -> bool:
     """
