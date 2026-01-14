@@ -30,9 +30,9 @@ except ImportError:
 try:
     from phoenix.otel import register
     from openinference.instrumentation.smolagents import SmolagentsInstrumentor
-    register()
+    register(project_name="ha_llm")
     SmolagentsInstrumentor().instrument()
-    print("[Telemetry] Phoenix monitoring enabled - visit http://localhost:6006")
+    print("[Telemetry] Phoenix monitoring enabled (project: ha_llm) - visit http://localhost:6006")
 except ImportError:
     print("[Telemetry] Phoenix not installed. Install: pip install arize-phoenix openinference-instrumentation-smolagents")
 # =============================================
