@@ -1,5 +1,6 @@
 {
   "enabledPlugins": {
-    "planning-with-files@planning-with-files": true
+    "planning-with-files@planning-with-files": true,
+    "code-simplifier@claude-plugins-official": true
   }
 }
