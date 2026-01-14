@@ -12,10 +12,13 @@ Usage:
 """
 
 import os
+import json
 import argparse
 import inspect
 import numpy as np
-from typing import List, Optional, Tuple
+from datetime import datetime
+from typing import List, Optional, Tuple, Any, Dict
+from dataclasses import asdict
 
 try:
     from dotenv import load_dotenv
@@ -167,6 +170,135 @@ def build_feedback_list(aggregator: ResultsAggregator) -> List[IterationFeedback
     return feedback_list
 
 
+def save_reasoning_log(
+    log_dir: str,
+    iteration: int,
+    task_prompt: str,
+    agent,
+    result: Any,
+    class_code: str,
+    analysis: str,
+    metrics: Dict,
+    llm_critique: str,
+    append_to_master: bool = True
+) -> str:
+    """Save complete reasoning trace for an iteration.
+
+    Returns the path to the saved log file.
+    """
+    os.makedirs(log_dir, exist_ok=True)
+
+    # Extract memory steps from agent
+    memory_steps = []
+    if hasattr(agent, 'memory') and agent.memory:
+        for step in agent.memory.steps:
+            step_dict = {}
+            step_dict['type'] = type(step).__name__
+
+            # Convert dataclass to dict, handling non-serializable objects
+            try:
+                raw_dict = asdict(step)
+                # Clean up non-JSON-serializable items
+                for k, v in raw_dict.items():
+                    if isinstance(v, (str, int, float, bool, type(None))):
+                        step_dict[k] = v
+                    elif isinstance(v, (list, tuple)):
+                        step_dict[k] = [str(item) if not isinstance(item, (str, int, float, bool, type(None))) else item for item in v]
+                    elif isinstance(v, dict):
+                        step_dict[k] = {str(kk): str(vv) if not isinstance(vv, (str, int, float, bool, type(None))) else vv for kk, vv in v.items()}
+                    else:
+                        step_dict[k] = str(v)
+            except Exception:
+                # Fallback: just get string representations of attributes
+                for attr in ['llm_output', 'tool_calls', 'observations', 'error', 'model_output']:
+                    if hasattr(step, attr):
+                        val = getattr(step, attr)
+                        step_dict[attr] = str(val) if val is not None else None
+
+            memory_steps.append(step_dict)
+
+    # Build the complete log entry
+    log_entry = {
+        "iteration": iteration,
+        "timestamp": datetime.now().isoformat(),
+        "input_prompt": task_prompt,
+        "reasoning_steps": memory_steps,
+        "final_result": str(result) if result else None,
+        "extracted_class_code": class_code,
+        "analysis_process": analysis,
+        "evaluation_metrics": metrics,
+        "llm_critique": llm_critique
+    }
+
+    # Save individual iteration log (JSON)
+    iter_log_path = os.path.join(log_dir, f"iter_{iteration}_reasoning.json")
+    with open(iter_log_path, 'w', encoding='utf-8') as f:
+        json.dump(log_entry, f, indent=2, ensure_ascii=False)
+
+    # Also save a human-readable markdown version
+    md_path = os.path.join(log_dir, f"iter_{iteration}_reasoning.md")
+    with open(md_path, 'w', encoding='utf-8') as f:
+        f.write(f"# Iteration {iteration} Reasoning Trace\n\n")
+        f.write(f"**Timestamp:** {log_entry['timestamp']}\n\n")
+
+        f.write("## Input Prompt\n\n")
+        f.write("```\n")
+        f.write(task_prompt[:5000] + ("..." if len(task_prompt) > 5000 else ""))
+        f.write("\n```\n\n")
+
+        f.write("## Reasoning Steps\n\n")
+        for i, step in enumerate(memory_steps, 1):
+            f.write(f"### Step {i} ({step.get('type', 'Unknown')})\n\n")
+            if step.get('llm_output'):
+                f.write("**LLM Output:**\n```\n")
+                output = str(step['llm_output'])[:3000]
+                f.write(output + ("..." if len(str(step.get('llm_output', ''))) > 3000 else ""))
+                f.write("\n```\n\n")
+            if step.get('tool_calls'):
+                f.write(f"**Tool Calls:** {step['tool_calls']}\n\n")
+            if step.get('observations'):
+                f.write("**Observations:**\n```\n")
+                obs = str(step['observations'])[:2000]
+                f.write(obs + ("..." if len(str(step.get('observations', ''))) > 2000 else ""))
+                f.write("\n```\n\n")
+            if step.get('error'):
+                f.write(f"**Error:** {step['error']}\n\n")
+
+        f.write("## Extracted Class Code\n\n")
+        f.write("```python\n")
+        f.write(class_code if class_code else "(None extracted)")
+        f.write("\n```\n\n")
+
+        f.write("## Evaluation Metrics\n\n")
+        f.write(f"```json\n{json.dumps(metrics, indent=2)}\n```\n\n")
+
+        f.write("## LLM Critique\n\n")
+        f.write(llm_critique if llm_critique else "(No critique)")
+        f.write("\n")
+
+    # Append to master log file for all iterations
+    if append_to_master:
+        master_log_path = os.path.join(log_dir, "master_reasoning_log.json")
+        master_data = []
+        if os.path.exists(master_log_path):
+            try:
+                with open(master_log_path, 'r', encoding='utf-8') as f:
+                    master_data = json.load(f)
+            except json.JSONDecodeError:
+                master_data = []
+
+        # Replace or append this iteration
+        master_data = [e for e in master_data if e.get('iteration') != iteration]
+        master_data.append(log_entry)
+        master_data.sort(key=lambda x: x.get('iteration', 0))
+
+        with open(master_log_path, 'w', encoding='utf-8') as f:
+            json.dump(master_data, f, indent=2, ensure_ascii=False)
+
+    print(f"  [Log] Saved reasoning trace to {iter_log_path}")
+    return iter_log_path
+
+
 def record_failure(aggregator: ResultsAggregator, iteration: int, reason: str,
                    analysis: str = "", class_code: str = "") -> None:
     """Record a failed iteration result."""
@@ -196,6 +328,8 @@ def main():
                         default=["hybrid_automaton_image_analysis", "validate_hybrid_automaton_specification"])
     parser.add_argument("--target-error", type=float, default=0.01)
     parser.add_argument("--feedback-top-k", type=int, default=3)
+    parser.add_argument("--save-reasoning-log", type=str, default="reasoning_logs",
+                        help="Directory to save reasoning logs (set to empty string to disable)")
     args = parser.parse_args()
 
     print(f"\n{'='*60}\nPURE PYTHON HA LEARNING\n{'='*60}")
@@ -234,11 +368,19 @@ def main():
 
         # Run agent
         print(f"[1/4] Running agent...")
+        result = None
         try:
             result = agent.run(task, images=images)
         except Exception as e:
             print(f"Agent failed: {e}")
             record_failure(aggregator, iteration, f"Agent failed: {e}")
+            if args.save_reasoning_log:
+                save_reasoning_log(
+                    log_dir=args.save_reasoning_log, iteration=iteration,
+                    task_prompt=task, agent=agent, result=None,
+                    class_code="", analysis="", metrics={},
+                    llm_critique=f"[FAILED] Agent exception: {e}"
+                )
             continue
 
         # Extract class code
@@ -248,6 +390,13 @@ def main():
         if not class_code:
             print("Failed to extract class code")
             record_failure(aggregator, iteration, "Could not extract Python class", analysis)
+            if args.save_reasoning_log:
+                save_reasoning_log(
+                    log_dir=args.save_reasoning_log, iteration=iteration,
+                    task_prompt=task, agent=agent, result=result,
+                    class_code="", analysis=analysis, metrics={},
+                    llm_critique="[FAILED] Could not extract Python class from agent output"
+                )
             continue
 
         # Validate syntax
@@ -255,6 +404,13 @@ def main():
         if not is_valid:
             print(f"Validation failed: {errors}")
             record_failure(aggregator, iteration, f"Syntax errors: {errors}", analysis, class_code)
+            if args.save_reasoning_log:
+                save_reasoning_log(
+                    log_dir=args.save_reasoning_log, iteration=iteration,
+                    task_prompt=task, agent=agent, result=result,
+                    class_code=class_code, analysis=analysis, metrics={},
+                    llm_critique=f"[FAILED] Syntax validation errors: {errors}"
+                )
             continue
 
         print(f"Class extracted ({len(class_code)} chars)")
@@ -293,6 +449,20 @@ def main():
             llm_critique=llm_critique,
             plot_path=plot_path
         ))
+
+        # Save reasoning log if enabled
+        if args.save_reasoning_log:
+            save_reasoning_log(
+                log_dir=args.save_reasoning_log,
+                iteration=iteration,
+                task_prompt=task,
+                agent=agent,
+                result=result,
+                class_code=opt_class or class_code,
+                analysis=analysis,
+                metrics=metrics,
+                llm_critique=llm_critique
+            )
 
         # Early stopping check
         should_stop, reason = aggregator.should_early_stop(
