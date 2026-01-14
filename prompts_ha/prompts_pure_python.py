@@ -1,7 +1,7 @@
 """
 Simplified prompts for pure Python class-based Hybrid Automaton generation.
 
-No JSON Schema, no conversion - direct Python class generation and iteration.
+No JSON Schema, no conversion - direct Python class generation with inheritance.
 Inspired by SR-Scientist's approach.
 """
 
@@ -20,14 +20,16 @@ Your response MUST follow this exact structure:
 
 ### Python Class
 ```python
-class HybridAutomaton:
+from utils.ha_base_class import HybridAutomatonBase
+
+class HybridAutomaton(HybridAutomatonBase):
     ...
 ```
 
 IMPORTANT: Do not add any other sections. Output ONLY the analysis and the Python class.
 """
 
-# Concise documentation focused on Python class structure
+# Concise documentation focused on Python class structure with inheritance
 HA_PYTHON_CLASS_DOCS = """# Hybrid Automaton Python Class Specification
 
 ## Core Concept
@@ -37,10 +39,14 @@ A **Hybrid Automaton** models systems with:
 - **Mode switching**: Guard conditions triggering transitions
 - **State resets**: Optional jumps when switching modes
 
-## Required Class Structure
+## Required Class Structure (with Inheritance)
+
+All classes MUST inherit from `HybridAutomatonBase`:
 
 ```python
-class HybridAutomaton:
+from utils.ha_base_class import HybridAutomatonBase
+
+class HybridAutomaton(HybridAutomatonBase):
     def __init__(self):
         # Tunable numerical parameters (will be optimized)
         self.params = [p0, p1, p2, ...]  # Max 10 parameters
@@ -89,74 +95,33 @@ class HybridAutomaton:
 
 ## Key Rules
 
-1. **Variable Count is FIXED**: `self.var` and `self.input` are pre-determined from data
+1. **MUST Inherit from Base Class**: Always use `class HybridAutomaton(HybridAutomatonBase):`
+   - Import: `from utils.ha_base_class import HybridAutomatonBase`
+   - This ensures consistent interface and provides utility methods
+
+2. **Variable Count is FIXED**: `self.var` and `self.input` are pre-determined from data
    - DO NOT change the number of variables
    - For single-variable systems, use higher-order ODEs (e.g., `x1[2] = ...` for 2nd order)
    - DO NOT split into multiple 1st-order variables
 
-2. **ODE Notation**:
+3. **ODE Notation**:
    - `x[0]` = variable value
    - `x[1]` = first derivative (dx/dt)
    - `x[2]` = second derivative (d²x/dt²)
    - Left side = highest derivative (e.g., `x1[2] = ...` for order=2)
 
-3. **Parameters**:
+4. **Parameters**:
    - Store ALL numerical values in `self.params` list
    - Use `self.params[i]` in equations (optimizer will tune these)
    - Max 10 parameters (params[0] through params[9])
 
-4. **Mode IDs**: Start from 1 (not 0)
+5. **Mode IDs**: Start from 1 (not 0)
 
-5. **Equation Strings**:
+6. **Equation Strings**:
    - Must be valid Python expressions
    - Reference params via `{self.params[i]}` in f-strings
    - Access inputs as `u['input_name']`
    - Example: `f"x1[2] = {self.params[0]}*x1[1] + {self.params[1]}*x1[0] + u['u1']"`
-
-## Common Patterns
-
-### Single-Mode Oscillator (Damped + Forced)
-```python
-def __init__(self):
-    self.params = [-0.5, -5.0, 1.0, 0, 0, 0, 0, 0, 0, 0]
-    self.var, self.input, self.order = "x1", "u1", 2
-
-def num_modes(self): return 1
-
-def mode_dynamics(self, mode_id, x, u):
-    # x'' = damping*x' + stiffness*x + gain*u
-    return f"x1[2] = {self.params[0]}*x1[1] + {self.params[1]}*x1[0] + {self.params[2]}*u['u1']"
-```
-
-### Two-Mode Switching System
-```python
-def __init__(self):
-    self.params = [2.0, -3.0, 1.5, 5.0, 0, 0, 0, 0, 0, 0]
-    # [k1, k2, threshold, ...]
-    self.var, self.input, self.order = "x1", "", 1
-
-def num_modes(self): return 2
-
-def mode_dynamics(self, mode_id, x, u):
-    if mode_id == 1:
-        return f"x1[1] = {self.params[0]}"  # Constant rate mode 1
-    elif mode_id == 2:
-        return f"x1[1] = {self.params[1]}"  # Constant rate mode 2
-
-def guard_condition(self, source, target, x, u):
-    if source == 1 and target == 2:
-        return x['x1'][0] >= self.params[2]  # Switch up
-    elif source == 2 and target == 1:
-        return x['x1'][0] < self.params[3]  # Switch down
-    return False
-```
-
-### Nonlinear System (e.g., Duffing)
-```python
-def mode_dynamics(self, mode_id, x, u):
-    # x'' + damping*x' + k1*x + k3*x³ = u
-    return f"x1[2] = {self.params[0]}*x1[1] + {self.params[1]}*x1[0] + {self.params[2]}*x1[0]**3 + u['u1']"
-```
 
 ## Your Task
 
@@ -168,7 +133,7 @@ You will be given:
 Your job:
 1. **Analyze** the trajectory patterns (oscillations? jumps? mode switches?)
 2. **Infer** the number of modes, dynamics equations, and switching logic
-3. **Generate** a complete Python class implementing the Hybrid Automaton
+3. **Generate** a complete Python class inheriting from `HybridAutomatonBase`
 4. **Iterate** based on evaluation feedback to improve accuracy
 
 ## Evaluation Metrics
@@ -204,7 +169,10 @@ You are a control systems engineer identifying a Hybrid Automaton from trajector
 - **Iteration**: {iteration}
 
 ## Objective
-Generate a complete Python class implementing a Hybrid Automaton that accurately reproduces the observed dynamics.
+Generate a complete Python class that:
+1. **Inherits from `HybridAutomatonBase`**
+2. Accurately reproduces the observed dynamics
+3. Uses `self.params` for tunable values
 
 {HA_PYTHON_CLASS_DOCS}
 
@@ -218,7 +186,7 @@ def get_feedback_section(feedback: str) -> str:
         return ""
 
     return f"""
-## ⚠️ FEEDBACK FROM PREVIOUS ITERATION
+## FEEDBACK FROM PREVIOUS ITERATION
 
 {feedback}
 

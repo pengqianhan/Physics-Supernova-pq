@@ -4,12 +4,16 @@ Conversion utilities for Python class-based Hybrid Automaton specifications to J
 This module provides the conversion layer between the new Python class-based HA format
 and the legacy JSON format used by HybridAutomata.from_json(). This allows gradual
 migration without rewriting the existing simulator.
+
+Supports classes that inherit from HybridAutomatonBase.
 """
 
 from typing import Optional, Dict, Any
 import numpy as np
 import sys
 import traceback
+
+from utils.ha_base_class import HybridAutomatonBase
 
 
 def convert_python_class_to_json(
@@ -24,6 +28,8 @@ def convert_python_class_to_json(
     2. Instantiates the HybridAutomaton class
     3. Optionally injects optimized parameters
     4. Calls the to_json() method to convert to JSON format
+
+    Supports classes that inherit from HybridAutomatonBase.
 
     Args:
         class_code: Python class definition as a string
@@ -51,22 +57,52 @@ def convert_python_class_to_json(
         ValueError: If class code cannot be executed or converted
         AttributeError: If HybridAutomaton class is missing required methods
     """
-    # Create isolated namespace for execution
-    namespace = {}
+    # Create isolated namespace with base class available for inheritance
+    class FakeModule:
+        HybridAutomatonBase = HybridAutomatonBase
+
+    namespace = {
+        'HybridAutomatonBase': HybridAutomatonBase,
+        'utils': type('utils', (), {'ha_base_class': FakeModule})(),
+    }
 
     try:
-        # Execute class code in isolated namespace
-        exec(class_code, namespace)
+        # Remove import statements for ha_base_class (already in namespace)
+        code_lines = class_code.split('\n')
+        filtered_lines = []
+        for line in code_lines:
+            if 'from utils.ha_base_class import' in line:
+                continue
+            if 'import utils.ha_base_class' in line:
+                continue
+            filtered_lines.append(line)
+        filtered_code = '\n'.join(filtered_lines)
+
+        # Execute class code in namespace
+        exec(filtered_code, namespace)
     except Exception as e:
         raise ValueError(f"Failed to execute class code: {str(e)}\n{traceback.format_exc()}")
 
-    # Check if HybridAutomaton class exists
-    if 'HybridAutomaton' not in namespace:
-        raise ValueError("Class code must define a class named 'HybridAutomaton'")
+    # Find HybridAutomaton class (or any class inheriting from HybridAutomatonBase)
+    ha_class = None
+
+    if 'HybridAutomaton' in namespace:
+        ha_class = namespace['HybridAutomaton']
+    else:
+        # Look for any class that inherits from HybridAutomatonBase
+        for name, obj in namespace.items():
+            if (isinstance(obj, type) and
+                issubclass(obj, HybridAutomatonBase) and
+                obj is not HybridAutomatonBase):
+                ha_class = obj
+                break
+
+    if ha_class is None:
+        raise ValueError("Class code must define 'HybridAutomaton' or a class inheriting from HybridAutomatonBase")
 
     try:
         # Instantiate the class
-        ha_instance = namespace['HybridAutomaton']()
+        ha_instance = ha_class()
     except Exception as e:
         raise ValueError(f"Failed to instantiate HybridAutomaton class: {str(e)}\n{traceback.format_exc()}")
 

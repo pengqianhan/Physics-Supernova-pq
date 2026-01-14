@@ -1,9 +1,14 @@
-"""Validation utilities for Python class-based Hybrid Automaton specifications."""
+"""Validation utilities for Python class-based Hybrid Automaton specifications.
+
+Supports classes that inherit from HybridAutomatonBase.
+"""
 
 import re
 import ast
 from typing import Tuple, List, Optional
 from dataclasses import dataclass
+
+from utils.ha_base_class import HybridAutomatonBase
 
 
 @dataclass
@@ -15,20 +20,34 @@ class StructuredAgentResult:
 
 
 def extract_python_class_from_text(text: str) -> Optional[str]:
-    """Extract Python class code from text, handling markdown code blocks."""
+    """Extract Python class code from text, handling markdown code blocks.
+
+    Supports both standalone HybridAutomaton classes and classes inheriting from HybridAutomatonBase.
+    """
     # Try markdown code blocks first
     for pattern in [r'```python\s*\n(.*?)```', r'```\s*\n(.*?)```']:
         for match in re.findall(pattern, text, re.DOTALL):
-            if 'class HybridAutomaton' in match:
+            # Check for either class definition pattern
+            if ('class HybridAutomaton' in match or
+                'HybridAutomatonBase' in match or
+                re.search(r'class \w+\s*\(\s*HybridAutomatonBase\s*\)', match)):
                 return match.strip()
 
     # Fallback: direct class definition
-    match = re.search(r'(class HybridAutomaton.*?)(?=\n*(?:final_answer|class\s|\Z))', text, re.DOTALL)
-    if match:
-        lines = match.group(1).strip().split('\n')
-        while lines and not lines[-1].strip():
-            lines.pop()
-        return '\n'.join(lines)
+    # Match class HybridAutomaton or any class inheriting from HybridAutomatonBase
+    patterns = [
+        r'(class HybridAutomaton.*?)(?=\n*(?:final_answer|class\s|\Z))',
+        r'(from utils\.ha_base_class.*?class \w+\s*\(\s*HybridAutomatonBase\s*\).*?)(?=\n*(?:final_answer|class\s|\Z))',
+    ]
+
+    for pattern in patterns:
+        match = re.search(pattern, text, re.DOTALL)
+        if match:
+            lines = match.group(1).strip().split('\n')
+            while lines and not lines[-1].strip():
+                lines.pop()
+            return '\n'.join(lines)
+
     return None
 
 
@@ -65,7 +84,10 @@ REQUIRED_METHODS = {
 
 
 def validate_python_class_syntax(class_code: str) -> Tuple[bool, List[str]]:
-    """Validate Python class syntax and structure."""
+    """Validate Python class syntax and structure.
+
+    Supports both standalone HybridAutomaton classes and classes inheriting from HybridAutomatonBase.
+    """
     errors = []
 
     # Syntax check
@@ -74,11 +96,24 @@ def validate_python_class_syntax(class_code: str) -> Tuple[bool, List[str]]:
     except SyntaxError as e:
         return False, [f"Syntax error at line {e.lineno}: {e.msg}"]
 
-    # Find class
-    ha_class = next((n for n in ast.walk(tree)
-                     if isinstance(n, ast.ClassDef) and n.name == 'HybridAutomaton'), None)
+    # Find class - either HybridAutomaton or any class inheriting from HybridAutomatonBase
+    ha_class = None
+    for n in ast.walk(tree):
+        if isinstance(n, ast.ClassDef):
+            # Check if it's named HybridAutomaton
+            if n.name == 'HybridAutomaton':
+                ha_class = n
+                break
+            # Check if it inherits from HybridAutomatonBase
+            for base in n.bases:
+                if isinstance(base, ast.Name) and base.id == 'HybridAutomatonBase':
+                    ha_class = n
+                    break
+            if ha_class:
+                break
+
     if not ha_class:
-        return False, ["No 'HybridAutomaton' class found"]
+        return False, ["No 'HybridAutomaton' class or class inheriting from HybridAutomatonBase found"]
 
     # Check methods
     methods = {item.name: len(item.args.args)
@@ -105,7 +140,7 @@ def validate_python_class_syntax(class_code: str) -> Tuple[bool, List[str]]:
 
 
 def auto_fix_common_class_issues(class_code: str) -> str:
-    """Fix common issues: tuple→list for params, add to_json stub."""
+    """Fix common issues: tuple to list for params, add to_json stub."""
     code = re.sub(r'(self\.params\s*=\s*)\((.*?)\)', r'\1[\2]', class_code, flags=re.DOTALL)
 
     if 'def to_json(' not in code:
@@ -118,19 +153,59 @@ def auto_fix_common_class_issues(class_code: str) -> str:
     return code
 
 
+def get_execution_namespace():
+    """Get namespace with base class for executing HA class code."""
+    class FakeModule:
+        HybridAutomatonBase = HybridAutomatonBase
+
+    return {
+        'HybridAutomatonBase': HybridAutomatonBase,
+        'utils': type('utils', (), {'ha_base_class': FakeModule})(),
+    }
+
+
 def extract_initial_params_from_class(class_code: str) -> List[float]:
-    """Extract initial parameter values from class's __init__ method."""
-    namespace = {}
+    """Extract initial parameter values from class's __init__ method.
+
+    Supports classes that inherit from HybridAutomatonBase.
+    """
+    # Create namespace with base class
+    namespace = get_execution_namespace()
+
+    # Filter out import statements (already in namespace)
+    code_lines = class_code.split('\n')
+    filtered_lines = []
+    for line in code_lines:
+        if 'from utils.ha_base_class import' in line:
+            continue
+        if 'import utils.ha_base_class' in line:
+            continue
+        filtered_lines.append(line)
+    filtered_code = '\n'.join(filtered_lines)
+
     try:
-        exec(class_code, namespace)
+        exec(filtered_code, namespace)
     except Exception as e:
         raise ValueError(f"Failed to execute: {e}")
 
-    if 'HybridAutomaton' not in namespace:
-        raise ValueError("No HybridAutomaton class found")
+    # Find the HA class
+    ha_class = None
+    if 'HybridAutomaton' in namespace:
+        ha_class = namespace['HybridAutomaton']
+    else:
+        # Look for any class inheriting from HybridAutomatonBase
+        for name, obj in namespace.items():
+            if (isinstance(obj, type) and
+                issubclass(obj, HybridAutomatonBase) and
+                obj is not HybridAutomatonBase):
+                ha_class = obj
+                break
+
+    if ha_class is None:
+        raise ValueError("No HybridAutomaton class or class inheriting from HybridAutomatonBase found")
 
     try:
-        ha = namespace['HybridAutomaton']()
+        ha = ha_class()
     except Exception as e:
         raise ValueError(f"Failed to instantiate: {e}")
 
@@ -164,12 +239,36 @@ That's the solution.
 '''
     extracted = extract_python_class_from_text(markdown_text)
     if extracted and 'class HybridAutomaton' in extracted:
-        print("✓ Successfully extracted class from markdown")
+        print("OK: Successfully extracted class from markdown")
     else:
-        print("✗ Failed to extract class")
+        print("FAIL: Failed to extract class")
 
-    # Test 2: Validate valid class
-    print("\nTest 2: Validate valid class")
+    # Test 2: Extract class inheriting from base
+    print("\nTest 2: Extract class inheriting from HybridAutomatonBase")
+    markdown_text_inheritance = '''
+Here is the HA class:
+
+```python
+from utils.ha_base_class import HybridAutomatonBase
+
+class DuffingOscillator(HybridAutomatonBase):
+    def __init__(self):
+        self.params = [1.0, 2.0]
+
+    def num_modes(self):
+        return 1
+```
+
+That's the solution.
+'''
+    extracted = extract_python_class_from_text(markdown_text_inheritance)
+    if extracted and 'HybridAutomatonBase' in extracted:
+        print("OK: Successfully extracted class with inheritance")
+    else:
+        print("FAIL: Failed to extract class with inheritance")
+
+    # Test 3: Validate valid class
+    print("\nTest 3: Validate valid class")
     valid_class = '''
 class HybridAutomaton:
     def __init__(self):
@@ -193,44 +292,72 @@ class HybridAutomaton:
 '''
     is_valid, errors = validate_python_class_syntax(valid_class)
     if is_valid:
-        print("✓ Valid class passed validation")
+        print("OK: Valid class passed validation")
     else:
-        print(f"✗ Validation failed: {errors}")
+        print(f"FAIL: Validation failed: {errors}")
 
-    # Test 3: Validate invalid class (missing methods)
-    print("\nTest 3: Validate invalid class (missing methods)")
-    invalid_class = '''
-class HybridAutomaton:
+    # Test 4: Validate class with inheritance
+    print("\nTest 4: Validate class with inheritance")
+    valid_class_inheritance = '''
+class DuffingOscillator(HybridAutomatonBase):
     def __init__(self):
         self.params = [1.0, 2.0]
-'''
-    is_valid, errors = validate_python_class_syntax(invalid_class)
-    if not is_valid and len(errors) > 0:
-        print(f"✓ Invalid class correctly identified ({len(errors)} errors)")
-        print(f"  Errors: {errors[:2]}")  # Show first 2 errors
-    else:
-        print("✗ Should have failed validation")
+        self.var = "x1"
 
-    # Test 4: Auto-fix params tuple
-    print("\nTest 4: Auto-fix params tuple")
-    class_with_tuple = '''
-class HybridAutomaton:
+    def num_modes(self):
+        return 1
+
+    def mode_dynamics(self, mode_id, x, u):
+        return "x1[1] = x1[0]"
+
+    def guard_condition(self, source_mode, target_mode, x, u):
+        return False
+
+    def reset_map(self, source_mode, target_mode, x, u):
+        pass
+'''
+    is_valid, errors = validate_python_class_syntax(valid_class_inheritance)
+    if is_valid:
+        print("OK: Valid class with inheritance passed validation")
+    else:
+        print(f"FAIL: Validation failed: {errors}")
+
+    # Test 5: Extract params from class with inheritance
+    print("\nTest 5: Extract params from class with inheritance")
+    class_with_inheritance = '''
+from utils.ha_base_class import HybridAutomatonBase
+
+class DuffingOscillator(HybridAutomatonBase):
     def __init__(self):
-        self.params = (1.0, 2.0, 3.0)
-'''
-    fixed = auto_fix_common_class_issues(class_with_tuple)
-    if 'self.params = [1.0, 2.0, 3.0]' in fixed:
-        print("✓ Successfully fixed tuple to list")
-    else:
-        print("✗ Failed to fix tuple")
+        self.params = [1.5, 2.5, 3.5]
+        self.var = "x1"
+        self.input = "u1"
+        self.dt = 0.001
+        self.total_time = 10.0
+        self.order = 2
 
-    # Test 5: Extract params
-    print("\nTest 5: Extract initial params")
+    def num_modes(self):
+        return 1
+
+    def mode_dynamics(self, mode_id, x, u):
+        return "x1[2] = x1[1] + x1[0]"
+
+    def guard_condition(self, source_mode, target_mode, x, u):
+        return False
+
+    def reset_map(self, source_mode, target_mode, x, u):
+        pass
+
+HybridAutomaton = DuffingOscillator
+'''
     try:
-        params = extract_initial_params_from_class(valid_class)
-        print(f"✓ Extracted params: {params}")
+        params = extract_initial_params_from_class(class_with_inheritance)
+        if params == [1.5, 2.5, 3.5]:
+            print(f"OK: Extracted params: {params}")
+        else:
+            print(f"FAIL: Wrong params: {params}")
     except Exception as e:
-        print(f"✗ Failed to extract params: {e}")
+        print(f"FAIL: Failed to extract params: {e}")
 
     print("\n" + "=" * 80)
     print("All tests completed")

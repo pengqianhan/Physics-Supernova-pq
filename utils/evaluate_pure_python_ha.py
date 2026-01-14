@@ -1,16 +1,48 @@
-"""Pure Python class-based HA evaluation (no JSON conversion)."""
+"""Pure Python class-based HA evaluation (no JSON conversion).
+
+Supports classes that inherit from HybridAutomatonBase.
+"""
 
 import os
 import numpy as np
 from typing import Tuple, Dict, Optional
 from datetime import datetime
 
+from utils.ha_base_class import HybridAutomatonBase
+
 
 def execute_python_class(class_code: str):
-    """Execute Python class code and return the HybridAutomaton instance."""
-    namespace = {}
+    """
+    Execute Python class code and return the HybridAutomaton instance.
+
+    The execution namespace includes HybridAutomatonBase for inheritance support.
+    """
+    # Create namespace with base class available for import
+    namespace = {
+        'HybridAutomatonBase': HybridAutomatonBase,
+    }
+
+    # Also simulate the import statement by adding to namespace
+    # This handles code that starts with: from utils.ha_base_class import HybridAutomatonBase
+    class FakeModule:
+        HybridAutomatonBase = HybridAutomatonBase
+
+    namespace['utils'] = type('utils', (), {'ha_base_class': FakeModule})()
+
     try:
-        exec(class_code, namespace)
+        # Remove the import statement if present (we've already provided the class)
+        code_lines = class_code.split('\n')
+        filtered_lines = []
+        for line in code_lines:
+            # Skip import lines for ha_base_class
+            if 'from utils.ha_base_class import' in line:
+                continue
+            if 'import utils.ha_base_class' in line:
+                continue
+            filtered_lines.append(line)
+        filtered_code = '\n'.join(filtered_lines)
+
+        exec(filtered_code, namespace)
     except SyntaxError as e:
         lines = class_code.split('\n')
         start, end = max(0, (e.lineno or 1) - 3), min(len(lines), (e.lineno or 1) + 2)
@@ -19,9 +51,27 @@ def execute_python_class(class_code: str):
             print(f"{' >>>' if i == e.lineno - 1 else '    '} {i+1}: {lines[i]}")
         raise
 
-    if 'HybridAutomaton' not in namespace:
-        raise ValueError("Class code must define 'HybridAutomaton' class")
-    return namespace['HybridAutomaton']()
+    # Look for HybridAutomaton class (or any class inheriting from HybridAutomatonBase)
+    ha_class = None
+
+    # First, try to find 'HybridAutomaton' explicitly
+    if 'HybridAutomaton' in namespace:
+        ha_class = namespace['HybridAutomaton']
+    else:
+        # Look for any class that inherits from HybridAutomatonBase
+        for name, obj in namespace.items():
+            if (isinstance(obj, type) and
+                issubclass(obj, HybridAutomatonBase) and
+                obj is not HybridAutomatonBase):
+                ha_class = obj
+                break
+
+    if ha_class is None:
+        raise ValueError(
+            "Class code must define 'HybridAutomaton' class or a class inheriting from HybridAutomatonBase"
+        )
+
+    return ha_class()
 
 
 def _fmt(val, fmt=".6f"):
@@ -63,6 +113,10 @@ def evaluate_python_ha_class(
     try:
         ha_instance = execute_python_class(class_code)
         print(f"Class: var={ha_instance.var}, modes={ha_instance.num_modes()}")
+
+        # Check if it properly inherits from base class
+        if isinstance(ha_instance, HybridAutomatonBase):
+            print("  (Inherits from HybridAutomatonBase)")
     except Exception as e:
         import traceback
         traceback.print_exc()
@@ -139,6 +193,21 @@ def evaluate_python_ha_class(
     return True, metrics, feedback, optimized_class_code, optimized_params, plot_path
 
 
+def get_execution_namespace():
+    """
+    Get the namespace dict for executing HA class code.
+
+    Use this when you need to provide the execution context externally.
+    """
+    class FakeModule:
+        HybridAutomatonBase = HybridAutomatonBase
+
+    return {
+        'HybridAutomatonBase': HybridAutomatonBase,
+        'utils': type('utils', (), {'ha_base_class': FakeModule})(),
+    }
+
+
 # Test
 if __name__ == "__main__":
     # Test with simple template
@@ -147,6 +216,8 @@ if __name__ == "__main__":
     test_class = get_simple_ha_template(num_variables=1, num_inputs=1)
 
     print("Testing evaluation with simple template:")
+    print("="*80)
+    print(test_class)
     print("="*80)
 
     success, metrics, feedback, opt_class, opt_params, plot_path = evaluate_python_ha_class(
@@ -158,8 +229,8 @@ if __name__ == "__main__":
     )
 
     if success:
-        print("\n✓ Evaluation succeeded!")
+        print("\n Evaluation succeeded!")
         print(f"Metrics: {metrics}")
         print(f"Plot saved to: {plot_path}")
     else:
-        print(f"\n✗ Evaluation failed: {feedback}")
+        print(f"\n Evaluation failed: {feedback}")

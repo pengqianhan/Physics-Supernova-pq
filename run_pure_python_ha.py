@@ -1,6 +1,8 @@
 """
 Pure Python Class-Based Hybrid Automaton Learning (SR-Scientist Style)
 
+All generated HA classes inherit from HybridAutomatonBase for consistent interface.
+
 Usage:
     python run_pure_python_ha.py \\
         --input-data-path data_all/non_linear/duffing \\
@@ -21,15 +23,15 @@ try:
 except ImportError:
     pass
 
-# === Agent 运行监控 (Phoenix - 免费本地方案) ===
+# === Agent Monitoring (Phoenix - Free Local Solution) ===
 try:
     from phoenix.otel import register
     from openinference.instrumentation.smolagents import SmolagentsInstrumentor
     register()
     SmolagentsInstrumentor().instrument()
-    print("[Telemetry] Phoenix 监控已启用 - 访问 http://localhost:6006")
+    print("[Telemetry] Phoenix monitoring enabled - visit http://localhost:6006")
 except ImportError:
-    print("[Telemetry] Phoenix 未安装，跳过监控。安装: pip install arize-phoenix openinference-instrumentation-smolagents")
+    print("[Telemetry] Phoenix not installed. Install: pip install arize-phoenix openinference-instrumentation-smolagents")
 # =============================================
 
 from smolagents import CodeAgent, LiteLLMModel
@@ -41,6 +43,7 @@ from utils.ha_class_validator import validate_python_class_syntax, extract_struc
 from utils.llm_evaluator import generate_llm_critique
 from utils.imgTools_ha import HybridAutomatonImageTool
 from utils.validateTools_ha import ValidateHASpecTool
+from utils.ha_base_class import HybridAutomatonBase
 
 
 def get_data_dimensions(input_data_path: str) -> Tuple[int, int]:
@@ -56,7 +59,7 @@ def get_data_dimensions(input_data_path: str) -> Tuple[int, int]:
 
 
 def create_agent(model_id: str, tools_list: Optional[List[str]] = None) -> CodeAgent:
-    """Create CodeAgent with specified tools."""
+    """Create CodeAgent with specified tools and base class in execution namespace."""
     model = LiteLLMModel(
         model_id=model_id,
         api_key=os.environ.get("GEMINI_API_KEY"),
@@ -79,6 +82,11 @@ def create_agent(model_id: str, tools_list: Optional[List[str]] = None) -> CodeA
                 tools.append(tool_map[name]())
 
     agent = CodeAgent(tools=tools, model=model, max_steps=100, verbosity_level=2)
+
+    # Inject base class into agent's execution namespace
+    # This allows the agent to define classes that inherit from HybridAutomatonBase
+    if hasattr(agent, 'python_executor') and hasattr(agent.python_executor, 'state'):
+        agent.python_executor.state['HybridAutomatonBase'] = HybridAutomatonBase
 
     for tool in agent.tools.values():
         if hasattr(tool, 'worker_agent'):

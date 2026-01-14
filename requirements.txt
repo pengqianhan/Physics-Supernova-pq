@@ -14,3 +14,4 @@ networkx
 smolagents[e2b] #sandbox environment
 matplotlib
 tenacity
+smolagents[telemetry,toolkit]

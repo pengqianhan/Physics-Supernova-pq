@@ -2,13 +2,15 @@
 Direct Python Class-Based Hybrid Automaton Simulator
 
 This module provides direct simulation and evaluation of Python class-based HA specifications
-without requiring JSON conversion. Inspired by SR-Scientist's direct code execution approach.
+that inherit from HybridAutomatonBase. No JSON conversion required.
 """
 
 import numpy as np
 import matplotlib.pyplot as plt
-from typing import Dict, Tuple, Optional, Any
+from typing import Dict, Tuple, Optional, Union
 import warnings
+
+from utils.ha_base_class import HybridAutomatonBase
 
 
 class HybridAutomatonSimulator:
@@ -19,12 +21,17 @@ class HybridAutomatonSimulator:
     avoiding JSON conversion overhead.
     """
 
-    def __init__(self, ha_instance, dt: float = 0.001, total_time: float = 10.0):
+    def __init__(
+        self,
+        ha_instance: Union[HybridAutomatonBase, object],
+        dt: float = 0.001,
+        total_time: float = 10.0
+    ):
         """
         Initialize simulator with HA instance.
 
         Args:
-            ha_instance: Instance of HybridAutomaton class
+            ha_instance: Instance of HybridAutomaton class (should inherit from HybridAutomatonBase)
             dt: Integration time step
             total_time: Total simulation duration
         """
@@ -57,8 +64,8 @@ class HybridAutomatonSimulator:
         mode_sequence = np.zeros(self.num_steps, dtype=int)
 
         # Parse variable and input names from HA
-        var_names = [v.strip() for v in self.ha.var.split(',')]
-        input_names = [i.strip() for i in self.ha.input.split(',')] if self.ha.input else []
+        var_names = self._get_var_names()
+        input_names = self._get_input_names()
 
         # Initialize state dict (for higher-order ODEs, store derivatives)
         # For order=2: x_dict = {'x1': [x1_value, x1_dot]}
@@ -98,6 +105,20 @@ class HybridAutomatonSimulator:
                 self._integrate_step(current_mode, x_dict, u_dict)
 
         return state_trajectory, mode_sequence
+
+    def _get_var_names(self):
+        """Get variable names from HA instance."""
+        if hasattr(self.ha, 'get_var_names'):
+            return self.ha.get_var_names()
+        return [v.strip() for v in self.ha.var.split(',')]
+
+    def _get_input_names(self):
+        """Get input names from HA instance."""
+        if hasattr(self.ha, 'get_input_names'):
+            return self.ha.get_input_names()
+        if not self.ha.input:
+            return []
+        return [i.strip() for i in self.ha.input.split(',')]
 
     def _check_transitions(self, current_mode: int, x_dict: Dict, u_dict: Dict) -> int:
         """Check all possible transitions from current mode."""
@@ -179,12 +200,18 @@ class PythonClassHAEvaluator:
     Directly simulates and compares against ground truth without JSON conversion.
     """
 
-    def __init__(self, ha_instance, npz_file_path: str, dt: float = 0.001, total_time: float = 10.0):
+    def __init__(
+        self,
+        ha_instance: Union[HybridAutomatonBase, object],
+        npz_file_path: str,
+        dt: float = 0.001,
+        total_time: float = 10.0
+    ):
         """
         Initialize evaluator.
 
         Args:
-            ha_instance: Instance of HybridAutomaton class
+            ha_instance: Instance of HybridAutomaton class (should inherit from HybridAutomatonBase)
             npz_file_path: Path to ground truth NPZ file
             dt: Integration time step
             total_time: Total simulation duration
@@ -286,7 +313,7 @@ class PythonClassHAEvaluator:
             axes = [axes]
 
         # Parse variable names
-        var_names = [v.strip() for v in self.ha.var.split(',')]
+        var_names = self.simulator._get_var_names()
 
         # Plot each variable
         min_len = min(self.sim_state.shape[1], gt_state.shape[1])
@@ -345,3 +372,24 @@ Evaluation Metrics:
         plot_path = self.plot(save_path=save_path, show_plot=show_plot)
 
         return metrics_text, plot_path if save_path else None
+
+
+def is_valid_ha_instance(obj) -> bool:
+    """Check if object is a valid HybridAutomaton instance."""
+    # Check for inheritance from base class
+    if isinstance(obj, HybridAutomatonBase):
+        return True
+
+    # Fallback: check for required methods (duck typing)
+    required_methods = ['num_modes', 'mode_dynamics', 'guard_condition', 'reset_map']
+    required_attrs = ['var', 'params']
+
+    for method in required_methods:
+        if not hasattr(obj, method) or not callable(getattr(obj, method)):
+            return False
+
+    for attr in required_attrs:
+        if not hasattr(obj, attr):
+            return False
+
+    return True
