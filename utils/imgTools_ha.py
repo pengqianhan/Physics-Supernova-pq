@@ -15,7 +15,7 @@ class HybridAutomatonImageTool(Tool):
 
     name = "hybrid_automaton_image_analysis"
     description = (
-        "Given an image reference (placeholder like <image_10>) and a question, "
+        "Given an image reference (placeholder like <image_0>, <image_1>, ...) and a question, "
         "return the image expert's answer about that image."
         "When you need to measure quantities from an image, you MUST call this tool for Accurate Measurements: measuring youself alone is not accurate enough and could lead to errors!"
     )
