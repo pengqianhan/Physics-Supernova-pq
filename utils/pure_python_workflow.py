@@ -119,6 +119,12 @@ def generate_pure_python_task(
 """
     if tools_list:
         task += f"**Tools**: {', '.join(tools_list)}\n\n"
+        task += "**Tool Usage Hints**:\n"
+        if "hybrid_automaton_image_analysis" in tools_list:
+            task += "- `hybrid_automaton_image_analysis`: Call this tool to extract detailed information from trajectory images, such as numerical values, system behavior patterns, and mode switching characteristics.\n"
+        if "validate_hybrid_automaton_specification" in tools_list:
+            task += "- `validate_hybrid_automaton_specification`: Call this tool to validate the structure and syntax of your HA specification.\n"
+        task += "\n"
 
     # Add initial template for first iteration
     if iteration == 1:
