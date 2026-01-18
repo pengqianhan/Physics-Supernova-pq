@@ -505,8 +505,10 @@ class HAEvaluator:
                 init_state_dict[var_name] = [init_state[i]] if i < len(init_state) else [0.0]
 
         # Add input data (use full time series, not function expression)
-        input_var_name = self.ha_dict['automaton']['input']
-        init_state_dict[input_var_name] = input_data_npz
+        # Only add if 'input' key exists and is not empty
+        input_var_name = self.ha_dict['automaton'].get('input', '')
+        if input_var_name:  # Only add if input variable name is non-empty
+            init_state_dict[input_var_name] = input_data_npz
 
         return init_state_dict
 
@@ -819,7 +821,7 @@ if __name__ == "__main__":
             "other_items": ""
         }
     }
-    data=json.load(open('utils/Dainarx_code/automata/non_linear/duffing.json', 'r'))
+    data=json.load(open('utils/Dainarx_code/automata/ATVA/ball.json', 'r'))
     print(data)
 
 
@@ -829,7 +831,7 @@ if __name__ == "__main__":
 
     evaluator = HAEvaluator(
         ha_dict=data,
-        npz_file_path='data_all/non_linear/duffing/ground_truth_0.npz',
+        npz_file_path='data_all/ATVA/ball/ground_truth_0.npz',
         dt=0.001,
         total_time=10.0
     )
