@@ -1,20 +1,35 @@
 {
   "automaton": {
-    "var": "x1",
-    "input": "u1",
+    "var": "x1, x2",
+    "input": "",
     "mode": [
       {
         "id": 1,
-        "eq": "x1[2] = -0.00388 * x1[1] - 0.00388 * x1[0] - 0.062 * x1[0]**3"
+        "eq": "x1[1] = x2[0], x2[1] = -9.8"
       }
     ],
-    "edge": []
+    "edge": [
+      {
+        "direction": "1 -> 1",
+        "condition": "x1 <= 0",
+        "reset": {
+          "x1": [
+            0
+          ],
+          "x2": [
+            "-0.8890 * x2[0]"
+          ]
+        }
+      }
+    ]
   },
   "config": {
     "dt": 0.001,
     "total_time": 10.0,
-    "order": 2,
-    "need_reset": false,
-    "non_linear_items": "x1[0]**3"
+    "order": 1,
+    "need_reset": true,
+    "non_linear_items": "",
+    "self_loop": true,
+    "need_bias": true
   }
 }

@@ -343,12 +343,12 @@ The `var` and `input` fields are pre-filled.
 ```json
 {
     "automaton": {
-        "var": "x1",
-        "input": "u1",
+        "var": "x1, x2",
+        "input": "",
         "mode": [
             {
                 "id": 1,
-                "eq": "x1[2] = x1[1] + x1[0] + u1"
+                "eq": "x1[1] = -0.5 * x1[0] + x2[0], x2[1] = -0.5 * x2[0]"
             }
         ],
         "edge": []
@@ -356,7 +356,7 @@ The `var` and `input` fields are pre-filled.
     "config": {
         "dt": 0.001,
         "total_time": 10.0,
-        "order": 2,
+        "order": 1,
         "need_reset": false,
         "non_linear_items": ""
     }
@@ -365,11 +365,11 @@ The `var` and `input` fields are pre-filled.
 
 ## Your Task
 Generate an improved HA specification (v1) that better matches the observed trajectory data.
-- **Keep `var: "x1"` and `input: "u1"` exactly as shown!**
+- **Keep `var: "x1, x2"` and `input: ""` exactly as shown!**
 - Make sure the HA specification is valid and complete.
 - Refine the HA specification to improve trajectory matching and reduce TC (Change-Point Error), Mean Difference, and Maximum Difference.
 
 ## Available Data
 The following data sources are provided:
-- **Trace visualizations**: ['<image_0>', '<image_1>', '<image_2>']
-- **Raw data files**: ['<npz_0>', '<npz_1>', '<npz_2>']
+- **Trace visualizations**: ['<image_0>', '<image_1>', '<image_2>'], use the `hybrid_automaton_image_analysis` tool to analyze the image if you want to obtain more detailed information about the system.
+- **Raw data files**: ['<npz_0>', '<npz_1>', '<npz_2>']. If you want to use the npz data to analyze the system, you MUSTuse the `data_analysis_expert` agent to analyze the data. You can not analyze the npz data directly.
