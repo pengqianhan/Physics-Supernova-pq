@@ -58,10 +58,10 @@ class HybridAutomata:
     def from_json(cls, info: dict):
         var_list = re.split(r"\s*,\s*", info['var'])
         input_expr = info.get('input')
-        if input_expr is None:
+        if input_expr is None or input_expr.strip() == '':
             input_list = []
         else:
-            input_list = re.split(r"\s*,\s*", info.get('input'))
+            input_list = [v.strip() for v in re.split(r"\s*,\s*", input_expr) if v.strip()]
         mode_list = {}
 
         adj = {}

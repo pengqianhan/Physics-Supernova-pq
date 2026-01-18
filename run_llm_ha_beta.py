@@ -44,6 +44,8 @@ from utils.imgTools_ha import HybridAutomatonImageTool
 from utils.reviewTools_ha import ReviewRequestTool_ha
 from utils.summemoryTools_ha import SummarizeMemoryTool
 from utils.validateTools_ha import ValidateHASpecTool
+from utils.Dainarx_code.HA_evaluation import HAEvaluator
+from utils.ha_spec_validator import preprocess_ha_for_evaluation
 import numpy as np
 
 
@@ -148,7 +150,7 @@ TOOLNAME2TOOL = {
 
 def _create_HA_agent(Tools_list: List[type[Tool]],
                      markdown_content: MarkdownMessage,
-                     model_id: str = "gemini/gemini-flash-lite-latest",
+                     model_id: str = "gemini/gemini-3-flash-preview",
                      managed_agents_list: List[MultiStepAgent] = None,
                      max_steps: int = 80,
                      **kwargs) -> ToolCallingAgent | CodeAgent:
@@ -241,6 +243,7 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
     # Get NPZ file paths from markdown_content
     # npz_paths is a dict like {"<image_0>": "/path/to/sample_0.npz", ...}
     npz_paths_list = list(markdown_content.npz_paths.values()) if markdown_content.npz_paths else []
+    npz_placeholders = list(markdown_content.npz_paths.keys()) 
 
     # Fallback to default path if no npz files found
     if not npz_paths_list:
@@ -258,7 +261,7 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
         )
 
         # Build file paths description for prompt
-        npz_files_description = "\n".join([f"  - `{path}`" for path in npz_paths_list])
+        npz_files_description = "\n".join([f" {placeholders} - `{path}`" for placeholders, path in zip(npz_placeholders, npz_paths_list)])
 
         # managed agent description with all available files
         managed_agent_description = f"""I am a managed agent with name {agent_name}. I can assist with code-related tasks.
@@ -283,6 +286,9 @@ data = np.load(DATA_FILE_PATH)
 """
         # use_e2b = bool(os.environ.get("E2B_API_KEY"))
         use_e2b = False
+        # save the managed_agent_description to a file
+        with open(f"managed_agent_description_{agent_name}.md", "w") as f:
+            f.write(managed_agent_description)
         managed_agent = CodeAgent(
             tools=[],
             executor_type="e2b" if use_e2b else "local",
@@ -327,7 +333,7 @@ data = np.load(DATA_FILE_PATH)
 
 
 # create the agent
-def create_agent(model_id: str = "gemini/gemini-flash-lite-latest",
+def create_agent(model_id: str = "gemini/gemini-3-flash-preview",
                 input_data_path: str = None,
                 tools_list: List[str] = [],
                 managed_agents_list: List[str] = None,
@@ -401,9 +407,9 @@ def obtain_task_and_images(input_data_path: str = None,
     # Load trace data with high res images
     markdown_content = load_trace_data_from_filepath(input_data_path)
     image_paths = markdown_content.image_paths## list(image_paths.keys())
-    image_paths_list = list(image_paths.keys())
+    image_placeholders = list(image_paths.keys())
     npz_paths = markdown_content.npz_paths## list(npz_paths.keys())
-    npz_paths_list = list(npz_paths.keys())
+    npz_placeholders = list(npz_paths.keys())
 
     # create the manager agent
     ToolsList = [TOOLNAME2TOOL[x] for x in tools_list]
@@ -802,8 +808,8 @@ Generate an improved HA specification (v1) that better matches the observed traj
 
 ## Available Data
 The following data sources are provided:
-- **Trace visualizations**: {image_paths_list}
-- **Raw data files**: {npz_paths_list}
+- **Trace visualizations**: {image_placeholders}, use the `hybrid_automaton_image_analysis` tool to analyze the image if you want to obtain more detailed information about the system.
+- **Raw data files**: {npz_placeholders}. If you want to use the npz data to analyze the system, you MUSTuse the `data_analysis_expert` agent to analyze the data. You can not analyze the npz data directly.
 """
 
     # Add feedback from previous iteration if available
@@ -844,13 +850,6 @@ def evaluate_ha_specification_with_feedback(
     print("\n" + "=" * 80)
     print("EVALUATION: Testing the generated Hybrid Automaton specification")
     print("=" * 80)
-
-    # Import HA evaluation module
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'utils', 'Dainarx_code'))
-    from HA_evaluation import HAEvaluator
-    
-    # Import HA specification validator
-    from utils.ha_spec_validator import preprocess_ha_for_evaluation
 
     # Use the validator to extract and fix HA specification
     print("\n--- HA Specification Validation ---")
@@ -951,13 +950,13 @@ def parse_args():
     ap.add_argument(
         "--input-data-path",
         type=str,
-        default='data_all/non_linear/duffing',
+        default='data_all/ATVA/ball',
         help="Path to the trace data directory.",
     )
     ap.add_argument(
         "--manager-model",
         type=str,
-        default="gemini/gemini-flash-lite-latest",
+        default="gemini/gemini-3-flash-preview",
         help="Model ID to use for the agent.",
     )
 
@@ -983,13 +982,13 @@ def parse_args():
     ap.add_argument(
         "--image-tool-model",
         type=str,
-        default="gemini-flash-lite-latest",
+        default="gemini-3-flash-preview",
         help="Model ID to use for the image analysis tool (Gemini API format).",
     )
     ap.add_argument(
         "--review-tool-model",
         type=str,
-        default="gemini-flash-lite-latest",
+        default="gemini-3-flash-preview",
         help="Model ID to use for the review tool (Gemini API format).",
     )
     ap.add_argument(
@@ -1012,7 +1011,7 @@ def parse_args():
     ap.add_argument(
         "--managed-agents-list-model",
         type=str,
-        default="gemini/gemini-flash-lite-latest",
+        default="gemini/gemini-3-flash-preview",
         help="Model ID to use for managed agents.",
     )
 
