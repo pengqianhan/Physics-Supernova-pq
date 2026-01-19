@@ -20,3 +20,6 @@ evaluation_results*/
 # data files
 data_all/
 data_*/
+
+# phoenix traces
+phoenix_traces/
