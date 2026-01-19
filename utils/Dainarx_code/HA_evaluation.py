@@ -831,7 +831,7 @@ if __name__ == "__main__":
 
     evaluator = HAEvaluator(
         ha_dict=data,
-        npz_file_path='data_all/ATVA/ball/ground_truth_0.npz',
+        npz_file_path='data_all/ATVA/ball_g/ground_truth_0.npz',
         dt=0.001,
         total_time=10.0
     )

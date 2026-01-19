@@ -6,12 +6,14 @@ from HA_evaluation import TrajectoryPlotter
 import json
 
 
-def creat_data(json_path: str, data_path: str, dT: float, times: float):
+def creat_data(json_path: str, data_path: str, dT: float, times: float, ground_truth_path: str = None):
     r"""
     :param json_path: File path of automata.
-    :param data_path: Data storage path.
+    :param data_path: Data storage path for sample data and plots.
     :param dT: Discrete time.
     :param times: Total sampling time.
+    :param ground_truth_path: Optional separate path for ground truth data.
+                              If None, ground truth is saved to data_path.
     """
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -19,6 +21,12 @@ def creat_data(json_path: str, data_path: str, dT: float, times: float):
         json_path = os.path.join(current_dir, json_path)
     if not os.path.isabs(data_path):
         data_path = os.path.join(current_dir, data_path)
+    
+    # Handle ground_truth_path
+    if ground_truth_path is None:
+        ground_truth_path = data_path
+    elif not os.path.isabs(ground_truth_path):
+        ground_truth_path = os.path.join(current_dir, ground_truth_path)
 
     if not os.path.exists(data_path):
         os.makedirs(data_path)
@@ -26,6 +34,15 @@ def creat_data(json_path: str, data_path: str, dT: float, times: float):
         files = os.listdir(data_path)
         for file in files:
             os.remove(os.path.join(data_path, file))
+    
+    # Create ground_truth_path directory if different from data_path
+    if ground_truth_path != data_path:
+        if not os.path.exists(ground_truth_path):
+            os.makedirs(ground_truth_path)
+        else:
+            files = os.listdir(ground_truth_path)
+            for file in files:
+                os.remove(os.path.join(ground_truth_path, file))
 
     with open(json_path, 'r') as f:
         data = json.load(f)
@@ -90,14 +107,16 @@ def creat_data(json_path: str, data_path: str, dT: float, times: float):
             plotter.close()
 
             # save the data
-            np.savez(os.path.join(data_path, "ground_truth_" + str(state_id)),
+            # ground_truth saved to ground_truth_path (can be different from data_path)
+            np.savez(os.path.join(ground_truth_path, "ground_truth_" + str(state_id)),
                      state=state_data, mode=mode_data, input=input_data, change_points=change_points)
+            # sample data saved to data_path
             np.savez(os.path.join(data_path, "sample_" + str(state_id)),
                      state=state_data, input=input_data)
             state_id += 1
 
 
-def creat_all_data(automata_dir: str = None, output_dir: str = None, default_dt: float = 0.001, default_total_time: float = 10.0):
+def creat_all_data(automata_dir: str = None, output_dir: str = None, default_dt: float = 0.001, default_total_time: float = 10.0, separate_ground_truth: bool = True):
     r"""
     Create datasets for all JSON files under the automata directory.
 
@@ -107,6 +126,8 @@ def creat_all_data(automata_dir: str = None, output_dir: str = None, default_dt:
                        Defaults to 'data_all' in the project root.
     :param default_dt: Default discrete time step if not specified in JSON config.
     :param default_total_time: Default total sampling time if not specified in JSON config.
+    :param separate_ground_truth: If True, save ground_truth files to a separate folder with '_g' suffix.
+                                  E.g., data_all/ATVA/ball -> data_all/ATVA/ball_g for ground truth.
     """
     # Determine project root (two levels up from this file: CreatData.py -> Dainarx_code -> utils -> root)
     current_file_dir = os.path.dirname(os.path.abspath(__file__))
@@ -157,12 +178,20 @@ def creat_all_data(automata_dir: str = None, output_dir: str = None, default_dt:
             # total_time = config.get('total_time', default_total_time)
             total_time = 10.0
 
+            # Determine ground truth output path
+            if separate_ground_truth:
+                ground_truth_output_path = data_output_path + "_g"
+            else:
+                ground_truth_output_path = None  # Will use data_output_path
+
             print(f"\nProcessing: {rel_path}")
-            print(f"  Output: {os.path.relpath(data_output_path, project_root)}")
+            print(f"  Sample Output: {os.path.relpath(data_output_path, project_root)}")
+            if separate_ground_truth:
+                print(f"  Ground Truth Output: {os.path.relpath(ground_truth_output_path, project_root)}")
             print(f"  dt={dt}, total_time={total_time}")
 
             # Create data using creat_data function
-            creat_data(json_path, data_output_path, dt, total_time)
+            creat_data(json_path, data_output_path, dt, total_time, ground_truth_output_path)
             print(f"  Done!")
 
         except Exception as e:

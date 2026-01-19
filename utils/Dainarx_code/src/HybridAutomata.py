@@ -96,8 +96,8 @@ class HybridAutomata:
                     self.mode_state = to
                     switched = True
                     if to in vis:
-                        if HybridAutomata.LoopWarning:
-                            print("warning: find loop!")
+                        # if HybridAutomata.LoopWarning:
+                        #     print("warning: find loop!")
                         is_cycle = True
                     vis.add(to)
                     via_list.append((to, reset_val))
