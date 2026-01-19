@@ -9,7 +9,7 @@
  - [ ] for current_feedback only choose the top k feedbacks(evaluation and HA specification) to be used in the next iteration. maybe need to create a pool of feedbacks and choose the top k from the pool.
  - [x] 验证数据路径加载流程是否正确,使用 --input-data-path 参数来指定数据路径。
  - [x] 分析image 的工具是否能正确分析图片,捋一遍图片的处理流程
- - [ ] 添加 use-e2b 参数来指定是否使用 e2b 云沙盒执行器。
+ - [x] 添加 use-e2b 参数来指定是否使用 e2b 云沙盒执行器。
  - [x] system_name 删除这个变量,来让agent对系统辨识任务跟系统名称无关。
  - [x] 学习原始的提示词,精简task 里的提示词
  - [ ] 每一次的输出结果 JSON 和 指标 都要被reviewer review 并添加comments 和 rating 来评价输出结果的质量。JSON, 评估指标 和 comments 一起构成feedback。
