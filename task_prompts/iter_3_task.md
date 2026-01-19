@@ -385,8 +385,8 @@ Performance is ranked from best (lowest error) to worst. Use these as inspiratio
 
 --- Explored Specifications (Ranked) ---
 
-### Rank 1 (Iteration 2)
-**Error**: 1.891068
+### Rank 1 (Iteration 1)
+**Error**: 2.046695
 ```json
 {
   "automaton": {
@@ -395,58 +395,23 @@ Performance is ranked from best (lowest error) to worst. Use these as inspiratio
     "mode": [
       {
         "id": 1,
-        "eq": "x1[1] = x2[0], x2[1] = -9.8"
+        "eq": "x1[1] = x2[0], x2[1] = -1.0 * x1[0] - 0.05 * x2[0]"
       }
     ],
     "edge": [
       {
         "direction": "1 -> 1",
-        "condition": "x1 <= 0",
+        "condition": "x2 >= 5.25",
         "reset": {
-          "x1": [
-            0
-          ],
           "x2": [
-            "-0.8928 * x2[0]"
+            "-0.9 * x2[0]"
           ]
         }
-      }
-    ]
-  },
-  "config": {
-    "dt": 0.001,
-    "total_time": 10.0,
-    "order": 1,
-    "need_reset": true,
-    "non_linear_items": "",
-    "self_loop": true,
-    "need_bias": true
-  }
-}
-```
-**Metrics**: tc: 0.0000, max_diff: 1.8911, mean_diff: 0.1094
-
-### Rank 2 (Iteration 1)
-**Error**: 1.898268
-```json
-{
-  "automaton": {
-    "var": "x1, x2",
-    "input": "",
-    "mode": [
-      {
-        "id": 1,
-        "eq": "x1[1] = x2[0], x2[1] = -9.8"
-      }
-    ],
-    "edge": [
+      },
       {
         "direction": "1 -> 1",
-        "condition": "x1 <= 0",
+        "condition": "x2 <= -5.25",
         "reset": {
-          "x1": [
-            0
-          ],
           "x2": [
             "-0.9 * x2[0]"
           ]
@@ -459,13 +424,11 @@ Performance is ranked from best (lowest error) to worst. Use these as inspiratio
     "total_time": 10.0,
     "order": 1,
     "need_reset": true,
-    "non_linear_items": "",
-    "self_loop": true,
-    "need_bias": true
+    "non_linear_items": ""
   }
 }
 ```
-**Metrics**: tc: 0.0000, max_diff: 1.8983, mean_diff: 0.0023
+**Metrics**: tc: 0.0000, max_diff: 2.0467, mean_diff: 0.6218
 
 -----------------------------------------
 
@@ -478,19 +441,16 @@ Performance is ranked from best (lowest error) to worst. Use these as inspiratio
     "mode": [
       {
         "id": 1,
-        "eq": "x1[1] = x2[0], x2[1] = -9.8"
+        "eq": "x1[1] = x2, x2[1] = -10.0 * x1 - 0.5 * x2"
       }
     ],
     "edge": [
       {
         "direction": "1 -> 1",
-        "condition": "x1 <= 0",
+        "condition": "x1 == 0",
         "reset": {
-          "x1": [
-            0
-          ],
           "x2": [
-            "-0.8928 * x2[0]"
+            "-0.9 * x2[0]"
           ]
         }
       }
@@ -501,16 +461,11 @@ Performance is ranked from best (lowest error) to worst. Use these as inspiratio
     "total_time": 10.0,
     "order": 1,
     "need_reset": true,
-    "non_linear_items": "",
-    "self_loop": true,
-    "need_bias": true
+    "non_linear_items": ""
   }
 }
 ```
 Evaluation Results:
-  TC (Change-Point Error):0.000000 seconds
-  Max Difference:1.891068
-  Mean Difference:0.109403
-
+The HA specification is not valid. Please try to generate a valid specification. Here is the error message: name 'x2' is not defined
     
     

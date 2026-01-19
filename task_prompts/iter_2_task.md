@@ -386,7 +386,7 @@ Performance is ranked from best (lowest error) to worst. Use these as inspiratio
 --- Explored Specifications (Ranked) ---
 
 ### Rank 1 (Iteration 1)
-**Error**: 1.898268
+**Error**: 2.046695
 ```json
 {
   "automaton": {
@@ -395,17 +395,23 @@ Performance is ranked from best (lowest error) to worst. Use these as inspiratio
     "mode": [
       {
         "id": 1,
-        "eq": "x1[1] = x2[0], x2[1] = -9.8"
+        "eq": "x1[1] = x2[0], x2[1] = -1.0 * x1[0] - 0.05 * x2[0]"
       }
     ],
     "edge": [
       {
         "direction": "1 -> 1",
-        "condition": "x1 <= 0",
+        "condition": "x2 >= 5.25",
         "reset": {
-          "x1": [
-            0
-          ],
+          "x2": [
+            "-0.9 * x2[0]"
+          ]
+        }
+      },
+      {
+        "direction": "1 -> 1",
+        "condition": "x2 <= -5.25",
+        "reset": {
           "x2": [
             "-0.9 * x2[0]"
           ]
@@ -418,13 +424,11 @@ Performance is ranked from best (lowest error) to worst. Use these as inspiratio
     "total_time": 10.0,
     "order": 1,
     "need_reset": true,
-    "non_linear_items": "",
-    "self_loop": true,
-    "need_bias": true
+    "non_linear_items": ""
   }
 }
 ```
-**Metrics**: tc: 0.0000, max_diff: 1.8983, mean_diff: 0.0023
+**Metrics**: tc: 0.0000, max_diff: 2.0467, mean_diff: 0.6218
 
 -----------------------------------------
 
@@ -437,17 +441,23 @@ Performance is ranked from best (lowest error) to worst. Use these as inspiratio
     "mode": [
       {
         "id": 1,
-        "eq": "x1[1] = x2[0], x2[1] = -9.8"
+        "eq": "x1[1] = x2[0], x2[1] = -1.0 * x1[0] - 0.05 * x2[0]"
       }
     ],
     "edge": [
       {
         "direction": "1 -> 1",
-        "condition": "x1 <= 0",
+        "condition": "x2 >= 5.25",
         "reset": {
-          "x1": [
-            0
-          ],
+          "x2": [
+            "-0.9 * x2[0]"
+          ]
+        }
+      },
+      {
+        "direction": "1 -> 1",
+        "condition": "x2 <= -5.25",
+        "reset": {
           "x2": [
             "-0.9 * x2[0]"
           ]
@@ -460,16 +470,14 @@ Performance is ranked from best (lowest error) to worst. Use these as inspiratio
     "total_time": 10.0,
     "order": 1,
     "need_reset": true,
-    "non_linear_items": "",
-    "self_loop": true,
-    "need_bias": true
+    "non_linear_items": ""
   }
 }
 ```
 Evaluation Results:
   TC (Change-Point Error):0.000000 seconds
-  Max Difference:1.898268
-  Mean Difference:0.002260
+  Max Difference:2.046695
+  Mean Difference:0.621761
 
     
     
