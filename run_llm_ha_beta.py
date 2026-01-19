@@ -33,7 +33,7 @@ except ImportError:
 
 def save_phoenix_traces(save_dir: str = "phoenix_traces") -> str:
     """
-    Save all Phoenix traces to local Parquet files.
+    Save all Phoenix traces to local files using Phoenix's built-in save method.
     
     Args:
         save_dir: Directory to save traces to
@@ -48,20 +48,9 @@ def save_phoenix_traces(save_dir: str = "phoenix_traces") -> str:
     os.makedirs(save_dir, exist_ok=True)
     
     try:
-        import uuid
-        client = px.Client()
-        # Use new API: get_spans_dataframe() instead of deprecated get_trace_dataset()
-        spans_df = client.get_spans_dataframe()
-        
-        if spans_df is None or spans_df.empty:
-            print("[Phoenix] No traces to save")
-            return None
-            
-        # Save as Parquet file
-        trace_id = str(uuid.uuid4())[:8]
-        filepath = os.path.join(save_dir, f"trace_dataset-{trace_id}.parquet")
-        spans_df.to_parquet(filepath)
-        print(f"[Phoenix] Traces saved to: {filepath}")
+        # Use Phoenix's official get_trace_dataset().save() method
+        trace_id = px.Client().get_trace_dataset().save(directory=save_dir)
+        print(f"[Phoenix] Traces saved to: {save_dir} (trace_id: {trace_id})")
         return trace_id
     except Exception as e:
         print(f"[Phoenix] Failed to save traces: {e}")
@@ -70,25 +59,24 @@ def save_phoenix_traces(save_dir: str = "phoenix_traces") -> str:
 
 def load_phoenix_traces(trace_id: str, load_dir: str = "phoenix_traces"):
     """
-    Load previously saved Phoenix traces.
+    Load previously saved Phoenix traces using Phoenix's native TraceDataset.load().
     
     Args:
         trace_id: The trace ID returned from save_phoenix_traces()
         load_dir: Directory where traces were saved
         
     Returns:
-        pandas DataFrame containing spans
+        TraceDataset object (use .get_spans_dataframe() to get DataFrame)
     """
     if not PHOENIX_AVAILABLE:
         print("[Phoenix] Phoenix not available, cannot load traces")
         return None
         
     try:
-        import pandas as pd
-        filepath = os.path.join(load_dir, f"trace_dataset-{trace_id}.parquet")
-        spans_df = pd.read_parquet(filepath)
-        print(f"[Phoenix] Loaded traces from: {filepath}")
-        return spans_df
+        from phoenix.trace.trace_dataset import TraceDataset
+        trace_ds = TraceDataset.load(trace_id, directory=load_dir)
+        print(f"[Phoenix] Loaded traces from: {load_dir} (trace_id: {trace_id})")
+        return trace_ds
     except Exception as e:
         print(f"[Phoenix] Failed to load traces: {e}")
         return None
