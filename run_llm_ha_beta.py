@@ -48,16 +48,20 @@ def save_phoenix_traces(save_dir: str = "phoenix_traces") -> str:
     os.makedirs(save_dir, exist_ok=True)
     
     try:
+        import uuid
         client = px.Client()
-        trace_dataset = client.get_trace_dataset()
+        # Use new API: get_spans_dataframe() instead of deprecated get_trace_dataset()
+        spans_df = client.get_spans_dataframe()
         
-        if trace_dataset is None or len(trace_dataset) == 0:
+        if spans_df is None or spans_df.empty:
             print("[Phoenix] No traces to save")
             return None
             
         # Save as Parquet file
-        trace_id = trace_dataset.save(directory=save_dir)
-        print(f"[Phoenix] Traces saved to: {save_dir}/trace_dataset-{trace_id}.parquet")
+        trace_id = str(uuid.uuid4())[:8]
+        filepath = os.path.join(save_dir, f"trace_dataset-{trace_id}.parquet")
+        spans_df.to_parquet(filepath)
+        print(f"[Phoenix] Traces saved to: {filepath}")
         return trace_id
     except Exception as e:
         print(f"[Phoenix] Failed to save traces: {e}")
@@ -73,16 +77,18 @@ def load_phoenix_traces(trace_id: str, load_dir: str = "phoenix_traces"):
         load_dir: Directory where traces were saved
         
     Returns:
-        TraceDataset object
+        pandas DataFrame containing spans
     """
     if not PHOENIX_AVAILABLE:
         print("[Phoenix] Phoenix not available, cannot load traces")
         return None
         
     try:
-        trace_dataset = px.TraceDataset.load(trace_id, directory=load_dir)
-        print(f"[Phoenix] Loaded traces from: {load_dir}")
-        return trace_dataset
+        import pandas as pd
+        filepath = os.path.join(load_dir, f"trace_dataset-{trace_id}.parquet")
+        spans_df = pd.read_parquet(filepath)
+        print(f"[Phoenix] Loaded traces from: {filepath}")
+        return spans_df
     except Exception as e:
         print(f"[Phoenix] Failed to load traces: {e}")
         return None
@@ -931,11 +937,22 @@ def evaluate_ha_specification_with_feedback(
         return False, {}, "Could not extract valid HA specification from agent output (missing 'automaton' or 'config').", None
 
     # Find test data file
-    test_data_files = [f for f in os.listdir(input_data_path) if f.startswith('ground_truth') and f.endswith('.npz')]
+    # Ground truth files are in a folder with the same name but with "_g" suffix
+    # e.g., if input_data_path is "data_all/ATVA/ball", ground truth is in "data_all/ATVA/ball_g"
+    ground_truth_path = input_data_path.rstrip('/') + '_g'
+    
+    if os.path.isdir(ground_truth_path):
+        test_data_files = [f for f in os.listdir(ground_truth_path) if f.startswith('ground_truth') and f.endswith('.npz')]
+        test_data_base_path = ground_truth_path
+    else:
+        # Fallback: look in the original input_data_path
+        test_data_files = [f for f in os.listdir(input_data_path) if f.startswith('ground_truth') and f.endswith('.npz')]
+        test_data_base_path = input_data_path
+    
     if not test_data_files:
-        return False, {}, f"No .npz test data files found in {input_data_path}", ha_specification
+        return False, {}, f"No .npz test data files found in {ground_truth_path} or {input_data_path}", ha_specification
 
-    npz_file_path = os.path.join(input_data_path, test_data_files[0])
+    npz_file_path = os.path.join(test_data_base_path, test_data_files[0])
     
     # Check dimensions
     gt_data = np.load(npz_file_path, allow_pickle=True)
