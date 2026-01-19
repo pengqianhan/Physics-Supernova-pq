@@ -480,21 +480,21 @@ def obtain_task_and_images(input_data_path: str = None,
     task = f"""# HYBRID AUTOMATON SYSTEM IDENTIFICATION TASK
 
 ## Your Role
-You are a control systems engineer specializing in **Hybrid Automaton (HA) system identification**. Your objective is to infer a mathematically precise HA model from observed trajectory data that accurately captures the underlying switched dynamical system behavior.
+You are a control systems engineer specializing in **Hybrid Automaton (HA) system identification**. Your objective is to infer a mathematically precise HA model from observed trajectory data.
 
 ## Problem Context
 A Hybrid Automaton models a system with:
 1. **Discrete modes** (operating regimes with distinct continuous dynamics)
-2. **Mode-specific ODEs** (differential equations governing each regime)
+2. **Mode-specific ODEs** (differential equations governing each mode)
 3. **Switching conditions** (guard predicates triggering mode transitions)
 4. **Reset maps** (state updates upon mode transitions)
 
 
-## Quality Criteria
-Your HA specification will be evaluated on:
-- **Trajectory Matching**: Simulated output should closely follow ground truth data
-- **Mode Detection Accuracy**: Correct identification of switching instants (TC (Change-Point Error) < 0.01s is good, <= 0.001s is excellent)
-- **State Error Minimization**: Low Mean Difference (Mean Difference) and Maximum Difference (Max Difference) between predicted and actual states (Max Difference < 0.005 is good, < 0.0001 is excellent)"""
+## Metrics (lower is better)
+- `Max Difference < 0.01`: good fit
+- `Mean Difference < 0.005`: accurate overall
+- `TC (Change-Point Error) < 0.01s`: mode switch timing correct
+"""
 
     task += "\n## Tool and Sub-Agents Resources:\n"
     # Add tool-specific prompts (unified style: init empty -> conditionally set -> unconditionally append)
@@ -516,13 +516,13 @@ Your HA specification will be evaluated on:
     # Add managed agents prompt
     if managed_agents_list and len(managed_agents_list) > 0:
         MANAGE_AGENT_PROMPT = f"""
-\n**Sub-Agents Resources:** You have access to managed Code Agent(s): `{managed_agents_list}`. The `{managed_agents_list}` have access to the npz data files and can be used to analyze the data."""
+\nYou have access to managed Code Agent: `{managed_agents_list}` to analyze the npz data files."""
         task += MANAGE_AGENT_PROMPT
 
-    # Add self code agent prompt
-    if manager_type == "CodeAgent":
-        SELF_IS_CODE_AGENT_PROMPT = "\n## Code Execution Capability\nYou can use Python Code to execute programs, which may help with your task-solving process."
-        task += SELF_IS_CODE_AGENT_PROMPT
+    # # Add self code agent prompt
+    # if manager_type == "CodeAgent":
+    #     SELF_IS_CODE_AGENT_PROMPT = "\n## Code Execution Capability\nYou can use Python Code to execute programs, which may help with your task-solving process."
+    #     task += SELF_IS_CODE_AGENT_PROMPT
 
     # Generate dynamic HA template with correct var and input fields pre-filled
     dynamic_ha_template = generate_dynamic_ha_template(num_variables, num_inputs)
@@ -844,15 +844,18 @@ Your output MUST conform to this JSON Schema:
     task += f"""
 {ha_spec_docs}
 
-## ⚠️ CRITICAL: Variable Count is PRE-DEFINED ⚠️
-The `var` and `input` fields in the template below are **already correctly set** based on the ground truth data.
-- **DO NOT** add or remove variables!
-- **DO NOT** convert to state-space form (e.g., splitting 1 variable into x1, x2)!
-- For single-variable systems: use higher-order ODE notation (e.g., `x1[2] = ...` for 2nd-order)
+## CRITICAL: Variable Count is PRE-DEFINED
+- The `var` and `input` fields in  Initial Hybrid Automaton Specification (v0) are **already correctly set** based on the ground truth data. **DO NOT** add or remove variables!
 - Focus on inferring the **equations** (`eq`), **modes**, and **edge conditions** only!
+- **DO NOT** convert to state-space form (e.g., splitting 1 variable into x1, x2)!
+- ODEnotation:
+   - `x[0]` = variable value
+   - `x[1]` = first derivative (dx/dt)
+   - `x[2]` = second derivative (d²x/dt²)
+   - Left side = highest derivative (e.g., `x1[2] = ...` for order=2)
+- For single-variable systems: use higher-order ODE notation (e.g., `x1[2] = ...` for 2nd-order)
 
 ## Initial Hybrid Automaton Specification (v0)
-The `var` and `input` fields are pre-filled.
 
 ```json
 {dynamic_ha_template}
@@ -861,11 +864,10 @@ The `var` and `input` fields are pre-filled.
 ## Your Task
 Generate an improved HA specification (v1) that better matches the observed trajectory data.
 - **Keep `var: "{var_names}"` and `input: "{input_names if num_inputs > 0 else ''}"` exactly as shown!**
-- Make sure the HA specification is valid and complete.
-- Refine the HA specification to improve trajectory matching and reduce TC (Change-Point Error), Mean Difference, and Maximum Difference.
+- Make sure the HA specification is valid and complete according to the JSON Schema.
+- Refine the HA specification to improve trajectory matching and reduce `Max Difference`, `Mean Difference`, and `TC (Change-Point Error)`.
 
 ## Available Data
-The following data sources are provided:
 - **Trace visualizations**: {image_placeholders}, use the `hybrid_automaton_image_analysis` tool to analyze the image if you want to obtain more detailed information about the system.
 - **Raw data files**: {npz_placeholders}. If you want to use the npz data to analyze the system, you MUSTuse the `data_analysis_expert` agent to analyze the data. You can not analyze the npz data directly.
 """
