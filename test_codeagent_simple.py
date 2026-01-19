@@ -36,7 +36,7 @@ def get_data_info(data: dict) -> str:
 
 def main():
     # ========== 1. 预加载数据 ==========
-    npz_path = "utils/Dainarx_code/data_duffing/sample_train_0.npz"
+    npz_path = "data_all/ATVA/ball/sample_0.npz"
     
     print(f"正在加载数据: {npz_path}")
     loaded_data = load_npz_to_dict(npz_path)
@@ -77,16 +77,12 @@ def main():
 数据结构:
 {data_info}
 
-请写 Python 代码完成以下分析:
-1. 计算每个数组的基本统计量 (min, max, mean, std)
-2. 检查数据是否包含异常值 (如 NaN 或 Inf)
-3. 如果是时间序列数据，分析其趋势特征
-4. 给出你对这个数据集的理解和可能的应用场景
-
 注意:
 - 直接使用 `data['array_name']` 访问数据
 - 可以使用 numpy 进行计算
 - 请写完整的分析代码
+
+最终输出这个数据的维度信息。
 """
     
     print("=" * 60)

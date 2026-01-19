@@ -8,20 +8,84 @@ from prompts_ha.prompts import (
     HA_SPEC_DOCUMENTATION,
     get_ha_spec_documentation_with_schema,
 )
-# Load environment variables from .env file if it exists
 try:
     from dotenv import load_dotenv
-    load_dotenv(override=True)  # Load from .env file in the current directory
-    print("dotenv loaded successfully from .env file")
-    print(f"Currently using api key: {os.environ.get('GEMINI_API_KEY', 'Not Set')[:20]}...")
+    load_dotenv(override=True)
 except ImportError:
-    # dotenv not available, continue without it
-    print("dotenv not available, continuing without it")
     pass
-except Exception:
-    # .env file doesn't exist or other error, continue without raising exception
-    print("Error loading .env file, continuing without it")
-    pass
+
+# === Agent Monitoring (Phoenix - Free Local Solution) ===
+PHOENIX_AVAILABLE = False
+try:
+    import phoenix as px
+    from phoenix.otel import register
+    from openinference.instrumentation.smolagents import SmolagentsInstrumentor
+    # Use timestamped project name to separate runs
+    project_name = f"ha_llm_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    register(project_name=project_name)
+    SmolagentsInstrumentor().instrument()
+    PHOENIX_AVAILABLE = True
+    print(f"[Telemetry] Phoenix monitoring enabled (project: {project_name}) - visit http://localhost:6006")
+except ImportError:
+    print("[Telemetry] Phoenix not installed. Install: pip install arize-phoenix openinference-instrumentation-smolagents")
+# =============================================
+
+
+def save_phoenix_traces(save_dir: str = "phoenix_traces") -> str:
+    """
+    Save all Phoenix traces to local Parquet files.
+    
+    Args:
+        save_dir: Directory to save traces to
+        
+    Returns:
+        trace_id if successful, None otherwise
+    """
+    if not PHOENIX_AVAILABLE:
+        print("[Phoenix] Phoenix not available, cannot save traces")
+        return None
+        
+    os.makedirs(save_dir, exist_ok=True)
+    
+    try:
+        client = px.Client()
+        trace_dataset = client.get_trace_dataset()
+        
+        if trace_dataset is None or len(trace_dataset) == 0:
+            print("[Phoenix] No traces to save")
+            return None
+            
+        # Save as Parquet file
+        trace_id = trace_dataset.save(directory=save_dir)
+        print(f"[Phoenix] Traces saved to: {save_dir}/trace_dataset-{trace_id}.parquet")
+        return trace_id
+    except Exception as e:
+        print(f"[Phoenix] Failed to save traces: {e}")
+        return None
+
+
+def load_phoenix_traces(trace_id: str, load_dir: str = "phoenix_traces"):
+    """
+    Load previously saved Phoenix traces.
+    
+    Args:
+        trace_id: The trace ID returned from save_phoenix_traces()
+        load_dir: Directory where traces were saved
+        
+    Returns:
+        TraceDataset object
+    """
+    if not PHOENIX_AVAILABLE:
+        print("[Phoenix] Phoenix not available, cannot load traces")
+        return None
+        
+    try:
+        trace_dataset = px.TraceDataset.load(trace_id, directory=load_dir)
+        print(f"[Phoenix] Loaded traces from: {load_dir}")
+        return trace_dataset
+    except Exception as e:
+        print(f"[Phoenix] Failed to load traces: {e}")
+        return None
 
 import argparse
 
@@ -150,7 +214,7 @@ TOOLNAME2TOOL = {
 
 def _create_HA_agent(Tools_list: List[type[Tool]],
                      markdown_content: MarkdownMessage,
-                     model_id: str = "gemini/gemini-3-flash-preview",
+                     model_id: str = "gemini/gemini-flash-lite-latest",
                      managed_agents_list: List[MultiStepAgent] = None,
                      max_steps: int = 80,
                      **kwargs) -> ToolCallingAgent | CodeAgent:
@@ -333,7 +397,7 @@ data = np.load(DATA_FILE_PATH)
 
 
 # create the agent
-def create_agent(model_id: str = "gemini/gemini-3-flash-preview",
+def create_agent(model_id: str = "gemini/gemini-flash-lite-latest",
                 input_data_path: str = None,
                 tools_list: List[str] = [],
                 managed_agents_list: List[str] = None,
@@ -867,7 +931,7 @@ def evaluate_ha_specification_with_feedback(
         return False, {}, "Could not extract valid HA specification from agent output (missing 'automaton' or 'config').", None
 
     # Find test data file
-    test_data_files = [f for f in os.listdir(input_data_path) if f.endswith('.npz')]
+    test_data_files = [f for f in os.listdir(input_data_path) if f.startswith('ground_truth') and f.endswith('.npz')]
     if not test_data_files:
         return False, {}, f"No .npz test data files found in {input_data_path}", ha_specification
 
@@ -956,7 +1020,7 @@ def parse_args():
     ap.add_argument(
         "--manager-model",
         type=str,
-        default="gemini/gemini-3-flash-preview",
+        default="gemini/gemini-flash-lite-latest",
         help="Model ID to use for the agent.",
     )
 
@@ -982,13 +1046,13 @@ def parse_args():
     ap.add_argument(
         "--image-tool-model",
         type=str,
-        default="gemini-3-flash-preview",
+        default="gemini-flash-lite-latest",
         help="Model ID to use for the image analysis tool (Gemini API format).",
     )
     ap.add_argument(
         "--review-tool-model",
         type=str,
-        default="gemini-3-flash-preview",
+        default="gemini-flash-lite-latest",
         help="Model ID to use for the review tool (Gemini API format).",
     )
     ap.add_argument(
@@ -1011,7 +1075,7 @@ def parse_args():
     ap.add_argument(
         "--managed-agents-list-model",
         type=str,
-        default="gemini/gemini-3-flash-preview",
+        default="gemini/gemini-flash-lite-latest",
         help="Model ID to use for managed agents.",
     )
 
@@ -1074,6 +1138,14 @@ def parse_args():
         type=bool,
         default=True,
         help="Include JSON Schema in the task prompt for structured output (default: True)",
+    )
+
+    # Phoenix traces saving option
+    ap.add_argument(
+        "--save-traces-dir",
+        type=str,
+        default="phoenix_traces",
+        help="Directory to save Phoenix traces (default: phoenix_traces). Set to empty string to disable saving.",
     )
 
     args = ap.parse_args()
@@ -1207,10 +1279,21 @@ def main():
             continue
 
         # Evaluate the generated HA specification
+        # Extract relative path from input_data_path to mirror structure in evaluation_results
+        # e.g., "data_all/ATVA/ball" -> "ATVA/ball"
+        if args.input_data_path.startswith("data_all/"):
+            relative_data_path = args.input_data_path[len("data_all/"):]
+        elif args.input_data_path.startswith("data_all"):
+            relative_data_path = args.input_data_path[len("data_all"):].lstrip("/")
+        else:
+            relative_data_path = os.path.basename(args.input_data_path)
+
+        eval_output_dir = os.path.join("evaluation_results", relative_data_path, f"iter_{iteration}")
+
         success, metrics, feedback_str, ha_spec = evaluate_ha_specification_with_feedback(
             result,
             args.input_data_path,
-            output_dir=os.path.join("evaluation_results", f"iter_{iteration}"),
+            output_dir=eval_output_dir,
             hyperparameters=hyperparameters,
             iteration=iteration
         )
@@ -1278,12 +1361,27 @@ def main():
     # Final Evaluation of the best result (saved to main evaluation folder)
     if results_aggregator.best_result and results_aggregator.best_result.ha_specification:
         print("\n--- Final Evaluation of Best Result ---")
+        # Extract relative path from input_data_path to mirror structure in evaluation_results
+        # e.g., "data_all/ATVA/ball" -> "ATVA/ball"
+        if args.input_data_path.startswith("data_all/"):
+            relative_data_path = args.input_data_path[len("data_all/"):]
+        elif args.input_data_path.startswith("data_all"):
+            relative_data_path = args.input_data_path[len("data_all"):].lstrip("/")
+        else:
+            relative_data_path = os.path.basename(args.input_data_path)
+
         # Save the best HA specification to a JSON file
-        best_spec_path = os.path.join("evaluation_results", "best_ha_specification.json")
-        os.makedirs("evaluation_results", exist_ok=True)
+        best_spec_dir = os.path.join("evaluation_results", relative_data_path)
+        best_spec_path = os.path.join(best_spec_dir, "best_ha_specification.json")
+        os.makedirs(best_spec_dir, exist_ok=True)
         with open(best_spec_path, "w", encoding="utf-8") as f:
             json.dump(results_aggregator.best_result.ha_specification, f, indent=2)
         print(f"Best HA specification saved to: {best_spec_path}")
+
+    # Save Phoenix traces to local storage
+    if args.save_traces_dir:
+        print("\n--- Saving Phoenix Traces ---")
+        save_phoenix_traces(save_dir=args.save_traces_dir)
 
 
 if __name__ == "__main__":
