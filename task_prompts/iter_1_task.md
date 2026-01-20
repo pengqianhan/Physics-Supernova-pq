@@ -328,6 +328,7 @@ Your output MUST conform to this JSON Schema:
 }
 ```
 
+
 ## CRITICAL: Variable Count is PRE-DEFINED
 - The `var` and `input` fields in  Initial Hybrid Automaton Specification (v0) are **already correctly set** based on the ground truth data. **DO NOT** add or remove variables!
 - Focus on inferring the **equations** (`eq`), **modes**, and **edge conditions** only!
@@ -365,11 +366,11 @@ Your output MUST conform to this JSON Schema:
 ```
 
 ## Your Task
-Generate an improved HA specification (v1) that better matches the observed trajectory data.
+Generate an improved HA specification that better matches the observed trajectory data.
 - **Keep `var: "x1, x2"` and `input: ""` exactly as shown!**
 - Make sure the HA specification is valid and complete according to the JSON Schema.
 - Refine the HA specification to improve trajectory matching and reduce `Max Difference`, `Mean Difference`, and `TC (Change-Point Error)`.
 
 ## Available Data
 - **Trace visualizations**: ['<image_0>', '<image_1>', '<image_2>'], use the `hybrid_automaton_image_analysis` tool to analyze the image if you want to obtain more detailed information about the system.
-- **Raw data files**: ['<npz_0>', '<npz_1>', '<npz_2>']. If you want to use the npz data to analyze the system, you MUSTuse the `data_analysis_expert` agent to analyze the data. You can not analyze the npz data directly.
+- **Raw data files**: ['<npz_0>', '<npz_1>', '<npz_2>']. If you want to use the npz data to analyze the system, you MUST use the `data_analysis_expert` agent to analyze the data. You can not analyze the npz data directly.

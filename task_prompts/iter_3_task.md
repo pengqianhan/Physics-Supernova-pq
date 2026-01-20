@@ -1,28 +1,26 @@
 # HYBRID AUTOMATON SYSTEM IDENTIFICATION TASK
 
 ## Your Role
-You are a control systems engineer specializing in **Hybrid Automaton (HA) system identification**. Your objective is to infer a mathematically precise HA model from observed trajectory data that accurately captures the underlying switched dynamical system behavior.
+You are a control systems engineer specializing in **Hybrid Automaton (HA) system identification**. Your objective is to infer a mathematically precise HA model from observed trajectory data.
 
 ## Problem Context
 A Hybrid Automaton models a system with:
 1. **Discrete modes** (operating regimes with distinct continuous dynamics)
-2. **Mode-specific ODEs** (differential equations governing each regime)
+2. **Mode-specific ODEs** (differential equations governing each mode)
 3. **Switching conditions** (guard predicates triggering mode transitions)
 4. **Reset maps** (state updates upon mode transitions)
 
 
-## Quality Criteria
-Your HA specification will be evaluated on:
-- **Trajectory Matching**: Simulated output should closely follow ground truth data
-- **Mode Detection Accuracy**: Correct identification of switching instants (TC (Change-Point Error) < 0.01s is good, <= 0.001s is excellent)
-- **State Error Minimization**: Low Mean Difference (Mean Difference) and Maximum Difference (Max Difference) between predicted and actual states (Max Difference < 0.005 is good, < 0.0001 is excellent)
+## Metrics (lower is better)
+- `Max Difference < 0.01`: good fit
+- `Mean Difference < 0.005`: accurate overall
+- `TC (Change-Point Error) < 0.01s`: mode switch timing correct
+
 ## Tool and Sub-Agents Resources:
 
 You MUST use the `hybrid_automaton_image_analysis` tool to analyze the image if you want to obtain more detailed information about the system.Before submitting your final answer, you MUST call the `validate_hybrid_automaton_specification` tool to check for syntax and semantic errors. If validation returns a FIXED specification, use the corrected version in your final answer!
 
-**Sub-Agents Resources:** You have access to managed Code Agent(s): `['data_analysis_expert']`. The `['data_analysis_expert']` have access to the npz data files and can be used to analyze the data.
-## Code Execution Capability
-You can use Python Code to execute programs, which may help with your task-solving process.
+You have access to managed Code Agent: `['data_analysis_expert']` to analyze the npz data files.
 ## Hybrid Automaton Specification Format (JSON Schema)
 
 ### JSON Schema Definition
@@ -330,15 +328,19 @@ Your output MUST conform to this JSON Schema:
 }
 ```
 
-## ⚠️ CRITICAL: Variable Count is PRE-DEFINED ⚠️
-The `var` and `input` fields in the template below are **already correctly set** based on the ground truth data.
-- **DO NOT** add or remove variables!
-- **DO NOT** convert to state-space form (e.g., splitting 1 variable into x1, x2)!
-- For single-variable systems: use higher-order ODE notation (e.g., `x1[2] = ...` for 2nd-order)
+
+## CRITICAL: Variable Count is PRE-DEFINED
+- The `var` and `input` fields in  Initial Hybrid Automaton Specification (v0) are **already correctly set** based on the ground truth data. **DO NOT** add or remove variables!
 - Focus on inferring the **equations** (`eq`), **modes**, and **edge conditions** only!
+- **DO NOT** convert to state-space form (e.g., splitting 1 variable into x1, x2)!
+- ODEnotation:
+   - `x[0]` = variable value
+   - `x[1]` = first derivative (dx/dt)
+   - `x[2]` = second derivative (d²x/dt²)
+   - Left side = highest derivative (e.g., `x1[2] = ...` for order=2)
+- For single-variable systems: use higher-order ODE notation (e.g., `x1[2] = ...` for 2nd-order)
 
 ## Initial Hybrid Automaton Specification (v0)
-The `var` and `input` fields are pre-filled.
 
 ```json
 {
@@ -364,17 +366,16 @@ The `var` and `input` fields are pre-filled.
 ```
 
 ## Your Task
-Generate an improved HA specification (v1) that better matches the observed trajectory data.
+Generate an improved HA specification that better matches the observed trajectory data.
 - **Keep `var: "x1, x2"` and `input: ""` exactly as shown!**
-- Make sure the HA specification is valid and complete.
-- Refine the HA specification to improve trajectory matching and reduce TC (Change-Point Error), Mean Difference, and Maximum Difference.
+- Make sure the HA specification is valid and complete according to the JSON Schema.
+- Refine the HA specification to improve trajectory matching and reduce `Max Difference`, `Mean Difference`, and `TC (Change-Point Error)`.
 
 ## Available Data
-The following data sources are provided:
 - **Trace visualizations**: ['<image_0>', '<image_1>', '<image_2>'], use the `hybrid_automaton_image_analysis` tool to analyze the image if you want to obtain more detailed information about the system.
-- **Raw data files**: ['<npz_0>', '<npz_1>', '<npz_2>']. If you want to use the npz data to analyze the system, you MUSTuse the `data_analysis_expert` agent to analyze the data. You can not analyze the npz data directly.
+- **Raw data files**: ['<npz_0>', '<npz_1>', '<npz_2>']. If you want to use the npz data to analyze the system, you MUST use the `data_analysis_expert` agent to analyze the data. You can not analyze the npz data directly.
 
-## ⚠️ FEEDBACK FROM PREVIOUS ITERATION
+## FEEDBACK FROM PREVIOUS ITERATION
 The following feedback was generated from evaluating your previous attempt. Use it to guide your next refinement:
     
     
@@ -385,8 +386,8 @@ Performance is ranked from best (lowest error) to worst. Use these as inspiratio
 
 --- Explored Specifications (Ranked) ---
 
-### Rank 1 (Iteration 1)
-**Error**: 2.046695
+### Rank 1 (Iteration 2)
+**Error**: 0.205267
 ```json
 {
   "automaton": {
@@ -395,40 +396,83 @@ Performance is ranked from best (lowest error) to worst. Use these as inspiratio
     "mode": [
       {
         "id": 1,
-        "eq": "x1[1] = x2[0], x2[1] = -1.0 * x1[0] - 0.05 * x2[0]"
+        "eq": "x1[1] = x2[0], x2[1] = -1.0 * x1[0] - 0.7 * x2[0]"
+      },
+      {
+        "id": 2,
+        "eq": "x1[1] = x2[0], x2[1] = -0.5 * x2[0]"
       }
     ],
     "edge": [
       {
-        "direction": "1 -> 1",
-        "condition": "x2 >= 5.25",
+        "direction": "1 -> 2",
+        "condition": "x1 <= 0.0",
         "reset": {
+          "x1": [
+            "0"
+          ],
           "x2": [
-            "-0.9 * x2[0]"
+            "-0.95 * x2[0]"
           ]
         }
       },
       {
-        "direction": "1 -> 1",
-        "condition": "x2 <= -5.25",
-        "reset": {
-          "x2": [
-            "-0.9 * x2[0]"
-          ]
-        }
+        "direction": "2 -> 1",
+        "condition": "x1 > 0.0"
       }
     ]
   },
   "config": {
     "dt": 0.001,
-    "total_time": 10.0,
-    "order": 1,
-    "need_reset": true,
-    "non_linear_items": ""
+    "total_time": 10.0
   }
 }
 ```
-**Metrics**: tc: 0.0000, max_diff: 2.0467, mean_diff: 0.6218
+**Metrics**: tc: 4.2720, max_diff: 1.1883, mean_diff: 0.2053
+
+### Rank 2 (Iteration 1)
+**Error**: 0.251594
+```json
+{
+  "automaton": {
+    "var": "x1, x2",
+    "input": "",
+    "mode": [
+      {
+        "id": 1,
+        "eq": "x1[1] = x2[0], x2[1] = -1.0 * x1[0] - 0.5 * x2[0]"
+      },
+      {
+        "id": 2,
+        "eq": "x1[1] = -0.5 * x1[0], x2[1] = -0.5 * x2[0]"
+      }
+    ],
+    "edge": [
+      {
+        "direction": "1 -> 2",
+        "condition": "x1 <= 0.0",
+        "reset": {
+          "x1": [
+            "0"
+          ],
+          "x2": [
+            "-0.9*x2[0]"
+          ]
+        }
+      },
+      {
+        "direction": "2 -> 1",
+        "condition": "x1 > 0.0"
+      }
+    ]
+  },
+  "config": {
+    "dt": 0.001,
+    "total_time": 10.0
+  }
+}
+```
+**Metrics**: tc: 0.8440, max_diff: 1.2090, mean_diff: 0.2516
 
 -----------------------------------------
 
@@ -441,31 +485,42 @@ Performance is ranked from best (lowest error) to worst. Use these as inspiratio
     "mode": [
       {
         "id": 1,
-        "eq": "x1[1] = x2, x2[1] = -10.0 * x1 - 0.5 * x2"
+        "eq": "x1[1] = x2[0], x2[1] = -1.0 * x1[0] - 0.7 * x2[0]"
+      },
+      {
+        "id": 2,
+        "eq": "x1[1] = x2[0], x2[1] = -0.5 * x2[0]"
       }
     ],
     "edge": [
       {
-        "direction": "1 -> 1",
-        "condition": "x1 == 0",
+        "direction": "1 -> 2",
+        "condition": "x1 <= 0.0",
         "reset": {
+          "x1": [
+            "0"
+          ],
           "x2": [
-            "-0.9 * x2[0]"
+            "-0.95 * x2[0]"
           ]
         }
+      },
+      {
+        "direction": "2 -> 1",
+        "condition": "x1 > 0.0"
       }
     ]
   },
   "config": {
     "dt": 0.001,
-    "total_time": 10.0,
-    "order": 1,
-    "need_reset": true,
-    "non_linear_items": ""
+    "total_time": 10.0
   }
 }
 ```
 Evaluation Results:
-The HA specification is not valid. Please try to generate a valid specification. Here is the error message: name 'x2' is not defined
+  TC (Change-Point Error):4.272000 seconds
+  Max Difference:1.188328
+  Mean Difference:0.205267
+
     
     
