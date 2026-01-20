@@ -835,6 +835,7 @@ if __name__ == "__main__":
         dt=0.001,
         total_time=10.0
     )
+    ## Because the ball system only has one mode, so the TC is always 0
 
     # Mode 1: Single plot (simulated only) with metrics
     print("\n1. Generating single plot (simulated only)...")
