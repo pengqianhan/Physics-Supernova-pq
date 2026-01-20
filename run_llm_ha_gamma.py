@@ -591,10 +591,6 @@ def evaluate_ha_specification_with_feedback(
     """
     Evaluate the generated Hybrid Automaton specification and return feedback for the agent.
 
-    采用两阶段架构:
-    - 阶段 1: 传统提取方法 (extract_and_fix_ha_spec)
-    - 阶段 2: 如果阶段 1 失败，使用 LLM 结构化输出转换
-
     Args:
         agent_result: Result from the agent.run() call
         input_data_path: Path to the directory containing test .npz files
