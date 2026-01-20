@@ -84,7 +84,7 @@ HA_JSON_SCHEMA = {
         "config": {
             "type": "object",
             "description": "Simulation and learning configuration parameters",
-            "required": ["dt", "total_time"],
+            "required": ["dt", "total_time", "order"],
             "properties": {
                 "dt": {
                     "type": "number",
@@ -175,7 +175,7 @@ HA_JSON_SCHEMA = {
                     "description": "Optional state reset map. Keys are variable names, values are arrays of reset expressions.",
                     "additionalProperties": {
                         "type": "array",
-                        "description": "Reset values for each derivative order. Use '' to preserve current value.",
+                        "description": "Reset values for each derivative order: [x[0], x[1], ...]. Use '' to preserve current value.",
                         "items": {
                             "oneOf": [
                                 {"type": "string"},
