@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 from collections import defaultdict
 from dataclasses import dataclass, field
-from utils.prompts import ha_spec_docs
+from utils.prompt import ha_spec_docs
 try:
     from dotenv import load_dotenv
     load_dotenv(override=True)

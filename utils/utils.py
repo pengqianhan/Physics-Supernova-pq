@@ -40,6 +40,10 @@ class HAHyperparameters:
 
     # Other configuration
     use_json_schema: bool = True
+    
+    # Two-stage structured output configuration
+    use_structured_output: bool = True
+    structured_output_model: str = "gemini/gemini-2.0-flash"
 
     def to_string(self) -> str:
         """Convert hyperparameters to a formatted string for logging."""
@@ -77,6 +81,8 @@ class HAHyperparameters:
             "",
             "--- Other ---",
             f"Use JSON Schema: {self.use_json_schema}",
+            f"Use Structured Output: {self.use_structured_output}",
+            f"Structured Output Model: {self.structured_output_model}",
             "=" * 60,
         ]
         return "\n".join(lines)
