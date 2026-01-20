@@ -43,7 +43,7 @@ class HAHyperparameters:
     
     # Two-stage structured output configuration
     use_structured_output: bool = True
-    structured_output_model: str = "gemini/gemini-2.0-flash"
+    structured_output_model: str = "gemini/gemini-3-flash-preview"
 
     def to_string(self) -> str:
         """Convert hyperparameters to a formatted string for logging."""
