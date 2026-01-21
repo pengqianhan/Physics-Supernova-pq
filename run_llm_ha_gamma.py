@@ -692,7 +692,6 @@ def build_artifact_manifest(
             "tc": metrics.get('tc', None),
             "max_diff": metrics.get('max_diff', None),
             "mean_diff": metrics.get('mean_diff', None),
-            "clustering_error": metrics.get('clustering_error', None)
         },
         "plot_summary": plot_summary,
         "artifacts": [
