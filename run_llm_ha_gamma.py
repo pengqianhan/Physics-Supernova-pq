@@ -989,8 +989,8 @@ def parse_args():
     ap.add_argument(
         "--summary-model",
         type=str,
-        default="gemini-flash-lite-latest",
-        help="Model ID for gen_summary LLM-based evaluation analysis (default: gemini-flash-lite-latest).",
+        default="gemini/gemini-flash-lite-latest",
+        help="Model ID for gen_summary LLM-based evaluation analysis (default: gemini/gemini-flash-lite-latest).",
     )
 
     # agent names of managed agents
