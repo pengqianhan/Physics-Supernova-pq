@@ -372,6 +372,8 @@ data = np.load(DATA_FILE_PATH)
             "scipy", "scipy.linalg", "scipy.optimize", "scipy.interpolate",
             "scipy.integrate", "scipy.stats", "scipy.signal", "scipy.fft",
             "scipy.sparse", "scipy.ndimage", "scipy.special"
+            # 
+            "pysindy","gradient_free_optimizers","gradient_free_optimizers.BayesianOptimizer"
         ],
             description=managed_agent_description,
             max_steps=80,
