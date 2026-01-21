@@ -4,8 +4,7 @@ import openai
 from smolagents.default_tools import Tool
 from base64 import b64decode
 
-# Import smolagents components for LLM model and message handling
-from smolagents.models import ChatMessage, MessageRole
+# Import smolagents components for message handling
 from .markdown_utils import MarkdownMessage
 from dotenv import load_dotenv
 load_dotenv()
@@ -15,21 +14,21 @@ class HybridAutomatonImageTool(Tool):
 
     name = "hybrid_automaton_image_analysis"
     description = (
-        "Given an image reference and a question, return the image expert's answer about that image. "
-        "Supports two input types: (1) placeholder like <image_N> for trace images, or "
-        "(2) file path like 'evaluation_results/runs/.../overlay.png' for evaluator plots. "
+        "Given an image placeholder and a question, return the image expert's answer about that image. "
+        "Accepts placeholders only: (1) <image_N> for original trace images from markdown, or "
+        "(2) <iter_image_N> for evaluator plots registered during iteration. "
         "When you need to measure quantities or analyze trajectory comparisons, you MUST call this tool."
     )
     inputs = {
         "image_ref": {
             "type": "string",
-            "description": "Image reference: either <image_N> placeholder or file path to evaluation plot"
+            "description": "Image placeholder: <image_N> for trace images or <iter_image_N> for evaluator plots"
         },
         "question": {"type": "string", "description": "Question to ask about the image"},
     }
     output_type = "string"
 
-    # Allowed image extensions for file path mode
+    # Allowed image extensions for file path validation during registration
     ALLOWED_EXTENSIONS = {'.png', '.jpg', '.jpeg', '.webp', '.gif'}
     # Allowed directory prefixes for security (relative to repo root)
     ALLOWED_PATH_PREFIXES = ['evaluation_results/', 'data_all/']
@@ -44,6 +43,8 @@ class HybridAutomatonImageTool(Tool):
         )
         self.vision_model_id = vision_model_id
         self.max_short_side_pixels = max_short_side_pixels  # Maximum image resolution for processing
+        # Registry for iteration images (evaluator plots registered upstream)
+        self._iteration_images: dict[int, bytes] = {}
 
     def _is_valid_file_path(self, path: str) -> tuple[bool, str]:
         """
@@ -78,9 +79,10 @@ class HybridAutomatonImageTool(Tool):
 
         return True, ""
 
-    def _extract_image_bytes_from_file(self, file_path: str) -> tuple[bytes | None, str]:
+    def _load_image_bytes_from_file(self, file_path: str) -> tuple[bytes | None, str]:
         """
         Read image bytes from a file path with security validation.
+        Used internally during image registration.
 
         Args:
             file_path: Path to the image file
@@ -107,70 +109,135 @@ class HybridAutomatonImageTool(Tool):
         except Exception as e:
             return None, f"Failed to read file: {str(e)}"
 
-    def _extract_image_bytes_from_placeholder(self, image_ref: str) -> bytes | None:
+    def register_iteration_image(self, index: int, source: str | bytes) -> tuple[bool, str]:
         """
-        Extract image bytes from markdown content using image reference like <image_1>.
+        Register an evaluator plot image for later analysis via <iter_image_N> placeholder.
+
+        Call this method upstream (before forward()) to make evaluator plots available
+        for analysis using consistent placeholder-based references.
 
         Args:
-            image_ref: Image reference placeholder (e.g. <image_N> or plain number)
+            index: The iteration image index (used in <iter_image_N> placeholder)
+            source: Either raw image bytes or a file path to load from
 
         Returns:
-            Image bytes from markdown content or None if not found
-        """
-        if not self.worker_agent or not hasattr(self.worker_agent, "markdown_content_high_res_image"):
-            return None
-        md: MarkdownMessage = self.worker_agent.markdown_content_high_res_image
-        # Parse image reference to extract index (supports both <image_N> and plain numbers)
-        idx = None
-        if image_ref.startswith("<image_") and image_ref.endswith(">"):
-            try:
-                idx = int(image_ref.strip("<image_>"))  # Convert to 0-based index
-            except ValueError:
-                pass
-        else:
-            try:
-                idx = int(image_ref)  # Handle plain number references
-            except ValueError:
-                pass
-        if idx is None:
-            return None
-        # Extract all image blocks from markdown content
-        img_blocks = [it for it in md.content if it.get("type") == "image_url"]
-        if 0 <= idx < len(img_blocks):
-            data_url = img_blocks[idx]["image_url"]["url"]
-            if data_url.startswith("data:image"):
-                base64_part = data_url.split(",", 1)[1]  # Remove data URL prefix
-                return b64decode(base64_part)  # Decode base64 to bytes
-        return None
+            Tuple of (success, error_message)
 
-    def _extract_image_bytes(self, image_ref: str) -> tuple[bytes | None, str]:
+        Example:
+            # Register from file path
+            tool.register_iteration_image(0, "evaluation_results/run_1/overlay.png")
+            # Then analyze using placeholder
+            tool.forward("<iter_image_0>", "What does this plot show?")
         """
-        Extract image bytes from either a placeholder or file path.
+        if isinstance(source, bytes):
+            self._iteration_images[index] = source
+            return True, ""
+        elif isinstance(source, str):
+            img_bytes, error_msg = self._load_image_bytes_from_file(source)
+            if img_bytes is None:
+                return False, error_msg
+            self._iteration_images[index] = img_bytes
+            return True, ""
+        # Defensive runtime check (type checker marks as unreachable due to type annotation)
+        return False, f"Invalid source type: {type(source)}. Expected bytes or str (file path)."  # type: ignore[unreachable]
+
+    def clear_iteration_images(self) -> None:
+        """
+        Clear all registered iteration images.
+
+        Call this between evaluation runs to reset the image registry.
+        """
+        self._iteration_images.clear()
+
+    def get_registered_iteration_indices(self) -> list[int]:
+        """
+        Get list of registered iteration image indices.
+
+        Returns:
+            List of indices that have registered images
+        """
+        return sorted(self._iteration_images.keys())
+
+    def _extract_image_bytes_from_placeholder(self, image_ref: str) -> tuple[bytes | None, str]:
+        """
+        Extract image bytes using placeholder reference.
+
+        Supports two placeholder types:
+        - <image_N>: Original trace images from markdown content
+        - <iter_image_N>: Evaluator plots registered via register_iteration_image()
 
         Args:
-            image_ref: Image reference - either <image_N> placeholder or file path
+            image_ref: Image reference placeholder
 
         Returns:
             Tuple of (image_bytes or None, error_message)
         """
-        # Determine if this is a placeholder or file path
-        is_placeholder = (
-            image_ref.startswith("<image_") and image_ref.endswith(">")
-        ) or image_ref.isdigit()
+        # Handle <iter_image_N> placeholders (evaluator plots)
+        if image_ref.startswith("<iter_image_") and image_ref.endswith(">"):
+            try:
+                idx = int(image_ref[len("<iter_image_"):-1])
+            except ValueError:
+                return None, f"Invalid iteration image placeholder format: {image_ref}"
 
-        if is_placeholder:
-            # Handle placeholder reference
-            img_bytes = self._extract_image_bytes_from_placeholder(image_ref)
-            if img_bytes is None:
-                return None, f"Could not find image {image_ref}. Valid format: <image_N> where N is 0-indexed."
-            return img_bytes, ""
+            if idx not in self._iteration_images:
+                available = self.get_registered_iteration_indices()
+                if available:
+                    return None, f"Iteration image {idx} not registered. Available: {available}"
+                else:
+                    return None, f"No iteration images registered. Call register_iteration_image() first."
+            return self._iteration_images[idx], ""
+
+        # Handle <image_N> placeholders (original markdown images)
+        if image_ref.startswith("<image_") and image_ref.endswith(">"):
+            try:
+                idx = int(image_ref[len("<image_"):-1])
+            except ValueError:
+                return None, f"Invalid image placeholder format: {image_ref}"
+        elif image_ref.isdigit():
+            idx = int(image_ref)  # Handle plain number references
         else:
-            # Handle file path reference
-            return self._extract_image_bytes_from_file(image_ref)
+            return None, f"Invalid placeholder format: {image_ref}. Use <image_N> or <iter_image_N>."
+
+        # Extract from markdown content
+        if not self.worker_agent or not hasattr(self.worker_agent, "markdown_content_high_res_image"):
+            return None, "No markdown content available. Ensure worker_agent is set with markdown_content_high_res_image."
+
+        md: MarkdownMessage = self.worker_agent.markdown_content_high_res_image
+        img_blocks = [it for it in md.content if it.get("type") == "image_url"]
+
+        if not (0 <= idx < len(img_blocks)):
+            return None, f"Image index {idx} out of range. Available: 0-{len(img_blocks)-1}"
+
+        data_url = img_blocks[idx]["image_url"]["url"]
+        if data_url.startswith("data:image"):
+            base64_part = data_url.split(",", 1)[1]
+            return b64decode(base64_part), ""
+
+        return None, f"Image {idx} has invalid data URL format."
+
+    def _extract_image_bytes(self, image_ref: str) -> tuple[bytes | None, str]:
+        """
+        Extract image bytes from a placeholder reference.
+
+        Only accepts placeholder-based inputs:
+        - <image_N>: Original trace images from markdown content
+        - <iter_image_N>: Evaluator plots registered via register_iteration_image()
+
+        File paths are NOT supported in forward(). To analyze evaluator plots,
+        register them first using register_iteration_image(), then reference
+        them via <iter_image_N> placeholders.
+
+        Args:
+            image_ref: Image placeholder reference
+
+        Returns:
+            Tuple of (image_bytes or None, error_message)
+        """
+        return self._extract_image_bytes_from_placeholder(image_ref)
 
     def forward(self, image_ref: str, question: str) -> str:  # type: ignore[override]
         """Process image analysis request and return expert response."""
-        # Extract image bytes (supports both <image_N> placeholders and file paths)
+        # Extract image bytes from placeholder (<image_N> or <iter_image_N>)
         img_bytes, error_msg = self._extract_image_bytes(image_ref)
 
         if img_bytes is None:
@@ -241,4 +308,10 @@ class HybridAutomatonImageTool(Tool):
 
 if __name__ == "__main__":
     tool = HybridAutomatonImageTool()
-    print(tool.forward("sample_0.png", "What is the plot of the data collected from the system?"))
+
+    # Example: Register an evaluator plot, then analyze via placeholder
+    # tool.register_iteration_image(0, "evaluation_results/run_1/overlay.png")
+    # print(tool.forward("<iter_image_0>", "What does this plot show?"))
+
+    # For testing without actual image, this will show an error message
+    print(tool.forward("<iter_image_0>", "What is the plot of the data collected from the system?"))

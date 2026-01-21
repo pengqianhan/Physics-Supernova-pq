@@ -578,8 +578,8 @@ Generate an improved HA specification that better matches the observed trajector
 
 ## Analyzing Evaluation Results (For Iterations 2+)
 When feedback includes an `Evaluation Artifacts (JSON)` section, you can analyze the comparison plot:
-1. Find the `artifacts[].path` in the JSON (e.g., `evaluation_results/ATVA/ball/runs/.../overlay.png`)
-2. Call `hybrid_automaton_image_analysis(image_ref="<path>", question="Where do simulated and ground truth trajectories diverge most?")`
+1. Find the `artifacts[].placeholder` in the JSON (e.g., `<iter_image_1>`, `<iter_image_2>`)
+2. Call `hybrid_automaton_image_analysis(image_ref="<iter_image_N>", question="Where do simulated and ground truth trajectories diverge most?")`
 3. Use the visual analysis to identify specific error patterns (amplitude drift, phase lag, mode switch timing)
 
 The `plot_summary` in the artifacts provides a text fallback if you cannot analyze the image.
@@ -715,7 +715,7 @@ def build_artifact_manifest(
     run_id: str,
     iteration: int,
     metrics: Dict,
-    plot_path: str,
+    plot_placeholder: str,
     plot_summary: str
 ) -> Dict:
     """
@@ -725,7 +725,7 @@ def build_artifact_manifest(
         run_id: Unique identifier for this experiment run
         iteration: Current iteration number
         metrics: Evaluation metrics dictionary
-        plot_path: Path to the overlay plot image
+        plot_placeholder: Placeholder reference for the overlay plot (e.g., <iter_image_1>)
         plot_summary: Text summary for fallback
 
     Returns:
@@ -746,7 +746,7 @@ def build_artifact_manifest(
             {
                 "id": f"eval_overlay_iter{iteration}",
                 "kind": "trajectory_overlay",
-                "path": plot_path,
+                "placeholder": plot_placeholder,
                 "caption": "Overlay: ground truth (solid) vs simulated (dash-dot)",
                 "created_at": datetime.now().isoformat()
             }
@@ -763,7 +763,8 @@ def evaluate_ha_specification_with_feedback(
     use_structured_output: bool = True,
     structured_output_model: str = "gemini-3-flash-preview",
     run_id: str = None,
-    summary_model: str = "gemini-3-flash-preview"
+    summary_model: str = "gemini-3-flash-preview",
+    image_tool: HybridAutomatonImageTool = None
 ) -> Tuple[bool, Dict, str, Optional[Dict]]:
     """
     Evaluate the generated Hybrid Automaton specification and return feedback for the agent.
@@ -778,6 +779,7 @@ def evaluate_ha_specification_with_feedback(
         structured_output_model: 结构化输出使用的模型 ID
         run_id: Unique run identifier for artifact tracking
         summary_model: Model ID for LLM-based summary generation
+        image_tool: HybridAutomatonImageTool instance for registering evaluation plots
 
     Returns:
         Tuple of (success_bool, metrics_dict, feedback_string, ha_specification_dict)
@@ -882,16 +884,22 @@ def evaluate_ha_specification_with_feedback(
         # Generate plot summary using LLM analysis of metrics, HA spec, and plot image
         plot_summary = gen_summary(metrics_dict, ha_specification, overlay_path, model_id=summary_model)
 
-        # Compute relative path for artifact manifest (relative to repo root)
-        # This makes paths portable across different environments
-        relative_overlay_path = os.path.relpath(overlay_path, os.getcwd())
+        # Register the overlay image with the image tool for placeholder-based access
+        # Use iteration number as the image index (e.g., iteration 1 -> <iter_image_1>)
+        plot_placeholder = f"<iter_image_{iteration}>"
+        if image_tool is not None:
+            success, error_msg = image_tool.register_iteration_image(iteration, overlay_path)
+            if not success:
+                print(f"[Warning] Failed to register overlay image: {error_msg}")
+        else:
+            print("[Warning] No image_tool provided - evaluation plots won't be available via placeholder")
 
-        # Build artifact manifest
+        # Build artifact manifest with placeholder instead of path
         artifact_manifest = build_artifact_manifest(
             run_id=run_id if run_id else "unknown",
             iteration=iteration,
             metrics=metrics_dict,
-            plot_path=relative_overlay_path,
+            plot_placeholder=plot_placeholder,
             plot_summary=plot_summary
         )
 
@@ -906,7 +914,7 @@ def evaluate_ha_specification_with_feedback(
 
         # Append artifact manifest as parseable JSON block
         feedback += "\n## Evaluation Artifacts (JSON)\n"
-        feedback += "Use the `hybrid_automaton_image_analysis` tool with the path below to analyze the comparison plot.\n"
+        feedback += f"Use the `hybrid_automaton_image_analysis` tool with placeholder `{plot_placeholder}` to analyze the comparison plot.\n"
         feedback += f"```json\n{json.dumps(artifact_manifest, indent=2)}\n```\n"
 
         return True, metrics_dict, feedback, ha_specification
@@ -1236,6 +1244,9 @@ def main():
         # Use <relative_data_path>/runs/<run_id>/iter_<N> structure for stable artifact referencing
         eval_output_dir = os.path.join("evaluation_results", relative_data_path, "runs", run_id, f"iter_{iteration}")
 
+        # Get the image tool from the agent for registering evaluation plots
+        image_tool = managerAgent.tools.get('hybrid_automaton_image_analysis', None)
+
         success, metrics, feedback_str, ha_spec = evaluate_ha_specification_with_feedback(
             result,
             args.input_data_path,
@@ -1245,7 +1256,8 @@ def main():
             use_structured_output=args.use_structured_output,
             structured_output_model=args.structured_output_model,
             run_id=run_id,
-            summary_model=args.summary_model
+            summary_model=args.summary_model,
+            image_tool=image_tool
         )
 
         # Extract error value from metrics
