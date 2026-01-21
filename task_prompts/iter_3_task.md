@@ -387,8 +387,143 @@ The `plot_summary` in the artifacts provides a text fallback if you cannot analy
 The following feedback was generated from evaluating your previous attempt. Use it to guide your next refinement:
 
 
+
+## Previously Explored HA Specifications
+The following specifications have been explored in previous iterations.
+Performance is ranked from best (lowest error) to worst. Use these as inspiration.
+
+--- Explored Specifications (Ranked) ---
+
+### Rank 1 (Iteration 1)
+**Error**: 0.314182
+```json
+{
+  "automaton": {
+    "var": "x1, x2",
+    "input": "",
+    "mode": [
+      {
+        "id": 1,
+        "eq": "x1[1] = x2[0], x2[1] = -1 * x1[0] - 0.1 * x2[0]"
+      }
+    ],
+    "edge": [
+      {
+        "direction": "1 -> 1",
+        "condition": "x1 <= 0",
+        "reset": {
+          "x2": [
+            "-0.8 * x2[0]"
+          ]
+        }
+      }
+    ]
+  },
+  "config": {
+    "dt": 0.001,
+    "total_time": 10.0,
+    "self_loop": true
+  }
+}
+```
+**Metrics**: tc: 0.0000, max_diff: 1.2554, mean_diff: 0.3142
+
+### Rank 2 (Iteration 2)
+**Error**: 0.335288
+```json
+{
+  "automaton": {
+    "var": "x1, x2",
+    "input": "",
+    "mode": [
+      {
+        "id": 1,
+        "eq": "x1[1] = x2[0], x2[1] = -10 * x1[0]"
+      }
+    ],
+    "edge": [
+      {
+        "direction": "1 -> 1",
+        "condition": "x1 <= 0",
+        "reset": {
+          "x2": [
+            "-0.95 * x2[0]"
+          ]
+        }
+      }
+    ]
+  },
+  "config": {
+    "dt": 0.001,
+    "total_time": 10.0,
+    "self_loop": true
+  }
+}
+```
+**Metrics**: tc: 0.0000, max_diff: 1.8132, mean_diff: 0.3353
+
+-----------------------------------------
+
 ## Most Recent Attempt (Iteration 2):
-HA specification validation failed. LLM conversion failed: ValidationError: 1 validation error for HASpecificationSchema
-  JSON input should be string, bytes or bytearray [type=json_type, input_value=None, input_type=NoneType]
-    For further information visit https://errors.
+```json
+{
+  "automaton": {
+    "var": "x1, x2",
+    "input": "",
+    "mode": [
+      {
+        "id": 1,
+        "eq": "x1[1] = x2[0], x2[1] = -10 * x1[0]"
+      }
+    ],
+    "edge": [
+      {
+        "direction": "1 -> 1",
+        "condition": "x1 <= 0",
+        "reset": {
+          "x2": [
+            "-0.95 * x2[0]"
+          ]
+        }
+      }
+    ]
+  },
+  "config": {
+    "dt": 0.001,
+    "total_time": 10.0,
+    "self_loop": true
+  }
+}
+```
+Evaluation Results:
+  TC (Change-Point Error):0.000000 seconds
+  Max Difference:1.813231
+  Mean Difference:0.335288
+
+## Evaluation Artifacts (JSON)
+Use the `hybrid_automaton_image_analysis` tool with placeholder `<iter_image_2>` to analyze the comparison plot.
+```json
+{
+  "feedback_version": 1,
+  "run_id": "20260122_113011_6a2b",
+  "iteration": 2,
+  "metrics": {
+    "tc": 0.0,
+    "max_diff": 1.813231446927976,
+    "mean_diff": 0.3352880922646253,
+    "clustering_error": 0
+  },
+  "plot_summary": "The HA simulation exhibits significant divergence from the ground truth, particularly in the $x_2$ variable, which shows large, sustained oscillations in the simulation compared to the decaying oscillations in the ground truth.\n\n**Fit Quality & Patterns:**\nThe $\\text{max\\_diff} (1.81)$ and $\\text{mean\\_diff} (0.33)$ are high, confirming poor fit. The simulated trajectory for $x_2$ (dashed/dotted light blue) fails to decay; instead, it appears to maintain or slightly increase amplitude, while the ground truth $x_2$ clearly damps towards zero. The $x_1$ trajectories are closer but still show amplitude/phase discrepancies.\n\n**Specific Issues:**\n1.  **Damping Failure:** The primary issue is the lack of damping in the simulated system. The ground truth suggests a stable, damped oscillation, whereas the simulation is unstable or critically damped.\n2.  **Mode Switch Timing:** The ground truth exhibits frequent, sharp transitions (mode switches) that are not perfectly captured by the simulation's timing, leading to phase lag and amplitude mismatch in the oscillatory peaks/troughs.\n\n**Suggestions for HA Specification Improvement:**\n\n1.  **Introduce Damping to ODEs:** The current continuous dynamics ($\\text{mode } 1$) are those of an undamped harmonic oscillator ($\\ddot{x}_1 + 10x_1 = 0$). To achieve the observed decay, add a damping term proportional to velocity ($\\dot{x}_1$ or $x_2$ in state-space form):\n    *   **Suggestion:** Modify $\\text{mode } 1$ to: `x1[1] = x2[0], x2[1] = -10 * x1[0] - c * x2[0]` where $c > 0$ (e.g., $c=0.5$ or $c=1.0$) to introduce linear damping.\n\n2.  **Refine Reset/Switch Logic:** The reset condition for $x_2$ (`-0.95 * x2[0]`) is applied when $x_1 \\le 0$. This reset likely models the impact/discontinuity. Given the large amplitude mismatch, this reset magnitude may be incorrect or applied at the wrong time relative to the ground truth dynamics.\n    *   **Suggestion:** Analyze the ground truth state when $x_1$ crosses zero to determine the correct multiplicative factor or additive offset for the reset of $x_2$. The current reset seems insufficient or misplaced to counteract the unstable ODE dynamics.",
+  "artifacts": [
+    {
+      "id": "eval_overlay_iter2",
+      "kind": "trajectory_overlay",
+      "placeholder": "<iter_image_2>",
+      "caption": "Overlay: ground truth (solid) vs simulated (dash-dot)",
+      "created_at": "2026-01-22T11:32:04.683499"
+    }
+  ]
+}
+```
+
 
