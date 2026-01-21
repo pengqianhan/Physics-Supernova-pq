@@ -1326,14 +1326,11 @@ def main():
         print(f"Best HA specification saved to: {best_spec_path}")
         print(f"All artifacts available at: evaluation_results/{relative_data_path}/runs/{run_id}/")
 
-    # Save Phoenix traces to local storage
-    if args.save_traces_dir:
-        print("\n--- Saving Phoenix Traces ---")
-        save_phoenix_traces(save_dir=args.save_traces_dir)
+        save_phoenix_traces(save_dir=best_spec_dir)
 
 
 if __name__ == "__main__":
     main()
 
     # Example usage:
-    # python run_llm_ha_beta.py --input-data-path data_all/non_linear/duffing --manager-type CodeAgent --tools-list hybrid_automaton_image_analysis summarize_hybrid_automaton_iterations validate_hybrid_automaton_specification
+    # python run_llm_ha_beta.py --input-data-path data_all/non_linear/ball --manager-type CodeAgent --tools-list hybrid_automaton_image_analysis summarize_hybrid_automaton_iterations validate_hybrid_automaton_specification
