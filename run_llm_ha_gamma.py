@@ -1277,7 +1277,6 @@ def main():
             json.dump(results_aggregator.best_result.ha_specification, f, indent=2)
         print(f"Best HA specification saved to: {best_spec_path}")
         print(f"All artifacts available at: evaluation_results/{relative_data_path}/runs/{run_id}/")
-        print(f"  - Agent traces saved as iter_*_trace.json/.md in each iteration folder")
 
 
 
