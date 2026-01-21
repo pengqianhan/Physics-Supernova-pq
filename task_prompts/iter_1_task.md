@@ -18,7 +18,7 @@ A Hybrid Automaton models a system with:
 
 ## Tool and Sub-Agents Resources:
 
-You MUST use the `hybrid_automaton_image_analysis` tool to analyze the image if you want to obtain more detailed information about the system.Before submitting your final answer, you MUST call the `validate_hybrid_automaton_specification` tool to check for syntax and semantic errors. If validation returns a FIXED specification, use the corrected version in your final answer!
+You MUST use the `hybrid_automaton_image_analysis` tool to analyze the image if you want to obtain more detailed information about the system.
 
 You have access to managed Code Agent: `['data_analysis_expert']` to analyze the npz data files.
 ## Hybrid Automaton Specification Format (JSON Schema)

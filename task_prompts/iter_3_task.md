@@ -18,7 +18,7 @@ A Hybrid Automaton models a system with:
 
 ## Tool and Sub-Agents Resources:
 
-You MUST use the `hybrid_automaton_image_analysis` tool to analyze the image if you want to obtain more detailed information about the system.Before submitting your final answer, you MUST call the `validate_hybrid_automaton_specification` tool to check for syntax and semantic errors. If validation returns a FIXED specification, use the corrected version in your final answer!
+You MUST use the `hybrid_automaton_image_analysis` tool to analyze the image if you want to obtain more detailed information about the system.
 
 You have access to managed Code Agent: `['data_analysis_expert']` to analyze the npz data files.
 ## Hybrid Automaton Specification Format (JSON Schema)
@@ -387,155 +387,8 @@ The `plot_summary` in the artifacts provides a text fallback if you cannot analy
 The following feedback was generated from evaluating your previous attempt. Use it to guide your next refinement:
 
 
-
-## Previously Explored HA Specifications
-The following specifications have been explored in previous iterations.
-Performance is ranked from best (lowest error) to worst. Use these as inspiration.
-
---- Explored Specifications (Ranked) ---
-
-### Rank 1 (Iteration 1)
-**Error**: 0.239267
-```json
-{
-  "automaton": {
-    "var": "x1, x2",
-    "input": "",
-    "mode": [
-      {
-        "id": 1,
-        "eq": "x1[1] = -0.7 * x1[0] + x2[0], x2[1] = -0.7 * x2[0]"
-      },
-      {
-        "id": 2,
-        "eq": "x1[1] = x2[0], x2[1] = 5.0"
-      }
-    ],
-    "edge": [
-      {
-        "direction": "1 -> 2",
-        "condition": "x1 <= 0",
-        "reset": {
-          "x2": [
-            "-0.8*x2[0]"
-          ]
-        }
-      },
-      {
-        "direction": "2 -> 1",
-        "condition": "x1 > 0",
-        "reset": {
-          "x2": [
-            "0.1*x2[0]"
-          ]
-        }
-      }
-    ]
-  },
-  "config": {
-    "dt": 0.001,
-    "total_time": 10.0
-  }
-}
-```
-**Metrics**: tc: 0.8640, max_diff: 1.1218, mean_diff: 0.2393
-
-### Rank 2 (Iteration 2)
-**Error**: 0.368636
-```json
-{
-  "automaton": {
-    "var": "x1, x2",
-    "input": "",
-    "mode": [
-      {
-        "id": 1,
-        "eq": "x1[1] = x2[0], x2[1] = -1.0 * x1[0] - 0.1 * x2[0]"
-      }
-    ],
-    "edge": [
-      {
-        "direction": "1 -> 1",
-        "condition": "x1 <= 0",
-        "reset": {
-          "x2": [
-            "-0.9 * x2[0]"
-          ]
-        }
-      }
-    ]
-  },
-  "config": {
-    "dt": 0.001,
-    "total_time": 10.0,
-    "self_loop": true
-  }
-}
-```
-**Metrics**: tc: 0.0000, max_diff: 1.2554, mean_diff: 0.3686
-
------------------------------------------
-
 ## Most Recent Attempt (Iteration 2):
-```json
-{
-  "automaton": {
-    "var": "x1, x2",
-    "input": "",
-    "mode": [
-      {
-        "id": 1,
-        "eq": "x1[1] = x2[0], x2[1] = -1.0 * x1[0] - 0.1 * x2[0]"
-      }
-    ],
-    "edge": [
-      {
-        "direction": "1 -> 1",
-        "condition": "x1 <= 0",
-        "reset": {
-          "x2": [
-            "-0.9 * x2[0]"
-          ]
-        }
-      }
-    ]
-  },
-  "config": {
-    "dt": 0.001,
-    "total_time": 10.0,
-    "self_loop": true
-  }
-}
-```
-Evaluation Results:
-  TC (Change-Point Error):0.000000 seconds
-  Max Difference:1.255373
-  Mean Difference:0.368636
-
-## Evaluation Artifacts (JSON)
-Use the `hybrid_automaton_image_analysis` tool with placeholder `<iter_image_2>` to analyze the comparison plot.
-```json
-{
-  "feedback_version": 1,
-  "run_id": "20260121_170125_d6e5",
-  "iteration": 2,
-  "metrics": {
-    "tc": 0.0,
-    "max_diff": 1.255373325463108,
-    "mean_diff": 0.36863615819812523,
-    "clustering_error": 0
-  },
-  "plot_summary": "The HA simulation exhibits significant divergence from the ground truth, characterized by large amplitude errors and incorrect dynamics, particularly during mode transitions.\n\n**Fit Quality & Patterns:**\nThe $\\text{mean\\_diff}$ (0.369) and $\\text{max\\_diff}$ (1.255) are high. Visually, the simulation (dashed lines) fails to capture the highly oscillatory nature of the ground truth (solid lines).\n1.  **$x_2$ (Light Blue):** The simulation shows a near-constant, slow decay/drift (approaching -1.0), whereas the ground truth exhibits rapid, large-amplitude sawtooth-like jumps, indicating incorrect dynamics or missing modes/resets.\n2.  **$x_1$ (Dark Blue):** The simulated $x_1$ is smoother and oscillates with a smaller amplitude than the ground truth, suggesting the damping/restoring forces are misidentified.\n\n**Specific Issues:**\n1.  **Mode Switching/Resets:** The ground truth shows frequent, sharp discontinuities (suggesting mode switches or resets) that are completely absent in the simulation, which appears stuck primarily in Mode 1 (based on the provided `mode` array). The ground truth has 28 change points, while the simulation reports only 4.\n2.  **ODE Dynamics:** The continuous dynamics in Mode 1 ($\\dot{x}_1 = x_2, \\dot{x}_2 = -x_1 - 0.1x_2$) do not match the observed smooth oscillation decay in the ground truth $x_1$ trajectory between resets.\n\n**Suggestions for Improvement:**\n1.  **Identify Missing Modes:** The sawtooth pattern in $x_2$ strongly suggests a second mode (or multiple modes) with different continuous dynamics and/or significantly different reset maps that trigger based on guards (e.g., $x_1 > C_1$ or $x_2 < C_2$).\n2.  **Refine Mode 1 Reset:** The current reset for $x_2$ ($\\text{reset}: x_2 = -0.9 x_2[0]$) upon entering the edge condition ($x_1 \\le 0$) is insufficient to explain the observed dynamics. This reset likely needs to be a *jump* condition that triggers the next mode, not just a simple state update within the same mode.\n3.  **Re-evaluate ODEs:** The continuous dynamics for the dominant mode(s) must be re-identified, as the current linear system does not produce the observed high-frequency oscillation/reset behavior.",
-  "artifacts": [
-    {
-      "id": "eval_overlay_iter2",
-      "kind": "trajectory_overlay",
-      "placeholder": "<iter_image_2>",
-      "caption": "Overlay: ground truth (solid) vs simulated (dash-dot)",
-      "created_at": "2026-01-21T17:03:31.711650"
-    }
-  ]
-}
-```
-
+HA specification validation failed. LLM conversion failed: ValidationError: 1 validation error for HASpecificationSchema
+  JSON input should be string, bytes or bytearray [type=json_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.
 

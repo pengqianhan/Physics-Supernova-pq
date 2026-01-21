@@ -18,7 +18,7 @@ A Hybrid Automaton models a system with:
 
 ## Tool and Sub-Agents Resources:
 
-You MUST use the `hybrid_automaton_image_analysis` tool to analyze the image if you want to obtain more detailed information about the system.Before submitting your final answer, you MUST call the `validate_hybrid_automaton_specification` tool to check for syntax and semantic errors. If validation returns a FIXED specification, use the corrected version in your final answer!
+You MUST use the `hybrid_automaton_image_analysis` tool to analyze the image if you want to obtain more detailed information about the system.
 
 You have access to managed Code Agent: `['data_analysis_expert']` to analyze the npz data files.
 ## Hybrid Automaton Specification Format (JSON Schema)
@@ -387,133 +387,10 @@ The `plot_summary` in the artifacts provides a text fallback if you cannot analy
 The following feedback was generated from evaluating your previous attempt. Use it to guide your next refinement:
 
 
-
-## Previously Explored HA Specifications
-The following specifications have been explored in previous iterations.
-Performance is ranked from best (lowest error) to worst. Use these as inspiration.
-
---- Explored Specifications (Ranked) ---
-
-### Rank 1 (Iteration 1)
-**Error**: 0.239267
-```json
-{
-  "automaton": {
-    "var": "x1, x2",
-    "input": "",
-    "mode": [
-      {
-        "id": 1,
-        "eq": "x1[1] = -0.7 * x1[0] + x2[0], x2[1] = -0.7 * x2[0]"
-      },
-      {
-        "id": 2,
-        "eq": "x1[1] = x2[0], x2[1] = 5.0"
-      }
-    ],
-    "edge": [
-      {
-        "direction": "1 -> 2",
-        "condition": "x1 <= 0",
-        "reset": {
-          "x2": [
-            "-0.8*x2[0]"
-          ]
-        }
-      },
-      {
-        "direction": "2 -> 1",
-        "condition": "x1 > 0",
-        "reset": {
-          "x2": [
-            "0.1*x2[0]"
-          ]
-        }
-      }
-    ]
-  },
-  "config": {
-    "dt": 0.001,
-    "total_time": 10.0
-  }
-}
-```
-**Metrics**: tc: 0.8640, max_diff: 1.1218, mean_diff: 0.2393
-
------------------------------------------
-
 ## Most Recent Attempt (Iteration 1):
-```json
-{
-  "automaton": {
-    "var": "x1, x2",
-    "input": "",
-    "mode": [
-      {
-        "id": 1,
-        "eq": "x1[1] = -0.7 * x1[0] + x2[0], x2[1] = -0.7 * x2[0]"
-      },
-      {
-        "id": 2,
-        "eq": "x1[1] = x2[0], x2[1] = 5.0"
-      }
-    ],
-    "edge": [
-      {
-        "direction": "1 -> 2",
-        "condition": "x1 <= 0",
-        "reset": {
-          "x2": [
-            "-0.8*x2[0]"
-          ]
-        }
-      },
-      {
-        "direction": "2 -> 1",
-        "condition": "x1 > 0",
-        "reset": {
-          "x2": [
-            "0.1*x2[0]"
-          ]
-        }
-      }
-    ]
-  },
-  "config": {
-    "dt": 0.001,
-    "total_time": 10.0
-  }
-}
-```
-Evaluation Results:
-  TC (Change-Point Error):0.864000 seconds
-  Max Difference:1.121769
-  Mean Difference:0.239267
-
-## Evaluation Artifacts (JSON)
-Use the `hybrid_automaton_image_analysis` tool with placeholder `<iter_image_1>` to analyze the comparison plot.
-```json
-{
-  "feedback_version": 1,
-  "run_id": "20260121_170125_d6e5",
-  "iteration": 1,
-  "metrics": {
-    "tc": 0.864,
-    "max_diff": 1.1217692888153086,
-    "mean_diff": 0.2392674212624309,
-    "clustering_error": 1
-  },
-  "plot_summary": "The HA simulation exhibits significant divergence from the ground truth, particularly in the transient phase.\n\n**Fit Quality & Visual Patterns:**\nThe $\\text{tc}$ (time-to-convergence) of $0.864$ is low, and the $\\text{max\\_diff}$ ($1.12$) is large, confirming poor fit. Visually, the simulation (dashed lines) fails to capture the highly oscillatory nature of the ground truth (solid lines). The simulation appears to be stuck in or rapidly converging from Mode 1, showing only slight damping for $x_1$ and near-constant behavior for $x_2$ (except for initial resets). The ground truth shows periodic, large-amplitude jumps characteristic of a bouncing or switching system.\n\n**Specific Issues:**\n1.  **Mode Switching Failure:** The ground truth exhibits frequent mode switches (indicated by sharp vertical drops/jumps in $x_2$ and corresponding changes in $x_1$'s dynamics). The simulation's $\\text{change\\_points}$ list is sparse, suggesting the defined guard conditions are rarely met or the dynamics within the modes are incorrect.\n2.  **Dynamics Mismatch:** Mode 1 dynamics ($\\dot{x}_1 = -0.7 x_1 + x_2$, $\\dot{x}_2 = -0.7 x_2$) are likely too heavily damped compared to the ground truth dynamics between switches.\n3.  **Reset Inaccuracy:** The reset maps are not generating the necessary large state changes observed in the ground truth jumps.\n\n**Suggestions for Improvement:**\n1.  **Re-evaluate Mode Dynamics:** The dynamics in Mode 1 must be less dissipative (smaller negative coefficients) to match the slower decay rate seen in the ground truth oscillations.\n2.  **Correct Guard Conditions:** The guard conditions ($\\text{x1} \\le 0$ for $1 \\to 2$ and $\\text{x1} > 0$ for $2 \\to 1$) are likely incorrect for triggering the observed switches. Analyze the ground truth state values at the true switch points to redefine the guards (e.g., perhaps switching based on $x_2$ crossing zero or a specific threshold).\n3.  **Implement Mode 2 Dynamics:** Mode 2 is currently defined with $\\text{x1}[1] = \\text{x2}[0]$ and $\\text{x2}[1] = 5.0$, which implies discrete jumps rather than continuous flow. If the system exhibits continuous flow between switches, Mode 2 must also contain differential equations, not just assignment statements. If it is a true reset/jump, the reset values must be calibrated to match the observed state jumps.",
-  "artifacts": [
-    {
-      "id": "eval_overlay_iter1",
-      "kind": "trajectory_overlay",
-      "placeholder": "<iter_image_1>",
-      "caption": "Overlay: ground truth (solid) vs simulated (dash-dot)",
-      "created_at": "2026-01-21T17:02:33.740054"
-    }
-  ]
-}
-```
-
+HA specification validation failed. LLM conversion failed: InternalServerError: litellm.InternalServerError: litellm.InternalServerError: geminiException - {
+  "error": {
+    "code": 503,
+    "message": "The model is overloaded. Please try again later.",
+    "status": "UNAVAILABL
 
