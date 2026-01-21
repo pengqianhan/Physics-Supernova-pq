@@ -377,8 +377,8 @@ Generate an improved HA specification that better matches the observed trajector
 
 ## Analyzing Evaluation Results (For Iterations 2+)
 When feedback includes an `Evaluation Artifacts (JSON)` section, you can analyze the comparison plot:
-1. Find the `artifacts[].path` in the JSON (e.g., `evaluation_results/ATVA/ball/runs/.../overlay.png`)
-2. Call `hybrid_automaton_image_analysis(image_ref="<path>", question="Where do simulated and ground truth trajectories diverge most?")`
+1. Find the `artifacts[].placeholder` in the JSON (e.g., `<iter_image_1>`, `<iter_image_2>`)
+2. Call `hybrid_automaton_image_analysis(image_ref="<iter_image_N>", question="Where do simulated and ground truth trajectories diverge most?")`
 3. Use the visual analysis to identify specific error patterns (amplitude drift, phase lag, mode switch timing)
 
 The `plot_summary` in the artifacts provides a text fallback if you cannot analyze the image.
@@ -394,8 +394,8 @@ Performance is ranked from best (lowest error) to worst. Use these as inspiratio
 
 --- Explored Specifications (Ranked) ---
 
-### Rank 1 (Iteration 2)
-**Error**: 0.621142
+### Rank 1 (Iteration 1)
+**Error**: 0.239267
 ```json
 {
   "automaton": {
@@ -404,21 +404,31 @@ Performance is ranked from best (lowest error) to worst. Use these as inspiratio
     "mode": [
       {
         "id": 1,
-        "eq": "x1[1] = -0.5 * x1[0] + x2[0], x2[1] = 3.5"
+        "eq": "x1[1] = -0.7 * x1[0] + x2[0], x2[1] = -0.7 * x2[0]"
       },
       {
         "id": 2,
-        "eq": "x1[1] = -0.5 * x1[0] + x2[0], x2[1] = -4.5"
+        "eq": "x1[1] = x2[0], x2[1] = 5.0"
       }
     ],
     "edge": [
       {
         "direction": "1 -> 2",
-        "condition": "x1 >= 1.3"
+        "condition": "x1 <= 0",
+        "reset": {
+          "x2": [
+            "-0.8*x2[0]"
+          ]
+        }
       },
       {
         "direction": "2 -> 1",
-        "condition": "x1 <= 0.2"
+        "condition": "x1 > 0",
+        "reset": {
+          "x2": [
+            "0.1*x2[0]"
+          ]
+        }
       }
     ]
   },
@@ -428,7 +438,41 @@ Performance is ranked from best (lowest error) to worst. Use these as inspiratio
   }
 }
 ```
-**Metrics**: tc: 4.2230, max_diff: 1.6820, mean_diff: 0.6211
+**Metrics**: tc: 0.8640, max_diff: 1.1218, mean_diff: 0.2393
+
+### Rank 2 (Iteration 2)
+**Error**: 0.368636
+```json
+{
+  "automaton": {
+    "var": "x1, x2",
+    "input": "",
+    "mode": [
+      {
+        "id": 1,
+        "eq": "x1[1] = x2[0], x2[1] = -1.0 * x1[0] - 0.1 * x2[0]"
+      }
+    ],
+    "edge": [
+      {
+        "direction": "1 -> 1",
+        "condition": "x1 <= 0",
+        "reset": {
+          "x2": [
+            "-0.9 * x2[0]"
+          ]
+        }
+      }
+    ]
+  },
+  "config": {
+    "dt": 0.001,
+    "total_time": 10.0,
+    "self_loop": true
+  }
+}
+```
+**Metrics**: tc: 0.0000, max_diff: 1.2554, mean_diff: 0.3686
 
 -----------------------------------------
 
@@ -441,56 +485,54 @@ Performance is ranked from best (lowest error) to worst. Use these as inspiratio
     "mode": [
       {
         "id": 1,
-        "eq": "x1[1] = -0.5 * x1[0] + x2[0], x2[1] = 3.5"
-      },
-      {
-        "id": 2,
-        "eq": "x1[1] = -0.5 * x1[0] + x2[0], x2[1] = -4.5"
+        "eq": "x1[1] = x2[0], x2[1] = -1.0 * x1[0] - 0.1 * x2[0]"
       }
     ],
     "edge": [
       {
-        "direction": "1 -> 2",
-        "condition": "x1 >= 1.3"
-      },
-      {
-        "direction": "2 -> 1",
-        "condition": "x1 <= 0.2"
+        "direction": "1 -> 1",
+        "condition": "x1 <= 0",
+        "reset": {
+          "x2": [
+            "-0.9 * x2[0]"
+          ]
+        }
       }
     ]
   },
   "config": {
     "dt": 0.001,
-    "total_time": 10.0
+    "total_time": 10.0,
+    "self_loop": true
   }
 }
 ```
 Evaluation Results:
-  TC (Change-Point Error):4.223000 seconds
-  Max Difference:1.682032
-  Mean Difference:0.621142
+  TC (Change-Point Error):0.000000 seconds
+  Max Difference:1.255373
+  Mean Difference:0.368636
 
 ## Evaluation Artifacts (JSON)
-Use the `hybrid_automaton_image_analysis` tool with the path below to analyze the comparison plot.
+Use the `hybrid_automaton_image_analysis` tool with placeholder `<iter_image_2>` to analyze the comparison plot.
 ```json
 {
   "feedback_version": 1,
-  "run_id": "20260121_140013_af99",
+  "run_id": "20260121_170125_d6e5",
   "iteration": 2,
   "metrics": {
-    "tc": 4.223,
-    "max_diff": 1.6820315796275782,
-    "mean_diff": 0.6211423111406591,
-    "clustering_error": 1
+    "tc": 0.0,
+    "max_diff": 1.255373325463108,
+    "mean_diff": 0.36863615819812523,
+    "clustering_error": 0
   },
-  "plot_summary": "LLM summary generation failed after all retries.",
+  "plot_summary": "The HA simulation exhibits significant divergence from the ground truth, characterized by large amplitude errors and incorrect dynamics, particularly during mode transitions.\n\n**Fit Quality & Patterns:**\nThe $\\text{mean\\_diff}$ (0.369) and $\\text{max\\_diff}$ (1.255) are high. Visually, the simulation (dashed lines) fails to capture the highly oscillatory nature of the ground truth (solid lines).\n1.  **$x_2$ (Light Blue):** The simulation shows a near-constant, slow decay/drift (approaching -1.0), whereas the ground truth exhibits rapid, large-amplitude sawtooth-like jumps, indicating incorrect dynamics or missing modes/resets.\n2.  **$x_1$ (Dark Blue):** The simulated $x_1$ is smoother and oscillates with a smaller amplitude than the ground truth, suggesting the damping/restoring forces are misidentified.\n\n**Specific Issues:**\n1.  **Mode Switching/Resets:** The ground truth shows frequent, sharp discontinuities (suggesting mode switches or resets) that are completely absent in the simulation, which appears stuck primarily in Mode 1 (based on the provided `mode` array). The ground truth has 28 change points, while the simulation reports only 4.\n2.  **ODE Dynamics:** The continuous dynamics in Mode 1 ($\\dot{x}_1 = x_2, \\dot{x}_2 = -x_1 - 0.1x_2$) do not match the observed smooth oscillation decay in the ground truth $x_1$ trajectory between resets.\n\n**Suggestions for Improvement:**\n1.  **Identify Missing Modes:** The sawtooth pattern in $x_2$ strongly suggests a second mode (or multiple modes) with different continuous dynamics and/or significantly different reset maps that trigger based on guards (e.g., $x_1 > C_1$ or $x_2 < C_2$).\n2.  **Refine Mode 1 Reset:** The current reset for $x_2$ ($\\text{reset}: x_2 = -0.9 x_2[0]$) upon entering the edge condition ($x_1 \\le 0$) is insufficient to explain the observed dynamics. This reset likely needs to be a *jump* condition that triggers the next mode, not just a simple state update within the same mode.\n3.  **Re-evaluate ODEs:** The continuous dynamics for the dominant mode(s) must be re-identified, as the current linear system does not produce the observed high-frequency oscillation/reset behavior.",
   "artifacts": [
     {
       "id": "eval_overlay_iter2",
       "kind": "trajectory_overlay",
-      "path": "evaluation_results/ATVA/ball/runs/20260121_140013_af99/iter_2/overlay.png",
+      "placeholder": "<iter_image_2>",
       "caption": "Overlay: ground truth (solid) vs simulated (dash-dot)",
-      "created_at": "2026-01-21T14:02:16.704215"
+      "created_at": "2026-01-21T17:03:31.711650"
     }
   ]
 }

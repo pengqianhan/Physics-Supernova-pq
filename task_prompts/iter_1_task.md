@@ -377,8 +377,8 @@ Generate an improved HA specification that better matches the observed trajector
 
 ## Analyzing Evaluation Results (For Iterations 2+)
 When feedback includes an `Evaluation Artifacts (JSON)` section, you can analyze the comparison plot:
-1. Find the `artifacts[].path` in the JSON (e.g., `evaluation_results/ATVA/ball/runs/.../overlay.png`)
-2. Call `hybrid_automaton_image_analysis(image_ref="<path>", question="Where do simulated and ground truth trajectories diverge most?")`
+1. Find the `artifacts[].placeholder` in the JSON (e.g., `<iter_image_1>`, `<iter_image_2>`)
+2. Call `hybrid_automaton_image_analysis(image_ref="<iter_image_N>", question="Where do simulated and ground truth trajectories diverge most?")`
 3. Use the visual analysis to identify specific error patterns (amplitude drift, phase lag, mode switch timing)
 
 The `plot_summary` in the artifacts provides a text fallback if you cannot analyze the image.
