@@ -981,7 +981,7 @@ def parse_args():
     ap.add_argument(
         "--summarize-tool-model",
         type=str,
-        default="gemini/gemini-2.5-flash-lite",
+        default="gemini-flash-lite-latest",
         help="Model ID to use for the summarize iterations tool (Gemini API format).",
     )
 
@@ -989,8 +989,8 @@ def parse_args():
     ap.add_argument(
         "--summary-model",
         type=str,
-        default="gemini/gemini-2.5-flash-preview-05-20",
-        help="Model ID for gen_summary LLM-based evaluation analysis (default: gemini/gemini-2.5-flash-preview-05-20).",
+        default="gemini-flash-lite-latest",
+        help="Model ID for gen_summary LLM-based evaluation analysis (default: gemini-flash-lite-latest).",
     )
 
     # agent names of managed agents
