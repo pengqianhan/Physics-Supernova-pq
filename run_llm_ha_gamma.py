@@ -1,10 +1,21 @@
 import os
 import sys
 import json
+import secrets
 from datetime import datetime
 from collections import defaultdict
 from dataclasses import dataclass, field
 from utils.prompt import ha_spec_docs
+
+
+def generate_run_id() -> str:
+    """
+    Generate a unique run ID for tracking experiment artifacts.
+    Format: YYYYMMDD_HHMMSS_<4-char-hex>
+    """
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    suffix = secrets.token_hex(2)  # 4 hex characters
+    return f"{timestamp}_{suffix}"
 try:
     from dotenv import load_dotenv
     load_dotenv(override=True)
@@ -563,6 +574,14 @@ Generate an improved HA specification that better matches the observed trajector
 ## Available Data
 - **Trace visualizations**: {image_placeholders}, use the `hybrid_automaton_image_analysis` tool to analyze the image if you want to obtain more detailed information about the system.
 - **Raw data files**: {npz_placeholders}. If you want to use the npz data to analyze the system, you MUST use the `data_analysis_expert` agent to analyze the data. You can not analyze the npz data directly.
+
+## Analyzing Evaluation Results (For Iterations 2+)
+When feedback includes an `Evaluation Artifacts (JSON)` section, you can analyze the comparison plot:
+1. Find the `artifacts[].path` in the JSON (e.g., `evaluation_results/ATVA/ball/runs/.../overlay.png`)
+2. Call `hybrid_automaton_image_analysis(image_ref="<path>", question="Where do simulated and ground truth trajectories diverge most?")`
+3. Use the visual analysis to identify specific error patterns (amplitude drift, phase lag, mode switch timing)
+
+The `plot_summary` in the artifacts provides a text fallback if you cannot analyze the image.
 """
 
     # Add feedback from previous iteration if available
@@ -570,13 +589,169 @@ Generate an improved HA specification that better matches the observed trajector
         task += f"""
 ## FEEDBACK FROM PREVIOUS ITERATION
 The following feedback was generated from evaluating your previous attempt. Use it to guide your next refinement:
-    
-    {feedback}
-    
-    """
+
+{feedback}
+
+"""
 
 
     return task, compressed_trace_images
+
+
+def gen_summary(
+    metrics_dict: Dict,
+    ha_specification: Dict,
+    plot_path: str,
+    model_id: str = "gemini/gemini-3-flash-preview"
+) -> str:
+    """
+    Generate a comprehensive summary of evaluation results using LLM with vision.
+
+    Analyzes the metrics, HA specification, and evaluation plot to provide
+    actionable feedback for improving the hybrid automaton model.
+
+    Args:
+        metrics_dict: Dictionary containing evaluation metrics (mean_diff, max_diff, tc, etc.)
+        ha_specification: The HA specification dictionary being evaluated
+        plot_path: Path to the overlay plot image (ground truth vs simulated)
+        model_id: LiteLLM model ID (default: gemini/gemini-3-flash-preview)
+
+    Returns:
+        LLM-generated summary with analysis and improvement suggestions
+    """
+    import base64
+    from litellm import completion
+
+    # Fallback if no metrics
+    if not metrics_dict:
+        return "No metrics available for analysis."
+
+    # Read and encode the plot image
+    image_content = None
+    if plot_path and os.path.isfile(plot_path):
+        try:
+            with open(plot_path, 'rb') as f:
+                image_bytes = f.read()
+            image_base64 = base64.b64encode(image_bytes).decode('utf-8')
+            # Determine mime type from extension
+            ext = os.path.splitext(plot_path)[1].lower()
+            mime_type = {'.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg'}.get(ext, 'image/png')
+            image_content = {
+                "type": "image_url",
+                "image_url": {"url": f"data:{mime_type};base64,{image_base64}"}
+            }
+        except Exception as e:
+            print(f"[gen_summary] Warning: Could not read plot image: {e}")
+
+    # Format metrics for prompt
+    metrics_text = "\n".join([
+        f"- {k}: {v:.6f}" if isinstance(v, float) else f"- {k}: {v}"
+        for k, v in metrics_dict.items() if v is not None
+    ])
+
+    # Format HA spec summary (truncate if too long)
+    ha_spec_str = json.dumps(ha_specification, indent=2)
+    if len(ha_spec_str) > 2000:
+        ha_spec_str = ha_spec_str[:2000] + "\n... (truncated)"
+
+    # Build the analysis prompt
+    system_prompt = """You are an expert in hybrid automaton system identification and control systems.
+Analyze the evaluation results and provide a concise, actionable summary.
+
+Focus on:
+1. Overall fit quality based on metrics
+2. Visual patterns in the trajectory comparison (if image provided)
+3. Specific issues: amplitude errors, phase lag, mode switch timing, divergence
+4. Concrete suggestions for improving the HA specification
+
+Keep the summary under 200 words. Be direct and technical."""
+
+    user_prompt = f"""## Evaluation Metrics
+{metrics_text}
+
+## HA Specification
+```json
+{ha_spec_str}
+```
+
+## Task
+Analyze the evaluation results and the trajectory comparison plot (ground truth vs simulated).
+Identify the main sources of error and suggest specific improvements to the ODE equations or guard conditions."""
+
+    # Build message content
+    content = [{"type": "text", "text": user_prompt}]
+    if image_content:
+        content.insert(0, image_content)
+
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": content}
+    ]
+
+    # Call LLM with retry
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            response = completion(
+                model=model_id,
+                messages=messages,
+                max_tokens=1024,
+                temperature=0.3,
+                api_key=os.environ.get("GEMINI_API_KEY")
+            )
+            summary = response.choices[0].message.content.strip()
+            if summary:
+                return summary
+        except Exception as e:
+            print(f"[gen_summary] Attempt {attempt + 1}/{max_retries} failed: {e}")
+            if attempt < max_retries - 1:
+                import time
+                time.sleep(2)
+
+    return "LLM summary generation failed after all retries."
+
+
+def build_artifact_manifest(
+    run_id: str,
+    iteration: int,
+    metrics: Dict,
+    plot_path: str,
+    plot_summary: str
+) -> Dict:
+    """
+    Build the artifact manifest structure for feedback.
+
+    Args:
+        run_id: Unique identifier for this experiment run
+        iteration: Current iteration number
+        metrics: Evaluation metrics dictionary
+        plot_path: Path to the overlay plot image
+        plot_summary: Text summary for fallback
+
+    Returns:
+        Dictionary containing the artifact manifest
+    """
+    return {
+        "feedback_version": 1,
+        "run_id": run_id,
+        "iteration": iteration,
+        "metrics": {
+            "tc": metrics.get('tc', None),
+            "max_diff": metrics.get('max_diff', None),
+            "mean_diff": metrics.get('mean_diff', None),
+            "clustering_error": metrics.get('clustering_error', None)
+        },
+        "plot_summary": plot_summary,
+        "artifacts": [
+            {
+                "id": f"eval_overlay_iter{iteration}",
+                "kind": "trajectory_overlay",
+                "path": plot_path,
+                "caption": "Overlay: ground truth (solid) vs simulated (dash-dot)",
+                "created_at": datetime.now().isoformat()
+            }
+        ]
+    }
 
 
 def evaluate_ha_specification_with_feedback(
@@ -586,7 +761,9 @@ def evaluate_ha_specification_with_feedback(
     hyperparameters: HAHyperparameters = None,
     iteration: int = 1,
     use_structured_output: bool = True,
-    structured_output_model: str = "gemini/gemini-2.0-flash"
+    structured_output_model: str = "gemini-3-flash-preview",
+    run_id: str = None,
+    summary_model: str = "gemini-3-flash-preview"
 ) -> Tuple[bool, Dict, str, Optional[Dict]]:
     """
     Evaluate the generated Hybrid Automaton specification and return feedback for the agent.
@@ -599,6 +776,8 @@ def evaluate_ha_specification_with_feedback(
         iteration: Current iteration number (for logging)
         use_structured_output: 是否启用两阶段结构化输出转换 (default: True)
         structured_output_model: 结构化输出使用的模型 ID
+        run_id: Unique run identifier for artifact tracking
+        summary_model: Model ID for LLM-based summary generation
 
     Returns:
         Tuple of (success_bool, metrics_dict, feedback_string, ha_specification_dict)
@@ -673,38 +852,62 @@ def evaluate_ha_specification_with_feedback(
             total_time=ha_specification['config'].get('total_time', 10.0)
         )
 
-        # Run evaluation - use absolute path to avoid path conversion in HAEvaluator
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        save_path = os.path.abspath(os.path.join(output_dir, f'ha_eval_{timestamp}.png'))
+        # Run evaluation - use consistent file names for artifact referencing
+        # Save overlay.png (consistent name) for artifact manifest
+        overlay_path = os.path.abspath(os.path.join(output_dir, 'overlay.png'))
         metrics_text, _ = evaluator(
             plot_mode='overlay',
-            save_path=save_path,
+            save_path=overlay_path,
             print_metrics=True
         )
         metrics_dict = evaluator.metrics
 
-        # Save metrics and hyperparameters to ha_evaluation_metrics.txt
-        metrics_file = os.path.join(output_dir, f'ha_eval_{timestamp}.txt')
+        # Save metrics to metrics.txt (consistent name)
+        metrics_file = os.path.join(output_dir, 'metrics.txt')
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         with open(metrics_file, 'w') as f:
             f.write("Hybrid Automaton Evaluation Results\n")
             f.write("=" * 80 + "\n")
             f.write(f"Timestamp: {timestamp}\n")
-            f.write(f"Iteration: {iteration}\n\n")
-            f.write(f"Metrics: \n {metrics_text}\n\n")
-            f.write(f"HA Specification: \n{json.dumps(ha_specification, indent=2)}\n\n")
+            f.write(f"Iteration: {iteration}\n")
+            f.write(f"Run ID: {run_id if run_id else 'N/A'}\n\n")
+            f.write(f"Metrics:\n{metrics_text}\n\n")
+            f.write(f"HA Specification:\n{json.dumps(ha_specification, indent=2)}\n\n")
 
             # Write hyperparameters if provided
             if hyperparameters is not None:
                 f.write(hyperparameters.to_string())
                 f.write("\n\n")
 
+        # Generate plot summary using LLM analysis of metrics, HA spec, and plot image
+        plot_summary = gen_summary(metrics_dict, ha_specification, overlay_path, model_id=summary_model)
 
-        # Construct feedback string is the same from metrics_file
-        
+        # Compute relative path for artifact manifest (relative to repo root)
+        # This makes paths portable across different environments
+        relative_overlay_path = os.path.relpath(overlay_path, os.getcwd())
+
+        # Build artifact manifest
+        artifact_manifest = build_artifact_manifest(
+            run_id=run_id if run_id else "unknown",
+            iteration=iteration,
+            metrics=metrics_dict,
+            plot_path=relative_overlay_path,
+            plot_summary=plot_summary
+        )
+
+        # Save artifact manifest to disk (for debugging/external tools)
+        manifest_file = os.path.join(output_dir, 'artifacts.json')
+        with open(manifest_file, 'w') as f:
+            json.dump(artifact_manifest, f, indent=2)
+
+        # Construct feedback string with HA spec, metrics, and artifact manifest
         feedback = f"```json\n{json.dumps(ha_specification, indent=2)}\n```\n"
-        # feedback = f"```json\n{agent_result}\n```\n"
         feedback += f"Evaluation Results:\n{metrics_text}\n"
 
+        # Append artifact manifest as parseable JSON block
+        feedback += "\n## Evaluation Artifacts (JSON)\n"
+        feedback += "Use the `hybrid_automaton_image_analysis` tool with the path below to analyze the comparison plot.\n"
+        feedback += f"```json\n{json.dumps(artifact_manifest, indent=2)}\n```\n"
 
         return True, metrics_dict, feedback, ha_specification
 
@@ -772,6 +975,14 @@ def parse_args():
         type=str,
         default="gemini/gemini-2.5-flash-lite",
         help="Model ID to use for the summarize iterations tool (Gemini API format).",
+    )
+
+    # Model for gen_summary (LLM-based evaluation analysis)
+    ap.add_argument(
+        "--summary-model",
+        type=str,
+        default="gemini/gemini-2.5-flash-preview-05-20",
+        help="Model ID for gen_summary LLM-based evaluation analysis (default: gemini/gemini-2.5-flash-preview-05-20).",
     )
 
     # agent names of managed agents
@@ -889,6 +1100,11 @@ def main():
     args = parse_args()
     print(f"Running HA Learning Agent with model: {args.manager_model}, tools: {args.tools_list},managed agents: {args.managed_agents_list}, data path: {args.input_data_path}")
 
+    # Generate unique run ID for this experiment session
+    # This ID persists across all iterations and enables stable artifact referencing
+    run_id = generate_run_id()
+    print(f"Run ID: {run_id}")
+
     # Auto-detect dimensions from data file (overrides command-line args if provided)
     num_variables, num_inputs = get_data_dimensions(args.input_data_path)
 
@@ -941,6 +1157,15 @@ def main():
         top_k=args.feedback_top_k,
         min_gap=args.feedback_min_gap
     )
+
+    # Extract relative path from input_data_path for output directory structure
+    # e.g., "data_all/ATVA/ball" -> "ATVA/ball"
+    if args.input_data_path.startswith("data_all/"):
+        relative_data_path = args.input_data_path[len("data_all/"):]
+    elif args.input_data_path.startswith("data_all"):
+        relative_data_path = args.input_data_path[len("data_all"):].lstrip("/")
+    else:
+        relative_data_path = os.path.basename(args.input_data_path)
 
     print(f"\nSTARTING HA-SCIENTIST LOOP (Max iterations: {args.max_iterations})")
     print(f"  - Top-K feedback selection: {results_aggregator.top_k}")
@@ -1008,16 +1233,8 @@ def main():
             continue
 
         # Evaluate the generated HA specification
-        # Extract relative path from input_data_path to mirror structure in evaluation_results
-        # e.g., "data_all/ATVA/ball" -> "ATVA/ball"
-        if args.input_data_path.startswith("data_all/"):
-            relative_data_path = args.input_data_path[len("data_all/"):]
-        elif args.input_data_path.startswith("data_all"):
-            relative_data_path = args.input_data_path[len("data_all"):].lstrip("/")
-        else:
-            relative_data_path = os.path.basename(args.input_data_path)
-
-        eval_output_dir = os.path.join("evaluation_results", relative_data_path, f"iter_{iteration}")
+        # Use <relative_data_path>/runs/<run_id>/iter_<N> structure for stable artifact referencing
+        eval_output_dir = os.path.join("evaluation_results", relative_data_path, "runs", run_id, f"iter_{iteration}")
 
         success, metrics, feedback_str, ha_spec = evaluate_ha_specification_with_feedback(
             result,
@@ -1026,16 +1243,18 @@ def main():
             hyperparameters=hyperparameters,
             iteration=iteration,
             use_structured_output=args.use_structured_output,
-            structured_output_model=args.structured_output_model
+            structured_output_model=args.structured_output_model,
+            run_id=run_id,
+            summary_model=args.summary_model
         )
 
         # Extract error value from metrics
         current_error = float('inf')
-        if success and isinstance(metrics, dict):
+        if success and isinstance(metrics, dict) and 'mean_diff' in metrics:
             current_error = metrics['mean_diff']
-            
-
-        print(f"Iteration {iteration} mean_diff: {current_error:.6f}, max_diff: {metrics['max_diff']:.6f}, tc: {metrics['tc']:.6f}")
+            print(f"Iteration {iteration} mean_diff: {current_error:.6f}, max_diff: {metrics.get('max_diff', float('inf')):.6f}, tc: {metrics.get('tc', float('inf')):.6f}")
+        else:
+            print(f"Iteration {iteration} FAILED - evaluation did not produce valid metrics")
 
         # Create and store iteration result
         iter_result = IterationResult(
@@ -1081,25 +1300,17 @@ def main():
         print("No successful results achieved.")
         print(f"Total iterations attempted: {len(results_aggregator.results)}")
 
-    # Final Evaluation of the best result (saved to main evaluation folder)
+    # Final Evaluation of the best result (saved to run folder)
     if results_aggregator.best_result and results_aggregator.best_result.ha_specification:
         print("\n--- Final Evaluation of Best Result ---")
-        # Extract relative path from input_data_path to mirror structure in evaluation_results
-        # e.g., "data_all/ATVA/ball" -> "ATVA/ball"
-        if args.input_data_path.startswith("data_all/"):
-            relative_data_path = args.input_data_path[len("data_all/"):]
-        elif args.input_data_path.startswith("data_all"):
-            relative_data_path = args.input_data_path[len("data_all"):].lstrip("/")
-        else:
-            relative_data_path = os.path.basename(args.input_data_path)
-
-        # Save the best HA specification to a JSON file
-        best_spec_dir = os.path.join("evaluation_results", relative_data_path)
+        # Save the best HA specification to the run directory
+        best_spec_dir = os.path.join("evaluation_results", relative_data_path, "runs", run_id)
         best_spec_path = os.path.join(best_spec_dir, "best_ha_specification.json")
         os.makedirs(best_spec_dir, exist_ok=True)
         with open(best_spec_path, "w", encoding="utf-8") as f:
             json.dump(results_aggregator.best_result.ha_specification, f, indent=2)
         print(f"Best HA specification saved to: {best_spec_path}")
+        print(f"All artifacts available at: evaluation_results/{relative_data_path}/runs/{run_id}/")
 
     # Save Phoenix traces to local storage
     if args.save_traces_dir:

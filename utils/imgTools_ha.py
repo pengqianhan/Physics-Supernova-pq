@@ -15,15 +15,24 @@ class HybridAutomatonImageTool(Tool):
 
     name = "hybrid_automaton_image_analysis"
     description = (
-        "Given an image reference (placeholder like <image_10>) and a question, "
-        "return the image expert's answer about that image."
-        "When you need to measure quantities from an image, you MUST call this tool for Accurate Measurements: measuring youself alone is not accurate enough and could lead to errors!"
+        "Given an image reference and a question, return the image expert's answer about that image. "
+        "Supports two input types: (1) placeholder like <image_N> for trace images, or "
+        "(2) file path like 'evaluation_results/runs/.../overlay.png' for evaluator plots. "
+        "When you need to measure quantities or analyze trajectory comparisons, you MUST call this tool."
     )
     inputs = {
-        "image_ref": {"type": "string", "description": "Placeholder identifying the image (e.g. <image_N>)"},
+        "image_ref": {
+            "type": "string",
+            "description": "Image reference: either <image_N> placeholder or file path to evaluation plot"
+        },
         "question": {"type": "string", "description": "Question to ask about the image"},
     }
     output_type = "string"
+
+    # Allowed image extensions for file path mode
+    ALLOWED_EXTENSIONS = {'.png', '.jpg', '.jpeg', '.webp', '.gif'}
+    # Allowed directory prefixes for security (relative to repo root)
+    ALLOWED_PATH_PREFIXES = ['evaluation_results/', 'data_all/']
 
     def __init__(self, worker_agent=None, vision_model_id: str = "models/gemini-flash-lite-latest", max_short_side_pixels: int=9999):
         super().__init__()
@@ -35,10 +44,72 @@ class HybridAutomatonImageTool(Tool):
         )
         self.vision_model_id = vision_model_id
         self.max_short_side_pixels = max_short_side_pixels  # Maximum image resolution for processing
-        
 
-    def _extract_image_bytes(self, image_ref: str) -> bytes | None:
-        """Extract image bytes from markdown content using image reference like <image_1>.
+    def _is_valid_file_path(self, path: str) -> tuple[bool, str]:
+        """
+        Validate that a file path is allowed and secure.
+
+        Args:
+            path: The path to validate
+
+        Returns:
+            Tuple of (is_valid, error_message)
+        """
+        # Reject path traversal attempts
+        if '..' in path:
+            return False, "Path traversal (..) is not allowed for security reasons."
+
+        # Check file extension
+        _, ext = os.path.splitext(path.lower())
+        if ext not in self.ALLOWED_EXTENSIONS:
+            return False, f"File extension '{ext}' not allowed. Allowed: {', '.join(self.ALLOWED_EXTENSIONS)}"
+
+        # Check if path starts with allowed prefix
+        path_normalized = path.replace('\\', '/')
+        if not any(path_normalized.startswith(prefix) for prefix in self.ALLOWED_PATH_PREFIXES):
+            # Also allow absolute paths within allowed directories
+            abs_path = os.path.abspath(path)
+            cwd = os.getcwd()
+            for prefix in self.ALLOWED_PATH_PREFIXES:
+                allowed_abs = os.path.abspath(os.path.join(cwd, prefix))
+                if abs_path.startswith(allowed_abs):
+                    return True, ""
+            return False, f"Path must start with one of: {', '.join(self.ALLOWED_PATH_PREFIXES)}"
+
+        return True, ""
+
+    def _extract_image_bytes_from_file(self, file_path: str) -> tuple[bytes | None, str]:
+        """
+        Read image bytes from a file path with security validation.
+
+        Args:
+            file_path: Path to the image file
+
+        Returns:
+            Tuple of (image_bytes or None, error_message)
+        """
+        # Validate path security
+        is_valid, error_msg = self._is_valid_file_path(file_path)
+        if not is_valid:
+            return None, error_msg
+
+        # Resolve to absolute path
+        abs_path = os.path.abspath(file_path)
+
+        # Check file exists
+        if not os.path.isfile(abs_path):
+            return None, f"File not found: {file_path}"
+
+        # Read file
+        try:
+            with open(abs_path, 'rb') as f:
+                return f.read(), ""
+        except Exception as e:
+            return None, f"Failed to read file: {str(e)}"
+
+    def _extract_image_bytes_from_placeholder(self, image_ref: str) -> bytes | None:
+        """
+        Extract image bytes from markdown content using image reference like <image_1>.
 
         Args:
             image_ref: Image reference placeholder (e.g. <image_N> or plain number)
@@ -46,7 +117,6 @@ class HybridAutomatonImageTool(Tool):
         Returns:
             Image bytes from markdown content or None if not found
         """
-        # image_ref ="<image_0>" ##TODO: remove this after testing
         if not self.worker_agent or not hasattr(self.worker_agent, "markdown_content_high_res_image"):
             return None
         md: MarkdownMessage = self.worker_agent.markdown_content_high_res_image
@@ -73,16 +143,43 @@ class HybridAutomatonImageTool(Tool):
                 return b64decode(base64_part)  # Decode base64 to bytes
         return None
 
+    def _extract_image_bytes(self, image_ref: str) -> tuple[bytes | None, str]:
+        """
+        Extract image bytes from either a placeholder or file path.
+
+        Args:
+            image_ref: Image reference - either <image_N> placeholder or file path
+
+        Returns:
+            Tuple of (image_bytes or None, error_message)
+        """
+        # Determine if this is a placeholder or file path
+        is_placeholder = (
+            image_ref.startswith("<image_") and image_ref.endswith(">")
+        ) or image_ref.isdigit()
+
+        if is_placeholder:
+            # Handle placeholder reference
+            img_bytes = self._extract_image_bytes_from_placeholder(image_ref)
+            if img_bytes is None:
+                return None, f"Could not find image {image_ref}. Valid format: <image_N> where N is 0-indexed."
+            return img_bytes, ""
+        else:
+            # Handle file path reference
+            return self._extract_image_bytes_from_file(image_ref)
+
     def forward(self, image_ref: str, question: str) -> str:  # type: ignore[override]
         """Process image analysis request and return expert response."""
-        img_bytes = self._extract_image_bytes(image_ref)
+        # Extract image bytes (supports both <image_N> placeholders and file paths)
+        img_bytes, error_msg = self._extract_image_bytes(image_ref)
+
+        if img_bytes is None:
+            return f"Error: {error_msg}"
+
         # Resize image if it exceeds maximum resolution for better processing
         if self.max_short_side_pixels is not None:
             from PIL import Image
             from io import BytesIO
-
-            if img_bytes is None:
-                return f"Error: Could not find image {image_ref}; the parsed in image_ref should be like <image_N>."
 
             # Check image size and resize if necessary
             img = Image.open(BytesIO(img_bytes))
@@ -97,9 +194,6 @@ class HybridAutomatonImageTool(Tool):
                 buffer = BytesIO()
                 img.save(buffer, format='PNG')
                 img_bytes = buffer.getvalue()
-
-        if img_bytes is None:
-            return f"Error: Could not find image {image_ref}; the parsed in image_ref should be like <image_N>."
 
         # Convert image bytes to base64 for OpenAI API
         import base64
