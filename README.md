@@ -32,11 +32,11 @@ GEMINI_API_KEY=...                # Google Gemini API Key
 
 ## Usage 🚀
 
-The main entry point is `run_llm_ha_beta.py`.
+The main entry point is `run_llm_ha_gamma.py`.
 
 ### Basic Command
 ```bash
-python run_llm_ha_beta.py \
+python run_llm_ha_gamma.py \
   --input-data-path "utils/Dainarx_code/data_duffing" \
   --manager-model "gemini/gemini-flash-lite-latest" \
   --max-iterations 3 \
@@ -95,10 +95,10 @@ python -m phoenix.server.main serve
 
 To save Phoenix traces, run the following command:
 ```bash
-python run_llm_ha_beta.py --save-traces-dir "phoenix_traces"
+python run_llm_ha_gamma.py --save-traces-dir "phoenix_traces"
 ```
 
 To load Phoenix traces, run the following command:
 ```bash
-python run_llm_ha_beta.py --load-traces-dir "phoenix_traces"
+python run_llm_ha_gamma.py --load-traces-dir "phoenix_traces"
 ```
