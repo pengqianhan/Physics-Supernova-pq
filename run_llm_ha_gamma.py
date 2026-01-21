@@ -6,7 +6,8 @@ from datetime import datetime
 from collections import defaultdict
 from dataclasses import dataclass, field
 from utils.prompt import ha_spec_docs
-
+import base64
+from litellm import completion
 
 def generate_run_id() -> str:
     """
@@ -619,8 +620,7 @@ def gen_summary(
     Returns:
         LLM-generated summary with analysis and improvement suggestions
     """
-    import base64
-    from litellm import completion
+
 
     # Fallback if no metrics
     if not metrics_dict:
