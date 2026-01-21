@@ -375,10 +375,18 @@ Generate an improved HA specification that better matches the observed trajector
 - **Trace visualizations**: ['<image_0>', '<image_1>', '<image_2>'], use the `hybrid_automaton_image_analysis` tool to analyze the image if you want to obtain more detailed information about the system.
 - **Raw data files**: ['<npz_0>', '<npz_1>', '<npz_2>']. If you want to use the npz data to analyze the system, you MUST use the `data_analysis_expert` agent to analyze the data. You can not analyze the npz data directly.
 
+## Analyzing Evaluation Results (For Iterations 2+)
+When feedback includes an `Evaluation Artifacts (JSON)` section, you can analyze the comparison plot:
+1. Find the `artifacts[].path` in the JSON (e.g., `evaluation_results/ATVA/ball/runs/.../overlay.png`)
+2. Call `hybrid_automaton_image_analysis(image_ref="<path>", question="Where do simulated and ground truth trajectories diverge most?")`
+3. Use the visual analysis to identify specific error patterns (amplitude drift, phase lag, mode switch timing)
+
+The `plot_summary` in the artifacts provides a text fallback if you cannot analyze the image.
+
 ## FEEDBACK FROM PREVIOUS ITERATION
 The following feedback was generated from evaluating your previous attempt. Use it to guide your next refinement:
-    
-    
+
+
 
 ## Previously Explored HA Specifications
 The following specifications have been explored in previous iterations.
@@ -387,7 +395,7 @@ Performance is ranked from best (lowest error) to worst. Use these as inspiratio
 --- Explored Specifications (Ranked) ---
 
 ### Rank 1 (Iteration 2)
-**Error**: 0.205267
+**Error**: 0.621142
 ```json
 {
   "automaton": {
@@ -396,29 +404,21 @@ Performance is ranked from best (lowest error) to worst. Use these as inspiratio
     "mode": [
       {
         "id": 1,
-        "eq": "x1[1] = x2[0], x2[1] = -1.0 * x1[0] - 0.7 * x2[0]"
+        "eq": "x1[1] = -0.5 * x1[0] + x2[0], x2[1] = 3.5"
       },
       {
         "id": 2,
-        "eq": "x1[1] = x2[0], x2[1] = -0.5 * x2[0]"
+        "eq": "x1[1] = -0.5 * x1[0] + x2[0], x2[1] = -4.5"
       }
     ],
     "edge": [
       {
         "direction": "1 -> 2",
-        "condition": "x1 <= 0.0",
-        "reset": {
-          "x1": [
-            "0"
-          ],
-          "x2": [
-            "-0.95 * x2[0]"
-          ]
-        }
+        "condition": "x1 >= 1.3"
       },
       {
         "direction": "2 -> 1",
-        "condition": "x1 > 0.0"
+        "condition": "x1 <= 0.2"
       }
     ]
   },
@@ -428,51 +428,7 @@ Performance is ranked from best (lowest error) to worst. Use these as inspiratio
   }
 }
 ```
-**Metrics**: tc: 4.2720, max_diff: 1.1883, mean_diff: 0.2053
-
-### Rank 2 (Iteration 1)
-**Error**: 0.251594
-```json
-{
-  "automaton": {
-    "var": "x1, x2",
-    "input": "",
-    "mode": [
-      {
-        "id": 1,
-        "eq": "x1[1] = x2[0], x2[1] = -1.0 * x1[0] - 0.5 * x2[0]"
-      },
-      {
-        "id": 2,
-        "eq": "x1[1] = -0.5 * x1[0], x2[1] = -0.5 * x2[0]"
-      }
-    ],
-    "edge": [
-      {
-        "direction": "1 -> 2",
-        "condition": "x1 <= 0.0",
-        "reset": {
-          "x1": [
-            "0"
-          ],
-          "x2": [
-            "-0.9*x2[0]"
-          ]
-        }
-      },
-      {
-        "direction": "2 -> 1",
-        "condition": "x1 > 0.0"
-      }
-    ]
-  },
-  "config": {
-    "dt": 0.001,
-    "total_time": 10.0
-  }
-}
-```
-**Metrics**: tc: 0.8440, max_diff: 1.2090, mean_diff: 0.2516
+**Metrics**: tc: 4.2230, max_diff: 1.6820, mean_diff: 0.6211
 
 -----------------------------------------
 
@@ -485,29 +441,21 @@ Performance is ranked from best (lowest error) to worst. Use these as inspiratio
     "mode": [
       {
         "id": 1,
-        "eq": "x1[1] = x2[0], x2[1] = -1.0 * x1[0] - 0.7 * x2[0]"
+        "eq": "x1[1] = -0.5 * x1[0] + x2[0], x2[1] = 3.5"
       },
       {
         "id": 2,
-        "eq": "x1[1] = x2[0], x2[1] = -0.5 * x2[0]"
+        "eq": "x1[1] = -0.5 * x1[0] + x2[0], x2[1] = -4.5"
       }
     ],
     "edge": [
       {
         "direction": "1 -> 2",
-        "condition": "x1 <= 0.0",
-        "reset": {
-          "x1": [
-            "0"
-          ],
-          "x2": [
-            "-0.95 * x2[0]"
-          ]
-        }
+        "condition": "x1 >= 1.3"
       },
       {
         "direction": "2 -> 1",
-        "condition": "x1 > 0.0"
+        "condition": "x1 <= 0.2"
       }
     ]
   },
@@ -518,9 +466,34 @@ Performance is ranked from best (lowest error) to worst. Use these as inspiratio
 }
 ```
 Evaluation Results:
-  TC (Change-Point Error):4.272000 seconds
-  Max Difference:1.188328
-  Mean Difference:0.205267
+  TC (Change-Point Error):4.223000 seconds
+  Max Difference:1.682032
+  Mean Difference:0.621142
 
-    
-    
+## Evaluation Artifacts (JSON)
+Use the `hybrid_automaton_image_analysis` tool with the path below to analyze the comparison plot.
+```json
+{
+  "feedback_version": 1,
+  "run_id": "20260121_140013_af99",
+  "iteration": 2,
+  "metrics": {
+    "tc": 4.223,
+    "max_diff": 1.6820315796275782,
+    "mean_diff": 0.6211423111406591,
+    "clustering_error": 1
+  },
+  "plot_summary": "LLM summary generation failed after all retries.",
+  "artifacts": [
+    {
+      "id": "eval_overlay_iter2",
+      "kind": "trajectory_overlay",
+      "path": "evaluation_results/ATVA/ball/runs/20260121_140013_af99/iter_2/overlay.png",
+      "caption": "Overlay: ground truth (solid) vs simulated (dash-dot)",
+      "created_at": "2026-01-21T14:02:16.704215"
+    }
+  ]
+}
+```
+
+

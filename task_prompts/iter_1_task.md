@@ -374,3 +374,11 @@ Generate an improved HA specification that better matches the observed trajector
 ## Available Data
 - **Trace visualizations**: ['<image_0>', '<image_1>', '<image_2>'], use the `hybrid_automaton_image_analysis` tool to analyze the image if you want to obtain more detailed information about the system.
 - **Raw data files**: ['<npz_0>', '<npz_1>', '<npz_2>']. If you want to use the npz data to analyze the system, you MUST use the `data_analysis_expert` agent to analyze the data. You can not analyze the npz data directly.
+
+## Analyzing Evaluation Results (For Iterations 2+)
+When feedback includes an `Evaluation Artifacts (JSON)` section, you can analyze the comparison plot:
+1. Find the `artifacts[].path` in the JSON (e.g., `evaluation_results/ATVA/ball/runs/.../overlay.png`)
+2. Call `hybrid_automaton_image_analysis(image_ref="<path>", question="Where do simulated and ground truth trajectories diverge most?")`
+3. Use the visual analysis to identify specific error patterns (amplitude drift, phase lag, mode switch timing)
+
+The `plot_summary` in the artifacts provides a text fallback if you cannot analyze the image.
