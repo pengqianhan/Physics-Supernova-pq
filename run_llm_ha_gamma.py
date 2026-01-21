@@ -334,15 +334,15 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
         # managed agent description with all available files
         managed_agent_description = f"""I am a managed agent with name {agent_name}. I can assist with code-related tasks.
 
-## AVAILABLE DATA FILES
+## Available npz files
 You have access to the following NPZ data files:
 {npz_files_description}
 
-**Quick Access via State Variables:**
+**Quick Access via State Variables**
 - `DATA_FILE_PATHS`: List of all available NPZ file paths
 - `DATA_FILE_PATH`: Path to the first/primary data file (for convenience)
 
-**Example Usage:**
+**Example Usage**
 ```python
 import numpy as np
 # Load a specific file
