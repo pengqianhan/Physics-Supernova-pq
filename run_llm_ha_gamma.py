@@ -25,70 +25,21 @@ except ImportError:
 
 # === Agent Monitoring (Phoenix - Free Local Solution) ===
 PHOENIX_AVAILABLE = False
+PHOENIX_PROJECT_NAME = None  # Global variable to store current project name
 try:
     import phoenix as px
     from phoenix.otel import register
     from openinference.instrumentation.smolagents import SmolagentsInstrumentor
     # Use timestamped project name to separate runs
-    project_name = f"ha_llm_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-    register(project_name=project_name)
+    PHOENIX_PROJECT_NAME = f"ha_llm_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    register(project_name=PHOENIX_PROJECT_NAME)
     SmolagentsInstrumentor().instrument()
     PHOENIX_AVAILABLE = True
-    print(f"[Telemetry] Phoenix monitoring enabled (project: {project_name}) - visit http://localhost:6006")
+    print(f"[Telemetry] Phoenix monitoring enabled (project: {PHOENIX_PROJECT_NAME}) - visit http://localhost:6006")
 except ImportError:
     print("[Telemetry] Phoenix not installed. Install: pip install arize-phoenix openinference-instrumentation-smolagents")
 # =============================================
 
-
-def save_phoenix_traces(save_dir: str = "phoenix_traces") -> str:
-    """
-    Save all Phoenix traces to local files using Phoenix's built-in save method.
-    
-    Args:
-        save_dir: Directory to save traces to
-        
-    Returns:
-        trace_id if successful, None otherwise
-    """
-    if not PHOENIX_AVAILABLE:
-        print("[Phoenix] Phoenix not available, cannot save traces")
-        return None
-        
-    os.makedirs(save_dir, exist_ok=True)
-    
-    try:
-        # Use Phoenix's official get_trace_dataset().save() method
-        trace_id = px.Client().get_trace_dataset().save(directory=save_dir)
-        print(f"[Phoenix] Traces saved to: {save_dir} (trace_id: {trace_id})")
-        return trace_id
-    except Exception as e:
-        print(f"[Phoenix] Failed to save traces: {e}")
-        return None
-
-
-def load_phoenix_traces(trace_id: str, load_dir: str = "phoenix_traces"):
-    """
-    Load previously saved Phoenix traces using Phoenix's native TraceDataset.load().
-    
-    Args:
-        trace_id: The trace ID returned from save_phoenix_traces()
-        load_dir: Directory where traces were saved
-        
-    Returns:
-        TraceDataset object (use .get_spans_dataframe() to get DataFrame)
-    """
-    if not PHOENIX_AVAILABLE:
-        print("[Phoenix] Phoenix not available, cannot load traces")
-        return None
-        
-    try:
-        from phoenix.trace.trace_dataset import TraceDataset
-        trace_ds = TraceDataset.load(trace_id, directory=load_dir)
-        print(f"[Phoenix] Loaded traces from: {load_dir} (trace_id: {trace_id})")
-        return trace_ds
-    except Exception as e:
-        print(f"[Phoenix] Failed to load traces: {e}")
-        return None
 
 import argparse
 
@@ -1280,6 +1231,7 @@ def main():
             error_value=current_error
         )
         results_aggregator.add_result(iter_result)
+        
 
         # Check for early stopping (enhanced logic from reference_code.py)
         should_stop, stop_reason = results_aggregator.should_early_stop(
@@ -1325,8 +1277,8 @@ def main():
             json.dump(results_aggregator.best_result.ha_specification, f, indent=2)
         print(f"Best HA specification saved to: {best_spec_path}")
         print(f"All artifacts available at: evaluation_results/{relative_data_path}/runs/{run_id}/")
+        print(f"  - Agent traces saved as iter_*_trace.json/.md in each iteration folder")
 
-        save_phoenix_traces(save_dir=best_spec_dir)
 
 
 if __name__ == "__main__":
