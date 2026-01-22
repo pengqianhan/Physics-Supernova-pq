@@ -154,12 +154,12 @@ class ResultsAggregator:
 
     def get_top_k_feedback(self) -> str:
         """
-        Generate feedback context from top-k diverse, best-performing specifications.
+        Generate feedback context from top-k best-performing specifications.
 
-        Uses minimum gap filtering to ensure diverse examples (from reference_code.py pattern).
+        Selects top-k results sorted by error value (ascending).
 
         Returns:
-            Formatted feedback string with sorted, distinct results
+            Formatted feedback string with sorted results
         """
         # Filter successful results with valid error values
         valid_results = [
@@ -173,16 +173,8 @@ class ResultsAggregator:
         # Sort by error value (ascending - best first)
         sorted_results = sorted(valid_results, key=lambda x: x.error_value)
 
-        # Select distinct results with minimum gap (diversity filtering)
-        distinct_results: List[IterationResult] = []
-        last_accepted_error = float('-inf')
-
-        for result in sorted_results:
-            if result.error_value - last_accepted_error >= self.min_gap:
-                distinct_results.append(result)
-                last_accepted_error = result.error_value
-                if len(distinct_results) >= self.top_k:
-                    break
+        # Select top-k results by error value (no diversity filtering)
+        distinct_results = sorted_results[:self.top_k]
 
         if not distinct_results:
             return ""
@@ -196,33 +188,13 @@ class ResultsAggregator:
         ]
 
         for i, result in enumerate(distinct_results, 1):
-            ha_spec_str = json.dumps(result.ha_specification, indent=2) if result.ha_specification else "N/A"
-            # Truncate if too long
-            if len(ha_spec_str) > 1500:
-                ha_spec_str = ha_spec_str[:1500] + "\n... (truncated)"
-
-            context_lines.append(f"\n### Rank {i} (Iteration {result.iteration})")
-            context_lines.append(f"**Error**: {result.error_value:.6f}")
-            context_lines.append(f"```json\n{ha_spec_str}\n```")
-
-            # Include key metrics if available
-            if result.metrics:
-                metrics_summary = ", ".join([
-                    f"{k}: {v:.4f}" if isinstance(v, float) else f"{k}: {v}"
-                    for k, v in result.metrics.items()
-                    if k in ['mean_diff', 'max_diff', 'tc', 'rmse']
-                ])
-                if metrics_summary:
-                    context_lines.append(f"**Metrics**: {metrics_summary}")
-
-        context_lines.append("\n-----------------------------------------\n")
+            context_lines.append("\n-----------------------------------------\n")
+            # Ensure feedback is a string (defensive check)
+            feedback_content = result.feedback if isinstance(result.feedback, str) else str(result.feedback)
+            context_lines.append(feedback_content)
+        
         return "\n".join(context_lines)
 
-    def get_latest_feedback(self) -> str:
-        """Get feedback from the most recent iteration only."""
-        if not self.results:
-            return ""
-        return self.results[-1].feedback
 
     def should_early_stop(self,
                           target_error: float = 0.01,

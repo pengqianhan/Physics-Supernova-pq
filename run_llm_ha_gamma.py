@@ -539,7 +539,7 @@ When feedback includes an `Evaluation Artifacts (JSON)` section, you can analyze
     # Add feedback from previous iteration if available
     if feedback:
         task += f"""
-## Feedback from {iteration}th attempt
+## Feedback
 Use it to guide your next refinement:
 
 {feedback}
