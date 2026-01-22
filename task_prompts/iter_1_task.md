@@ -375,8 +375,3 @@ Generate an improved HA specification that better matches the observed trajector
 - **Trace visualizations**: ['<image_0>', '<image_1>', '<image_2>'], use the `hybrid_automaton_image_analysis` tool to analyze the image if you want to obtain more detailed information about the system.
 - **Raw data files**: ['<npz_0>', '<npz_1>', '<npz_2>']. If you want to use the npz data to analyze the system, you MUST use the `data_analysis_expert` agent to analyze the data. You can not analyze the npz data directly.
 
-## Analyzing Evaluation Results (For Iterations 2+)
-When feedback includes an `Evaluation Artifacts (JSON)` section, you can analyze the comparison plot:
-1. Find the `artifacts[].placeholder` in the JSON (e.g., `<iter_image_1>`, `<iter_image_2>`), which are the placeholders for the comparison plot. <iter_image_1> is the comparison plot of the 1st iteration, <iter_image_2> is the comparison plot of the 2nd iteration, and so on.
-2. Call `hybrid_automaton_image_analysis' to analyze the image if you want to obtain more detailed information about the simulated trajectory and the ground truth trajectories.
-3. The `plot_summary` in the artifacts provides a text fallback.

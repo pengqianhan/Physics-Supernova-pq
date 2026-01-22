@@ -529,11 +529,6 @@ Generate an improved HA specification that better matches the observed trajector
 - **Trace visualizations**: {image_placeholders}, use the `hybrid_automaton_image_analysis` tool to analyze the image if you want to obtain more detailed information about the system.
 - **Raw data files**: {npz_placeholders}. If you want to use the npz data to analyze the system, you MUST use the `data_analysis_expert` agent to analyze the data. You can not analyze the npz data directly.
 
-## Analyzing Evaluation Results (For Iterations 2+)
-When feedback includes an `Evaluation Artifacts (JSON)` section, you can analyze the comparison plot:
-1. Find the `artifacts[].placeholder` in the JSON (e.g., `<iter_image_1>`, `<iter_image_2>`), which are the placeholders for the comparison plot. <iter_image_1> is the comparison plot of the 1st iteration, <iter_image_2> is the comparison plot of the 2nd iteration, and so on.
-2. Call `hybrid_automaton_image_analysis' to analyze the image if you want to obtain more detailed information about the simulated trajectory and the ground truth trajectories.
-3. The `plot_summary` in the artifacts provides a text fallback.
 """
 
     # Add feedback from previous iteration if available
@@ -683,19 +678,15 @@ def build_artifact_manifest(
         Dictionary containing the artifact manifest
     """
     return {
-        "iteration": iteration,
-        "metrics": {
+        "Evaluation Metrics": {
             "TC (Change-Point Error)": metrics.get('tc', None),
             "Max Difference": metrics.get('max_diff', None),
             "Mean Difference": metrics.get('mean_diff', None),
         },
-        "plot_summary": plot_summary,
-        "artifacts": [
-            {
-                "placeholder": plot_placeholder,
-                "caption": "Overlay: ground truth (solid) vs simulated (dash-dot)",
-            }
-        ]
+        "Evaluation Plot": {
+            "Placeholder": plot_placeholder,
+            "Summary": plot_summary,
+        }
     }
 
 
@@ -854,11 +845,9 @@ def evaluate_ha_specification_with_feedback(
             json.dump(artifact_manifest, f, indent=2)
 
         # Construct feedback string with HA spec, metrics, and artifact manifest
-        feedback = f"```json\n{json.dumps(ha_specification, indent=2)}\n```\n"
-        # Append artifact manifest as parseable JSON block
-        feedback += "\n## Evaluation Artifacts (JSON)\n"
-        feedback += f"Use the `hybrid_automaton_image_analysis` tool with placeholder `{plot_placeholder}` to analyze the comparison plot.\n"
-        feedback += f"```json\n{json.dumps(artifact_manifest, indent=2)}\n```\n"
+        feedback = f"The {iteration}th attempt result:\n"
+        feedback += f"  1. HA JSON Specification:\n```json\n{json.dumps(ha_specification, indent=2)}\n```\n"
+        feedback += f"  2. Evaluation Feedback:\n{json.dumps(artifact_manifest, indent=2)}\n"
 
         return True, metrics_dict, feedback, ha_specification
 

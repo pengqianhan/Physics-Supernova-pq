@@ -375,8 +375,67 @@ Generate an improved HA specification that better matches the observed trajector
 - **Trace visualizations**: ['<image_0>', '<image_1>', '<image_2>'], use the `hybrid_automaton_image_analysis` tool to analyze the image if you want to obtain more detailed information about the system.
 - **Raw data files**: ['<npz_0>', '<npz_1>', '<npz_2>']. If you want to use the npz data to analyze the system, you MUST use the `data_analysis_expert` agent to analyze the data. You can not analyze the npz data directly.
 
-## Analyzing Evaluation Results (For Iterations 2+)
-When feedback includes an `Evaluation Artifacts (JSON)` section, you can analyze the comparison plot:
-1. Find the `artifacts[].placeholder` in the JSON (e.g., `<iter_image_1>`, `<iter_image_2>`), which are the placeholders for the comparison plot. <iter_image_1> is the comparison plot of the 1st iteration, <iter_image_2> is the comparison plot of the 2nd iteration, and so on.
-2. Call `hybrid_automaton_image_analysis' to analyze the image if you want to obtain more detailed information about the simulated trajectory and the ground truth trajectories.
-3. The `plot_summary` in the artifacts provides a text fallback.
+
+## Feedback
+Use it to guide your next refinement:
+
+
+## Previously Explored HA Specifications with Feedback
+Use these as inspiration to guide your next refinement.
+Use the `hybrid_automaton_image_analysis` tool to analyze the comparison plot through the `Placeholder` in the `Evaluation Plot` section.
+
+-----------------------------------------
+
+The 1th attempt result:
+  1. HA JSON Specification:
+```json
+{
+  "automaton": {
+    "var": "x1, x2",
+    "input": "",
+    "mode": [
+      {
+        "id": 1,
+        "eq": "x1[1] = x2[0], x2[1] = -1.0 * x1[0] - 0.2 * x2[0]"
+      },
+      {
+        "id": 2,
+        "eq": "x1[1] = x2[0], x2[1] = -4.0 * x1[0] - 1.0 * x2[0]"
+      }
+    ],
+    "edge": [
+      {
+        "direction": "1 -> 2",
+        "condition": "x1 <= 0",
+        "reset": {
+          "x2": [
+            "-0.7 * x2[0]"
+          ]
+        }
+      },
+      {
+        "direction": "2 -> 1",
+        "condition": "x1 > 0"
+      }
+    ]
+  },
+  "config": {
+    "dt": 0.001,
+    "total_time": 10.0
+  }
+}
+```
+  2. Evaluation Feedback:
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 3.9170000000000003,
+    "Max Difference": 1.2431141850056364,
+    "Mean Difference": 0.23649600826879377
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_1>",
+    "Summary": "The simulated trajectory exhibits significant divergence from the ground truth, particularly in the initial cycles.\n\n**Fit Quality & Visual Patterns:**\nThe **maximum difference ($\\text{max\\_diff} = 1.24$)** is high, indicating poor overall fit. Visually, the simulation (dashed lines) fails to capture the high-amplitude, periodic jumps characteristic of the ground truth (solid lines). The simulation appears to be decaying too quickly or missing the sharp transitions entirely. The ground truth shows large, rapid drops in $x_2$ (light blue) followed by oscillations, suggesting strong, periodic mode switching based on $x_1$ crossing zero.\n\n**Specific Issues:**\n1.  **Mode Switch Timing/Frequency:** The simulated mode changes (indicated by the piecewise nature of the dashed lines) occur far less frequently than the ground truth jumps. The ground truth exhibits many switches within the first 4 seconds, whereas the simulation seems stuck in Mode 1 or switches infrequently.\n2.  **Reset/Jump Magnitude:** The simulated jumps (e.g., the drop in $x_2$ after a switch) are much smaller in magnitude than the ground truth. This suggests the **reset condition** or the **reset equation** for the edge transition is incorrect, particularly for the $x_2$ reset.\n3.  **Divergence:** While the system eventually converges towards the same steady state (around $t=10$s), the transient behavior is fundamentally wrong.\n\n**Suggestions for Improvement:**\n1.  **Refine Guard Conditions:** The guard conditions ($\\text{x1} \\le 0$ for $1 \\to 2$ and $\\text{x1} > 0$ for $2 \\to 1$) are likely too simplistic or the underlying ODEs are causing the state to remain in one mode longer than intended. Verify the exact switching logic in the ground truth system.\n2.  **Adjust Reset for $x_2$:** The reset $\\text{x2}: [-0.7 \\cdot \\text{x2}[0]]$ seems insufficient to generate the large negative excursions seen in the ground truth. Consider increasing the magnitude or introducing a dependency on $x_1[0]$ in the reset map.\n3.  **Review Mode 2 Dynamics:** The dynamics in Mode 2 ($\\text{x2}[1] = -4.0 \\cdot \\text{x1}[0] - 1.0 \\cdot \\text{x2}[0]$) might be too aggressive or too weak compared to the ground truth dynamics in that phase."
+  }
+}
+
+
