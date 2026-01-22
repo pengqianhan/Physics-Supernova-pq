@@ -531,18 +531,16 @@ Generate an improved HA specification that better matches the observed trajector
 
 ## Analyzing Evaluation Results (For Iterations 2+)
 When feedback includes an `Evaluation Artifacts (JSON)` section, you can analyze the comparison plot:
-1. Find the `artifacts[].placeholder` in the JSON (e.g., `<iter_image_1>`, `<iter_image_2>`)
-2. Call `hybrid_automaton_image_analysis(image_ref="<iter_image_N>", question="Where do simulated and ground truth trajectories diverge most?")`
-3. Use the visual analysis to identify specific error patterns (amplitude drift, phase lag, mode switch timing)
-
-The `plot_summary` in the artifacts provides a text fallback if you cannot analyze the image.
+1. Find the `artifacts[].placeholder` in the JSON (e.g., `<iter_image_1>`, `<iter_image_2>`), which are the placeholders for the comparison plot. <iter_image_1> is the comparison plot of the 1st iteration, <iter_image_2> is the comparison plot of the 2nd iteration, and so on.
+2. Call `hybrid_automaton_image_analysis' to analyze the image if you want to obtain more detailed information about the simulated trajectory and the ground truth trajectories.
+3. The `plot_summary` in the artifacts provides a text fallback.
 """
 
     # Add feedback from previous iteration if available
     if feedback:
         task += f"""
-## FEEDBACK FROM PREVIOUS ITERATION
-The following feedback was generated from evaluating your previous attempt. Use it to guide your next refinement:
+## Feedback from {iteration}th attempt
+Use it to guide your next refinement:
 
 {feedback}
 
@@ -685,22 +683,17 @@ def build_artifact_manifest(
         Dictionary containing the artifact manifest
     """
     return {
-        "feedback_version": 1,
-        "run_id": run_id,
         "iteration": iteration,
         "metrics": {
-            "tc": metrics.get('tc', None),
-            "max_diff": metrics.get('max_diff', None),
-            "mean_diff": metrics.get('mean_diff', None),
+            "TC (Change-Point Error)": metrics.get('tc', None),
+            "Max Difference": metrics.get('max_diff', None),
+            "Mean Difference": metrics.get('mean_diff', None),
         },
         "plot_summary": plot_summary,
         "artifacts": [
             {
-                "id": f"eval_overlay_iter{iteration}",
-                "kind": "trajectory_overlay",
                 "placeholder": plot_placeholder,
                 "caption": "Overlay: ground truth (solid) vs simulated (dash-dot)",
-                "created_at": datetime.now().isoformat()
             }
         ]
     }
@@ -816,7 +809,7 @@ def evaluate_ha_specification_with_feedback(
         )
         metrics_dict = evaluator.metrics
 
-        # Save metrics to metrics.txt (consistent name)
+        # Save metrics and hyperparameters to metrics.txt (consistent name)
         metrics_file = os.path.join(output_dir, 'metrics.txt')
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         with open(metrics_file, 'w') as f:
@@ -862,8 +855,6 @@ def evaluate_ha_specification_with_feedback(
 
         # Construct feedback string with HA spec, metrics, and artifact manifest
         feedback = f"```json\n{json.dumps(ha_specification, indent=2)}\n```\n"
-        feedback += f"Evaluation Results:\n{metrics_text}\n"
-
         # Append artifact manifest as parseable JSON block
         feedback += "\n## Evaluation Artifacts (JSON)\n"
         feedback += f"Use the `hybrid_automaton_image_analysis` tool with placeholder `{plot_placeholder}` to analyze the comparison plot.\n"

@@ -377,119 +377,16 @@ Generate an improved HA specification that better matches the observed trajector
 
 ## Analyzing Evaluation Results (For Iterations 2+)
 When feedback includes an `Evaluation Artifacts (JSON)` section, you can analyze the comparison plot:
-1. Find the `artifacts[].placeholder` in the JSON (e.g., `<iter_image_1>`, `<iter_image_2>`)
-2. Call `hybrid_automaton_image_analysis(image_ref="<iter_image_N>", question="Where do simulated and ground truth trajectories diverge most?")`
-3. Use the visual analysis to identify specific error patterns (amplitude drift, phase lag, mode switch timing)
+1. Find the `artifacts[].placeholder` in the JSON (e.g., `<iter_image_1>`, `<iter_image_2>`), which are the placeholders for the comparison plot. <iter_image_1> is the comparison plot of the 1st iteration, <iter_image_2> is the comparison plot of the 2nd iteration, and so on.
+2. Call `hybrid_automaton_image_analysis' to analyze the image if you want to obtain more detailed information about the simulated trajectory and the ground truth trajectories.
+3. The `plot_summary` in the artifacts provides a text fallback.
 
-The `plot_summary` in the artifacts provides a text fallback if you cannot analyze the image.
+## Feedback from 2th attempt
+Use it to guide your next refinement:
 
-## FEEDBACK FROM PREVIOUS ITERATION
-The following feedback was generated from evaluating your previous attempt. Use it to guide your next refinement:
-
-
-
-## Previously Explored HA Specifications
-The following specifications have been explored in previous iterations.
-Performance is ranked from best (lowest error) to worst. Use these as inspiration.
-
---- Explored Specifications (Ranked) ---
-
-### Rank 1 (Iteration 1)
-**Error**: 0.314182
-```json
-{
-  "automaton": {
-    "var": "x1, x2",
-    "input": "",
-    "mode": [
-      {
-        "id": 1,
-        "eq": "x1[1] = x2[0], x2[1] = -1 * x1[0] - 0.1 * x2[0]"
-      }
-    ],
-    "edge": [
-      {
-        "direction": "1 -> 1",
-        "condition": "x1 <= 0",
-        "reset": {
-          "x2": [
-            "-0.8 * x2[0]"
-          ]
-        }
-      }
-    ]
-  },
-  "config": {
-    "dt": 0.001,
-    "total_time": 10.0,
-    "self_loop": true
-  }
-}
-```
-**Metrics**: tc: 0.0000, max_diff: 1.2554, mean_diff: 0.3142
-
------------------------------------------
 
 ## Most Recent Attempt (Iteration 1):
-```json
-{
-  "automaton": {
-    "var": "x1, x2",
-    "input": "",
-    "mode": [
-      {
-        "id": 1,
-        "eq": "x1[1] = x2[0], x2[1] = -1 * x1[0] - 0.1 * x2[0]"
-      }
-    ],
-    "edge": [
-      {
-        "direction": "1 -> 1",
-        "condition": "x1 <= 0",
-        "reset": {
-          "x2": [
-            "-0.8 * x2[0]"
-          ]
-        }
-      }
-    ]
-  },
-  "config": {
-    "dt": 0.001,
-    "total_time": 10.0,
-    "self_loop": true
-  }
-}
-```
-Evaluation Results:
-  TC (Change-Point Error):0.000000 seconds
-  Max Difference:1.255373
-  Mean Difference:0.314182
-
-## Evaluation Artifacts (JSON)
-Use the `hybrid_automaton_image_analysis` tool with placeholder `<iter_image_1>` to analyze the comparison plot.
-```json
-{
-  "feedback_version": 1,
-  "run_id": "20260122_113011_6a2b",
-  "iteration": 1,
-  "metrics": {
-    "tc": 0.0,
-    "max_diff": 1.255373325463108,
-    "mean_diff": 0.31418245862775335,
-    "clustering_error": 0
-  },
-  "plot_summary": "The HA simulation exhibits significant divergence from the ground truth, particularly in the initial transient phase.\n\n**Fit Quality & Visual Patterns:**\nThe **Mean Difference (0.314)** and **Max Difference (1.255)** are high, indicating poor overall fit. Visually, the simulation ($x_1$ dashed, $x_2$ dash-dot) fails to capture the rapid, high-amplitude oscillations present in the ground truth (solid lines). The simulated trajectory $x_2$ shows a severe amplitude error, decaying too slowly or being incorrectly reset, leading to much smaller oscillations than observed. Furthermore, the simulated mode switches appear much less frequent than the ground truth, suggesting the guard condition is not triggering correctly or the dynamics within the mode are too slow.\n\n**Specific Issues:**\n1.  **Amplitude Mismatch:** The simulated $x_2$ amplitude is significantly lower than the ground truth, especially after the first few cycles.\n2.  **Mode Switching Frequency/Timing:** The ground truth exhibits frequent, sharp transitions (suggesting a fast reset or guard crossing), whereas the simulation shows only 4 explicit changes in the first 10s (based on the provided `change_points` for the simulation vs. many more in the ground truth). The simulation's $x_2$ trajectory shows only one major drop after $t=0$, followed by smooth evolution, contrasting sharply with the ground truth's periodic drops.\n\n**Suggestions for Improvement:**\n1.  **Re-evaluate Mode Dynamics (ODE):** The continuous dynamics in Mode 1 ($x_2' = -x_1 - 0.1x_2$) likely do not accurately model the system's natural frequency or damping during the continuous phase. Adjust the coefficients of $x_1$ and $x_2$ to better match the observed oscillation frequency and decay rate.\n2.  **Refine Guard Condition:** The guard condition $x_1 \\le 0$ seems insufficient or incorrectly placed, given the discrepancy in transition timing. If the reset is intended to model a physical event (e.g., hitting a stop or saturation), the guard condition must precisely match the ground truth crossing points.\n3.  **Correct Reset Map:** The reset map for $x_2$ ($\\text{reset } x_2 = -0.8 x_2[0]$) appears to be causing the amplitude mismatch. This reset might be too weak or applied at the wrong time/state. If the ground truth shows a near-instantaneous jump in $x_2$, the reset value needs to be calibrated to match the observed state jump magnitude.",
-  "artifacts": [
-    {
-      "id": "eval_overlay_iter1",
-      "kind": "trajectory_overlay",
-      "placeholder": "<iter_image_1>",
-      "caption": "Overlay: ground truth (solid) vs simulated (dash-dot)",
-      "created_at": "2026-01-22T11:31:24.220138"
-    }
-  ]
-}
-```
-
+HA specification validation failed. LLM conversion failed: ValidationError: 1 validation error for HASpecificationSchema
+  JSON input should be string, bytes or bytearray [type=json_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.
 
