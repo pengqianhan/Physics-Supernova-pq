@@ -1118,12 +1118,6 @@ def main():
     else:
         relative_data_path = os.path.basename(args.input_data_path)
 
-    print(f"\nSTARTING HA-SCIENTIST LOOP (Max iterations: {args.max_iterations})")
-    print(f"  - Top-K feedback selection: {results_aggregator.top_k}")
-    print(f"  - Diversity gap threshold: {results_aggregator.min_gap}")
-    print(f"  - Target error for early stop: {args.target_error}")
-    print(f"  - No-improvement patience: {args.no_improvement_patience}")
-
     for iteration in range(1, args.max_iterations + 1):
         print(f"\n{'#'*40}")
         print(f"ITERATION {iteration}/{args.max_iterations}")
@@ -1136,11 +1130,6 @@ def main():
         else:
             # Use top-k diverse feedback instead of raw concatenation
             current_feedback = results_aggregator.get_top_k_feedback()
-
-            # Also include latest iteration's feedback for recency
-            latest_feedback = results_aggregator.get_latest_feedback()
-            if latest_feedback and latest_feedback not in current_feedback:
-                current_feedback += f"\n## Most Recent Attempt (Iteration {iteration - 1}):\n{latest_feedback}"
 
             # Show dynamic target if available
             dynamic_target = results_aggregator.get_dynamic_error_threshold()
@@ -1170,13 +1159,12 @@ def main():
         try:
             result = managerAgent.run(task, images=compressed_trace_images)
         except Exception as e:
-            print(f"Agent execution failed: {e}")
             # Create failed iteration result
             failed_result = IterationResult(
                 iteration=iteration,
                 ha_specification=None,
                 metrics={},
-                feedback=f"Agent execution failed: {str(e)}",
+                feedback=f"Agent execution failed to get result: {str(e)}",
                 success=False,
                 error_value=float('inf')
             )
