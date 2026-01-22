@@ -533,7 +533,10 @@ Generate an improved HA specification that better matches the observed trajector
 
     # Add feedback from previous iteration if available
     if feedback:
-        task += f"""{feedback}"""
+        task += f""""\n## Previously Explored HA Specifications with Feedback",
+            "Use these as inspiration to guide your next refinement.",
+            "Use the `hybrid_automaton_image_analysis` tool to analyze the comparison plot through the `Placeholder` in the `Evaluation Plot` section."
+            {feedback}"""
 
 
     return task, compressed_trace_images

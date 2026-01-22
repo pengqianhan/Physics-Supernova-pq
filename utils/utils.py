@@ -180,11 +180,7 @@ class ResultsAggregator:
             return ""
 
         # Build structured feedback context
-        context_lines = [
-            "\n## Previously Explored HA Specifications with Feedback",
-            "Use these as inspiration to guide your next refinement.",
-            "Use the `hybrid_automaton_image_analysis` tool to analyze the comparison plot through the `Placeholder` in the `Evaluation Plot` section.",
-        ]
+        context_lines = []
 
         for i, result in enumerate(distinct_results, 1):
             context_lines.append("\n-----------------------------------------\n")
