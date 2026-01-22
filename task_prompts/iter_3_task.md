@@ -381,9 +381,8 @@ When feedback includes an `Evaluation Artifacts (JSON)` section, you can analyze
 2. Call `hybrid_automaton_image_analysis' to analyze the image if you want to obtain more detailed information about the simulated trajectory and the ground truth trajectories.
 3. The `plot_summary` in the artifacts provides a text fallback.
 
-## Feedback from 3th attempt
+## Feedback
 Use it to guide your next refinement:
-
 
 
 ## Previously Explored HA Specifications
@@ -392,104 +391,60 @@ Performance is ranked from best (lowest error) to worst. Use these as inspiratio
 
 --- Explored Specifications (Ranked) ---
 
-### Rank 1 (Iteration 1)
-**Error**: 0.351352
-```json
-{
-  "automaton": {
-    "var": "x1, x2",
-    "input": "",
-    "mode": [
-      {
-        "id": 1,
-        "eq": "x1[1] = -0.5 * x1[0] + x2[0], x2[1] = -0.5 * x2[0]"
-      },
-      {
-        "id": 2,
-        "eq": "x1[1] = x1[0] + x2[0], x2[1] = x1[0] - x2[0]"
-      }
-    ],
-    "edge": [
-      {
-        "direction": "1 -> 2",
-        "condition": "x1 <= 0.5",
-        "reset": {
-          "x2": [
-            "-1.0 * x2[0]"
-          ]
-        }
-      },
-      {
-        "direction": "2 -> 1",
-        "condition": "x1 >= 1.5",
-        "reset": {
-          "x2": [
-            "-1.0 * x2[0]"
-          ]
-        }
-      }
-    ]
-  },
-  "config": {
-    "dt": 0.001,
-    "total_time": 10.0
-  }
-}
-```
-**Metrics**: tc: 4.7860, max_diff: 1.1401, mean_diff: 0.3514
-
-### Rank 2 (Iteration 2)
-**Error**: 0.763322
-```json
-{
-  "automaton": {
-    "var": "x1, x2",
-    "input": "",
-    "mode": [
-      {
-        "id": 1,
-        "eq": "x1[1] = 0, x2[1] = -0.5"
-      },
-      {
-        "id": 2,
-        "eq": "x1[1] = 1, x2[1] = 0"
-      }
-    ],
-    "edge": [
-      {
-        "direction": "1 -> 2",
-        "condition": "x1 <= 0",
-        "reset": {
-          "x1": [
-            "-0.01"
-          ],
-          "x2": [
-            "-0.8 * x2[0]"
-          ]
-        }
-      },
-      {
-        "direction": "2 -> 1",
-        "condition": "x1 >= 0",
-        "reset": {
-          "x1": [
-            "0.01"
-          ],
-          "x2": [
-            "-0.8 * x2[0]"
-          ]
-        }
-      }
-    ]
-  },
-  "config": {
-    "dt": 0.001,
-    "total_time": 10.0
-  }
-}
-```
-**Metrics**: tc: 0.0000, max_diff: 1.2740, mean_diff: 0.7633
-
 -----------------------------------------
+
+```json
+{
+  "automaton": {
+    "var": "x1, x2",
+    "input": "",
+    "mode": [
+      {
+        "id": 1,
+        "eq": "x1[1] = x2[0], x2[1] = -10.0"
+      }
+    ],
+    "edge": [
+      {
+        "direction": "1 -> 1",
+        "condition": "x1 <= 0.0",
+        "reset": {
+          "x1": [
+            "0.0"
+          ],
+          "x2": [
+            "-0.79*x2[0]"
+          ]
+        }
+      }
+    ]
+  },
+  "config": {
+    "dt": 0.001,
+    "total_time": 10.0,
+    "self_loop": true
+  }
+}
+```
+
+## Evaluation Artifacts (JSON)
+Use the `hybrid_automaton_image_analysis` tool with placeholder `<iter_image_2>` to analyze the comparison plot.
+```json
+{
+  "iteration": 2,
+  "metrics": {
+    "TC (Change-Point Error)": 0.0,
+    "Max Difference": 1.7930568373251192,
+    "Mean Difference": 0.1980359279769642
+  },
+  "plot_summary": "The simulation exhibits significant divergence, characterized by a **large amplitude error** in the simulated trajectory ($x_2$ simulated vs $x_2$ ground truth) and **inaccurate mode switching timing**.\n\n**Key Issues:**\n\n1.  **Amplitude Mismatch ($x_2$):** The simulated $x_2$ (dashed/dotted light blue) shows excessively large, sustained oscillations compared to the ground truth (solid light blue), which is clearly decaying. The maximum difference ($\\text{max\\_diff} = 1.79$) is substantial, primarily driven by $x_2$.\n2.  **Mode Switching/Reset Inaccuracy:** The ground truth exhibits sharp, periodic resets/jumps (characteristic of a bouncing or switching system), but the simulated jumps are poorly timed and result in incorrect subsequent trajectories. The specified change points differ significantly from the ground truth change points (e.g., first switch at $t \\approx 0.39s$ simulated vs $t \\approx 0.394s$ ground truth for $x_1$, but the subsequent structure is lost).\n3.  **Damping/Dynamics Error:** The ground truth shows clear exponential decay, while the simulation appears to maintain or even amplify the oscillation magnitude initially before settling poorly.\n\n**Suggestions for Improvement:**\n\n1.  **Revisit Mode 1 Dynamics (ODE):** The current mode 1 equation ($\\dot{x}_1 = x_2, \\dot{x}_2 = -10.0$) suggests constant acceleration ($\\ddot{x}_2 = 0$, $\\ddot{x}_1 = \\dot{x}_2$). This is likely an oversimplification. Introduce damping terms (e.g., $-\\alpha x_1, -\\beta x_2$) to the ODEs in Mode 1 to capture the observed decay.\n2.  **Refine Reset Condition/Value:** The reset condition ($x_1 \\le 0.0$) seems to trigger the switch, but the reset values are problematic. The reset for $x_2$ ($\\text{reset}: x_2 = -0.79 x_2[0]$) suggests a coefficient of restitution of $0.79$. Verify this coefficient and ensure the reset logic correctly models the physical impact (e.g., if the switch occurs when $x_1$ crosses zero, the reset should apply to the state *after* the impact).\n3.  **Check Guard/Invariant Consistency:** The simulation appears stuck in Mode 1 or switches incorrectly. Ensure the guard condition ($x_1 \\le 0.0$) accurately captures the transition event observed in the ground truth data.",
+  "artifacts": [
+    {
+      "placeholder": "<iter_image_2>",
+      "caption": "Overlay: ground truth (solid) vs simulated (dash-dot)"
+    }
+  ]
+}
+```
 
 
