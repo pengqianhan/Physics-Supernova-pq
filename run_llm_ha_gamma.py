@@ -533,13 +533,7 @@ Generate an improved HA specification that better matches the observed trajector
 
     # Add feedback from previous iteration if available
     if feedback:
-        task += f"""
-## Feedback
-Use it to guide your next refinement:
-
-{feedback}
-
-"""
+        task += f"""{feedback}"""
 
 
     return task, compressed_trace_images
