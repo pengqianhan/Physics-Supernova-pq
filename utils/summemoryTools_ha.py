@@ -114,7 +114,7 @@ class SummarizeMemoryTool(Tool):
         "When you have completed multiple iterations of Hybrid Automaton specification refinement and want to get a comprehensive summary of ALL versions (v0, v1, v2, ...), call this tool. "
         "This tool will generate a complete history showing:\n"
         "- Each Hybrid Automaton version (v0 = initial, v1, v2, ... = refined versions)\n"
-        "- The complete Python dict specification for each version\n"
+        "- The complete JSON specification for each version\n"
         "- Analysis explaining what led to each version (problems found, metrics, changes made)\n"
         "- Evaluation metrics for each version\n"
         "- Review feedback received for each version\n"
