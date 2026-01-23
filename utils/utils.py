@@ -28,7 +28,6 @@ class HAHyperparameters:
     # Iteration and feedback configuration
     max_iterations: int = 3
     feedback_top_k: int = 3
-    feedback_min_gap: float = 0.005
     target_error: float = 0.01
     no_improvement_patience: int = 3
 
@@ -69,7 +68,6 @@ class HAHyperparameters:
             "--- Iteration Configuration ---",
             f"Max Iterations: {self.max_iterations}",
             f"Feedback Top-K: {self.feedback_top_k}",
-            f"Feedback Min Gap: {self.feedback_min_gap}",
             f"Target Error: {self.target_error}",
             f"No Improvement Patience: {self.no_improvement_patience}",
             "",
@@ -101,7 +99,6 @@ class HAHyperparameters:
             "summarize_tool_model": self.summarize_tool_model,
             "max_iterations": self.max_iterations,
             "feedback_top_k": self.feedback_top_k,
-            "feedback_min_gap": self.feedback_min_gap,
             "target_error": self.target_error,
             "no_improvement_patience": self.no_improvement_patience,
             "input_data_path": self.input_data_path,
@@ -129,17 +126,15 @@ class ResultsAggregator:
     Aggregates results across iterations for intelligent feedback selection.
     Inspired by reference_code.py's _create_previous_turn_context pattern.
     """
-    def __init__(self, top_k: int = 3, min_gap: float = 0.005):
+    def __init__(self, top_k: int = 3):
         """
         Initialize the results aggregator.
 
         Args:
             top_k: Maximum number of distinct results to include in feedback
-            min_gap: Minimum error gap between selected results for diversity
         """
         self.results: List[IterationResult] = []
         self.top_k = top_k
-        self.min_gap = min_gap
         self.best_result: Optional[IterationResult] = None
         self.best_error: float = float('inf')
 

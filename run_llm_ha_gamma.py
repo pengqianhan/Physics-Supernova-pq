@@ -938,15 +938,6 @@ def parse_args():
         default="gemini/gemini-flash-lite-latest",
         help="Model ID to use for managed agents.",
     )
-
-    # HA specification file (optional)
-    ap.add_argument(
-        "--initial-ha-spec-file",
-        type=str,
-        default=None,
-        help="Path to JSON file containing initial HA specification (optional).",
-    )
-
     ap.add_argument(
         "--tools-to-remove",
         type=str,
@@ -972,13 +963,6 @@ def parse_args():
     )
 
     ap.add_argument(
-        "--feedback-min-gap",
-        type=float,
-        default=0.005,
-        help="Minimum error gap between selected feedback specs for diversity. Default: 0.005",
-    )
-
-    ap.add_argument(
         "--target-error",
         type=float,
         default=0.01,
@@ -1000,14 +984,6 @@ def parse_args():
         help="Include JSON Schema in the task prompt for structured output (default: True)",
     )
 
-    # Phoenix traces saving option
-    ap.add_argument(
-        "--save-traces-dir",
-        type=str,
-        default="phoenix_traces",
-        help="Directory to save Phoenix traces (default: phoenix_traces). Set to empty string to disable saving.",
-    )
-    
     # Two-stage structured output options
     ap.add_argument(
         "--use-structured-output",
@@ -1059,7 +1035,6 @@ def main():
         summarize_tool_model=args.summarize_tool_model,
         max_iterations=args.max_iterations,
         feedback_top_k=args.feedback_top_k,
-        feedback_min_gap=args.feedback_min_gap,
         target_error=args.target_error,
         no_improvement_patience=args.no_improvement_patience,
         input_data_path=args.input_data_path,
@@ -1091,8 +1066,7 @@ def main():
 
     # Initialize results aggregator for intelligent feedback selection
     results_aggregator = ResultsAggregator(
-        top_k=args.feedback_top_k,
-        min_gap=args.feedback_min_gap
+        top_k=args.feedback_top_k
     )
 
     # Extract relative path from input_data_path for output directory structure
@@ -1246,6 +1220,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-    # Example usage:
-    # python run_llm_ha_beta.py --input-data-path data_all/non_linear/ball --manager-type CodeAgent --tools-list hybrid_automaton_image_analysis summarize_hybrid_automaton_iterations validate_hybrid_automaton_specification
