@@ -392,16 +392,19 @@ The 1th attempt result:
     "mode": [
       {
         "id": 1,
-        "eq": "x1[1] = x2[0], x2[1] = -160 * x1[0] - 0.4 * x2[0]"
+        "eq": "x1[1] = 0.0010 * x2[0], x2[1] = -0.0570 * x1[0] - 0.0157 * x2[0]"
       }
     ],
     "edge": [
       {
         "direction": "1 -> 1",
-        "condition": "x1 <= 0.1",
+        "condition": "x1 <= 0 and x2 < 0",
         "reset": {
+          "x1": [
+            "0"
+          ],
           "x2": [
-            "-0.8*x2[0]"
+            "-0.9000 * x2[0] - 0.01"
           ]
         }
       }
@@ -418,11 +421,11 @@ The 1th attempt result:
 {
   "Evaluation Metrics": {
     "TC (Change-Point Error)": 0.0,
-    "Max Difference": 3.0129008061859257,
-    "Mean Difference": 0.26181261960002605
+    "Max Difference": 1.1968584796256005,
+    "Mean Difference": 0.5731380531492432
   },
   "Evaluation Plot": {
     "Placeholder": "<iter_image_1>",
-    "Summary": "## HA System Identification Summary\n\n**Overall Fit Quality:** Poor, characterized by significant amplitude and phase discrepancies, especially in the initial transient phase. The Mean Difference ($\\mu=0.26$) is acceptable for the steady-state, but the Max Difference ($\\text{Max}=3.01$) indicates severe initial errors.\n\n**Visual Patterns:**\n1.  **State $x_2$ (Light Blue):** The simulated trajectory exhibits highly exaggerated, periodic oscillations with much larger amplitudes than the ground truth, particularly for $t < 2s$. This indicates the simulation is overshooting the true dynamics significantly after each mode switch.\n2.  **Mode Switching:** The simulated jumps (sawtooth pattern) occur much more frequently and with larger magnitude changes than the ground truth, suggesting the guard condition or reset map is triggering incorrectly or too aggressively.\n3.  **Steady State:** Both trajectories converge to approximately $(0, 0)$, but the convergence rate of the simulation appears slower or more oscillatory than the ground truth in the later stages.\n\n**Specific Issues:**\n*   **Amplitude Error:** The reset map for $x_2$ ($\\text{reset}: x_2 = -0.8 x_2[0]$) is likely too strong or the guard condition is met at inappropriate times, leading to the large initial overshoots in $x_2$.\n*   **Phase/Timing Error:** The frequency of the simulated jumps does not match the ground truth's behavior, suggesting the guard condition ($\\text{guard}: x_1 \\le 0.1$) is not accurately capturing the physical switching logic.\n\n**Suggestions for HA Specification Improvement:**\n\n1.  **Refine Reset Map:** The reset factor for $x_2$ (currently $-0.8$) is too aggressive. Test a smaller magnitude (e.g., $-0.2$ to $-0.5$) to dampen the overshoot immediately following a switch.\n2.  **Adjust Guard Condition:** The guard $x_1 \\le 0.1$ seems too broad or misplaced. Analyze the ground truth data to find the precise state value (or a combination of states) that triggers the switch, potentially incorporating $x_2$ into the guard condition for better timing.\n3.  **Review ODEs:** The continuous dynamics ($x_1' = x_2$, $x_2' = -160 x_1 - 0.4 x_2$) might be slightly inaccurate, contributing to the overall divergence, although the primary issue appears to be the discrete transitions. Consider parameter estimation refinement for the damping term ($0.4$) or stiffness ($160$)."
+    "Summary": "The simulation exhibits **severe divergence** from the ground truth, characterized by a complete failure to capture the periodic, reset-driven behavior.\n\n**Fit Quality & Visual Patterns:**\nThe metrics ($\\text{max\\_diff} \\approx 1.2$, $\\text{mean\\_diff} \\approx 0.57$) are high, confirming poor fit. Visually, the simulated trajectory ($\\text{x1, x2}$ dashed lines) immediately settles to a fixed point near $(1.4, -1.6)$, while the ground truth shows strong oscillations with periodic, near-vertical resets (characteristic of a hybrid system). The simulated system is stuck in a single continuous mode (mode 1) with no observed mode switches.\n\n**Specific Issues:**\n1.  **Missing Resets/Guards:** The ground truth clearly shows state jumps (resets) occurring frequently. The simulation's $\\text{change\\_points}$ array shows only one segment (0 to 10001), indicating the guard condition for the edge is never met, or the dynamics are incorrect.\n2.  **Incorrect Dynamics:** The continuous dynamics in Mode 1 are likely inaccurate, as the system should be oscillating, not converging to a fixed point.\n3.  **Phase/Amplitude Mismatch:** The simulated trajectory does not match the amplitude or frequency of the ground truth oscillations.\n\n**Suggestions for HA Specification Improvement:**\n1.  **Verify Guard Conditions:** The guard $\\text{\"x1 <= 0 and x2 < 0\"}$ is likely incorrect or too restrictive. Analyze the ground truth state values at the observed reset times ($\\text{change\\_points}$) to define the correct guards that trigger the edge transition.\n2.  **Refine Continuous Dynamics (Mode 1):** The current linear ODEs ($\\dot{x}_1 = 0.001 x_2$, $\\dot{x}_2 = -0.057 x_1 - 0.0157 x_2$) do not produce sustained oscillations. These must be re-identified to match the observed sinusoidal behavior between resets.\n3.  **Review Reset Map:** The reset map ($\\text{x2} \\rightarrow -0.9 x_2[0] - 0.01$) should be checked against the magnitude of the jump observed in the ground truth data at mode switches."
   }
 }
