@@ -1,6 +1,6 @@
 import os
 import time
-import openai
+from litellm import completion
 from smolagents.default_tools import Tool
 from base64 import b64decode
 
@@ -33,14 +33,10 @@ class HybridAutomatonImageTool(Tool):
     # Allowed directory prefixes for security (relative to repo root)
     ALLOWED_PATH_PREFIXES = ['evaluation_results/', 'data_all/']
 
-    def __init__(self, worker_agent=None, vision_model_id: str = "models/gemini-flash-lite-latest", max_short_side_pixels: int=9999):
+    def __init__(self, worker_agent=None, vision_model_id: str = "gemini/gemini-flash-lite-latest", max_short_side_pixels: int=9999):
         super().__init__()
         self.worker_agent = worker_agent  # Reference to the main agent for accessing markdown content
-        # Initialize OpenAI client for Gemini API
-        self.client = openai.OpenAI(
-            base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
-            api_key=os.getenv("GEMINI_API_KEY") if os.getenv("GEMINI_API_KEY") else "<<<<<<your_api_key>>>>>>>",
-        )
+        self.api_key = os.getenv("GEMINI_API_KEY")
         self.vision_model_id = vision_model_id
         self.max_short_side_pixels = max_short_side_pixels  # Maximum image resolution for processing
         # Registry for iteration images (evaluator plots registered upstream)
@@ -294,7 +290,8 @@ class HybridAutomatonImageTool(Tool):
         for _ in range(max_try):
             # Generate response from vision model
             try:
-                response = self.client.chat.completions.create(
+                response = completion(
+                    api_key=self.api_key,
                     model=self.vision_model_id,
                     messages=messages,
                     max_tokens=8192,
