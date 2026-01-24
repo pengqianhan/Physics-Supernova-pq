@@ -471,10 +471,6 @@ A Hybrid Automaton models a system with:
 \nYou have access to managed Code Agent: `{managed_agents_list}` to analyze the npz data files."""
         task += MANAGE_AGENT_PROMPT
 
-    # # Add self code agent prompt
-    # if manager_type == "CodeAgent":
-    #     SELF_IS_CODE_AGENT_PROMPT = "\n## Code Execution Capability\nYou can use Python Code to execute programs, which may help with your task-solving process."
-    #     task += SELF_IS_CODE_AGENT_PROMPT
 
     # Generate dynamic HA template with correct var and input fields pre-filled
     dynamic_ha_template = generate_dynamic_ha_template(num_variables, num_inputs)
