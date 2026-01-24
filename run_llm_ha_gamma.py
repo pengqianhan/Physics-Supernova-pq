@@ -858,9 +858,6 @@ def evaluate_ha_specification_with_feedback(
 
 
 def parse_args():
-    # Get the directory where this script is located
-    # script_dir = os.path.dirname(os.path.abspath(__file__))
-    # default_data_path = os.path.join(script_dir, "utils", "Dainarx_code", "data_duffing")
 
     ap = argparse.ArgumentParser(description="Run the HA Learning Agent with specified tools and model.")
     ap.add_argument(
