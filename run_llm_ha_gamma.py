@@ -888,8 +888,9 @@ def parse_args():
         type=str,
         nargs='*',
         default=["hybrid_automaton_image_analysis"],
+        choices=["hybrid_automaton_image_analysis", "hybrid_automaton_review_expert", "summarize_hybrid_automaton_iterations", "validate_hybrid_automaton_specification"],
         help="List of tool names to use in the agent.",
-    )# not include hybrid_automaton_review_expert validate_hybrid_automaton_specification for fast output final answer
+    )
 
     # LLM model ids for the tools
     ap.add_argument(
@@ -962,15 +963,15 @@ def parse_args():
     ap.add_argument(
         "--target-error",
         type=float,
-        default=0.01,
-        help="Target error threshold for early stopping. Default: 0.01",
+        default=0.001,
+        help="Target error threshold for early stopping. Default: 0.001",
     )
 
     ap.add_argument(
         "--no-improvement-patience",
         type=int,
-        default=3,
-        help="Stop if no improvement for this many iterations. Default: 3",
+        default=10,
+        help="Stop if no improvement for this many iterations. Default: 10",
     )
 
     # JSON Schema option
