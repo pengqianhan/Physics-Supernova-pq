@@ -66,6 +66,7 @@ class HAConfigSchema(BaseModel):
     """配置参数"""
     dt: float = Field(..., gt=0, description="Time step, e.g., 0.001")
     total_time: float = Field(..., gt=0, description="Total simulation time, e.g., 10.0")
+    order: int = Field(default=1, ge=1, description="ODE order: 1 for first-order ODE, 2 for second-order ODE")
     self_loop: bool = Field(default=False, description="Whether self-loop transitions exist")
 
 
@@ -123,8 +124,10 @@ def _convert_structured_to_standard_ha(structured_dict: dict) -> dict:
             "total_time": structured_dict["config"]["total_time"],
         }
     }
-    
+
     # 添加可选的 config 字段
+    if structured_dict["config"].get("order"):
+        result["config"]["order"] = structured_dict["config"]["order"]
     if structured_dict["config"].get("self_loop"):
         result["config"]["self_loop"] = True
     
@@ -284,8 +287,15 @@ def convert_agent_result_to_ha(
         
         # 解析响应
         content = response.choices[0].message.content
+        if content is None:
+            msg = "LLM returned empty response (content is None)"
+            messages.append(msg)
+            if fallback_to_extraction and ha_dict is not None:
+                messages.append("Falling back to traditional extraction result")
+                return ha_dict, True, "\n".join(messages)
+            return ha_dict, False, "\n".join(messages)
         structured_result = HASpecificationSchema.model_validate_json(content)
-        
+
         # 转换为标准格式
         converted_ha = _convert_structured_to_standard_ha(structured_result.model_dump())
         
@@ -382,6 +392,8 @@ def preprocess_ha_for_evaluation_v2(
         
         # 解析并转换为标准格式
         content = response.choices[0].message.content
+        if content is None:
+            return None, False, "LLM returned empty response (content is None)"
         structured_result = HASpecificationSchema.model_validate_json(content)
         ha_dict = _convert_structured_to_standard_ha(structured_result.model_dump())
         
