@@ -294,9 +294,6 @@ data = np.load(DATA_FILE_PATHS[0])
 data = np.load(DATA_FILE_PATH)"""
         # use_e2b = bool(os.environ.get("E2B_API_KEY"))
         use_e2b = False
-        # save the managed_agent_description to a file
-        with open(f"managed_agent_description_{agent_name}.md", "w") as f:
-            f.write(managed_agent_description)
         managed_agent = CodeAgent(
             tools=[],
             executor_type="e2b" if use_e2b else "local",
