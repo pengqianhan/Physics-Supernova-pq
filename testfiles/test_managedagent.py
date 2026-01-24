@@ -1,5 +1,5 @@
 """
-测试 run_llm_ha_beta.py 中 get_managed_agents_list 定义的 managed_agent
+测试 run_llm_ha_gamma.py 中 get_managed_agents_list 定义的 managed_agent
 验证其可以正常加载数据和运行
 """
 import os
@@ -45,7 +45,7 @@ def test_get_managed_agents_list_creation():
     print("测试 2: 测试 get_managed_agents_list 函数创建 managed agents")
     print("=" * 60)
     
-    from run_llm_ha_beta import get_managed_agents_list
+    from run_llm_ha_gamma import get_managed_agents_list
     
     # 测试空输入
     result_empty = get_managed_agents_list(None, None)
@@ -83,7 +83,7 @@ def test_managed_agent_can_execute_code():
     print("测试 3: 测试 managed agent 的 Python 执行器")
     print("=" * 60)
     
-    from run_llm_ha_beta import get_managed_agents_list
+    from run_llm_ha_gamma import get_managed_agents_list
     
     managed_agents = get_managed_agents_list(
         managed_agents_list=['data_analysis_expert'],
@@ -163,7 +163,7 @@ def test_managed_agent_run_with_llm():
         print("⚠ 跳过此测试: GEMINI_API_KEY 未设置")
         return None
     
-    from run_llm_ha_beta import get_managed_agents_list
+    from run_llm_ha_gamma import get_managed_agents_list
     
     managed_agents = get_managed_agents_list(
         managed_agents_list=['data_analysis_expert'],
