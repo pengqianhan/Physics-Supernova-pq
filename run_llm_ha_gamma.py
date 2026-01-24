@@ -1014,7 +1014,6 @@ def main():
     # Generate unique run ID for this experiment session
     # This ID persists across all iterations and enables stable artifact referencing
     run_id = generate_run_id()
-    print(f"Run ID: {run_id}")
 
     # Auto-detect dimensions from data file (overrides command-line args if provided)
     num_variables, num_inputs = get_data_dimensions(args.input_data_path)
@@ -1218,3 +1217,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+    
