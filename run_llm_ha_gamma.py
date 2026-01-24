@@ -890,7 +890,7 @@ def parse_args():
         "--tools-list",
         type=str,
         nargs='*',
-        default=["hybrid_automaton_image_analysis", "summarize_hybrid_automaton_iterations"],
+        default=["hybrid_automaton_image_analysis"],
         help="List of tool names to use in the agent.",
     )# not include hybrid_automaton_review_expert validate_hybrid_automaton_specification for fast output final answer
 
