@@ -890,19 +890,19 @@ def parse_args():
     ap.add_argument(
         "--image-tool-model",
         type=str,
-        default="gemini-flash-lite-latest",
+        default="gemini/gemini-flash-lite-latest",
         help="Model ID to use for the image analysis tool (Gemini API format).",
     )
     ap.add_argument(
         "--review-tool-model",
         type=str,
-        default="gemini-flash-lite-latest",
+        default="gemini/gemini-flash-lite-latest",
         help="Model ID to use for the review tool (Gemini API format).",
     )
     ap.add_argument(
         "--summarize-tool-model",
         type=str,
-        default="gemini-flash-lite-latest",
+        default="gemini/gemini-flash-lite-latest",
         help="Model ID to use for the summarize iterations tool (Gemini API format).",
     )
 
