@@ -996,8 +996,6 @@ def parse_args():
 
 def main():
     args = parse_args()
-    print(f"Running HA Learning Agent with model: {args.manager_model}, tools: {args.tools_list},managed agents: {args.managed_agents_list}, data path: {args.input_data_path}")
-
     # Generate unique run ID for this experiment session
     # This ID persists across all iterations and enables stable artifact referencing
     run_id = generate_run_id()
