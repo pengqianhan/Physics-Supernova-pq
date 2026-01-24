@@ -277,12 +277,10 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
         npz_files_description = "\n".join([f" {placeholders} - `{path}`" for placeholders, path in zip(npz_placeholders, npz_paths_list)])
 
         # managed agent description with all available files
-        managed_agent_description = f"""I am a managed agent with name {agent_name}. I can assist with code-related tasks.
-
-## Available npz files
+        managed_agent_description = f"""I am a managed agent with name {agent_name}. I can assist with code-related tasks."""
+        managed_agent_instruction = f"""## Available npz files
 You have access to the following NPZ data files:
 {npz_files_description}
-
 **Quick Access via State Variables**
 - `DATA_FILE_PATHS`: List of all available NPZ file paths
 - `DATA_FILE_PATH`: Path to the first/primary data file (for convenience)
@@ -293,10 +291,7 @@ import numpy as np
 # Load a specific file
 data = np.load(DATA_FILE_PATHS[0])
 # Or use the primary file
-data = np.load(DATA_FILE_PATH)
-```
-
-"""
+data = np.load(DATA_FILE_PATH)"""
         # use_e2b = bool(os.environ.get("E2B_API_KEY"))
         use_e2b = False
         # save the managed_agent_description to a file
@@ -321,9 +316,12 @@ data = np.load(DATA_FILE_PATH)
             "pysindy","gradient_free_optimizers","gradient_free_optimizers.BayesianOptimizer"
         ],
             description=managed_agent_description,
+            instructions=managed_agent_instruction,
             max_steps=80,
             verbosity_level=2,
         )
+        ## print the managed agent system prompt
+        print(managed_agent.system_prompt)
         if use_e2b:
             print("使用 E2B 云沙盒执行器，正在上传数据文件...")
             # 上传所有文件到 E2B 沙盒
