@@ -333,12 +333,18 @@ Your output MUST conform to this JSON Schema:
 - The `var` and `input` fields in  Initial Hybrid Automaton Specification (v0) are **already correctly set** based on the ground truth data. **DO NOT** add or remove variables!
 - Focus on inferring the **equations** (`eq`), **modes**, and **edge conditions** only!
 - **DO NOT** convert to state-space form (e.g., splitting 1 variable into x1, x2)!
-- ODEnotation:
+- ODE notation:
    - `x[0]` = variable value
    - `x[1]` = first derivative (dx/dt)
    - `x[2]` = second derivative (d²x/dt²)
    - Left side = highest derivative (e.g., `x1[2] = ...` for order=2)
 - For single-variable systems: use higher-order ODE notation (e.g., `x1[2] = ...` for 2nd-order)
+
+## IMPORTANT: Python Boolean Syntax
+When constructing the HA specification dictionary in Python code:
+- Use `True`/`False` (Python syntax), **NOT** `true`/`false` (JSON syntax)
+- Example: `"need_reset": True` not `"need_reset": true`
+- Example: `"self_loop": False` not `"self_loop": false`
 
 ## Initial Hybrid Automaton Specification (v0)
 
@@ -373,7 +379,16 @@ Generate an improved HA specification that better matches the observed trajector
 
 ## Available Data
 - **Trace visualizations**: ['<image_0>', '<image_1>', '<image_2>'], use the `hybrid_automaton_image_analysis` tool to analyze the image if you want to obtain more detailed information about the system.
-- **Raw data files**: ['<npz_0>', '<npz_1>', '<npz_2>']. If you want to use the npz data to analyze the system, you MUST use the `data_analysis_expert` agent to analyze the data. You can not analyze the npz data directly.
+- **Raw data files**: If you want to use the npz data to analyze the system, you MUST use the `data_analysis_expert` agent to analyze the data. You can not analyze the npz data directly.
+
+### NPZ Data Format (for reference - use via `data_analysis_expert` agent)
+Each NPZ file contains:
+- `state`: numpy array, shape `(num_variables, num_steps)` - state trajectories
+  - Access: `x1 = data['state'][0, :]`, `x2 = data['state'][1, :]`
+- `input`: numpy array, shape `(num_inputs, num_steps)` - input signals (if applicable)
+  - Access: `u1 = data['input'][0, :]`
+
+**WARNING**: Do NOT use placeholder names like `<npz_0>` as file paths! Use the `data_analysis_expert` agent which has access to the actual file paths.
 
 "
 ## Previously Explored HA Specifications with Feedback",
@@ -382,7 +397,7 @@ Generate an improved HA specification that better matches the observed trajector
             
 -----------------------------------------
 
-The 1th attempt result:
+The 2th attempt result:
   1. HA JSON Specification:
 ```json
 {
@@ -392,19 +407,29 @@ The 1th attempt result:
     "mode": [
       {
         "id": 1,
-        "eq": "x1[1] = 0.0010 * x2[0], x2[1] = -0.0570 * x1[0] - 0.0157 * x2[0]"
+        "eq": "x1[1] = -0.5 * x1[0] + x2[0], x2[1] = -0.5 * x2[0]"
+      },
+      {
+        "id": 2,
+        "eq": "x1[1] = -0.5 * x1[0] - x2[0], x2[1] = -0.5 * x2[0]"
       }
     ],
     "edge": [
       {
-        "direction": "1 -> 1",
-        "condition": "x1 <= 0 and x2 < 0",
+        "direction": "1 -> 2",
+        "condition": "x1 <= 0",
         "reset": {
-          "x1": [
-            "0"
-          ],
           "x2": [
-            "-0.9000 * x2[0] - 0.01"
+            "-0.94*x2[0]"
+          ]
+        }
+      },
+      {
+        "direction": "2 -> 1",
+        "condition": "x1 >= 0",
+        "reset": {
+          "x2": [
+            "-0.94*x2[0]"
           ]
         }
       }
@@ -413,19 +438,19 @@ The 1th attempt result:
   "config": {
     "dt": 0.001,
     "total_time": 10.0,
-    "self_loop": true
+    "order": 1
   }
 }
 ```
   2. Evaluation Feedback:
 {
   "Evaluation Metrics": {
-    "TC (Change-Point Error)": 0.0,
-    "Max Difference": 1.1968584796256005,
-    "Mean Difference": 0.5731380531492432
+    "TC (Change-Point Error)": 0.863,
+    "Max Difference": 1.1518219624636648,
+    "Mean Difference": 0.3816216088514591
   },
   "Evaluation Plot": {
-    "Placeholder": "<iter_image_1>",
-    "Summary": "The simulation exhibits **severe divergence** from the ground truth, characterized by a complete failure to capture the periodic, reset-driven behavior.\n\n**Fit Quality & Visual Patterns:**\nThe metrics ($\\text{max\\_diff} \\approx 1.2$, $\\text{mean\\_diff} \\approx 0.57$) are high, confirming poor fit. Visually, the simulated trajectory ($\\text{x1, x2}$ dashed lines) immediately settles to a fixed point near $(1.4, -1.6)$, while the ground truth shows strong oscillations with periodic, near-vertical resets (characteristic of a hybrid system). The simulated system is stuck in a single continuous mode (mode 1) with no observed mode switches.\n\n**Specific Issues:**\n1.  **Missing Resets/Guards:** The ground truth clearly shows state jumps (resets) occurring frequently. The simulation's $\\text{change\\_points}$ array shows only one segment (0 to 10001), indicating the guard condition for the edge is never met, or the dynamics are incorrect.\n2.  **Incorrect Dynamics:** The continuous dynamics in Mode 1 are likely inaccurate, as the system should be oscillating, not converging to a fixed point.\n3.  **Phase/Amplitude Mismatch:** The simulated trajectory does not match the amplitude or frequency of the ground truth oscillations.\n\n**Suggestions for HA Specification Improvement:**\n1.  **Verify Guard Conditions:** The guard $\\text{\"x1 <= 0 and x2 < 0\"}$ is likely incorrect or too restrictive. Analyze the ground truth state values at the observed reset times ($\\text{change\\_points}$) to define the correct guards that trigger the edge transition.\n2.  **Refine Continuous Dynamics (Mode 1):** The current linear ODEs ($\\dot{x}_1 = 0.001 x_2$, $\\dot{x}_2 = -0.057 x_1 - 0.0157 x_2$) do not produce sustained oscillations. These must be re-identified to match the observed sinusoidal behavior between resets.\n3.  **Review Reset Map:** The reset map ($\\text{x2} \\rightarrow -0.9 x_2[0] - 0.01$) should be checked against the magnitude of the jump observed in the ground truth data at mode switches."
+    "Placeholder": "<iter_image_2>",
+    "Summary": "The HA simulation exhibits significant discrepancies with the ground truth, particularly concerning the fast, oscillatory behavior of $x_2$.\n\n**Fit Quality & Visual Patterns:**\nThe overall fit quality is poor ($\\text{tc}=0.863$, $\\text{max\\_diff}=1.15$). The simulation fails to capture the rapid, high-amplitude oscillations seen in the ground truth $x_2$. The simulated $x_2$ (light blue dashed line) is nearly constant or shows very slow drift, while the ground truth $x_2$ (light blue solid line) exhibits sharp, periodic drops. The simulation's $x_1$ (dark blue dashed line) shows a slow, damped trend, which loosely follows the envelope of the ground truth $x_1$, but lacks the high-frequency component.\n\n**Specific Issues:**\n1.  **Mode Switching Mismatch:** The ground truth exhibits frequent, rapid mode switches (indicated by the sharp drops in $x_2$), with approximately 10 switches in the first 5 seconds. The simulation only recorded **one** major switch at $t=0.863$s, followed by settling into Mode 2 until $t=10$s. This indicates the guard conditions are not being met correctly or the dynamics within the modes are wrong.\n2.  **$x_2$ Dynamics Failure:** The simulation's dynamics for $x_2$ are completely incorrect. The ground truth suggests $x_2$ is being reset or driven to large negative values periodically, which is not replicated by the simulated dynamics or resets.\n3.  **Reset Action:** The reset condition $\\text{reset}: x_2 \\leftarrow -0.94 x_2[0]$ seems insufficient or incorrectly timed to generate the observed behavior.\n\n**Suggestions for Improvement:**\n1.  **Re-evaluate Mode 1 & 2 ODEs:** The current linear dynamics ($x_1[1] = -0.5 x_1[0] \\pm x_2[0], x_2[1] = -0.5 x_2[0]$) are too simplistic to generate the observed high-frequency oscillations. The ground truth likely involves coupling terms that drive $x_2$ more aggressively.\n2.  **Correct Guard Conditions:** The guard conditions ($\\text{x1} \\le 0$ and $\\text{x1} \\ge 0$) are likely incorrect or incomplete. The sharp drops in $x_2$ suggest a threshold condition related to $x_2$ itself, or a time-based event, is missing or misidentified.\n3.  **Investigate Reset Dynamics:** The reset for $x_2$ must be significantly different or occur much more frequently. If the system is a relaxation oscillator, the reset might need to be a hard jump (e.g., $x_2 \\leftarrow \\text{constant}$) rather than a scaled version of the previous state, or the transition condition must be met almost instantly."
   }
 }

@@ -333,12 +333,18 @@ Your output MUST conform to this JSON Schema:
 - The `var` and `input` fields in  Initial Hybrid Automaton Specification (v0) are **already correctly set** based on the ground truth data. **DO NOT** add or remove variables!
 - Focus on inferring the **equations** (`eq`), **modes**, and **edge conditions** only!
 - **DO NOT** convert to state-space form (e.g., splitting 1 variable into x1, x2)!
-- ODEnotation:
+- ODE notation:
    - `x[0]` = variable value
    - `x[1]` = first derivative (dx/dt)
    - `x[2]` = second derivative (d²x/dt²)
    - Left side = highest derivative (e.g., `x1[2] = ...` for order=2)
 - For single-variable systems: use higher-order ODE notation (e.g., `x1[2] = ...` for 2nd-order)
+
+## IMPORTANT: Python Boolean Syntax
+When constructing the HA specification dictionary in Python code:
+- Use `True`/`False` (Python syntax), **NOT** `true`/`false` (JSON syntax)
+- Example: `"need_reset": True` not `"need_reset": true`
+- Example: `"self_loop": False` not `"self_loop": false`
 
 ## Initial Hybrid Automaton Specification (v0)
 
@@ -373,5 +379,14 @@ Generate an improved HA specification that better matches the observed trajector
 
 ## Available Data
 - **Trace visualizations**: ['<image_0>', '<image_1>', '<image_2>'], use the `hybrid_automaton_image_analysis` tool to analyze the image if you want to obtain more detailed information about the system.
-- **Raw data files**: ['<npz_0>', '<npz_1>', '<npz_2>']. If you want to use the npz data to analyze the system, you MUST use the `data_analysis_expert` agent to analyze the data. You can not analyze the npz data directly.
+- **Raw data files**: If you want to use the npz data to analyze the system, you MUST use the `data_analysis_expert` agent to analyze the data. You can not analyze the npz data directly.
+
+### NPZ Data Format (for reference - use via `data_analysis_expert` agent)
+Each NPZ file contains:
+- `state`: numpy array, shape `(num_variables, num_steps)` - state trajectories
+  - Access: `x1 = data['state'][0, :]`, `x2 = data['state'][1, :]`
+- `input`: numpy array, shape `(num_inputs, num_steps)` - input signals (if applicable)
+  - Access: `u1 = data['input'][0, :]`
+
+**WARNING**: Do NOT use placeholder names like `<npz_0>` as file paths! Use the `data_analysis_expert` agent which has access to the actual file paths.
 
