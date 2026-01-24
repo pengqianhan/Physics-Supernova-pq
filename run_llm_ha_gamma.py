@@ -317,8 +317,6 @@ data = np.load(DATA_FILE_PATH)"""
             max_steps=80,
             verbosity_level=2,
         )
-        ## print the managed agent system prompt
-        print(managed_agent.system_prompt)
         if use_e2b:
             print("使用 E2B 云沙盒执行器，正在上传数据文件...")
             # 上传所有文件到 E2B 沙盒
