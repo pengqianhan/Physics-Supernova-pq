@@ -239,12 +239,6 @@ def _create_HA_agent(Tools_list: List[type[Tool]],
     # Docs: https://huggingface.co/docs/smolagents/en/tutorials/building_good_agents (agents support dynamic attributes)
     managerAgent.markdown_content_high_res_image = markdown_content
 
-    # Remove unwanted default tools or make add_base_tools=False in manager_agent_kwargs
-    # tools_to_remove = kwargs.get("tools_to_remove", ['web_search', 'visit_webpage'])
-    # for tool_name in tools_to_remove:
-    #     if tool_name in managerAgent.tools:
-    #         del managerAgent.tools[tool_name]
-
     return managerAgent
 
 
@@ -936,13 +930,6 @@ def parse_args():
         default="gemini/gemini-flash-lite-latest",
         help="Model ID to use for managed agents.",
     )
-    ap.add_argument(
-        "--tools-to-remove",
-        type=str,
-        nargs='*',
-        default=[],##['web_search', 'visit_webpage']
-        help="List of default tools to remove from the agent.",
-    )
 
     # HA-Scientist Loop parameters
     ap.add_argument(
@@ -1053,7 +1040,6 @@ def main():
         managed_agents_list=args.managed_agents_list if hasattr(args, 'managed_agents_list') else None,
         managed_agents_list_model_id=args.managed_agents_list_model if hasattr(args, 'managed_agents_list_model') else None,
         manager_type=args.manager_type,
-        tools_to_remove=args.tools_to_remove,
     )
 
     # ========================================================================
