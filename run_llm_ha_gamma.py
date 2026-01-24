@@ -276,27 +276,24 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
         # Build file paths description for prompt
         npz_files_description = "\n".join([f" {placeholders} - `{path}`" for placeholders, path in zip(npz_placeholders, npz_paths_list)])
 
-        # managed agent description with all available files
-        managed_agent_description = f"""I am a managed agent with name {agent_name}. I can assist with code-related tasks."""
-        managed_agent_instruction = f"""## Available npz files
-You have access to the following NPZ data files:
-{npz_files_description}
-**Quick Access via State Variables**
-- `DATA_FILE_PATHS`: List of all available NPZ file paths
-- `DATA_FILE_PATH`: Path to the first/primary data file (for convenience)
-
-**Example Usage**
-```python
-import numpy as np
-# Load a specific file
-data = np.load(DATA_FILE_PATHS[0])
-# Or use the primary file
-data = np.load(DATA_FILE_PATH)"""
+        
         # use_e2b = bool(os.environ.get("E2B_API_KEY"))
         use_e2b = False
-        managed_agent = CodeAgent(
+        if use_e2b:
+            print("使用 E2B 云沙盒执行器，正在上传数据文件...")
+            # 上传所有文件到 E2B 沙盒
+            sandbox_file_paths = []
+            for i, npz_path in enumerate(npz_paths_list):
+                with open(npz_path, "rb") as f:
+                    file_content = f.read()
+                sandbox_file_path = f"/tmp/sample_{i}.npz"
+                managed_agent.python_executor.sandbox.files.write(sandbox_file_path, file_content)
+                sandbox_file_paths.append(sandbox_file_path)
+                print(f"✓ 文件已上传到 E2B 沙盒: {sandbox_file_path}")
+
+            managed_agent = CodeAgent(
             tools=[],
-            executor_type="e2b" if use_e2b else "local",
+            executor_type="e2b",
             model=model,
             name=agent_name,
             additional_authorized_imports=[
@@ -317,22 +314,50 @@ data = np.load(DATA_FILE_PATH)"""
             max_steps=80,
             verbosity_level=2,
         )
-        if use_e2b:
-            print("使用 E2B 云沙盒执行器，正在上传数据文件...")
-            # 上传所有文件到 E2B 沙盒
-            sandbox_file_paths = []
-            for i, npz_path in enumerate(npz_paths_list):
-                with open(npz_path, "rb") as f:
-                    file_content = f.read()
-                sandbox_file_path = f"/tmp/sample_{i}.npz"
-                managed_agent.python_executor.sandbox.files.write(sandbox_file_path, file_content)
-                sandbox_file_paths.append(sandbox_file_path)
-                print(f"✓ 文件已上传到 E2B 沙盒: {sandbox_file_path}")
             # 注入所有文件路径到 agent 状态
             managed_agent.python_executor.state["DATA_FILE_PATHS"] = sandbox_file_paths
             managed_agent.python_executor.state["DATA_FILE_PATH"] = sandbox_file_paths[0] if sandbox_file_paths else ""
         else:
+            # managed agent description with all available files
+            managed_agent_description = f"""I am a managed agent with name {agent_name}. I can assist with code-related tasks."""
+            managed_agent_instruction = f"""## Available npz files
+            You have access to the following NPZ data files:
+            {npz_files_description}
+            **Quick Access via State Variables**
+            - `DATA_FILE_PATHS`: List of all available NPZ file paths
+            - `DATA_FILE_PATH`: Path to the first/primary data file (for convenience)
+
+            **Example Usage**
+            ```python
+            import numpy as np
+            # Load a specific file
+            data = np.load(DATA_FILE_PATHS[0])
+            # Or use the primary file
+            data = np.load(DATA_FILE_PATH)"""
             # 本地执行器：将所有数据文件路径注入到 agent 的状态中
+            managed_agent = CodeAgent(
+            tools=[],
+            executor_type="local",
+            model=model,
+            name=agent_name,
+            additional_authorized_imports=[
+            "os", "sys", "time", "argparse", "pathlib",
+            "matplotlib.pyplot", "matplotlib", "pandas", "json",
+            # numpy and all common submodules
+            "numpy", "numpy.linalg", "numpy.fft", "numpy.random", 
+            "numpy.polynomial", "numpy.ma", "numpy.lib",
+            # scipy and all common submodules
+            "scipy", "scipy.linalg", "scipy.optimize", "scipy.interpolate",
+            "scipy.integrate", "scipy.stats", "scipy.signal", "scipy.fft",
+            "scipy.sparse", "scipy.ndimage", "scipy.special"
+            # 
+            "pysindy","gradient_free_optimizers","gradient_free_optimizers.BayesianOptimizer"
+        ],
+            description=managed_agent_description,
+            instructions=managed_agent_instruction,
+            max_steps=80,
+            verbosity_level=2,
+        )
             managed_agent.python_executor.state["DATA_FILE_PATHS"] = npz_paths_list
             managed_agent.python_executor.state["DATA_FILE_PATH"] = npz_paths_list[0] if npz_paths_list else ""
         managed_agents.append(managed_agent)
