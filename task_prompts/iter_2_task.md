@@ -390,3 +390,58 @@ Each NPZ file contains:
 
 **WARNING**: Do NOT use placeholder names like `<npz_0>` as file paths! Use the `data_analysis_expert` agent which has access to the actual file paths.
 
+"
+## Previously Explored HA Specifications with Feedback",
+            "Use these as inspiration to guide your next refinement.",
+            "Use the `hybrid_automaton_image_analysis` tool to analyze the comparison plot through the `Placeholder` in the `Evaluation Plot` section."
+            
+-----------------------------------------
+
+The 1th attempt result:
+  1. HA JSON Specification:
+```json
+{
+  "automaton": {
+    "var": "x1, x2",
+    "input": "",
+    "mode": [
+      {
+        "id": 1,
+        "eq": "x1[1] = x2[0], x2[1] = -9.8"
+      }
+    ],
+    "edge": [
+      {
+        "direction": "1 -> 1",
+        "condition": "x1 <= 0 and x2 < 0",
+        "reset": {
+          "x1": [
+            "0"
+          ],
+          "x2": [
+            "-0.9 * x2[0]"
+          ]
+        }
+      }
+    ]
+  },
+  "config": {
+    "dt": 0.001,
+    "total_time": 10.0,
+    "order": 1,
+    "self_loop": true
+  }
+}
+```
+  2. Evaluation Feedback:
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.0,
+    "Max Difference": 1.8982055225957664,
+    "Mean Difference": 0.0023333567016376117
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_1>",
+    "Summary": "The identified hybrid automaton demonstrates excellent tracking with a low `mean_diff` (0.0023). The visual comparison shows near-perfect alignment in both continuous dynamics and discrete resets"
+  }
+}

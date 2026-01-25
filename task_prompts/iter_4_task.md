@@ -497,3 +497,55 @@ The 2th attempt result:
     "Summary": "The HA model demonstrates an excellent fit, with the identified dynamics ($\\dot{x}_1=x_2, \\dot{x}_2=-9.8$) and restitution coefficient ($e=0.9$) accurately"
   }
 }
+
+
+-----------------------------------------
+
+The 3th attempt result:
+  1. HA JSON Specification:
+```json
+{
+  "automaton": {
+    "var": "x1, x2",
+    "input": "",
+    "mode": [
+      {
+        "id": 1,
+        "eq": "x1[1] = x2[0], x2[1] = -9.8"
+      }
+    ],
+    "edge": [
+      {
+        "direction": "1 -> 1",
+        "condition": "x1 <= 0 and x2 < 0",
+        "reset": {
+          "x1": [
+            "0"
+          ],
+          "x2": [
+            "-0.8*x2[0]"
+          ]
+        }
+      }
+    ]
+  },
+  "config": {
+    "dt": 0.001,
+    "total_time": 10.0,
+    "order": 1,
+    "self_loop": true
+  }
+}
+```
+  2. Evaluation Feedback:
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.0,
+    "Max Difference": 1.7982055225957667,
+    "Mean Difference": 0.19365051560083973
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_3>",
+    "Summary": "The simulation demonstrates poor long-term predictive accuracy, with a **max_diff of 1.798** and significant phase divergence. The primary failure mode is **premature Zeno behavior**:"
+  }
+}
