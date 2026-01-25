@@ -556,11 +556,8 @@ Each NPZ file contains:
 
     # Add feedback from previous iteration if available
     if feedback:
-        task += f""""\n## Previously Explored HA Specifications with Feedback",
-            "Use these as inspiration to guide your next refinement.",
-            "Use the `hybrid_automaton_image_analysis` tool to analyze the comparison plot through the `Placeholder` in the `Evaluation Plot` section."
-            {feedback}"""
-
+        task += f""""\n## Previously Explored HA Specifications with Feedback:\nUse these as inspiration to guide your next refinement.\nUse the `hybrid_automaton_image_analysis` tool to analyze the comparison plot through the `Placeholder` in the `Evaluation Plot` section.\n
+{feedback}"""
 
     return task, compressed_trace_images
 
