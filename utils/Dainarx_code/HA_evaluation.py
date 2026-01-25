@@ -823,40 +823,41 @@ if __name__ == "__main__":
             "other_items": ""
         }
     }
-    data1=json.load(open('utils/Dainarx_code/automata/ATVA/ball.json', 'r'))
-    # print(data)
-    data = {
-  "automaton": {
-    "var": "x1, x2",
-    "input": "",
-    "mode": [
-      {
-        "id": 1,
-        "eq": "x1[1] = x2[0], x2[1] = -9.8"
-      }
-    ],
-    "edge": [
-      {
-        "direction": "1 -> 1",
-        "condition": "x1 <= 0 and x2 < 0",
-        "reset": {
-          "x1": [
-            "0"
-          ],
-          "x2": [
-            "-0.9 * x2[0]"
-          ]
+    data2 = {
+        "automaton": {
+            "var": "x1, x2",
+            "input": "",
+            "mode": [
+            {
+                "id": 1,
+                "eq": "x1[1] = x2[0], x2[1] = -9.8"
+            }
+            ],
+            "edge": [
+            {
+                "direction": "1 -> 1",
+                "condition": "x1 <= 0 and x2 < 0",
+                "reset": {
+                "x1": [
+                    "0"
+                ],
+                "x2": [
+                    "-0.9 * x2[0]"
+                ]
+                }
+            }
+            ]
+        },
+        "config": {
+            "dt": 0.001,
+            "total_time": 10.0,
+            "order": 1,
+            "self_loop": True
         }
-      }
-    ]
-  },
-  "config": {
-    "dt": 0.001,
-    "total_time": 10.0,
-    "order": 1,
-    "self_loop": True
-  }
-}
+        }
+    data=json.load(open('utils/Dainarx_code/automata/ATVA/ball.json', 'r'))
+    # print(data)
+    
 
 
     # Create evaluator using the new HAEvaluator class
