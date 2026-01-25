@@ -583,9 +583,11 @@ class HAEvaluator:
         gt_change_points = self.ground_truth['change_points']
 
         # Truncate to shorter length for fair comparison
-        min_len = min(sim_state.shape[1], gt_state.shape[1])
+        # Note: sim[i] corresponds to GT[i+1] due to timing offset
+        # (sim uses GT[0] as initial state, so sim[0] is at t=2*dt while GT[0] is at t=dt)
+        min_len = min(sim_state.shape[1], gt_state.shape[1] - 1)
         sim_state_truncated = sim_state[:, :min_len]
-        gt_state_truncated = gt_state[:, :min_len]
+        gt_state_truncated = gt_state[:, 1:min_len+1]  # Offset by 1
 
         # Use Evaluation class to compute metrics
         evaluator = Evaluation(name="HA_Single_Trajectory_Evaluation")
@@ -593,7 +595,7 @@ class HAEvaluator:
         evaluator.submit(
             fit_mode=[sim_mode[:min_len]],
             fit_data=[sim_state_truncated],
-            gt_mode=[gt_mode[:min_len]] if gt_mode is not None else [[1] * min_len],
+            gt_mode=[gt_mode[1:min_len+1]] if gt_mode is not None else [[1] * min_len],  # Offset by 1
             gt_data=[gt_state_truncated],
             chp=[sim_change_points],
             gt_chp=[gt_change_points] if gt_change_points is not None else [[0, min_len]],
@@ -821,8 +823,40 @@ if __name__ == "__main__":
             "other_items": ""
         }
     }
-    data=json.load(open('utils/Dainarx_code/automata/ATVA/ball.json', 'r'))
-    print(data)
+    data1=json.load(open('utils/Dainarx_code/automata/ATVA/ball.json', 'r'))
+    # print(data)
+    data = {
+  "automaton": {
+    "var": "x1, x2",
+    "input": "",
+    "mode": [
+      {
+        "id": 1,
+        "eq": "x1[1] = x2[0], x2[1] = -9.8"
+      }
+    ],
+    "edge": [
+      {
+        "direction": "1 -> 1",
+        "condition": "x1 <= 0 and x2 < 0",
+        "reset": {
+          "x1": [
+            "0"
+          ],
+          "x2": [
+            "-0.9 * x2[0]"
+          ]
+        }
+      }
+    ]
+  },
+  "config": {
+    "dt": 0.001,
+    "total_time": 10.0,
+    "order": 1,
+    "self_loop": True
+  }
+}
 
 
     # Create evaluator using the new HAEvaluator class
