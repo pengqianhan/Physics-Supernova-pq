@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.0,
+    "Max Difference": 0.6504481572122673,
+    "Mean Difference": 0.014890451084616197
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_42>",
+    "Summary": "The system identification for $x_1$ is excellent, but $x_2$ exhibits a significant transient error ($\\text{max\\_diff} \\approx 0.65$) following"
+  }
+}

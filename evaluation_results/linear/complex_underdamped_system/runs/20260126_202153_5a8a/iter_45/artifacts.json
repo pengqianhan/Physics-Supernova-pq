@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.0,
+    "Max Difference": 0.15162466038862085,
+    "Mean Difference": 0.0050045285162257265
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_45>",
+    "Summary": "The HA model demonstrates high fidelity for $x_1$ but exhibits significant transient divergence in $x_2$ following the first mode transition at $t=1s$. While the `mean_"
+  }
+}

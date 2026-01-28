@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.234,
+    "Max Difference": 0.053977405231633704,
+    "Mean Difference": 0.007855956677969308
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_38>",
+    "Summary": "**Analysis Summary**\n\n**Overall Fit:** The model demonstrates good short-term tracking (mean_diff: 0.0078) but suffers from significant **cumulative phase lag** and **"
+  }
+}

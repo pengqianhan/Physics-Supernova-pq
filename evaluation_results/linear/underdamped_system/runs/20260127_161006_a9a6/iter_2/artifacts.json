@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.03,
+    "Max Difference": 0.022364908027349854,
+    "Mean Difference": 0.004614124850800575
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_2>",
+    "Summary": "**Overall Fit Quality:** Excellent. The model achieves a mean difference of 0.0046 and zero clustering errors, indicating high-fidelity identification of the underlying hybrid dynamics.\n\n**"
+  }
+}

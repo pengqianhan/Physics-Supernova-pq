@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.654,
+    "Max Difference": 1.8833432569138,
+    "Mean Difference": 0.2826447705845468
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_14>",
+    "Summary": "The identification shows a poor fit (**$tc \\approx 0.65$**, **$max\\_diff = 1.88$**). The primary failure is a structural mismatch in the"
+  }
+}

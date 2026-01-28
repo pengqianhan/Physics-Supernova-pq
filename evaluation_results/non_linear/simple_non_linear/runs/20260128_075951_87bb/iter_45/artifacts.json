@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.005,
+    "Max Difference": 0.007477083649052479,
+    "Mean Difference": 0.0006449326808429194
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_45>",
+    "Summary": "The evaluation indicates an **excellent fit** with a $max\\_diff$ of $0.0075$ and negligible $mean\\_diff$. The simulated trajectory perfectly tracks the ground truth across multiple"
+  }
+}

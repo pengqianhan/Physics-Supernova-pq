@@ -1,0 +1,18 @@
+{
+  "automaton": {
+    "var": "x1",
+    "input": "",
+    "mode": [
+      {
+        "id": 1,
+        "eq": "x1[1] = x1[0] ** -1"
+      }
+    ],
+    "edge": []
+  },
+  "config": {
+    "dt": 0.001,
+    "total_time": 10.0,
+    "order": 1
+  }
+}

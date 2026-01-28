@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 1.024,
+    "Max Difference": 1.4872808641692161,
+    "Mean Difference": 0.25824708488450676
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_2>",
+    "Summary": "0.001s$, whereas ground truth remains in Mode 1 until $t=0.592s$.\n        3.  **Guard Issues:** The condition $x_"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 4.999,
+    "Max Difference": 0.8747039580144516,
+    "Mean Difference": 0.6092866597383594
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_15>",
+    "Summary": "**Fit Quality:** Poor. The simulation fails to capture the high-frequency switching dynamics of the ground truth, instead converging to a static equilibrium.\n\n**Visual Patterns & Issues:**\n*   **"
+  }
+}

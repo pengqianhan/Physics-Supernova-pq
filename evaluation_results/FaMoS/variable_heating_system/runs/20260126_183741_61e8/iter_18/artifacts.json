@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.182,
+    "Max Difference": 0.08259886614821205,
+    "Mean Difference": 0.038924534663426116
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_18>",
+    "Summary": "The simulation exhibits a significant **phase lead**, with mode transitions occurring consistently earlier than the ground truth (e.g., first switch at $t=1.330s$ vs."
+  }
+}

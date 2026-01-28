@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.608,
+    "Max Difference": 0.3420077485050669,
+    "Mean Difference": 0.14187111971491778
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_47>",
+    "Summary": "**Analysis:**\nThe simulation achieves a poor fit (TC: 0.608) characterized by significant **cumulative phase lag** and **amplitude divergence** starting after $t=3"
+  }
+}

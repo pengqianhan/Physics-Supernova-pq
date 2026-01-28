@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.47700000000000004,
+    "Max Difference": 0.13818871275854477,
+    "Mean Difference": 0.04988741609991324
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_3>",
+    "Summary": "The system exhibits good short-term tracking, but suffers from significant **cumulative phase drift** and **amplitude divergence** starting around $t=5s$. \n\n**Key Observations:**\n1.  **Mode Switch Timing:** Comparison of `change_points` reveals the simulation consistently lags behind the ground truth (e.g., switching at index 5745 vs. 5601). This delay in triggering the transition logic is the primary driver of the phase error.\n2.  **Dynamics Divergence:** The simulated trajectory overshoots the ground truth peaks. This suggests the damping terms (coefficients of $x_1[1]$ and"
+  }
+}

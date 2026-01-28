@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.556,
+    "Max Difference": 0.23753005731407045,
+    "Mean Difference": 0.0899240846649481
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_17>",
+    "Summary": "The model exhibits significant **temporal divergence** and **phase lead**. While the cyclic mode sequence is qualitatively captured, the simulated system cycles faster than the ground truth, resulting in a poor trajectory correlation ($tc"
+  }
+}

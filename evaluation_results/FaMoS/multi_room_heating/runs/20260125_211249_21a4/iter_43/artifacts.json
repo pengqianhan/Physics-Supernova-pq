@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.155,
+    "Max Difference": 0.03708879083789094,
+    "Mean Difference": 0.0059381199762663225
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_43>",
+    "Summary": "=19.0$) using a sensitivity analysis to align the period.\n        2. **Dynamics Tuning:** Re-estimate the constant terms ($6.44, 6."
+  }
+}

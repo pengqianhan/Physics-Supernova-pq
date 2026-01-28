@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.8320000000000001,
+    "Max Difference": 0.344259739444387,
+    "Mean Difference": 0.15362000095346628
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_7>",
+    "Summary": "The identification shows a significant **phase lead** and **frequency mismatch**, with the simulated trajectory diverging early. While `clustering_error` is 0, the temporal alignment is poor ($tc \\"
+  }
+}

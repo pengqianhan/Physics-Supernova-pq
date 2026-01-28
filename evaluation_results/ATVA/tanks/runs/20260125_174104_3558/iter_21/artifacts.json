@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.15,
+    "Max Difference": 0.26304228607990854,
+    "Mean Difference": 0.04552702252079763
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_21>",
+    "Summary": "The system identification shows a strong structural match (zero clustering error) but significant parametric inaccuracies, reflected in a `max_diff` of 0.263.\n\n**Key Observations:**\n1.  **Dynamics Mismatch:** The simulated $x_1$ exhibits a faster decay rate than the ground truth in the initial transient (0\u20132s). The use of coarse integer coefficients (e.g., $-1.0, 1.0$) in the ODEs fails to capture the precise system eigenvalues.\n2.  **Switching Latency:** There is a visible timing mismatch in mode transitions (e.g., first switch at 0.204s vs. 0.185s). This indicates that the guard conditions (e.g., `x1 <= -1.0`) are slightly offset from the true physical boundaries.\n3.  **Amplitude Errors"
+  }
+}

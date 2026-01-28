@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 2.119,
+    "Max Difference": 1.0219386002359248,
+    "Mean Difference": 0.3637529589371989
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_3>",
+    "Summary": "**Fit Quality:** Poor. The simulation diverges significantly after $t \\approx 2.1$s (matching the reported $t_c$). While the initial transient is captured, the"
+  }
+}

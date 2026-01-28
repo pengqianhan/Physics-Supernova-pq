@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.0,
+    "Max Difference": 0.24072962620058055,
+    "Mean Difference": 0.02102575464222913
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_3>",
+    "Summary": "The HA model demonstrates excellent overall fit (mean difference: 0.021). Mode switch timing at $t \\approx 4.1s$ (guard $x_4 \\ge"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.8320000000000001,
+    "Max Difference": 0.2407084483700175,
+    "Mean Difference": 0.04053458007351272
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_15>",
+    "Summary": "The identification shows a moderate fit (**tc: 0.83**) but suffers from significant **temporal misalignment** and **mode mismatch**.\n\n**Key Observations:**\n1.  **Phase Lead/Timing Error:** Simulated transitions occur consistently earlier than ground truth (e.g., first major switch at index 684 vs. 824). This suggests the decay rates in the ODEs are too aggressive or the guard thresholds are too narrow.\n2.  **Initial Mode Mismatch:** The simulation starts in Mode 1 and immediately jumps to Mode 4, while ground truth starts in Mode 7. This causes an immediate trajectory divergence."
+  }
+}

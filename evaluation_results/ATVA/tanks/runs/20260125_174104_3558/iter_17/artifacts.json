@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.851,
+    "Max Difference": 0.9713848035310273,
+    "Mean Difference": 0.18553850624077364
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_17>",
+    "Summary": "The evaluation shows a moderate fit (TC: 0.85) but significant structural divergence. The simulation exhibits a **clustering error of 1**, indicating a fundamental mismatch in mode identification.\n\n**Key Issues:**\n1.  **Mode Initialization & Chattering:** The simulation starts in the wrong mode (Mode 1 vs. GT Mode 2). The simulated trajectory shows excessive switching (16 vs. 12 change points), particularly \"chattering\" around $x_2 \\approx 1.0$.\n2.  **Reset Discrepancy:** The hard reset `x2 = 0.0` in the HA spec causes sharp vertical drops in the simulation that are absent or differently scaled in the ground truth. The GT"
+  }
+}

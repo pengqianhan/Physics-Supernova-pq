@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 2.119,
+    "Max Difference": 0.5120121680407964,
+    "Mean Difference": 0.2694577084979705
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_16>",
+    "Summary": "1[2]$, suggesting a 2nd-order discrete-time difference equation.\n\n    *   *Draft:* The model fails to capture the oscillatory behavior of the ground truth, resulting in"
+  }
+}

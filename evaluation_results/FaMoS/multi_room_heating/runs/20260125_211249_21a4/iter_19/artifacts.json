@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.834,
+    "Max Difference": 0.2893567446855378,
+    "Mean Difference": 0.06997891960773836
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_19>",
+    "Summary": "**Fit Quality:** The model achieves a moderate fit (TC: 0.834) but suffers from significant **temporal divergence** and **phase lag** as time progresses.\n\n**"
+  }
+}

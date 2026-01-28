@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 1.6340000000000001,
+    "Max Difference": 2.1379061442930714,
+    "Mean Difference": 0.48173972166307794
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_11>",
+    "Summary": "approx 0.6, 3.2$) but is missed or incorrectly timed in simulation.\n\n    **Actionable Improvements:**\n    *   **Re-estimate ODEs:** Increase the"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.003,
+    "Max Difference": 0.0581032398645447,
+    "Mean Difference": 0.012763368969904515
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_16>",
+    "Summary": "The HA model demonstrates excellent fit quality with a **mean difference of 0.012** and perfect mode clustering. The $x_1$ trajectory (triangular wave) is accurately captured by the high"
+  }
+}

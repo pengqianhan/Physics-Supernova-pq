@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.003,
+    "Max Difference": 0.06355255098189486,
+    "Mean Difference": 0.014052623865101395
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_14>",
+    "Summary": "The HA model demonstrates high fidelity with a mean difference of **0.014**. $x_1$ tracking is nearly perfect, governed by stiff velocity control and precise guards at $x_"
+  }
+}

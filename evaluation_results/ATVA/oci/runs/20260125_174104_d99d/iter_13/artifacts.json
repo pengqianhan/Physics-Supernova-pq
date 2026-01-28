@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.005,
+    "Max Difference": 0.02072886777239963,
+    "Mean Difference": 0.003537893517968247
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_13>",
+    "Summary": "The HA model demonstrates excellent fit quality (mean error: 0.0035, max error: 0.0207). The simulated trajectories show high fidelity in both amplitude and phase"
+  }
+}

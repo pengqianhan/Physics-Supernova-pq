@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.004,
+    "Max Difference": 0.02684830137190287,
+    "Mean Difference": 0.001605157413305954
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_4>",
+    "Summary": "The identification demonstrates high precision, with a **mean difference of 0.0016** and near-perfect tracking of the state trajectories. The linear and affine dynamics for both modes are well"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 1.735,
+    "Max Difference": 0.01977116399617852,
+    "Mean Difference": 0.004119664748120599
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_14>",
+    "Summary": "The HA model demonstrates a high-quality fit (Mean Diff: 0.004), but exhibits structural divergence in switching frequency. The simulation identifies only 5 change points compared to 1"
+  }
+}

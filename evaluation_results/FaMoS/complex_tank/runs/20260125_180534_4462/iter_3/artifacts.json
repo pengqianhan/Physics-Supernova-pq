@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.918,
+    "Max Difference": 0.40538205368004376,
+    "Mean Difference": 0.03662646413666833
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_3>",
+    "Summary": "The evaluation shows a **Theil Coefficient of 0.918**, but visual analysis reveals significant **mode-switching latency**, particularly for $x_2$. While $x_1$ and"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.66,
+    "Max Difference": 0.23781064370083677,
+    "Mean Difference": 0.09044296608796133
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_4>",
+    "Summary": "The identification shows a significant **frequency mismatch** and **phase divergence**. While `mean_diff` is low (0.09), the `tc` of 0.66 confirms a poor"
+  }
+}

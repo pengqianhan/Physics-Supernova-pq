@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.0,
+    "Max Difference": 1.071753650516903,
+    "Mean Difference": 0.11743054510711945
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_1>",
+    "Summary": "**Overall Fit:** The identification of $x_1$ is excellent, with near-perfect alignment and accurate guard detection (timing error < 1ms). However, $x_2$ exhibits significant"
+  }
+}

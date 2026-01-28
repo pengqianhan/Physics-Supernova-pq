@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.772,
+    "Max Difference": 0.9314605748054897,
+    "Mean Difference": 0.26217624241022297
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_22>",
+    "Summary": "**Fit Quality:** Moderate (TC: 0.77). While $x_1$ follows the general trend, $x_2$ shows severe morphological mismatch and a high `max"
+  }
+}

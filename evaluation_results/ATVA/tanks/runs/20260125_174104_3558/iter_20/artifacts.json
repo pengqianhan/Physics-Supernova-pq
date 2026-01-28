@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.15,
+    "Max Difference": 0.26304228607990854,
+    "Mean Difference": 0.04552702252079763
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_20>",
+    "Summary": "The HA model captures the qualitative switching logic (clustering error = 0), but exhibits significant local inaccuracies. The **max_diff (0.263)** is driven by timing mismatches"
+  }
+}

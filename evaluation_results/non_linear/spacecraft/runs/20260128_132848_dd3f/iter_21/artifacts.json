@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.001,
+    "Max Difference": 0.012139724548983386,
+    "Mean Difference": 0.0014670046104623708
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_21>",
+    "Summary": "The hybrid automaton identification is highly successful, achieving a **mean difference of 0.0015** and zero clustering error. The simulation perfectly tracks the ground truth across both modes, with the mode"
+  }
+}

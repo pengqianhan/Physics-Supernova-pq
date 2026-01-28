@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.558,
+    "Max Difference": 0.2373716616933517,
+    "Mean Difference": 0.08870584061107274
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_2>",
+    "Summary": "**Overall Fit:** Moderate (TC: 0.558). While the cyclic topology is captured, there is a significant **phase lead** in the simulation, resulting in a cumulative timing mismatch"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 3.606,
+    "Max Difference": 0.5356759374135802,
+    "Mean Difference": 0.27775654114252313
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_11>",
+    "Summary": "**Overall Fit Quality:** Poor. The simulation fails to capture the oscillatory nature of the ground truth, resulting in a massive amplitude mismatch and total phase divergence. The `clustering_error` of 1 confirms the mode sequences are entirely misaligned.\n\n**Specific Issues:**\n1.  **Damped Dynamics"
+  }
+}

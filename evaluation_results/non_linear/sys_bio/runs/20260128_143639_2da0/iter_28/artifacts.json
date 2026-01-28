@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.0,
+    "Max Difference": 64752024.984274454,
+    "Mean Difference": 1804862.9959654957
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_28>",
+    "Summary": "**Evaluation Summary:**\n\nThe identification is a **catastrophic failure**. While ground truth trajectories remain stable and near-zero, the simulated system diverges exponentially after $t=4.5s$, with `max_diff` exceeding $6.47 \\times 10^7$. This indicates severe numerical instability in the learned discrete-time map.\n\n**Key Issues:**\n1.  **Numerical Instability:** The equations for $x_5, x_8,$ and $x_"
+  }
+}

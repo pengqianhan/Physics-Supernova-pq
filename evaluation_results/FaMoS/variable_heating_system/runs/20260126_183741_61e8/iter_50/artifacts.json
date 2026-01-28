@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.168,
+    "Max Difference": 0.07698803998520866,
+    "Mean Difference": 0.03611218382099995
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_50>",
+    "Summary": "The HA model captures the system's structural switching logic but exhibits a significant **phase lead** and cumulative temporal drift. While the `mean_diff` (0.036) is low,"
+  }
+}

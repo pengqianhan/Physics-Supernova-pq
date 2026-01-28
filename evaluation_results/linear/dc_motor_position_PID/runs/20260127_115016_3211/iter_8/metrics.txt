@@ -1,0 +1,90 @@
+Hybrid Automaton Evaluation Results
+================================================================================
+Timestamp: 20260127_151516
+Iteration: 8
+Run ID: 20260127_115016_3211
+
+Metrics:
+  TC (Change-Point Error):2.759000 seconds
+  Max Difference:1.049511
+  Mean Difference:0.363321
+
+HA Specification:
+{
+  "automaton": {
+    "var": "x1, x2",
+    "input": "",
+    "mode": [
+      {
+        "id": 1,
+        "eq": "x1[2] = 0, x2[2] = 1.14796298 + 0.15117831 * x1[0] - 1.19502456 * x2[0] - 1.64121274 * x2[1] + 0.00404079 * x1[0] ** 2 + 0.13923212 * x2[0] ** 2 + 0.63061715 * x2[1] ** 2 - 0.11565241 * x1[0] * x2[0] + 0.11859660 * x1[0] * x2[1] + 0.54060986 * x2[0] * x2[1]"
+      },
+      {
+        "id": 2,
+        "eq": "x1[2] = 0, x2[2] = 0.15398479 - 0.45636564 * x1[0] - 2.65806315 * x2[0] - 2.71298785 * x2[1] + 0.14535248 * x1[0] ** 2 + 0.06032915 * x2[0] ** 2 + 1.92787730 * x2[1] ** 2 + 0.19014934 * x1[0] * x2[0] + 0.90191360 * x1[0] * x2[1] - 0.31726929 * x2[0] * x2[1]"
+      }
+    ],
+    "edge": [
+      {
+        "direction": "1 -> 2",
+        "condition": "x1 >= 5.0",
+        "reset": {
+          "x1[1]": [
+            "-1.0"
+          ]
+        }
+      },
+      {
+        "direction": "2 -> 1",
+        "condition": "x1 <= 0.0",
+        "reset": {
+          "x1[1]": [
+            "1.0"
+          ]
+        }
+      }
+    ]
+  },
+  "config": {
+    "dt": 0.001,
+    "total_time": 10.0,
+    "order": 2
+  }
+}
+
+Experiment Hyperparameters
+============================================================
+
+--- Manager Agent ---
+Model: gemini/gemini-3-flash-preview
+Type: CodeAgent
+
+--- Managed Agents ---
+Count: 1
+Agent Names: data_analysis_expert
+Model: gemini/gemini-3-flash-preview
+
+--- Tools ---
+Tools List: hybrid_automaton_image_analysis
+Image Tool Model: gemini/gemini-3-flash-preview
+Review Tool Model: gemini/gemini-flash-lite-latest
+Summarize Tool Model: gemini/gemini-flash-lite-latest
+
+--- Iteration Configuration ---
+Max Iterations: 50
+Feedback Top-K: 50
+Target Error: 0.001
+No Improvement Patience: 20
+
+--- Data Configuration ---
+Input Data Path: data_all/linear/dc_motor_position_PID
+System Name: 
+Num Variables: 2
+Num Inputs: 0
+
+--- Other ---
+Use JSON Schema: True
+Use Structured Output: True
+Structured Output Model: gemini/gemini-3-flash-preview
+============================================================
+

@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.001,
+    "Max Difference": 0.017327940952664253,
+    "Mean Difference": 0.0012340517115496364
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_5>",
+    "Summary": "The identification is highly successful, yielding an excellent fit with a **mean difference of 0.0012** and **zero clustering error**. Visual inspection confirms near-perfect alignment across both modes, with no observable phase lag or divergence. The transition at $t \\approx 0.158s$ is accurately captured by the guard condition $x_1 \\ge -0.4"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.001,
+    "Max Difference": 0.01213972435706262,
+    "Mean Difference": 0.0014538872072900895
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_18>",
+    "Summary": "The HA model demonstrates high fidelity with a **mean difference of 0.0014** and **zero clustering error**. Visual inspection confirms nearly perfect alignment across all four states ($x_"
+  }
+}

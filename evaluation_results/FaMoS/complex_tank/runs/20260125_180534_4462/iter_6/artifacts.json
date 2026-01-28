@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.851,
+    "Max Difference": 0.3251006625500323,
+    "Mean Difference": 0.05025258808478357
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_6>",
+    "Summary": "The system shows a moderate fit (**TC: 0.85**) but suffers from significant **phase lag** and **mode switch timing errors**, particularly for $x_2$ and $x_3$.\n\n**Key Observations:**\n1.  **Phase Lag:** Simulated $x_2$ (brown) and $x_3$ (cyan) transitions occur significantly later than ground truth.\n2.  **Guard Restriction:** The simulated $x_2$ charge (Mode 3) is delayed because the guard `1 -> 3` requires `x1 > 15.0`. In the ground truth, $x_2$ begins recovery while $x_1$ is still at its minimum.\n3.  **Decay Mismatch:** The simulated $x_3$"
+  }
+}

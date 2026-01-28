@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.0,
+    "Max Difference": 3.4658089923376707,
+    "Mean Difference": 0.5715220516842072
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_5>",
+    "Summary": "The identification shows **poor fit quality**, characterized by catastrophic divergence in high-magnitude states. While the clustering error is zero (indicating a single-mode system), the `max_diff` of"
+  }
+}

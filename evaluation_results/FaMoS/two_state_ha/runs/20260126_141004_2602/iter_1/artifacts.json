@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.486,
+    "Max Difference": 0.20939965318223855,
+    "Mean Difference": 0.09331084255438353
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_1>",
+    "Summary": "The identification shows a poor fit (tc \u2248 0.486) characterized by a significant **accumulative phase lag** and **mode-switch misalignment**. \n\n**Key Issues:**\n1.  **Initial State/Mode Mismatch:** The simulation starts in Mode 1, while the ground truth starts in Mode 2, causing immediate divergence.\n2.  **Frequency Error:** The discrete-time coefficients"
+  }
+}

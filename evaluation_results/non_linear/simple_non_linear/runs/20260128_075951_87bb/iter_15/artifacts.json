@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 2.221,
+    "Max Difference": 3642.826052729524,
+    "Mean Difference": 225.64607509392584
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_15>",
+    "Summary": "The simulation exhibits catastrophic divergence, reaching $\\approx -4.5 \\times 10^5$ while the ground truth remains stable near zero. The primary failure is a **guard mismatch** that"
+  }
+}

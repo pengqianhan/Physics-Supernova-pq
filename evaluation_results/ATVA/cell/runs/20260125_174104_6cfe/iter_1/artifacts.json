@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 1.315,
+    "Max Difference": 0.22631810544833159,
+    "Mean Difference": 0.12459205736453177
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_1>",
+    "Summary": "The identification shows a **total failure to capture system dynamics**. While the ground truth decays from 38 to 29, the simulation remains static at the initial value ($x_1 \\approx"
+  }
+}

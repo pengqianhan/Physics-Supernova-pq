@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.0,
+    "Max Difference": 0.48197460415930804,
+    "Mean Difference": 0.11082716079390971
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_5>",
+    "Summary": "The system identification for $x_1$ is excellent, with near-perfect alignment and accurate mode transition timing (error $\\approx 1$ms). However, $x_2$ exhibits significant tracking error, with a `max_diff` of 0.48.\n\n**Key Issues:**\n1. **$x_2$ Dynamic Mismatch:** Simulated $x_2$ diverges immediately. In Mode 1, the simulation shows a steep decline while ground truth remains nearly constant. In Mode 2, the simulated trajectory reaches a much lower minimum ($\\approx -0.5$ vs GT $\\approx -0.2$).\n2. **Steady-State/Bias Error:** The constant terms in the $x_2$ equations ($0.7711$ and $0.2019$) appear to be incorrectly estimated, leading to a vertical offset and incorrect drift rates.\n3. **Coupling Errors:** The linear coefficients for $x_1$ and $x_2$ in the $\\dot{x}_2$ equations fail to capture the actual curvature of the ground truth"
+  }
+}

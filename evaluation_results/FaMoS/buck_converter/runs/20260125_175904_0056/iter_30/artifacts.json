@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.035,
+    "Max Difference": 1.6623902969739248,
+    "Mean Difference": 0.29652970835857223
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_30>",
+    "Summary": "The HA model captures the global limit cycle but exhibits significant phase drift and amplitude errors (`max_diff`: 1.66). A major initial transient error is visible in $x_2$,"
+  }
+}

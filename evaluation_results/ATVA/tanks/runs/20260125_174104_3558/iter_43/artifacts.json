@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.152,
+    "Max Difference": 0.25523864263140333,
+    "Mean Difference": 0.04436431369801942
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_43>",
+    "Summary": "The HA model demonstrates strong structural alignment (mean\\_diff: 0.044) but suffers from significant local divergence (max\\_diff: 0.255), particularly during transients and"
+  }
+}

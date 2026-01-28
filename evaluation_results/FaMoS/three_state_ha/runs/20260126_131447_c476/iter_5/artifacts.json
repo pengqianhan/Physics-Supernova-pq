@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 2.119,
+    "Max Difference": 0.726089248219476,
+    "Mean Difference": 0.2403355256897536
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_5>",
+    "Summary": "**Evaluation Summary:**\n\nThe model shows poor fit quality, with significant divergence starting at $t \\approx 3s$. While the initial phase shows a slight phase lag, the simulation fails to capture the system's cyclic behavior, resulting in a massive amplitude error in the second half of the trajectory (Simulated: ~17 vs. Ground Truth: ~29).\n\n**Key Issues:**\n1.  **Structural Deficiency:** The HA is defined as a linear sequence ($1 \\to 2 \\to 3$), but the ground truth exhibits five segments, suggesting a cyclic or repetitive structure (e.g., $3 \\to 1$).\n2.  **Dynamics Mismatch:** Modes 1 and 3 are identical, yet the ground truth shows Mode 3 should represent a strong recovery/rising phase. The current equations lack the necessary forcing term or positive gain to drive the"
+  }
+}

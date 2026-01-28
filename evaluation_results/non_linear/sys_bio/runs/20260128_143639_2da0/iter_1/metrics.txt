@@ -1,0 +1,80 @@
+Hybrid Automaton Evaluation Results
+================================================================================
+Timestamp: 20260128_151054
+Iteration: 1
+Run ID: 20260128_143639_2da0
+
+Metrics:
+  TC (Change-Point Error):4.960000 seconds
+  Max Difference:1370.967710
+  Mean Difference:42.023877
+
+HA Specification:
+{
+  "automaton": {
+    "var": "x1, x2, x3, x4, x5, x6, x7, x8, x9",
+    "input": "",
+    "mode": [
+      {
+        "id": 1,
+        "eq": "x1[1] = -2.344*x1[0] + 2.707*x3[0] - 0.295*x4[0] - 0.241*x5[0] - 0.885*x6[0] + 0.114*x7[0] + 3.065, x2[1] = -0.327*x2[0] - 1.28*x3[0] + 0.892*x4[0] + 0.201*x6[0] + 0.576, x3[1] = 2.344*x1[0] - 2.707*x3[0] + 0.295*x4[0] + 0.241*x5[0] + 0.885*x6[0] - 0.114*x7[0] - 3.065, x4[1] = 0.965*x2[0] - 0.862*x4[0] + 0.158*x5[0] + 0.708*x6[0] - 0.688, x5[1] = 5.0*x1[0] + 3.0*x3[0] - 1.0*x5[0], x6[1] = 11.316*x1[0] + 8.988*x2[0] + 4.222*x3[0] + 1.785*x4[0] + 1.673*x5[0] - 1.442*x6[0] - 3.154*x7[0] - 22.034, x7[1] = 1.0*x2[0] + 5.0*x4[0] - 0.5*x7[0], x8[1] = 13.453*x1[0] + 9.941*x2[0] + 1.588*x3[0] + 1.231*x4[0] - 2.922*x5[0] + 1.149*x6[0] + 1.768*x7[0] - 25.783, x9[1] = -13.454*x1[0] - 9.939*x2[0] - 1.588*x3[0] - 1.219*x4[0] + 2.922*x5[0] - 1.149*x6[0] + 3.231*x7[0] + 25.786"
+      },
+      {
+        "id": 2,
+        "eq": "x1[1] = 0.16*x1[0] - 0.675*x2[0] + 0.211*x3[0] + 2.003*x4[0] - 0.739*x6[0] + 0.145*x7[0] + 0.15, x2[1] = -0.184*x1[0] - 1.898*x2[0] - 0.446*x3[0] + 0.116*x4[0] + 0.113*x5[0] + 0.653*x6[0] - 0.165*x7[0] + 0.151*x8[0] - 0.099*x9[0] - 0.874, x3[1] = -0.227*x1[0] + 10.295*x2[0] - 2.323*x3[0] + 0.051*x4[0] + 0.109*x5[0] + 0.439*x6[0] - 0.06*x7[0] + 0.461, x4[1] = -2.418*x1[0] - 6.313*x2[0] - 0.551*x3[0] + 2.286*x4[0] + 1.25*x5[0] - 6.377*x6[0] - 1.917*x7[0] + 0.17*x8[0] - 0.61*x9[0] + 25.241, x5[1] = 2.0*x1[0] - 1.0*x5[0] + 5.0*x7[0], x6[1] = -0.17*x1[0] - 3.771*x2[0] + 0.262*x3[0] + 0.111*x5[0] - 0.471*x6[0] - 0.093*x7[0] + 0.13*x8[0] - 0.106*x9[0] + 3.088, x7[1] = 2.0*x4[0] - 0.5*x7[0] + 0.025, x8[1] = 1.073*x1[0] + 25.507*x2[0] - 6.308*x3[0] + 1.004*x4[0] - 0.755*x5[0] - 2.658*x6[0] + 0.556*x7[0] - 0.932*x8[0] + 0.766*x9[0] + 10.406, x9[1] = -1.072*x1[0] - 25.501*x2[0] + 6.307*x3[0] - 1.0*x4[0] + 0.755*x5[0] + 2.658*x6[0] + 3.442*x7[0] + 0.732*x8[0] - 1.266*x9[0] - 10.404"
+      }
+    ],
+    "edge": [
+      {
+        "direction": "1 -> 2",
+        "condition": "x1 >= 1.5"
+      },
+      {
+        "direction": "2 -> 1",
+        "condition": "x1 < 1.5"
+      }
+    ]
+  },
+  "config": {
+    "dt": 0.001,
+    "total_time": 10.0,
+    "order": 1
+  }
+}
+
+Experiment Hyperparameters
+============================================================
+
+--- Manager Agent ---
+Model: gemini/gemini-3-flash-preview
+Type: CodeAgent
+
+--- Managed Agents ---
+Count: 1
+Agent Names: data_analysis_expert
+Model: gemini/gemini-3-flash-preview
+
+--- Tools ---
+Tools List: hybrid_automaton_image_analysis
+Image Tool Model: gemini/gemini-3-flash-preview
+Review Tool Model: gemini/gemini-flash-lite-latest
+Summarize Tool Model: gemini/gemini-flash-lite-latest
+
+--- Iteration Configuration ---
+Max Iterations: 50
+Feedback Top-K: 50
+Target Error: 0.001
+No Improvement Patience: 20
+
+--- Data Configuration ---
+Input Data Path: data_all/non_linear/sys_bio
+System Name: 
+Num Variables: 9
+Num Inputs: 0
+
+--- Other ---
+Use JSON Schema: True
+Use Structured Output: True
+Structured Output Model: gemini/gemini-3-flash-preview
+============================================================
+

@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 4.658,
+    "Max Difference": 2.3320357016764382e+31,
+    "Mean Difference": 3.168381024597415e+29
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_23>",
+    "Summary": "The identification is a **catastrophic failure**. The simulated trajectory diverges exponentially to $\\approx -3 \\times 10^{33}$, indicating severe numerical instability and a total failure to"
+  }
+}

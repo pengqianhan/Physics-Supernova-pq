@@ -1,0 +1,80 @@
+Hybrid Automaton Evaluation Results
+================================================================================
+Timestamp: 20260127_172053
+Iteration: 10
+Run ID: 20260127_115016_3211
+
+Metrics:
+  TC (Change-Point Error):0.000000 seconds
+  Max Difference:0.184684
+  Mean Difference:0.026489
+
+HA Specification:
+{
+  "automaton": {
+    "var": "x1, x2",
+    "input": "",
+    "mode": [
+      {
+        "id": 1,
+        "eq": "x1[1] = 1.0, x2[1] = 0.40282 + 0.42408 * x1[0] + 3.81706 * x2[0] - 2.04836 * x1[0] ** 2 + 14.97522 * x1[0] * x2[0] - 31.43042 * x2[0] ** 2 + 0.87994 * x1[0] ** 3 - 4.51228 * x1[0] ** 2 * x2[0] - 2.64409 * x1[0] * x2[0] ** 2 + 22.54315 * x2[0] ** 3 - 0.06298 * x1[0] ** 4 + 0.07345 * x1[0] ** 3 * x2[0] + 1.52227 * x1[0] ** 2 * x2[0] ** 2 - 1.47801 * x1[0] * x2[0] ** 3 - 4.20685 * x2[0] ** 4"
+      },
+      {
+        "id": 2,
+        "eq": "x1[1] = -1.0, x2[1] = -5.40423 - 7.49770 * x1[0] - 95.47319 * x2[0] + 2.37395 * x1[0] ** 2 + 57.60711 * x1[0] * x2[0] + 56.67854 * x2[0] ** 2 + 0.67630 * x1[0] ** 3 - 14.88956 * x1[0] ** 2 * x2[0] - 13.00140 * x1[0] * x2[0] ** 2 - 24.62485 * x2[0] ** 3 - 0.08990 * x1[0] ** 4 + 0.76274 * x1[0] ** 3 * x2[0] + 1.70279 * x1[0] ** 2 * x2[0] ** 2 + 7.64371 * x1[0] * x2[0] ** 3 - 7.84051 * x2[0] ** 4"
+      }
+    ],
+    "edge": [
+      {
+        "direction": "1 -> 2",
+        "condition": "x1 >= 5.0"
+      },
+      {
+        "direction": "2 -> 1",
+        "condition": "x1 <= 0.0"
+      }
+    ]
+  },
+  "config": {
+    "dt": 0.001,
+    "total_time": 10.0,
+    "order": 1
+  }
+}
+
+Experiment Hyperparameters
+============================================================
+
+--- Manager Agent ---
+Model: gemini/gemini-3-flash-preview
+Type: CodeAgent
+
+--- Managed Agents ---
+Count: 1
+Agent Names: data_analysis_expert
+Model: gemini/gemini-3-flash-preview
+
+--- Tools ---
+Tools List: hybrid_automaton_image_analysis
+Image Tool Model: gemini/gemini-3-flash-preview
+Review Tool Model: gemini/gemini-flash-lite-latest
+Summarize Tool Model: gemini/gemini-flash-lite-latest
+
+--- Iteration Configuration ---
+Max Iterations: 50
+Feedback Top-K: 50
+Target Error: 0.001
+No Improvement Patience: 20
+
+--- Data Configuration ---
+Input Data Path: data_all/linear/dc_motor_position_PID
+System Name: 
+Num Variables: 2
+Num Inputs: 0
+
+--- Other ---
+Use JSON Schema: True
+Use Structured Output: True
+Structured Output Model: gemini/gemini-3-flash-preview
+============================================================
+

@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.277,
+    "Max Difference": 0.029245879076184995,
+    "Mean Difference": 0.007100179612330767
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_15>",
+    "Summary": "**Evaluation Summary**\n\nThe hybrid automaton demonstrates a strong qualitative fit but exhibits cumulative quantitative divergence. With a `mean_diff` of 0.007 and `max_diff`"
+  }
+}

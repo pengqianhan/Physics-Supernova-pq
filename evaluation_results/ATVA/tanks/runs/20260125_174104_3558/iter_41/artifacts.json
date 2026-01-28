@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.15,
+    "Max Difference": 0.26304228607990854,
+    "Mean Difference": 0.04552702252079763
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_41>",
+    "Summary": "The system demonstrates high structural fidelity (mean_diff: 0.045), but exhibits significant transient errors (max_diff: 0.26) primarily driven by **mode-"
+  }
+}

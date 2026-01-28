@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.47000000000000003,
+    "Max Difference": 0.5532343466615371,
+    "Mean Difference": 0.16847760396082212
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_7>",
+    "Summary": "The HA model exhibits poor long-term tracking ($tc=0.47$) despite an accurate initial fit ($t < 2s$). Significant divergence occurs after $t=3s$, characterized by severe phase lag, amplitude mismatch, and a failure to capture the ground truth's damping profile.\n\n**Key Issues:**\n1.  **Mode Mismatch & Chattering:** The simulation undergoes 27 mode transitions compared to 18 in the ground truth. The system incorrectly settles into Mode 4, while the ground truth remains in Mode 2.\n2.  **Guard Instability:** The simple state-based guards ($x_1 > 1.0$, etc.) are insufficient. The high frequency of switches suggests the boundaries are poorly defined or lack hysteresis.\n3.  **Dynamics Divergence:** The nonlinear terms ($x^3$) in Modes 2 and 4 appear to drive the simulation toward an incorrect limit cycle, failing to replicate the observed decay.\n\n**Actionable Improvements:**\n*   **Augment Guards:** Incorporate derivative"
+  }
+}

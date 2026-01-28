@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.077,
+    "Max Difference": 2.100310621547362,
+    "Mean Difference": 1.1636771453356152
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_2>",
+    "Summary": "The identification shows a fundamental **mode-dynamics mismatch**, resulting in poor fit metrics (`mean_diff: 1.16`) and complete phase inversion.\n\n**Key Issues:**\n1."
+  }
+}

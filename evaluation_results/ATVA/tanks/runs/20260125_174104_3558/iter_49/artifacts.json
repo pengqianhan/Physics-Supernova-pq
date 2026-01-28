@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.224,
+    "Max Difference": 0.8812565756394278,
+    "Mean Difference": 0.08476395718741685
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_49>",
+    "Summary": "The HA model demonstrates a persistent **phase lead** and **mode-switch timing mismatch**. While the `mean_diff` (0.08) is low, the `max_diff` (0.88) is significant, primarily occurring at transition points.\n\n**Key Observations:**\n1.  **Timing Error:** Simulated"
+  }
+}

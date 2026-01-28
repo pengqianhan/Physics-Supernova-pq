@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.003,
+    "Max Difference": 1.671914829450152,
+    "Mean Difference": 0.37867502807958636
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_16>",
+    "Summary": "0.001$ suggest an unstable or poorly identified discrete-time mapping.\n        3. **Switching Frequency:** Simulated change points occur more rapidly than ground truth, indicating guard sensitivity."
+  }
+}

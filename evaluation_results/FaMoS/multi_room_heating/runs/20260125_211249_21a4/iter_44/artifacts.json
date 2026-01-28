@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.499,
+    "Max Difference": 0.24221745231771818,
+    "Mean Difference": 0.0877053639281363
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_44>",
+    "Summary": "The identification exhibits a **0.50 trajectory correlation**, primarily degraded by a pronounced **phase lead** and frequency mismatch. While the qualitative switching logic is captured, the simulation oscillates faster than the"
+  }
+}

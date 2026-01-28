@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.0,
+    "Max Difference": 0.07617196743034951,
+    "Mean Difference": 0.00505541005561806
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_46>",
+    "Summary": "The identification is highly accurate (mean error: 0.005). The mode switch timing\u2014governed by guards at $x_1 \\ge 5.0$ and"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.0,
+    "Max Difference": 0.08161584910231895,
+    "Mean Difference": 0.00715430781169134
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_48>",
+    "Summary": "The HA model demonstrates high overall accuracy (mean diff: 0.007), with $x_1$ tracking perfectly. However, $x_2$ exhibits significant transient errors between $t"
+  }
+}

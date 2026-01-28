@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.001,
+    "Max Difference": 0.012141141659691894,
+    "Mean Difference": 0.0014541546149772467
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_14>",
+    "Summary": "**Overall Fit Quality:** The identified Hybrid Automaton (HA) demonstrates an excellent fit. The mean difference is extremely low (0.0014), and the clustering error is zero, indicating"
+  }
+}

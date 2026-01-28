@@ -1,0 +1,104 @@
+Hybrid Automaton Evaluation Results
+================================================================================
+Timestamp: 20260125_232025
+Iteration: 7
+Run ID: 20260125_211249_21a4
+
+Metrics:
+  TC (Change-Point Error):0.531000 seconds
+  Max Difference:0.265033
+  Mean Difference:0.089738
+
+HA Specification:
+{
+  "automaton": {
+    "var": "x1, x2, x3",
+    "input": "",
+    "mode": [
+      {
+        "id": 1,
+        "eq": "x1[1] = -0.105 * x1[0] + 6.7, x2[1] = -0.105 * x2[0], x3[1] = -0.105 * x3[0]"
+      },
+      {
+        "id": 2,
+        "eq": "x1[1] = -0.105 * x1[0], x2[1] = -0.105 * x2[0] + 6.55, x3[1] = -0.105 * x3[0]"
+      },
+      {
+        "id": 3,
+        "eq": "x1[1] = -0.105 * x1[0], x2[1] = -0.105 * x2[0], x3[1] = -0.105 * x3[0] + 7.15"
+      },
+      {
+        "id": 4,
+        "eq": "x1[1] = -0.105 * x1[0], x2[1] = -0.105 * x2[0], x3[1] = -0.105 * x3[0]"
+      }
+    ],
+    "edge": [
+      {
+        "direction": "1 -> 3",
+        "condition": "x1 >= 24.0"
+      },
+      {
+        "direction": "3 -> 2",
+        "condition": "x3 >= 26.0"
+      },
+      {
+        "direction": "2 -> 1",
+        "condition": "x2 >= 25.0"
+      },
+      {
+        "direction": "4 -> 1",
+        "condition": "x1 <= 19.0 and x1 <= x2 and x1 <= x3"
+      },
+      {
+        "direction": "4 -> 2",
+        "condition": "x2 <= 18.0 and x2 < x1 and x2 <= x3"
+      },
+      {
+        "direction": "4 -> 3",
+        "condition": "x3 <= 19.5 and x3 < x1 and x3 < x2"
+      }
+    ]
+  },
+  "config": {
+    "dt": 0.001,
+    "total_time": 10.0,
+    "order": 1
+  }
+}
+
+Experiment Hyperparameters
+============================================================
+
+--- Manager Agent ---
+Model: gemini/gemini-3-flash-preview
+Type: CodeAgent
+
+--- Managed Agents ---
+Count: 1
+Agent Names: data_analysis_expert
+Model: gemini/gemini-3-flash-preview
+
+--- Tools ---
+Tools List: hybrid_automaton_image_analysis
+Image Tool Model: gemini/gemini-3-flash-preview
+Review Tool Model: gemini/gemini-flash-lite-latest
+Summarize Tool Model: gemini/gemini-flash-lite-latest
+
+--- Iteration Configuration ---
+Max Iterations: 50
+Feedback Top-K: 50
+Target Error: 0.001
+No Improvement Patience: 20
+
+--- Data Configuration ---
+Input Data Path: data_all/FaMoS/multi_room_heating
+System Name: 
+Num Variables: 3
+Num Inputs: 0
+
+--- Other ---
+Use JSON Schema: True
+Use Structured Output: True
+Structured Output Model: gemini/gemini-3-flash-preview
+============================================================
+

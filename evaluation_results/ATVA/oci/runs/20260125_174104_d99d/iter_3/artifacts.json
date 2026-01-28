@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.054,
+    "Max Difference": 0.22338268550785315,
+    "Mean Difference": 0.03588958963419086
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_3>",
+    "Summary": "The identification captures the hybrid structure correctly (zero clustering error), but exhibits a significant **cumulative phase lag** and a high `max_diff` (0.223) concentrated at switching"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.01,
+    "Max Difference": 0.05462419101070437,
+    "Mean Difference": 0.0031946964145751293
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_44>",
+    "Summary": "The HA model demonstrates excellent fit quality with a **mean difference of 0.0032** and zero clustering errors. The simulation captures the limit cycle behavior accurately.\n\n**Key Observations:**\n1.  **Phase Lead/Timing Drift:** Comparison of change points reveals a cumulative drift. By the final peak, the"
+  }
+}

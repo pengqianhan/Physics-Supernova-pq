@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.003,
+    "Max Difference": 0.03453709776508835,
+    "Mean Difference": 0.002720777212296703
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_4>",
+    "Summary": "The identification yields a high-fidelity model with a **mean difference of 0.0027** and perfect mode clustering. The simulated trajectories closely track the ground truth, capturing the rapid transient and subsequent convergence.\n\n**Key Observations:**\n1.  **Mode Switch Timing:** The simulation triggers the transition to Mode 2 at index 154, while the ground truth switches at 158. This 4ms lead suggests the guard condition $x_1 \\ge -0.496$ is slightly premature.\n2.  **Steady-State Offset:** In Mode"
+  }
+}

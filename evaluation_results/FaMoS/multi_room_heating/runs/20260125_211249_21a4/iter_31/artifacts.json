@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.51,
+    "Max Difference": 0.24109652316899144,
+    "Mean Difference": 0.08981328743279779
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_31>",
+    "Summary": "The simulation exhibits a significant **phase lead** and higher switching frequency compared to the ground truth. While the peak-to-peak amplitudes are generally captured, the simulated trajectories reach guard thresholds too quickly,"
+  }
+}

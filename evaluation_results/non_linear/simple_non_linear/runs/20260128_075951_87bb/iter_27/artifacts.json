@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.34600000000000003,
+    "Max Difference": 0.691992439412589,
+    "Mean Difference": 0.15121073706003782
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_27>",
+    "Summary": "The simulation exhibits significant **phase lag** and **period mismatch**, with simulated peaks occurring consistently later than ground truth. While clustering error is zero, the **mode switch timing** is the primary failure"
+  }
+}

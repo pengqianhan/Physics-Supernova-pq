@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.47700000000000004,
+    "Max Difference": 0.13818871275854477,
+    "Mean Difference": 0.04988741609991324
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_46>",
+    "Summary": "The hybrid automaton (HA) demonstrates high structural fidelity with zero clustering error, but exhibits cumulative **phase lead** and **amplitude divergence** starting at $t \\approx 5s$."
+  }
+}

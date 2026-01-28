@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.002,
+    "Max Difference": 2.007276119316251,
+    "Mean Difference": 0.547813233021991
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_11>",
+    "Summary": "**Fit Quality:** Poor. The simulation exhibits high-frequency chattering and significant divergence from the ground truth, reflected in a `clustering_error` of 1 and a `max_diff`"
+  }
+}

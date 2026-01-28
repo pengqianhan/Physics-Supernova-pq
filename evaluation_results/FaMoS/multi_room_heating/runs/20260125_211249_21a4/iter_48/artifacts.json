@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.508,
+    "Max Difference": 0.24121675808054022,
+    "Mean Difference": 0.08930635886913744
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_48>",
+    "Summary": "The simulation exhibits a significant **phase lead**, completing approximately one extra cycle compared to the ground truth over the 10s interval. While the peak amplitudes (e.g., $x_3 \\"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 2.0060000000000002,
+    "Max Difference": 2.0126706606918696,
+    "Mean Difference": 0.8522539042544512
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_49>",
+    "Summary": "The identification results show **critical divergence** between the ground truth and simulation. While the clustering error is reported as 0, the dynamical fit is poor, characterized by a massive amplitude overshoot (Sim: ~65 vs. GT: ~25) and frequency mismatch.\n\n**Key Issues:**\n1.  **Initial Mode Mismatch:** The simulation starts in Mode 1, whereas the ground truth begins in Mode 2. This leads to immediate divergence in the trajectory slope.\n2.  **Unstable Dynamics:** Mode 1's discrete-time coefficients ($x_1[k-2]$ coeff of $-1.6025$) suggest an unstable or highly underdamped oscillator, causing the observed high-amplitude excursion.\n3.  **Invalid Guards:** The guard $x_1 \\geq 29.1$ for $1 \\to 2$ is never triggered by the ground truth data, which peaks at $\\approx 29$. This causes the simulation to remain in the wrong mode for too long.\n\n**Actionable Suggestions:**\n*   **Re-initialize:** Force the initial state to Mode"
+  }
+}

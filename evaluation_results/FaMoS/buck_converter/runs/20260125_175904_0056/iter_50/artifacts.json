@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.036000000000000004,
+    "Max Difference": 1.6685724799071893,
+    "Mean Difference": 0.29702306372860066
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_50>",
+    "Summary": "0.0$ is incorrect; ground truth $x_1$ maintains continuous motion.\n        2. **Coefficient Scaling:** Coefficients in Modes 1 and 2 (e.g.,"
+  }
+}

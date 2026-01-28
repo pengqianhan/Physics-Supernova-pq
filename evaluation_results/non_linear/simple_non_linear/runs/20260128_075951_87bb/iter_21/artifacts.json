@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 4.658,
+    "Max Difference": 9.64154049037284e+31,
+    "Mean Difference": 1.2921424829923276e+30
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_21>",
+    "Summary": "The evaluation indicates a **catastrophic failure** in system identification. The simulation diverges exponentially to $\\approx -1.2 \\times 10^{34}$, while the ground truth remains stable"
+  }
+}

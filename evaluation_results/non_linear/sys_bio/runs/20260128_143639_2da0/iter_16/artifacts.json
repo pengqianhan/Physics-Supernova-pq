@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.0,
+    "Max Difference": NaN,
+    "Mean Difference": NaN
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_16>",
+    "Summary": "The simulation exhibits **immediate numerical divergence**, with state values exploding to $>10^{10}$ and resulting in `NaN` metrics within $t < 0.1s$. While the ground truth"
+  }
+}

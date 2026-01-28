@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.168,
+    "Max Difference": 0.08407449998290961,
+    "Mean Difference": 0.061544493248916886
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_1>",
+    "Summary": "The HA model correctly identifies the switching thresholds ($x_1 \\in [20, 25]$) but fails significantly on temporal synchronization and initial mode logic.\n\n**Analysis:**"
+  }
+}

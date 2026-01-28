@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.762,
+    "Max Difference": 0.10897863830365453,
+    "Mean Difference": 0.032211288175482085
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_7>",
+    "Summary": "The system exhibits a moderate fit (**TC: 0.76**) characterized by significant **cumulative phase lag** and **amplitude attenuation** appearing after $t=2s$. The simulated trajectory oscillates at"
+  }
+}

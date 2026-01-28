@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.003,
+    "Max Difference": 0.0433333068048482,
+    "Mean Difference": 0.009118224339878956
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_19>",
+    "Summary": "The system identification is **excellent**, with a mean difference of 0.009 and near-perfect mode switch timing (jitter $\\le 2$ms). The hybrid automaton correctly captures the"
+  }
+}

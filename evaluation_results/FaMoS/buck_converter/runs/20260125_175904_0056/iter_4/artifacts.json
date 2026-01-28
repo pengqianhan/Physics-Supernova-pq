@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 4.999,
+    "Max Difference": 0.8749667412160118,
+    "Mean Difference": 0.6093135254660541
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_4>",
+    "Summary": "**The HA identification is poor, failing to capture the high-frequency switching behavior of the ground truth. While the ground truth exhibits a limit-cycle-like oscillation, the simulation converges to a stable"
+  }
+}

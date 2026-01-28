@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.516,
+    "Max Difference": 0.24072611858139664,
+    "Mean Difference": 0.09015249516121988
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_32>",
+    "Summary": "The HA model captures the qualitative oscillatory behavior but suffers from significant **phase lag and frequency mismatch**. While the `mean_diff` is low (0.09), the `tc` (0"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 4.658,
+    "Max Difference": 536.6665520458273,
+    "Mean Difference": 64.88924686478892
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_26>",
+    "Summary": "**Summary:**\nThe identification is **failed**, characterized by catastrophic divergence. While the ground truth remains bounded and exhibits periodic mode switching, the simulation diverges to $\\approx -70,000"
+  }
+}

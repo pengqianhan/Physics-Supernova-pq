@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 3.606,
+    "Max Difference": 0.5813273260365295,
+    "Mean Difference": 0.1929356604645084
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_20>",
+    "Summary": "**Evaluation Summary:**\n\nThe identification quality is **poor**, characterized by a total failure to capture the hybrid switching behavior. While the ground truth (GT) cycles through multiple modes, the simulation remains trapped"
+  }
+}

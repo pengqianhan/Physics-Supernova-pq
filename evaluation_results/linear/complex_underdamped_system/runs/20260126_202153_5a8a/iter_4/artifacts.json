@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.0,
+    "Max Difference": 0.15162466038862085,
+    "Mean Difference": 0.0050045285162257265
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_4>",
+    "Summary": "The system identification shows excellent tracking for $x_1$, but significant transient errors in $x_2$ following the first mode transition. While the `mean_diff` is low (0.005), the `max_diff` (0.151) highlights a localized divergence between $t=1s$ and $t=3s$.\n\n**Key Issues:**\n1.  **Reset Discontinuity:** The error originates at the $1 \\to 2$ transition ($x_1 \\ge 5.0$). The hard reset `x2[1] = -1.0` (derivative jump) causes the simulated $x_2$ to overshoot the ground truth significantly.\n2.  **Mode 2 Dynamics:** The simulated $x_2$ exhibits higher peak amplitude and a phase lead"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.0,
+    "Max Difference": 9596.883904412614,
+    "Mean Difference": 267.52646662029093
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_2>",
+    "Summary": "The model exhibits **catastrophic divergence**. While ground truth trajectories remain stable and bounded near zero, the simulated states grow exponentially after $t \\approx 4s$, resulting in a `max_diff` of ~9597.\n\n**Technical Analysis:**\n1.  **Instability:** The identified discrete-time transition matrix is unstable. The large coefficients (e.g., $-26.9$ for $x_2$ in the $x_5$ update) suggest the system's eigenvalues lie far outside the unit circle.\n2."
+  }
+}

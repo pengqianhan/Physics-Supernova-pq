@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.002,
+    "Max Difference": 1.8005999846120382,
+    "Mean Difference": 0.47771753401938805
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_45>",
+    "Summary": "The HA model captures the high-frequency switching envelope but suffers from significant **amplitude errors** and **numerical chattering**. While the `mean_diff` (0.47) is moderate, the `max_diff` (1.80) and visual \"fuzziness\" in the simulated $x_1$ trajectory indicate high-frequency instability.\n\n**Key Issues:**\n1. **Stiff Dynamics:** The coefficients in Modes 1 and 2 are extremely large (e.g., -307, 377). Combined with $dt="
+  }
+}

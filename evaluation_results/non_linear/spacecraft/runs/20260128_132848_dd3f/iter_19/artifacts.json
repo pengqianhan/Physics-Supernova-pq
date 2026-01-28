@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.012,
+    "Max Difference": 0.0712693588344538,
+    "Mean Difference": 0.001503879153835703
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_19>",
+    "Summary": "**Overall Assessment:**\nThe identification demonstrates high fidelity with a **mean difference of 0.0015** and zero clustering error. The simulation tracks the ground truth closely across both modes"
+  }
+}

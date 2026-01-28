@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.0,
+    "Max Difference": 0.15162466038862085,
+    "Mean Difference": 0.0050045285162257265
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_5>",
+    "Summary": "The HA model demonstrates excellent tracking for $x_1$ and perfect mode sequence identification (clustering error = 0). However, a significant transient discrepancy occurs in $x_2$ during **"
+  }
+}

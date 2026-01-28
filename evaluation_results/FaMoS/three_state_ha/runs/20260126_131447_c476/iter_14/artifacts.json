@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 2.119,
+    "Max Difference": 1.2835352920453689,
+    "Mean Difference": 0.4938993606819963
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_14>",
+    "Summary": "The simulation exhibits severe divergence after $t=2s$. While the initial transient captures the first peak, it shows significant phase lag and amplitude error. The ground truth displays oscillatory behavior with five segments, whereas"
+  }
+}

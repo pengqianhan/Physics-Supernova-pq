@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.40800000000000003,
+    "Max Difference": 0.4438552076608995,
+    "Mean Difference": 0.17681456819019511
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_48>",
+    "Summary": "The identification shows a poor fit (**TC: 0.408**) characterized by significant **phase lag** and **frequency mismatch** starting at $t \\approx 3s$."
+  }
+}

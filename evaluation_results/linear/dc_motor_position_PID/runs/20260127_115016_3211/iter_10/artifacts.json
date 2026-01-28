@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.0,
+    "Max Difference": 0.18468387299596806,
+    "Mean Difference": 0.02648897970448869
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_10>",
+    "Summary": "The identification captures $x_1$ dynamics and mode transitions (guards at $x_1=5, 0$) with near-perfect accuracy. However, $x_2$ exhibits significant amplitude"
+  }
+}

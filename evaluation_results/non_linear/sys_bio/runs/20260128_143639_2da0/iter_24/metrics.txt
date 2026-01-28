@@ -1,0 +1,67 @@
+Hybrid Automaton Evaluation Results
+================================================================================
+Timestamp: 20260128_232210
+Iteration: 24
+Run ID: 20260128_143639_2da0
+
+Metrics:
+  TC (Change-Point Error):0.000000 seconds
+  Max Difference:1.609452
+  Mean Difference:0.535630
+
+HA Specification:
+{
+  "automaton": {
+    "var": "x1, x2, x3, x4, x5, x6, x7, x8, x9",
+    "input": "",
+    "mode": [
+      {
+        "id": 1,
+        "eq": "x1[1] = 0.1982 * x4[0] - 0.0957 * x2[0] * x6[0] + 0.0703 * x2[0] - 0.0690 * x2[0] * x4[0] + 0.0633 * x3[0] - 0.0488 * x1[0] * x2[0] + 0.0153, x2[1] = -0.3313 * x2[0] + 0.1740 * x2[0] ** 2 + 0.0764 * x2[0] * x6[0] - 0.0374 * x2[0] * x4[0] + 0.0517, x3[1] = -0.1520 * x2[0] + 0.1474 * x7[0] + 0.1439 * x3[0] - 0.0695 * x6[0] * x8[0] - 0.0568 * x1[0] - 0.0494 * x4[0] + 0.0381 * x5[0], x4[1] = -0.1998 * x4[0] + 0.1006 * x3[0] * x4[0] + 0.0853 * x2[0] * x6[0] + 0.0833 * x2[0] ** 2 - 0.0198 * x2[0] * x3[0] - 0.0088 * x2[0] * x7[0] - 0.0085 * x3[0], x5[1] = -25.7811 * x2[0] + 9.5439 * x2[0] ** 2 + 2.9397 * x2[0] * x3[0] - 2.3797 * x3[0] - 0.8705 * x2[0] * x6[0] - 0.4051 * x6[0] + 18.3654, x6[1] = -0.3170 * x2[0] * x4[0] + 0.2745 * x3[0] + 0.1179 * x2[0] ** 2 - 0.1093 * x6[0] - 0.0923 * x2[0] * x3[0] + 0.0776 * x2[0] * x6[0] + 0.3048, x7[1] = -0.7025 * x2[0] + 0.4541 * x2[0] ** 2 + 0.2808 * x2[0] * x6[0] + 0.2010 * x4[0] - 0.0525 * x6[0] - 0.0495 * x7[0] + 0.1246, x8[1] = -0.6456 * x2[0] + 0.5172 * x2[0] ** 2 + 0.3809 * x7[0] + 0.2590 * x2[0] * x6[0] - 0.1992 * x6[0] * x8[0] - 0.1467 * x2[0] * x3[0] + 0.0989 * x9[0], x9[1] = -1.3550 * x2[0] + 0.8117 * x2[0] ** 2 + 0.2769 * x2[0] * x6[0] + 0.1990 * x6[0] * x8[0] - 0.1492 * x9[0] - 0.0719 * x6[0] + 0.2975"
+      }
+    ],
+    "edge": []
+  },
+  "config": {
+    "dt": 0.001,
+    "total_time": 10.0,
+    "order": 1
+  }
+}
+
+Experiment Hyperparameters
+============================================================
+
+--- Manager Agent ---
+Model: gemini/gemini-3-flash-preview
+Type: CodeAgent
+
+--- Managed Agents ---
+Count: 1
+Agent Names: data_analysis_expert
+Model: gemini/gemini-3-flash-preview
+
+--- Tools ---
+Tools List: hybrid_automaton_image_analysis
+Image Tool Model: gemini/gemini-3-flash-preview
+Review Tool Model: gemini/gemini-flash-lite-latest
+Summarize Tool Model: gemini/gemini-flash-lite-latest
+
+--- Iteration Configuration ---
+Max Iterations: 50
+Feedback Top-K: 50
+Target Error: 0.001
+No Improvement Patience: 20
+
+--- Data Configuration ---
+Input Data Path: data_all/non_linear/sys_bio
+System Name: 
+Num Variables: 9
+Num Inputs: 0
+
+--- Other ---
+Use JSON Schema: True
+Use Structured Output: True
+Structured Output Model: gemini/gemini-3-flash-preview
+============================================================
+

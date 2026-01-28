@@ -1,0 +1,80 @@
+Hybrid Automaton Evaluation Results
+================================================================================
+Timestamp: 20260127_130312
+Iteration: 1
+Run ID: 20260127_115016_3211
+
+Metrics:
+  TC (Change-Point Error):0.000000 seconds
+  Max Difference:1.071754
+  Mean Difference:0.117431
+
+HA Specification:
+{
+  "automaton": {
+    "var": "x1, x2",
+    "input": "",
+    "mode": [
+      {
+        "id": 1,
+        "eq": "x1[1] = 1.0, x2[1] = 0.11 * x1[0] - 0.2 * x2[0] - 0.29"
+      },
+      {
+        "id": 2,
+        "eq": "x1[1] = -1.0, x2[1] = -0.15 * x1[0] - 0.2 * x2[0] + 0.26"
+      }
+    ],
+    "edge": [
+      {
+        "direction": "1 -> 2",
+        "condition": "x1 >= 5.0"
+      },
+      {
+        "direction": "2 -> 1",
+        "condition": "x1 <= 0.0"
+      }
+    ]
+  },
+  "config": {
+    "dt": 0.001,
+    "total_time": 10.0,
+    "order": 1
+  }
+}
+
+Experiment Hyperparameters
+============================================================
+
+--- Manager Agent ---
+Model: gemini/gemini-3-flash-preview
+Type: CodeAgent
+
+--- Managed Agents ---
+Count: 1
+Agent Names: data_analysis_expert
+Model: gemini/gemini-3-flash-preview
+
+--- Tools ---
+Tools List: hybrid_automaton_image_analysis
+Image Tool Model: gemini/gemini-3-flash-preview
+Review Tool Model: gemini/gemini-flash-lite-latest
+Summarize Tool Model: gemini/gemini-flash-lite-latest
+
+--- Iteration Configuration ---
+Max Iterations: 50
+Feedback Top-K: 50
+Target Error: 0.001
+No Improvement Patience: 20
+
+--- Data Configuration ---
+Input Data Path: data_all/linear/dc_motor_position_PID
+System Name: 
+Num Variables: 2
+Num Inputs: 0
+
+--- Other ---
+Use JSON Schema: True
+Use Structured Output: True
+Structured Output Model: gemini/gemini-3-flash-preview
+============================================================
+

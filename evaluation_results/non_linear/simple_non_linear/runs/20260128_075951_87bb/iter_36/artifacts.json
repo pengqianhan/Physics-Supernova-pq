@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.7030000000000001,
+    "Max Difference": 0.8589405297815513,
+    "Mean Difference": 0.1676850618736209
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_36>",
+    "Summary": "The identification shows a significant **phase lead** in the simulated trajectory (TC \u2248 0.70). While peak amplitudes are captured, the simulation oscillates at a higher frequency than the ground truth,"
+  }
+}

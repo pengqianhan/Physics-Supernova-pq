@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.014,
+    "Max Difference": 0.08127621869466758,
+    "Mean Difference": 0.001786059233893063
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_6>",
+    "Summary": "The identification shows high fidelity with a mean difference of 0.0018. Trajectories for $x_1$ through $x_4$ track ground truth closely, and mode clustering is"
+  }
+}

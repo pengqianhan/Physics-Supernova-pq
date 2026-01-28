@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.781,
+    "Max Difference": 1.284122120082755,
+    "Mean Difference": 0.3578701833309485
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_5>",
+    "Summary": "**Evaluation Summary**\n\nThe model achieves a moderate fit (**TC: 0.78**), but exhibits significant structural errors. The **max_diff (1.28)** and visual analysis reveal a fundamental mismatch in system dynamics and switching logic.\n\n**Key Issues:**\n1.  **Dynamics Mismatch ($x_2$):** The simulated $x_2$ is jagged and follows $x_1$ algebraically (e.g., $x"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.851,
+    "Max Difference": 0.3481265168650956,
+    "Mean Difference": 0.038497338102790865
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_5>",
+    "Summary": "The system achieves a Trajectory Correlation (TC) of **0.85**, indicating a moderate fit but significant temporal misalignment and mode-switching errors.\n\n**Key Issues:**\n1."
+  }
+}

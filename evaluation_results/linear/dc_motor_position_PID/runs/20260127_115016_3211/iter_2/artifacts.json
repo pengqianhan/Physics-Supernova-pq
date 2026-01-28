@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.0,
+    "Max Difference": 0.5261096178286471,
+    "Mean Difference": 0.07533068141963595
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_2>",
+    "Summary": "The HA model demonstrates excellent identification of $x_1$ dynamics and transition timing, with guards ($x_1 \\ge 5.0, x_1 \\le 0.0$) accurately capturing mode switches. However, $x_2$ exhibits significant divergence, resulting in a `max_diff"
+  }
+}

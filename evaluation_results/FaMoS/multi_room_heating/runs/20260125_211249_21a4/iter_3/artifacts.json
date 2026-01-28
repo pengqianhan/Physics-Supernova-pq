@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.558,
+    "Max Difference": 0.2373716616933517,
+    "Mean Difference": 0.08870584061107274
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_3>",
+    "Summary": "4, 7.21$ values) to slow down the rise times.\n        2.  **Decrease the decay coefficient** (currently $-0.1$) to match the ground"
+  }
+}

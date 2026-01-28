@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 4.658,
+    "Max Difference": 598.7284135909894,
+    "Mean Difference": 71.3057788438404
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_24>",
+    "Summary": "25$ is never reached, preventing the necessary transition to Mode 2.\n        3.  **Unstable Dynamics:** Mode 1 dynamics are divergent (likely due to incorrect coefficients or"
+  }
+}

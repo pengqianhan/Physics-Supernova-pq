@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.026000000000000002,
+    "Max Difference": 1.7507040401156486,
+    "Mean Difference": 0.3710129673237885
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_20>",
+    "Summary": "The HA captures the high-frequency oscillatory behavior but exhibits a **max_diff of 1.75**, primarily due to an initial transient spike and persistent amplitude mismatches.\n\n**Key Issues:**"
+  }
+}

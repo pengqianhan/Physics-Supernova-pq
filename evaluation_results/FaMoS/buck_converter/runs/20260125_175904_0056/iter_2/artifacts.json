@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 1.629,
+    "Max Difference": 1.6485326257568764,
+    "Mean Difference": 0.34277054814123586
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_2>",
+    "Summary": "The identification results show a significant mismatch between the ground truth (GT) and simulated trajectories. With a **clustering error of 1**, the model fails to capture the underlying discrete dynamics.\n\n**Key Issues:**\n1. **Mode Dominance:** The simulation remains trapped in Mode 1, whereas the GT data utilizes Modes 2 and 3. The current guard conditions are too restrictive or poorly scaled, preventing necessary transitions.\n2. **Frequency/Phase Mismatch:** The GT exhibits high-frequency switching (change points every ~3ms), while the simulation produces a slow, smooth oscillation. This suggests the identified linear dynamics in Mode 1 are too damped or have incorrect eigenvalues.\n3. **Amplitude/Offset Errors:** GT $x_1$ oscillates between discrete levels (approx. 7.5 and -4), while simulated $x_1$ follows a continuous sinusoidal-like path. The affine terms (e.g., +7.7093) in the equations are likely over-fitted to a single state rather than representing the switching manifold.\n\n**Suggestions:**\n* **Re-identify Modes:** Align HA modes with GT labels (2 and 3).\n* **Relax Guards:** Adjust the coefficients in the guard conditions to trigger at the observed state thresholds (e.g., $x_1 \\approx"
+  }
+}

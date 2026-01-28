@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.59,
+    "Max Difference": 0.23717583207860843,
+    "Mean Difference": 0.08900833949698726
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_6>",
+    "Summary": "The HA model shows a poor fit (**tc=0.59**) characterized by a significant **phase lead** and period mismatch. While the cyclic topology is captured, the simulation transitions between modes faster"
+  }
+}

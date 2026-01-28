@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 1.274,
+    "Max Difference": 0.5403488500947922,
+    "Mean Difference": 0.20418475764004307
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_42>",
+    "Summary": "The simulation exhibits a significant **phase lead** and **frequency mismatch**, diverging from the ground truth after $t=2s$. While the `mean_diff` is relatively low, the"
+  }
+}

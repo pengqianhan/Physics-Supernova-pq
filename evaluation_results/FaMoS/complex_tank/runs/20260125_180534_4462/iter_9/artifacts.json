@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 1.21,
+    "Max Difference": 0.37279379221764075,
+    "Mean Difference": 0.050808135115421905
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_9>",
+    "Summary": "The overall fit is moderate (mean_diff: 0.05), but the model fails to capture the full system logic. While $x_1$ tracks well, $x_"
+  }
+}

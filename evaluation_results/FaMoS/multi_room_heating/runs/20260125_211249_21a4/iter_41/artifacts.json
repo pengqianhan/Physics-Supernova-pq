@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.195,
+    "Max Difference": 0.045390444109327216,
+    "Mean Difference": 0.0068231110206760735
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_41>",
+    "Summary": "The HA model demonstrates high short-term accuracy (mean_diff: 0.0068) but suffers from **cumulative phase drift** and **mode-switching misalignment**. By $"
+  }
+}

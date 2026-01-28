@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.061,
+    "Max Difference": 0.24611169668827965,
+    "Mean Difference": 0.03916167014191122
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_9>",
+    "Summary": "The HA model qualitatively captures the limit cycle but exhibits a significant **phase lag** and a `max_diff` of 0.246. The primary error is **delayed mode transitions**:"
+  }
+}

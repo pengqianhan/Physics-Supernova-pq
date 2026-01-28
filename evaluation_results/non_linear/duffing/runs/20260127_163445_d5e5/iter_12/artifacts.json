@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.516,
+    "Max Difference": 0.5648793625623812,
+    "Mean Difference": 0.17095851816752883
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_12>",
+    "Summary": "**Evaluation Summary**\n\nThe identified Hybrid Automaton (HA) shows poor predictive performance (TC: 0.516). While tracking is acceptable for $t < 2s$, the simulation exhibits severe **phase lag and frequency mismatch** starting at $t \\approx 3s$, leading to complete divergence by $t=5s$.\n\n**Key Issues:**\n1.  **Mode Switch Timing:** The change points drift significantly after $t=3s$."
+  }
+}

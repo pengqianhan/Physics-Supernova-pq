@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 1.122,
+    "Max Difference": 0.9734484290243367,
+    "Mean Difference": 0.18296111281040378
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_23>",
+    "Summary": "The HA model captures the qualitative switching behavior but exhibits significant temporal drift and amplitude errors, evidenced by a **max_diff of 0.97**. While the mode count is correct, the simulation suffers"
+  }
+}

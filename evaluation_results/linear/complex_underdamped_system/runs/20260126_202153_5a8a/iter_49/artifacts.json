@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.0,
+    "Max Difference": 0.07995275046217819,
+    "Mean Difference": 0.005531233335740541
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_49>",
+    "Summary": "The HA model demonstrates high fidelity with a low `mean_diff` (0.0055) and perfect mode transition timing (`tc=0`). The linear dynamics of $x_1$"
+  }
+}

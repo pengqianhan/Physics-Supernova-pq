@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.168,
+    "Max Difference": 0.08407449998290961,
+    "Mean Difference": 0.061544493248916886
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_7>",
+    "Summary": "The identification exhibits a significant **initial mode error** and **cumulative phase lag**. While the guard conditions ($x_1 \\ge 25, x_1 \\le 20$) correctly"
+  }
+}

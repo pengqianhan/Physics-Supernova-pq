@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.666,
+    "Max Difference": 0.4808806415633433,
+    "Mean Difference": 0.1393704232613506
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_17>",
+    "Summary": "**Analysis of Evaluation Results**\n\n**1. Fit Quality:**\nThe Theil\u2019s Inequality Coefficient (TC) of **0.666** and a **max_diff of 0"
+  }
+}

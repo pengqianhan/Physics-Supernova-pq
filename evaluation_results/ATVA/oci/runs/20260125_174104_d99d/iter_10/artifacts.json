@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.188,
+    "Max Difference": 0.6649782226483653,
+    "Mean Difference": 0.10462998343712834
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_10>",
+    "Summary": "The HA model exhibits a significant **accumulating phase lead**, resulting in a high `max_diff` (0.66) and poor long-term synchronization. While the qualitative limit"
+  }
+}

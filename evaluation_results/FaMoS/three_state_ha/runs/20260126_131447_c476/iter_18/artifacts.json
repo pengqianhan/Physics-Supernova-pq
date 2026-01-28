@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 2.119,
+    "Max Difference": 7.046887923333583,
+    "Mean Difference": 0.9609210528542972
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_18>",
+    "Summary": "The simulation exhibits catastrophic divergence starting at $t \\approx 4\\text{s}$, with the state reaching $>225$ while the ground truth remains bounded near $25$."
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.0,
+    "Max Difference": 1.420273431267505,
+    "Mean Difference": 0.5903250661673749
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_13>",
+    "Summary": "The identification results show a **significant divergence** in amplitude for the primary states ($x_8$ and $x_9$). While the `clustering_error` is zero (correctly identifying a single"
+  }
+}

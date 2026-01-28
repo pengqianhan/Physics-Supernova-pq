@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.0,
+    "Max Difference": 0.11612479280974068,
+    "Mean Difference": 0.003966276042754787
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_47>",
+    "Summary": "**Overall Fit:** The identification is highly accurate regarding mode transitions (clustering error: 0, tc: 0) and $x_1$ tracking. The piecewise linear integration of $x_1"
+  }
+}

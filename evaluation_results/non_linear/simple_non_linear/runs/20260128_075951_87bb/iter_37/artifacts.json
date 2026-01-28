@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.33,
+    "Max Difference": 0.6866966658628445,
+    "Mean Difference": 0.08846149968339188
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_37>",
+    "Summary": "**Analysis of Evaluation Results**\n\n**1. Overall Fit Quality**\nThe model captures the hybrid structure (clustering error: 0) but suffers from a significant **phase lead**. While `mean_diff` (0.088) is low, the temporal misalignment grows over time, indicating a fundamental mismatch in the system's natural frequency.\n\n**2. Visual Patterns & Issues**\n*   **Phase Lead:** Simulated peaks occur consistently earlier than ground truth. The simulated period is too short.\n*   **Mode Switch Timing:** The transition from Mode 1 to Mode 2 (lower guard $x_1 \\le 10$) is reached too quickly.\n*   **Amplitude/Slope:** The simulated ascent in Mode 2 is steeper than the ground truth, and the peak amplitude slightly exceeds the target.\n\n**3. Concrete Suggestions for Improvement**\n*   **Decelerate Dynamics:** Reduce the magnitude of the linear and quadratic coefficients in both modes. Specifically, in Mode 2, the $+2050.0 \\cdot x_1$ term is likely too aggressive, causing the premature peak.\n*   **Calibrate Resets:** The velocity reset gains (`-2.0` and `-1.81`) appear too high. Lowering these magnitudes"
+  }
+}

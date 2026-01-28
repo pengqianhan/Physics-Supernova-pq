@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 0.8260000000000001,
+    "Max Difference": 0.24078347167040273,
+    "Mean Difference": 0.04359512954491745
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_12>",
+    "Summary": "**Overall Fit:** The model achieves a reasonable fit (TC: 0.826), but exhibits significant temporal drift and mode-switching errors as the simulation progresses.\n\n**Visual Patterns & Issues:**\n1. **Phase Lead:** Simulated trajectories trigger resets earlier than the ground truth (e.g., $x_1$ at $t \\approx 4.5s$). This indicates that the guard conditions are too sensitive or the thresholds are slightly off.\n2. **Mode Mismatch:** The ground truth starts in Mode 7, while the simulation initializes in Mode 1/5. This causes an immediate divergence in"
+  }
+}

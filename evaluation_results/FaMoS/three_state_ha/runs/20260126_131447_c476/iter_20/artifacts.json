@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 2.9050000000000002,
+    "Max Difference": 0.5205128123488048,
+    "Mean Difference": 0.1983914834925242
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_20>",
+    "Summary": "**Analysis:**\nThe simulation shows a **poor fit** with significant amplitude errors and phase lag. While the ground truth (GT) exhibits a wide oscillation ($5 \\leq x_1 \\"
+  }
+}

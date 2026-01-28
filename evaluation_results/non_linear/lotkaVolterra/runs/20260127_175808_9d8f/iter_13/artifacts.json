@@ -1,0 +1,11 @@
+{
+  "Evaluation Metrics": {
+    "TC (Change-Point Error)": 1.81,
+    "Max Difference": 0.04259309710960914,
+    "Mean Difference": 0.009794467192052863
+  },
+  "Evaluation Plot": {
+    "Placeholder": "<iter_image_13>",
+    "Summary": "1.03` is likely too restrictive. Broaden the guard or remove the $x_2 < 0.99$ constraint to match the ground truth's switching frequency."
+  }
+}
