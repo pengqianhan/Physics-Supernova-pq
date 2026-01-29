@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import secrets
+import shutil
 from datetime import datetime
 from collections import defaultdict
 from dataclasses import dataclass, field
@@ -1221,6 +1222,19 @@ def main():
         with open(best_spec_path, "w", encoding="utf-8") as f:
             json.dump(results_aggregator.best_result.ha_specification, f, indent=2)
         print(f"Best HA specification saved to: {best_spec_path}")
+        
+        # Copy the best iteration folder as best_iter_*
+        best_iter_num = results_aggregator.best_result.iteration
+        source_iter_dir = os.path.join(best_spec_dir, f"iter_{best_iter_num}")
+        dest_iter_dir = os.path.join(best_spec_dir, f"best_iter_{best_iter_num}")
+        if os.path.exists(source_iter_dir):
+            if os.path.exists(dest_iter_dir):
+                shutil.rmtree(dest_iter_dir)  # Remove existing if present
+            shutil.copytree(source_iter_dir, dest_iter_dir)
+            print(f"Best iteration folder copied to: {dest_iter_dir}")
+        else:
+            print(f"Warning: Source iteration folder not found: {source_iter_dir}")
+        
         print(f"All artifacts available at: evaluation_results/{relative_data_path}/runs/{run_id}/")
 
 
