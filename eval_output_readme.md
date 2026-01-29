@@ -15,5 +15,6 @@ API cost: about 108 USD
 ## Training data:
 in 'load_trace_data_from_filepath' there are codes like 'for sample_id in sample_ids[:3]:', which means only the first 3 samples are used for training.
 
+The rest number of ground truth files are used for evaluation. ground_truth_3.npz to ground_truth_14.npz, which is 12 files.
 ## 
 
