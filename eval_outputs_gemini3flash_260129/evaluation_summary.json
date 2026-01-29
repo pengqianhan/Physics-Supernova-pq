@@ -2882,12 +2882,12 @@
     "num_iterations": 20,
     "max_iter": 28,
     "aggregate": {
-      "tc_mean": 1.6079999999999999,
-      "tc_std": 0.7010145029407976,
-      "max_diff_mean": NaN,
-      "max_diff_std": NaN,
-      "mean_diff_mean": NaN,
-      "mean_diff_std": NaN,
+      "tc_mean": 1.5244166666666665,
+      "tc_std": 0.5367475288459392,
+      "max_diff_mean": 1.5157233809182706,
+      "max_diff_std": 1.3666695013478303,
+      "mean_diff_mean": 0.3680441509108418,
+      "mean_diff_std": 0.064645907239689,
       "success_rate": 1.0
     },
     "results": [
@@ -2949,9 +2949,9 @@
       },
       {
         "gt_file": "ground_truth_5.npz",
-        "tc": 3.2840000000000003,
-        "max_diff": NaN,
-        "mean_diff": NaN,
+        "tc": 2.281,
+        "max_diff": 0.9979875958579365,
+        "mean_diff": 0.30623344912965345,
         "clustering_error": 1,
         "status": "success"
       },

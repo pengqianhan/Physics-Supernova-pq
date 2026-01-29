@@ -28,5 +28,5 @@ non_linear/oscillator                    0.054037        0.003080        12/12  
 non_linear/simple_non_linear             0.267512        0.068688        12/12      29           45
 non_linear/simple_non_poly               0.378973        0.250874        12/12      1            7
 non_linear/spacecraft                    0.054557        0.001402        12/12      27           30
-non_linear/sys_bio                       nan             nan             12/12      20           28
+non_linear/sys_bio                       1.515723        0.368044        12/12      20           28
 =========================================================================================================
