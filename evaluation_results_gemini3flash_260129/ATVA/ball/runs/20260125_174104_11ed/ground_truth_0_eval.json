@@ -1,0 +1,12 @@
+{
+  "gt_file": "ground_truth_0.npz",
+  "tc": 0.0,
+  "max_diff": 0.0,
+  "mean_diff": 0.0,
+  "clustering_error": 0,
+  "status": "success",
+  "dataset": "ATVA/ball",
+  "ha_spec_path": "evaluation_results_gemini3flash_260129/ATVA/ball/runs/20260125_174104_11ed/best_ha_specification.json",
+  "num_iterations": 2,
+  "max_iter": 2
+}

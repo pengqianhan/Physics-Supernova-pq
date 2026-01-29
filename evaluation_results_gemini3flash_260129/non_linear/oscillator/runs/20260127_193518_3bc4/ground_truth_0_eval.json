@@ -1,0 +1,12 @@
+{
+  "gt_file": "ground_truth_0.npz",
+  "tc": 0.004,
+  "max_diff": 0.027291983126967595,
+  "mean_diff": 0.0007568851187542831,
+  "clustering_error": 0,
+  "status": "success",
+  "dataset": "non_linear/oscillator",
+  "ha_spec_path": "evaluation_results_gemini3flash_260129/non_linear/oscillator/runs/20260127_193518_3bc4/best_ha_specification.json",
+  "num_iterations": 13,
+  "max_iter": 50
+}

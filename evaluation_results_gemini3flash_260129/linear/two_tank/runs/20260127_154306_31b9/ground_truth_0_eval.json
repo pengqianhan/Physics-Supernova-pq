@@ -1,0 +1,12 @@
+{
+  "gt_file": "ground_truth_0.npz",
+  "tc": 3.216,
+  "max_diff": 0.7625378296584279,
+  "mean_diff": 0.25821465901523416,
+  "clustering_error": 0,
+  "status": "success",
+  "dataset": "linear/two_tank",
+  "ha_spec_path": "evaluation_results_gemini3flash_260129/linear/two_tank/runs/20260127_154306_31b9/best_ha_specification.json",
+  "num_iterations": 11,
+  "max_iter": 11
+}

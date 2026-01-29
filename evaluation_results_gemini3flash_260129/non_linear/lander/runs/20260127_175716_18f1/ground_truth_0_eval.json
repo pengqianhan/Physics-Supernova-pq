@@ -1,0 +1,12 @@
+{
+  "gt_file": "ground_truth_0.npz",
+  "tc": 0.001,
+  "max_diff": 0.0002639846723184645,
+  "mean_diff": 5.179742066383718e-05,
+  "clustering_error": 0,
+  "status": "success",
+  "dataset": "non_linear/lander",
+  "ha_spec_path": "evaluation_results_gemini3flash_260129/non_linear/lander/runs/20260127_175716_18f1/best_ha_specification.json",
+  "num_iterations": 4,
+  "max_iter": 4
+}

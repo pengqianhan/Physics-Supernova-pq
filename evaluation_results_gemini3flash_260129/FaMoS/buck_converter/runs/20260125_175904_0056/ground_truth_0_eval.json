@@ -1,0 +1,12 @@
+{
+  "gt_file": "ground_truth_0.npz",
+  "tc": 4.997,
+  "max_diff": 1.2865736157865795,
+  "mean_diff": 0.2694489348245992,
+  "clustering_error": 0,
+  "status": "success",
+  "dataset": "FaMoS/buck_converter",
+  "ha_spec_path": "evaluation_results_gemini3flash_260129/FaMoS/buck_converter/runs/20260125_175904_0056/best_ha_specification.json",
+  "num_iterations": 34,
+  "max_iter": 50
+}

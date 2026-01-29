@@ -1,0 +1,12 @@
+{
+  "gt_file": "ground_truth_0.npz",
+  "tc": 0.0,
+  "max_diff": 0.0,
+  "mean_diff": 0.0,
+  "clustering_error": 0,
+  "status": "success",
+  "dataset": "linear/one_legged_jumper",
+  "ha_spec_path": "evaluation_results_gemini3flash_260129/linear/one_legged_jumper/runs/20260127_142225_2051/best_ha_specification.json",
+  "num_iterations": 3,
+  "max_iter": 3
+}

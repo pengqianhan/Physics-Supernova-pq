@@ -1,0 +1,45 @@
+\begin{table}[htbp]
+\centering
+\caption{Dataset Classification by Mean Difference (Gemini 3 Flash)}
+\label{tab:dataset_classification}
+\begin{tabular}{l|c|c|c|c}
+\hline
+\textbf{Dataset} & \textbf{Mean Diff} & \textbf{Max Diff} & \textbf{TC Mean} & \textbf{Max Iter} \\
+\hline
+\multicolumn{5}{c}{\textbf{Category 1: Excellent ($\bar{\epsilon} \leq 0.001$)}} \\
+\hline
+ATVA/ball & 0 & 0 & 0.000 & 2 \\
+linear/one\_legged\_jumper & 0 & 0 & 0.000 & 3 \\
+ATVA/cell & 1.26e-05 & 1.26e-05 & 0.000 & 2 \\
+ATVA/oci & 0.0010 & 0.0031 & 0.001 & 15 \\
+\hline
+\multicolumn{5}{c}{\textbf{Category 2: Good ($0.001 < \bar{\epsilon} \leq 0.1$)}} \\
+\hline
+non\_linear/lander & 0.0010 & 0.0042 & 0.000 & 4 \\
+non\_linear/spacecraft & 0.0014 & 0.055 & 0.010 & 30 \\
+linear/loop & 0.0018 & 0.070 & 0.792 & 2 \\
+non\_linear/oscillator & 0.0031 & 0.054 & 0.005 & 50 \\
+FaMoS/complex\_tank & 0.0099 & 0.199 & 0.463 & 19 \\
+linear/complex\_underdamped\_system & 0.016 & 0.210 & 1.166 & 50 \\
+FaMoS/simple\_heating\_system & 0.016 & 0.028 & 0.018 & 22 \\
+non\_linear/lotkaVolterra & 0.019 & 0.063 & 0.440 & 15 \\
+FaMoS/multi\_room\_heating & 0.047 & 0.188 & 0.526 & 49 \\
+linear/two\_tank & 0.066 & 0.208 & 0.190 & 11 \\
+non\_linear/simple\_non\_linear & 0.069 & 0.268 & 0.194 & 45 \\
+\hline
+\multicolumn{5}{c}{\textbf{Category 3: Poor ($\bar{\epsilon} > 0.1$)}} \\
+\hline
+FaMoS/variable\_heating\_system & 0.109 & 0.322 & 0.522 & 50 \\
+non\_linear/duffing & 0.138 & 0.362 & 0.757 & 50 \\
+linear/dc\_motor\_position\_PID & 0.145 & 0.297 & 0.727 & 31 \\
+FaMoS/two\_state\_ha & 0.194 & 0.393 & 1.045 & 24 \\
+linear/linear\_1 & 0.217 & 0.488 & 0.463 & 1 \\
+ATVA/tanks & 0.223 & 0.876 & 0.402 & 50 \\
+linear/underdamped\_system & 0.225 & 0.486 & 0.670 & 3 \\
+FaMoS/three\_state\_ha & 0.246 & 0.595 & 1.817 & 50 \\
+non\_linear/simple\_non\_poly & 0.251 & 0.379 & 1.849 & 7 \\
+FaMoS/buck\_converter & 0.367 & 1.624 & 4.997 & 50 \\
+non\_linear/sys\_bio & 0.368 & 1.516 & 1.524 & 28 \\
+\hline
+\end{tabular}
+\end{table}

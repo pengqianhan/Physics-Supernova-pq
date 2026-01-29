@@ -1,0 +1,12 @@
+{
+  "gt_file": "ground_truth_0.npz",
+  "tc": 0.012,
+  "max_diff": 0.06728254520012784,
+  "mean_diff": 0.0012311639092857413,
+  "clustering_error": 0,
+  "status": "success",
+  "dataset": "non_linear/spacecraft",
+  "ha_spec_path": "evaluation_results_gemini3flash_260129/non_linear/spacecraft/runs/20260128_132848_dd3f/best_ha_specification.json",
+  "num_iterations": 27,
+  "max_iter": 30
+}

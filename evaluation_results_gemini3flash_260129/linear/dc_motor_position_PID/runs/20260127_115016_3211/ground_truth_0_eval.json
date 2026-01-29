@@ -1,0 +1,12 @@
+{
+  "gt_file": "ground_truth_0.npz",
+  "tc": 0.004,
+  "max_diff": 0.01879857542003937,
+  "mean_diff": 0.004847899112929865,
+  "clustering_error": 0,
+  "status": "success",
+  "dataset": "linear/dc_motor_position_PID",
+  "ha_spec_path": "evaluation_results_gemini3flash_260129/linear/dc_motor_position_PID/runs/20260127_115016_3211/best_ha_specification.json",
+  "num_iterations": 30,
+  "max_iter": 31
+}

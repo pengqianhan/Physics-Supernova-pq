@@ -1,0 +1,12 @@
+{
+  "gt_file": "ground_truth_0.npz",
+  "tc": 0.0,
+  "max_diff": 0.13558095241853124,
+  "mean_diff": 0.006932841356738209,
+  "clustering_error": 1,
+  "status": "success",
+  "dataset": "linear/complex_underdamped_system",
+  "ha_spec_path": "evaluation_results_gemini3flash_260129/linear/complex_underdamped_system/runs/20260126_202153_5a8a/best_ha_specification.json",
+  "num_iterations": 19,
+  "max_iter": 50
+}

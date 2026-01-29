@@ -1,0 +1,12 @@
+{
+  "gt_file": "ground_truth_0.npz",
+  "tc": 0.34400000000000003,
+  "max_diff": 0.9070204565028915,
+  "mean_diff": 0.2678780548051564,
+  "clustering_error": 0,
+  "status": "success",
+  "dataset": "non_linear/simple_non_linear",
+  "ha_spec_path": "evaluation_results_gemini3flash_260129/non_linear/simple_non_linear/runs/20260128_075951_87bb/best_ha_specification.json",
+  "num_iterations": 29,
+  "max_iter": 45
+}
