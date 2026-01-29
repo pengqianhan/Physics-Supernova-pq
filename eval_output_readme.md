@@ -4,5 +4,6 @@ main hyperparameters:
     FEEDBACK_TOP_K=50
     TARGET_ERROR=0.001
     NO_IMPROVEMENT_PATIENCE=20
+API cost: about 108 USD
 
 
