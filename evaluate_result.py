@@ -201,20 +201,21 @@ def main():
 
     # Build and print final summary table
     summary_lines = []
-    summary_lines.append("=" * 105)
+    summary_lines.append("=" * 120)
     summary_lines.append("EVALUATION SUMMARY")
-    summary_lines.append("=" * 105)
-    summary_lines.append(f"{'Dataset':<40} {'max_diff':<15} {'mean_diff':<15} {'Success':<10} {'Iterations':<12} {'max_iter'}")
-    summary_lines.append("-" * 105)
+    summary_lines.append("=" * 120)
+    summary_lines.append(f"{'Dataset':<40} {'tc':<15} {'max_diff':<15} {'mean_diff':<15} {'Success':<10} {'Iterations':<12} {'max_iter'}")
+    summary_lines.append("-" * 120)
     for r in all_results:
         agg = r.get('aggregate', {})
+        tc_val = f"{agg.get('tc_mean', 0):.6f}" if agg else "N/A"
         max_d = f"{agg.get('max_diff_mean', 0):.6f}" if agg else "N/A"
         mean_d = f"{agg.get('mean_diff_mean', 0):.6f}" if agg else "N/A"
         success = f"{r.get('num_success', 0)}/{r.get('num_files', 0)}"
         iterations = str(r.get('num_iterations', 0))
         max_iter = str(r.get('max_iter', 0))
-        summary_lines.append(f"{r['dataset']:<40} {max_d:<15} {mean_d:<15} {success:<10} {iterations:<12} {max_iter}")
-    summary_lines.append("=" * 105)
+        summary_lines.append(f"{r['dataset']:<40} {tc_val:<15} {max_d:<15} {mean_d:<15} {success:<10} {iterations:<12} {max_iter}")
+    summary_lines.append("=" * 120)
 
     # Print to console
     print("\n" + "\n".join(summary_lines))
