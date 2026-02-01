@@ -17,17 +17,17 @@
 
 | Dataset | mean_diff | max_diff | tc | clustering_error | iterations |
 |---------|-----------|----------|-----|------------------|------------|
-| ATVA/ball | 0.000000e+00 | 0.000000e+00 | 0.0 | 0 | 2/2 |
-| ATVA/cell | 0.000000e+00 | 0.000000e+00 | 0.0 | 0 | 2/2 |
-| FaMoS/complex_tank | 0.000000e+00 | 0.000000e+00 | 0.0 | 0 | 18/19 |
-| linear/linear_1 | 0.000000e+00 | 0.000000e+00 | 0.0 | 0 | 1/1 |
-| linear/one_legged_jumper | 0.000000e+00 | 0.000000e+00 | 0.0 | 0 | 3/3 |
-| non_linear/simple_non_poly | 0.000000e+00 | 0.000000e+00 | 0.0 | 0 | 1/7 |
-| non_linear/lander | 5.179742e-05 | 2.639847e-04 | 0.001 | 0 | 4/4 |
-| linear/loop | 7.236274e-05 | 2.221225e-03 | 0.1 | 1 | 2/2 |
-| linear/underdamped_system | 6.385763e-04 | 4.893493e-03 | 0.002 | 0 | 3/3 |
-| non_linear/oscillator | 7.568851e-04 | 2.729198e-02 | 0.004 | 0 | 13/50 |
-| FaMoS/simple_heating_system | 7.992262e-04 | 2.069350e-03 | 0.004 | 0 | 7/22 |
+| ATVA/ball | 0.000000 | 0.000000 | 0.0 | 0 | 2/2 |
+| ATVA/cell | 0.000000 | 0.000000 | 0.0 | 0 | 2/2 |
+| FaMoS/complex_tank | 0.000000 | 0.000000 | 0.0 | 0 | 18/19 |
+| linear/linear_1 | 0.000000 | 0.000000 | 0.0 | 0 | 1/1 |
+| linear/one_legged_jumper | 0.000000 | 0.000000 | 0.0 | 0 | 3/3 |
+| non_linear/simple_non_poly | 0.000000 | 0.000000 | 0.0 | 0 | 1/7 |
+| non_linear/lander | 0.000052 | 0.000264 | 0.001 | 0 | 4/4 |
+| linear/loop | 0.000072 | 0.002221 | 0.1 | 1 | 2/2 |
+| linear/underdamped_system | 0.000639 | 0.004893 | 0.002 | 0 | 3/3 |
+| non_linear/oscillator | 0.000757 | 0.027292 | 0.004 | 0 | 13/50 |
+| FaMoS/simple_heating_system | 0.000799 | 0.002069 | 0.004 | 0 | 7/22 |
 
 ---
 
@@ -35,21 +35,21 @@
 
 | Dataset | mean_diff | max_diff | tc | clustering_error | iterations |
 |---------|-----------|----------|-----|------------------|------------|
-| non_linear/spacecraft | 1.231164e-03 | 6.728255e-02 | 0.012 | 0 | 27/30 |
-| ATVA/oci | 2.546690e-03 | 8.347211e-03 | 0.002 | 0 | 15/15 |
-| ATVA/tanks | 2.805367e-03 | 2.557987e-02 | 0.016 | 0 | 32/50 |
-| linear/dc_motor_position_PID | 4.847899e-03 | 1.879858e-02 | 0.004 | 0 | 30/31 |
-| linear/complex_underdamped_system | 6.932841e-03 | 1.355810e-01 | 0.0 | 1 | 19/50 |
-| FaMoS/multi_room_heating | 2.171113e-02 | 1.126006e-01 | 0.501 | 0 | 37/49 |
-| FaMoS/variable_heating_system | 2.439205e-02 | 1.179787e-01 | 0.228 | 0 | 14/50 |
-| non_linear/lotkaVolterra | 2.783526e-02 | 9.752026e-02 | 0.203 | 0 | 15/15 |
-| FaMoS/two_state_ha | 1.796139e-01 | 4.163519e-01 | 1.12 | 0 | 16/24 |
-| FaMoS/three_state_ha | 1.995152e-01 | 4.503231e-01 | 1.12 | 0 | 22/50 |
-| linear/two_tank | 2.582147e-01 | 7.625378e-01 | 3.216 | 0 | 11/11 |
-| non_linear/simple_non_linear | 2.678781e-01 | 9.070205e-01 | 0.34400000000000003 | 0 | 29/45 |
-| FaMoS/buck_converter | 2.694489e-01 | 1.286574e+00 | 4.997 | 0 | 34/50 |
-| non_linear/duffing | 3.443114e-01 | 6.184907e-01 | 2.129 | 0 | 18/50 |
-| non_linear/sys_bio | 3.614074e-01 | 1.002014e+00 | 1.577 | 1 | 20/28 |
+| non_linear/spacecraft | 0.001231 | 0.067283 | 0.012 | 0 | 27/30 |
+| ATVA/oci | 0.002547 | 0.008347 | 0.002 | 0 | 15/15 |
+| ATVA/tanks | 0.002805 | 0.025580 | 0.016 | 0 | 32/50 |
+| linear/dc_motor_position_PID | 0.004848 | 0.018799 | 0.004 | 0 | 30/31 |
+| linear/complex_underdamped_system | 0.006933 | 0.135581 | 0.0 | 1 | 19/50 |
+| FaMoS/multi_room_heating | 0.021711 | 0.112601 | 0.501 | 0 | 37/49 |
+| FaMoS/variable_heating_system | 0.024392 | 0.117979 | 0.228 | 0 | 14/50 |
+| non_linear/lotkaVolterra | 0.027835 | 0.097520 | 0.203 | 0 | 15/15 |
+| FaMoS/two_state_ha | 0.179614 | 0.416352 | 1.12 | 0 | 16/24 |
+| FaMoS/three_state_ha | 0.199515 | 0.450323 | 1.12 | 0 | 22/50 |
+| linear/two_tank | 0.258215 | 0.762538 | 3.216 | 0 | 11/11 |
+| non_linear/simple_non_linear | 0.267878 | 0.907020 | 0.34400000000000003 | 0 | 29/45 |
+| FaMoS/buck_converter | 0.269449 | 1.286574 | 4.997 | 0 | 34/50 |
+| non_linear/duffing | 0.344311 | 0.618491 | 2.129 | 0 | 18/50 |
+| non_linear/sys_bio | 0.361407 | 1.002014 | 1.577 | 1 | 20/28 |
 
 ---
 
@@ -57,8 +57,8 @@
 
 ### ATVA/ball
 
-- **mean_diff**: 0.000000e+00
-- **max_diff**: 0.000000e+00
+- **mean_diff**: 0.000000
+- **max_diff**: 0.000000
 - **tc**: 0.0
 - **clustering_error**: 0
 - **iterations**: 2/2
@@ -66,8 +66,8 @@
 
 ### ATVA/cell
 
-- **mean_diff**: 0.000000e+00
-- **max_diff**: 0.000000e+00
+- **mean_diff**: 0.000000
+- **max_diff**: 0.000000
 - **tc**: 0.0
 - **clustering_error**: 0
 - **iterations**: 2/2
@@ -75,8 +75,8 @@
 
 ### FaMoS/complex_tank
 
-- **mean_diff**: 0.000000e+00
-- **max_diff**: 0.000000e+00
+- **mean_diff**: 0.000000
+- **max_diff**: 0.000000
 - **tc**: 0.0
 - **clustering_error**: 0
 - **iterations**: 18/19
@@ -84,8 +84,8 @@
 
 ### linear/linear_1
 
-- **mean_diff**: 0.000000e+00
-- **max_diff**: 0.000000e+00
+- **mean_diff**: 0.000000
+- **max_diff**: 0.000000
 - **tc**: 0.0
 - **clustering_error**: 0
 - **iterations**: 1/1
@@ -93,8 +93,8 @@
 
 ### linear/one_legged_jumper
 
-- **mean_diff**: 0.000000e+00
-- **max_diff**: 0.000000e+00
+- **mean_diff**: 0.000000
+- **max_diff**: 0.000000
 - **tc**: 0.0
 - **clustering_error**: 0
 - **iterations**: 3/3
@@ -102,8 +102,8 @@
 
 ### non_linear/simple_non_poly
 
-- **mean_diff**: 0.000000e+00
-- **max_diff**: 0.000000e+00
+- **mean_diff**: 0.000000
+- **max_diff**: 0.000000
 - **tc**: 0.0
 - **clustering_error**: 0
 - **iterations**: 1/7
@@ -111,8 +111,8 @@
 
 ### non_linear/lander
 
-- **mean_diff**: 5.179742e-05
-- **max_diff**: 2.639847e-04
+- **mean_diff**: 0.000052
+- **max_diff**: 0.000264
 - **tc**: 0.001
 - **clustering_error**: 0
 - **iterations**: 4/4
@@ -120,8 +120,8 @@
 
 ### linear/loop
 
-- **mean_diff**: 7.236274e-05
-- **max_diff**: 2.221225e-03
+- **mean_diff**: 0.000072
+- **max_diff**: 0.002221
 - **tc**: 0.1
 - **clustering_error**: 1
 - **iterations**: 2/2
@@ -129,8 +129,8 @@
 
 ### linear/underdamped_system
 
-- **mean_diff**: 6.385763e-04
-- **max_diff**: 4.893493e-03
+- **mean_diff**: 0.000639
+- **max_diff**: 0.004893
 - **tc**: 0.002
 - **clustering_error**: 0
 - **iterations**: 3/3
@@ -138,8 +138,8 @@
 
 ### non_linear/oscillator
 
-- **mean_diff**: 7.568851e-04
-- **max_diff**: 2.729198e-02
+- **mean_diff**: 0.000757
+- **max_diff**: 0.027292
 - **tc**: 0.004
 - **clustering_error**: 0
 - **iterations**: 13/50
@@ -147,8 +147,8 @@
 
 ### FaMoS/simple_heating_system
 
-- **mean_diff**: 7.992262e-04
-- **max_diff**: 2.069350e-03
+- **mean_diff**: 0.000799
+- **max_diff**: 0.002069
 - **tc**: 0.004
 - **clustering_error**: 0
 - **iterations**: 7/22

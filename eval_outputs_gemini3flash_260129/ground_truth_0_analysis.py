@@ -81,7 +81,7 @@ def analyze_from_summary(summary_file: str = None,
 
     for item in passing_datasets:
         md_lines.append(
-            f"| {item['dataset']} | {item['mean_diff']:.6e} | {item['max_diff']:.6e} | {item['tc']} | {item['clustering_error']} | {item['num_iterations']}/{item['max_iter']} |"
+            f"| {item['dataset']} | {item['mean_diff']:.6f} | {item['max_diff']:.6f} | {item['tc']} | {item['clustering_error']} | {item['num_iterations']}/{item['max_iter']} |"
         )
 
     md_lines.extend([
@@ -95,8 +95,8 @@ def analyze_from_summary(summary_file: str = None,
     ])
 
     for item in failing_datasets:
-        mean_diff_str = f"{item['mean_diff']:.6e}" if item['mean_diff'] is not None else "N/A"
-        max_diff_str = f"{item['max_diff']:.6e}" if item['max_diff'] is not None else "N/A"
+        mean_diff_str = f"{item['mean_diff']:.6f}" if item['mean_diff'] is not None else "N/A"
+        max_diff_str = f"{item['max_diff']:.6f}" if item['max_diff'] is not None else "N/A"
         md_lines.append(
             f"| {item['dataset']} | {mean_diff_str} | {max_diff_str} | {item['tc']} | {item['clustering_error']} | {item['num_iterations']}/{item['max_iter']} |"
         )
@@ -113,8 +113,8 @@ def analyze_from_summary(summary_file: str = None,
         md_lines.extend([
             f"### {item['dataset']}",
             "",
-            f"- **mean_diff**: {item['mean_diff']:.6e}",
-            f"- **max_diff**: {item['max_diff']:.6e}",
+            f"- **mean_diff**: {item['mean_diff']:.6f}",
+            f"- **max_diff**: {item['max_diff']:.6f}",
             f"- **tc**: {item['tc']}",
             f"- **clustering_error**: {item['clustering_error']}",
             f"- **iterations**: {item['num_iterations']}/{item['max_iter']}",
