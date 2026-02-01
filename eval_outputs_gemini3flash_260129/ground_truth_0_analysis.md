@@ -1,10 +1,17 @@
 # Ground Truth 0 Evaluation Analysis
 
-**Threshold**: mean_diff < 0.001
+## Classification Criteria
+
+- **Category 1 (Excellent)**: mean_diff < 0.001
+- **Category 2 (Good)**: 0.001 <= mean_diff < 0.005
+- **Category 3 (Poor)**: mean_diff >= 0.005
+
+## Overview
+
 **Total datasets**: 26
-**Passing**: 11
-**Failing**: 15
-**Success rate**: 42.3%
+**Excellent (Cat 1)**: 11 (42.3%)
+**Good (Cat 2)**: 4 (15.4%)
+**Poor (Cat 3)**: 11 (42.3%)
 
 ## Summary Statistics
 
@@ -13,7 +20,7 @@
 
 ---
 
-## Passing Datasets (mean_diff < 0.001)
+## Category 1: Excellent (mean_diff < 0.001)
 
 | Dataset | mean_diff | max_diff | tc | clustering_error | iterations |
 |---------|-----------|----------|-----|------------------|------------|
@@ -31,7 +38,7 @@
 
 ---
 
-## Failing Datasets (mean_diff >= 0.001)
+## Category 2: Good (0.001 <= mean_diff < 0.005)
 
 | Dataset | mean_diff | max_diff | tc | clustering_error | iterations |
 |---------|-----------|----------|-----|------------------|------------|
@@ -39,6 +46,13 @@
 | ATVA/oci | 0.002547 | 0.008347 | 0.002 | 0 | 15/15 |
 | ATVA/tanks | 0.002805 | 0.025580 | 0.016 | 0 | 32/50 |
 | linear/dc_motor_position_PID | 0.004848 | 0.018799 | 0.004 | 0 | 30/31 |
+
+---
+
+## Category 3: Poor (mean_diff >= 0.005)
+
+| Dataset | mean_diff | max_diff | tc | clustering_error | iterations |
+|---------|-----------|----------|-----|------------------|------------|
 | linear/complex_underdamped_system | 0.006933 | 0.135581 | 0.0 | 1 | 19/50 |
 | FaMoS/multi_room_heating | 0.021711 | 0.112601 | 0.501 | 0 | 37/49 |
 | FaMoS/variable_heating_system | 0.024392 | 0.117979 | 0.228 | 0 | 14/50 |
@@ -53,7 +67,7 @@
 
 ---
 
-## Passing Datasets Details
+## Excellent Datasets Details
 
 ### ATVA/ball
 

@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """
-Analyze ground_truth_0_summary.json and find datasets with mean_diff < 0.001
+Analyze ground_truth_0_summary.json and classify datasets into three categories:
+- Category 1 (Excellent): mean_diff < 0.001
+- Category 2 (Good): 0.001 <= mean_diff < 0.005
+- Category 3 (Poor): mean_diff >= 0.005
 """
 
 import json
@@ -8,27 +11,32 @@ from pathlib import Path
 
 
 def analyze_from_summary(summary_file: str = None,
-                         threshold: float = 0.001,
+                         threshold_excellent: float = 0.001,
+                         threshold_good: float = 0.005,
                          output_file: str = None):
+    """
+    Read ground_truth_0_summary.json and classify datasets into three categories.
+
+    Args:
+        summary_file: Path to the summary JSON file
+        threshold_excellent: Upper bound for excellent category (default 0.001)
+        threshold_good: Upper bound for good category (default 0.005)
+        output_file: Output markdown file path
+    """
     # Default paths relative to script location
     script_dir = Path(__file__).parent
     if summary_file is None:
         summary_file = script_dir / "ground_truth_0_summary.json"
     if output_file is None:
         output_file = script_dir / "ground_truth_0_analysis.md"
-    """
-    Read ground_truth_0_summary.json and record datasets with mean_diff < threshold.
 
-    Args:
-        summary_file: Path to the summary JSON file
-        threshold: mean_diff threshold (default 0.001)
-        output_file: Output markdown file path
-    """
     with open(summary_file, 'r') as f:
         data = json.load(f)
 
-    passing_datasets = []
-    failing_datasets = []
+    # Three categories
+    excellent_datasets = []  # mean_diff < 0.001
+    good_datasets = []       # 0.001 <= mean_diff < 0.005
+    poor_datasets = []       # mean_diff >= 0.005
 
     for item in data:
         mean_diff = item.get("mean_diff")
@@ -47,24 +55,37 @@ def analyze_from_summary(summary_file: str = None,
             "ha_spec_path": item.get("ha_spec_path")
         }
 
-        if mean_diff is not None and mean_diff < threshold:
-            passing_datasets.append(entry)
+        if mean_diff is None:
+            poor_datasets.append(entry)
+        elif mean_diff < threshold_excellent:
+            excellent_datasets.append(entry)
+        elif mean_diff < threshold_good:
+            good_datasets.append(entry)
         else:
-            failing_datasets.append(entry)
+            poor_datasets.append(entry)
 
-    # Sort passing by mean_diff
-    passing_datasets.sort(key=lambda x: x['mean_diff'])
-    failing_datasets.sort(key=lambda x: x['mean_diff'] if x['mean_diff'] is not None else float('inf'))
+    # Sort each category by mean_diff
+    excellent_datasets.sort(key=lambda x: x['mean_diff'])
+    good_datasets.sort(key=lambda x: x['mean_diff'])
+    poor_datasets.sort(key=lambda x: x['mean_diff'] if x['mean_diff'] is not None else float('inf'))
 
     # Generate markdown report
+    total = len(data)
     md_lines = [
         "# Ground Truth 0 Evaluation Analysis",
         "",
-        f"**Threshold**: mean_diff < {threshold}",
-        f"**Total datasets**: {len(data)}",
-        f"**Passing**: {len(passing_datasets)}",
-        f"**Failing**: {len(failing_datasets)}",
-        f"**Success rate**: {len(passing_datasets)/len(data)*100:.1f}%",
+        "## Classification Criteria",
+        "",
+        f"- **Category 1 (Excellent)**: mean_diff < {threshold_excellent}",
+        f"- **Category 2 (Good)**: {threshold_excellent} <= mean_diff < {threshold_good}",
+        f"- **Category 3 (Poor)**: mean_diff >= {threshold_good}",
+        "",
+        "## Overview",
+        "",
+        f"**Total datasets**: {total}",
+        f"**Excellent (Cat 1)**: {len(excellent_datasets)} ({len(excellent_datasets)/total*100:.1f}%)",
+        f"**Good (Cat 2)**: {len(good_datasets)} ({len(good_datasets)/total*100:.1f}%)",
+        f"**Poor (Cat 3)**: {len(poor_datasets)} ({len(poor_datasets)/total*100:.1f}%)",
         "",
         "## Summary Statistics",
         "",
@@ -73,13 +94,13 @@ def analyze_from_summary(summary_file: str = None,
         "",
         "---",
         "",
-        "## Passing Datasets (mean_diff < 0.001)",
+        f"## Category 1: Excellent (mean_diff < {threshold_excellent})",
         "",
         "| Dataset | mean_diff | max_diff | tc | clustering_error | iterations |",
         "|---------|-----------|----------|-----|------------------|------------|",
     ]
 
-    for item in passing_datasets:
+    for item in excellent_datasets:
         md_lines.append(
             f"| {item['dataset']} | {item['mean_diff']:.6f} | {item['max_diff']:.6f} | {item['tc']} | {item['clustering_error']} | {item['num_iterations']}/{item['max_iter']} |"
         )
@@ -88,13 +109,28 @@ def analyze_from_summary(summary_file: str = None,
         "",
         "---",
         "",
-        "## Failing Datasets (mean_diff >= 0.001)",
+        f"## Category 2: Good ({threshold_excellent} <= mean_diff < {threshold_good})",
         "",
         "| Dataset | mean_diff | max_diff | tc | clustering_error | iterations |",
         "|---------|-----------|----------|-----|------------------|------------|",
     ])
 
-    for item in failing_datasets:
+    for item in good_datasets:
+        md_lines.append(
+            f"| {item['dataset']} | {item['mean_diff']:.6f} | {item['max_diff']:.6f} | {item['tc']} | {item['clustering_error']} | {item['num_iterations']}/{item['max_iter']} |"
+        )
+
+    md_lines.extend([
+        "",
+        "---",
+        "",
+        f"## Category 3: Poor (mean_diff >= {threshold_good})",
+        "",
+        "| Dataset | mean_diff | max_diff | tc | clustering_error | iterations |",
+        "|---------|-----------|----------|-----|------------------|------------|",
+    ])
+
+    for item in poor_datasets:
         mean_diff_str = f"{item['mean_diff']:.6f}" if item['mean_diff'] is not None else "N/A"
         max_diff_str = f"{item['max_diff']:.6f}" if item['max_diff'] is not None else "N/A"
         md_lines.append(
@@ -105,11 +141,11 @@ def analyze_from_summary(summary_file: str = None,
         "",
         "---",
         "",
-        "## Passing Datasets Details",
+        "## Excellent Datasets Details",
         "",
     ])
 
-    for item in passing_datasets:
+    for item in excellent_datasets:
         md_lines.extend([
             f"### {item['dataset']}",
             "",
@@ -127,9 +163,11 @@ def analyze_from_summary(summary_file: str = None,
         f.write('\n'.join(md_lines))
 
     print(f"Analysis complete. Results saved to {output_file}")
-    print(f"Passing datasets: {len(passing_datasets)}/{len(data)} ({len(passing_datasets)/len(data)*100:.1f}%)")
+    print(f"Category 1 (Excellent, mean_diff < {threshold_excellent}): {len(excellent_datasets)}/{total} ({len(excellent_datasets)/total*100:.1f}%)")
+    print(f"Category 2 (Good, {threshold_excellent} <= mean_diff < {threshold_good}): {len(good_datasets)}/{total} ({len(good_datasets)/total*100:.1f}%)")
+    print(f"Category 3 (Poor, mean_diff >= {threshold_good}): {len(poor_datasets)}/{total} ({len(poor_datasets)/total*100:.1f}%)")
 
-    return passing_datasets, failing_datasets
+    return excellent_datasets, good_datasets, poor_datasets
 
 
 if __name__ == "__main__":
