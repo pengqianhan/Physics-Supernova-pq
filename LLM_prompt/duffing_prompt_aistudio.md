@@ -16,11 +16,6 @@ A Hybrid Automaton models a system with:
 - `Mean Difference < 0.005`: accurate overall
 - `TC (Change-Point Error) < 0.01s`: mode switch timing correct
 
-## Tool and Sub-Agents Resources:
-
-You MUST use the `hybrid_automaton_image_analysis` tool to analyze the image if you want to obtain more detailed information about the system.
-
-You have access to managed Code Agent: `['data_analysis_expert']` to analyze the npz data files.
 ## Hybrid Automaton Specification Format (JSON Schema)
 
 ### JSON Schema Definition
@@ -372,21 +367,8 @@ When constructing the HA specification dictionary in Python code:
 ```
 
 ## Your Task
-Generate an improved HA specification that better matches the observed trajectory data.
+Generate an HA specification that matches the trajectory data plotted in the image.
 - **Keep `var: "x1"` and `input: "u1"` exactly as shown!**
 - Make sure the HA specification is valid and complete according to the JSON Schema.
 - Refine the HA specification to improve trajectory matching and reduce `Max Difference`, `Mean Difference`, and `TC (Change-Point Error)`.
-
-## Available Data
-- **Trace visualizations**: ['<image_0>', '<image_1>', '<image_2>'], use the `hybrid_automaton_image_analysis` tool to analyze the image if you want to obtain more detailed information about the system.
-- **Raw data files**: If you want to use the npz data to analyze the system, you MUST use the `data_analysis_expert` agent to analyze the data. You can not analyze the npz data directly.
-
-### NPZ Data Format (for reference - use via `data_analysis_expert` agent)
-Each NPZ file contains:
-- `state`: numpy array, shape `(num_variables, num_steps)` - state trajectories
-  - Access: `x1 = data['state'][0, :]`, `x2 = data['state'][1, :]`
-- `input`: numpy array, shape `(num_inputs, num_steps)` - input signals (if applicable)
-  - Access: `u1 = data['input'][0, :]`
-
-**WARNING**: Do NOT use placeholder names like `<npz_0>` as file paths! Use the `data_analysis_expert` agent which has access to the actual file paths.
 
