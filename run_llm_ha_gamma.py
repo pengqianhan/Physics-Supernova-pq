@@ -45,7 +45,7 @@ except ImportError:
 import argparse
 
 # for type hints
-from typing import List, Dict, Tuple, Optional
+from typing import List, Dict, Tuple, Optional, Union
 from smolagents.default_tools import Tool
 from smolagents import (
     MultiStepAgent,
@@ -569,55 +569,89 @@ Each NPZ file contains:
     return task, compressed_trace_images
 
 
+def compute_aggregated_metrics(metrics_list: List[Dict]) -> Dict:
+    """
+    Compute average metrics across multiple evaluations.
+
+    Args:
+        metrics_list: List of metrics dictionaries from individual evaluations
+
+    Returns:
+        Dictionary containing averaged metrics and per-file details
+    """
+    if not metrics_list:
+        return {}
+    avg = {}
+    for key in ['tc', 'max_diff', 'mean_diff']:
+        vals = [m.get(key) for m in metrics_list if m.get(key) is not None]
+        if vals:
+            avg[key] = sum(vals) / len(vals)
+    return {**avg, 'num_evaluations': len(metrics_list), 'per_file_metrics': metrics_list}
+
+
 def gen_summary(
     metrics_dict: Dict,
     ha_specification: Dict,
-    plot_path: str,
+    plot_paths: Union[str, List[str]],
     model_id: str = "gemini/gemini-3-flash-preview"
 ) -> str:
     """
     Generate a comprehensive summary of evaluation results using LLM with vision.
 
-    Analyzes the metrics, HA specification, and evaluation plot to provide
+    Analyzes the metrics, HA specification, and evaluation plot(s) to provide
     actionable feedback for improving the hybrid automaton model.
 
     Args:
         metrics_dict: Dictionary containing evaluation metrics (mean_diff, max_diff, tc, etc.)
         ha_specification: The HA specification dictionary being evaluated
-        plot_path: Path to the overlay plot image (ground truth vs simulated)
+        plot_paths: Path(s) to overlay plot image(s) - can be a single string or list of strings
         model_id: LiteLLM model ID (default: gemini/gemini-3-flash-preview)
 
     Returns:
         LLM-generated summary with analysis and improvement suggestions
     """
 
-
     # Fallback if no metrics
     if not metrics_dict:
         return "No metrics available for analysis."
 
-    # Read and encode the plot image
-    image_content = None
-    if plot_path and os.path.isfile(plot_path):
-        try:
-            with open(plot_path, 'rb') as f:
-                image_bytes = f.read()
-            image_base64 = base64.b64encode(image_bytes).decode('utf-8')
-            # Determine mime type from extension
-            ext = os.path.splitext(plot_path)[1].lower()
-            mime_type = {'.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg'}.get(ext, 'image/png')
-            image_content = {
-                "type": "image_url",
-                "image_url": {"url": f"data:{mime_type};base64,{image_base64}"}
-            }
-        except Exception as e:
-            print(f"[gen_summary] Warning: Could not read plot image: {e}")
+    # Normalize plot_paths to a list
+    if isinstance(plot_paths, str):
+        plot_paths_list = [plot_paths]
+    else:
+        plot_paths_list = plot_paths if plot_paths else []
 
-    # Format metrics for prompt
-    metrics_text = "\n".join([
-        f"- {k}: {v:.6f}" if isinstance(v, float) else f"- {k}: {v}"
-        for k, v in metrics_dict.items() if v is not None
-    ])
+    # Read and encode all plot images
+    image_contents = []
+    for idx, plot_path in enumerate(plot_paths_list):
+        if plot_path and os.path.isfile(plot_path):
+            try:
+                with open(plot_path, 'rb') as f:
+                    image_bytes = f.read()
+                image_base64 = base64.b64encode(image_bytes).decode('utf-8')
+                # Determine mime type from extension
+                ext = os.path.splitext(plot_path)[1].lower()
+                mime_type = {'.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg'}.get(ext, 'image/png')
+                image_contents.append({
+                    "type": "image_url",
+                    "image_url": {"url": f"data:{mime_type};base64,{image_base64}"}
+                })
+            except Exception as e:
+                print(f"[gen_summary] Warning: Could not read plot image {idx}: {e}")
+
+    # Format metrics for prompt (handle aggregated metrics)
+    metrics_lines = []
+    for k, v in metrics_dict.items():
+        if v is None:
+            continue
+        if k == 'per_file_metrics':
+            # Skip per-file details in text summary, they're in the images
+            continue
+        if isinstance(v, float):
+            metrics_lines.append(f"- {k}: {v:.6f}")
+        else:
+            metrics_lines.append(f"- {k}: {v}")
+    metrics_text = "\n".join(metrics_lines)
 
     # Format HA spec summary (truncate if too long)
     ha_spec_str = json.dumps(ha_specification, indent=2)
@@ -625,6 +659,9 @@ def gen_summary(
         ha_spec_str = ha_spec_str[:2000] + "\n... (truncated)"
 
     # Build the analysis prompt
+    num_plots = len(image_contents)
+    plot_description = f"{num_plots} trajectory comparison plot(s)" if num_plots > 0 else "trajectory comparison plot (not available)"
+
     system_prompt = """You are an expert in hybrid automaton system identification and control systems.
 Analyze the evaluation results and provide a concise, actionable summary.
 
@@ -645,13 +682,14 @@ Keep the summary under 200 words. Be direct and technical."""
 ```
 
 ## Task
-Analyze the evaluation results and the trajectory comparison plot (ground truth vs simulated).
+Analyze the evaluation results and the {plot_description} (ground truth vs simulated).
 Identify the main sources of error and suggest specific improvements to the ODE equations or guard conditions."""
 
-    # Build message content
-    content = [{"type": "text", "text": user_prompt}]
-    if image_content:
-        content.insert(0, image_content)
+    # Build message content - add all images first, then text
+    content = []
+    for img_content in image_contents:
+        content.append(img_content)
+    content.append({"type": "text", "text": user_prompt})
 
     messages = [
         {"role": "system", "content": system_prompt},
@@ -685,8 +723,9 @@ def build_artifact_manifest(
     run_id: str,
     iteration: int,
     metrics: Dict,
-    plot_placeholder: str,
-    plot_summary: str
+    plot_placeholders: Union[str, List[str]],
+    plot_summary: str,
+    per_file_results: List[Dict] = None
 ) -> Dict:
     """
     Build the artifact manifest structure for feedback.
@@ -694,24 +733,38 @@ def build_artifact_manifest(
     Args:
         run_id: Unique identifier for this experiment run
         iteration: Current iteration number
-        metrics: Evaluation metrics dictionary
-        plot_placeholder: Placeholder reference for the overlay plot (e.g., <iter_image_1>)
+        metrics: Evaluation metrics dictionary (may be aggregated if multiple files)
+        plot_placeholders: Placeholder reference(s) for overlay plot(s)
         plot_summary: Text summary for fallback
+        per_file_results: Optional list of per-file evaluation results
 
     Returns:
         Dictionary containing the artifact manifest
     """
-    return {
-        "Evaluation Metrics": {
+    # Normalize plot_placeholders to list
+    if isinstance(plot_placeholders, str):
+        placeholders_list = [plot_placeholders]
+    else:
+        placeholders_list = plot_placeholders if plot_placeholders else []
+
+    manifest = {
+        "Evaluation Metrics (Averaged)": {
             "TC (Change-Point Error)": metrics.get('tc', None),
             "Max Difference": metrics.get('max_diff', None),
             "Mean Difference": metrics.get('mean_diff', None),
+            "Num Ground Truth Files": metrics.get('num_evaluations', 1),
         },
         "Evaluation Plot": {
-            "Placeholder": plot_placeholder,
+            "Placeholders": placeholders_list,
             "Summary": plot_summary,
         }
     }
+
+    # Add per-file results if available
+    if per_file_results:
+        manifest["Per-File Results"] = per_file_results
+
+    return manifest
 
 
 def evaluate_ha_specification_with_feedback(
@@ -724,7 +777,8 @@ def evaluate_ha_specification_with_feedback(
     structured_output_model: str = "gemini-3-flash-preview",
     run_id: str = None,
     summary_model: str = "gemini/gemini-3-flash-preview",
-    image_tool: HybridAutomatonImageTool = None
+    image_tool: HybridAutomatonImageTool = None,
+    eval_train_num: int = 1
 ) -> Tuple[bool, Dict, str, Optional[Dict]]:
     """
     Evaluate the generated Hybrid Automaton specification and return feedback for the agent.
@@ -740,6 +794,7 @@ def evaluate_ha_specification_with_feedback(
         run_id: Unique run identifier for artifact tracking
         summary_model: Model ID for LLM-based summary generation
         image_tool: HybridAutomatonImageTool instance for registering evaluation plots
+        eval_train_num: Number of ground truth files to evaluate against (default: 1)
 
     Returns:
         Tuple of (success_bool, metrics_dict, feedback_string, ha_specification_dict)
@@ -759,9 +814,9 @@ def evaluate_ha_specification_with_feedback(
     else:
         # print("Using traditional extraction only")
         ha_specification, is_valid, validation_message = preprocess_ha_for_evaluation(agent_result)
-    
+
     print(validation_message)
-    
+
     if not is_valid:
         error_msg = "HA specification validation failed. " + validation_message
         if ha_specification is not None:
@@ -772,11 +827,11 @@ def evaluate_ha_specification_with_feedback(
     if ha_specification is None or 'automaton' not in ha_specification or 'config' not in ha_specification:
         return False, {}, "Could not extract valid HA specification from agent output (missing 'automaton' or 'config').", None
 
-    # Find test data file
+    # Find test data files
     # Ground truth files are in a folder with the same name but with "_g" suffix
     # e.g., if input_data_path is "data_all/ATVA/ball", ground truth is in "data_all/ATVA/ball_g"
     ground_truth_path = input_data_path.rstrip('/') + '_g'
-    
+
     if os.path.isdir(ground_truth_path):
         test_data_files = [f for f in os.listdir(ground_truth_path) if f.startswith('ground_truth') and f.endswith('.npz')]
         test_data_base_path = ground_truth_path
@@ -784,18 +839,30 @@ def evaluate_ha_specification_with_feedback(
         # Fallback: look in the original input_data_path
         test_data_files = [f for f in os.listdir(input_data_path) if f.startswith('ground_truth') and f.endswith('.npz')]
         test_data_base_path = input_data_path
-    
+
     if not test_data_files:
         return False, {}, f"No .npz test data files found in {ground_truth_path} or {input_data_path}", ha_specification
 
-    npz_file_path = os.path.join(test_data_base_path, test_data_files[0])
-    
-    # Check dimensions
-    gt_data = np.load(npz_file_path, allow_pickle=True)
+    # Sort files by numeric index (ground_truth_0.npz, ground_truth_1.npz, ...)
+    def extract_index(filename):
+        # Extract number from filename like "ground_truth_0.npz" -> 0
+        import re
+        match = re.search(r'ground_truth_(\d+)\.npz', filename)
+        return int(match.group(1)) if match else float('inf')
+
+    test_data_files.sort(key=extract_index)
+
+    # Limit to eval_train_num files
+    test_data_files = test_data_files[:eval_train_num]
+    print(f"Evaluating against {len(test_data_files)} ground truth file(s): {test_data_files}")
+
+    # Check dimensions using the first file
+    first_npz_path = os.path.join(test_data_base_path, test_data_files[0])
+    gt_data = np.load(first_npz_path, allow_pickle=True)
     gt_num_vars = gt_data['state'].shape[0]
     var_str = ha_specification['automaton'].get('var', '')
     ha_num_vars = len([v.strip() for v in var_str.split(',') if v.strip()])
-    
+
     if ha_num_vars != gt_num_vars:
         msg = f"Variable count mismatch! HA spec has {ha_num_vars}, ground truth has {gt_num_vars}. Check state-space vs higher-order ODE format."
         return False, {}, msg, ha_specification
@@ -806,25 +873,69 @@ def evaluate_ha_specification_with_feedback(
     os.makedirs(output_dir, exist_ok=True)
 
     try:
-        # Create evaluator
-        evaluator = HAEvaluator(
-            ha_dict=ha_specification,
-            npz_file_path=npz_file_path,
-            dt=ha_specification['config'].get('dt', 0.001),
-            total_time=ha_specification['config'].get('total_time', 10.0)
-        )
+        # Evaluate against each ground truth file
+        all_metrics = []
+        all_overlay_paths = []
+        all_plot_placeholders = []
+        per_file_results = []
+        all_metrics_texts = []
 
-        # Run evaluation - use consistent file names for artifact referencing
-        # Save overlay.png (consistent name) for artifact manifest
-        overlay_path = os.path.abspath(os.path.join(output_dir, 'overlay.png'))
-        metrics_text, _ = evaluator(
-            plot_mode='overlay',
-            save_path=overlay_path,
-            print_metrics=True
-        )
-        metrics_dict = evaluator.metrics
+        for file_idx, test_file in enumerate(test_data_files):
+            npz_file_path = os.path.join(test_data_base_path, test_file)
+            print(f"\n--- Evaluating against {test_file} ({file_idx + 1}/{len(test_data_files)}) ---")
 
-        # Save metrics and hyperparameters to metrics.txt (consistent name)
+            # Create evaluator for this file
+            evaluator = HAEvaluator(
+                ha_dict=ha_specification,
+                npz_file_path=npz_file_path,
+                dt=ha_specification['config'].get('dt', 0.001),
+                total_time=ha_specification['config'].get('total_time', 10.0)
+            )
+
+            # Run evaluation - save as overlay_0.png, overlay_1.png, etc.
+            overlay_filename = f'overlay_{file_idx}.png'
+            overlay_path = os.path.abspath(os.path.join(output_dir, overlay_filename))
+            metrics_text, _ = evaluator(
+                plot_mode='overlay',
+                save_path=overlay_path,
+                print_metrics=True
+            )
+            file_metrics = evaluator.metrics
+
+            all_metrics.append(file_metrics)
+            all_overlay_paths.append(overlay_path)
+            all_metrics_texts.append(metrics_text)
+
+            # Create placeholder for this file's plot
+            plot_placeholder = f"<iter_image_{iteration}_{file_idx}>"
+            all_plot_placeholders.append(plot_placeholder)
+
+            # Register the overlay image with the image tool
+            if image_tool is not None:
+                # Use a unique index combining iteration and file index
+                unique_idx = iteration * 100 + file_idx  # e.g., iteration 1, file 0 -> 100
+                success, error_msg = image_tool.register_iteration_image(unique_idx, overlay_path)
+                if not success:
+                    print(f"[Warning] Failed to register overlay image {file_idx}: {error_msg}")
+
+            # Build per-file result entry
+            per_file_results.append({
+                "ground_truth_index": file_idx,
+                "ground_truth_file": test_file,
+                "plot_placeholder": plot_placeholder,
+                "tc": file_metrics.get('tc'),
+                "max_diff": file_metrics.get('max_diff'),
+                "mean_diff": file_metrics.get('mean_diff')
+            })
+
+        # Compute aggregated metrics
+        aggregated_metrics = compute_aggregated_metrics(all_metrics)
+        print(f"\n--- Aggregated Metrics (over {len(all_metrics)} files) ---")
+        print(f"  Mean TC: {aggregated_metrics.get('tc', 'N/A'):.6f}" if aggregated_metrics.get('tc') is not None else "  Mean TC: N/A")
+        print(f"  Mean Max Diff: {aggregated_metrics.get('max_diff', 'N/A'):.6f}" if aggregated_metrics.get('max_diff') is not None else "  Mean Max Diff: N/A")
+        print(f"  Mean Mean Diff: {aggregated_metrics.get('mean_diff', 'N/A'):.6f}" if aggregated_metrics.get('mean_diff') is not None else "  Mean Mean Diff: N/A")
+
+        # Save metrics and hyperparameters to metrics.txt
         metrics_file = os.path.join(output_dir, 'metrics.txt')
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         with open(metrics_file, 'w') as f:
@@ -832,35 +943,39 @@ def evaluate_ha_specification_with_feedback(
             f.write("=" * 80 + "\n")
             f.write(f"Timestamp: {timestamp}\n")
             f.write(f"Iteration: {iteration}\n")
-            f.write(f"Run ID: {run_id if run_id else 'N/A'}\n\n")
-            f.write(f"Metrics:\n{metrics_text}\n\n")
-            f.write(f"HA Specification:\n{json.dumps(ha_specification, indent=2)}\n\n")
+            f.write(f"Run ID: {run_id if run_id else 'N/A'}\n")
+            f.write(f"Number of Ground Truth Files: {len(test_data_files)}\n\n")
+
+            # Write aggregated metrics
+            f.write("Aggregated Metrics:\n")
+            f.write(f"  Mean TC: {aggregated_metrics.get('tc', 'N/A')}\n")
+            f.write(f"  Mean Max Diff: {aggregated_metrics.get('max_diff', 'N/A')}\n")
+            f.write(f"  Mean Mean Diff: {aggregated_metrics.get('mean_diff', 'N/A')}\n\n")
+
+            # Write per-file metrics
+            f.write("Per-File Metrics:\n")
+            for idx, (test_file, metrics_text) in enumerate(zip(test_data_files, all_metrics_texts)):
+                f.write(f"\n  [{idx}] {test_file}:\n")
+                f.write(f"    {metrics_text}\n")
+
+            f.write(f"\nHA Specification:\n{json.dumps(ha_specification, indent=2)}\n\n")
 
             # Write hyperparameters if provided
             if hyperparameters is not None:
                 f.write(hyperparameters.to_string())
                 f.write("\n\n")
 
-        # Generate plot summary using LLM analysis of metrics, HA spec, and plot image
-        plot_summary = gen_summary(metrics_dict, ha_specification, overlay_path, model_id=summary_model)
+        # Generate plot summary using LLM analysis of metrics, HA spec, and all plot images
+        plot_summary = gen_summary(aggregated_metrics, ha_specification, all_overlay_paths, model_id=summary_model)
 
-        # Register the overlay image with the image tool for placeholder-based access
-        # Use iteration number as the image index (e.g., iteration 1 -> <iter_image_1>)
-        plot_placeholder = f"<iter_image_{iteration}>"
-        if image_tool is not None:
-            success, error_msg = image_tool.register_iteration_image(iteration, overlay_path)
-            if not success:
-                print(f"[Warning] Failed to register overlay image: {error_msg}")
-        else:
-            print("[Warning] No image_tool provided - evaluation plots won't be available via placeholder")
-
-        # Build artifact manifest with placeholder instead of path
+        # Build artifact manifest with all placeholders and per-file results
         artifact_manifest = build_artifact_manifest(
             run_id=run_id if run_id else "unknown",
             iteration=iteration,
-            metrics=metrics_dict,
-            plot_placeholder=plot_placeholder,
-            plot_summary=plot_summary
+            metrics=aggregated_metrics,
+            plot_placeholders=all_plot_placeholders,
+            plot_summary=plot_summary,
+            per_file_results=per_file_results
         )
 
         # Save artifact manifest to disk (for debugging/external tools)
@@ -873,7 +988,7 @@ def evaluate_ha_specification_with_feedback(
         feedback += f"  1. HA JSON Specification:\n```json\n{json.dumps(ha_specification, indent=2)}\n```\n"
         feedback += f"  2. Evaluation Feedback:\n{json.dumps(artifact_manifest, indent=2)}\n"
 
-        return True, metrics_dict, feedback, ha_specification
+        return True, aggregated_metrics, feedback, ha_specification
 
     except Exception as e:
         import traceback
@@ -1025,6 +1140,15 @@ def parse_args():
         help="Number of training samples to load from trace data (default: 3)",
     )
 
+    # Evaluation ground truth count
+    ap.add_argument(
+        "--eval-train-num",
+        type=int,
+        default=1,
+        help="Number of ground truth files to evaluate against (default: 1). "
+             "When >1, metrics are averaged across all files and multiple overlay plots are generated.",
+    )
+
     args = ap.parse_args()
 
     if not args.input_data_path:
@@ -1172,7 +1296,8 @@ def main():
             structured_output_model=args.structured_output_model,
             run_id=run_id,
             summary_model=args.summary_model,
-            image_tool=image_tool
+            image_tool=image_tool,
+            eval_train_num=args.train_num
         )
 
         # Extract error value from metrics
