@@ -6,7 +6,7 @@ import os
 load_dotenv()
 
 # 读取本地图片文件
-image_path = "evaluation_results/ATVA/ball/runs/20260202_152652_e357/best_iter_1/overlay_0.png"
+image_path = "data_all/non_linear/duffing/sample_0.png"
 
 # 方法1: 使用 PIL Image (推荐，更简洁)
 image = Image.open(image_path)
@@ -22,22 +22,38 @@ response = client.models.generate_content(
     model="gemini-3-flash-preview",
     contents=[
         image,
-        "Analyze this hybrid automaton trajectory overlay plot. Describe what you see: the ground truth vs simulated trajectories, any mode transitions, and the quality of the fit."
+        "Analyze this hybrid automaton trajectory overlay plot. use hybrid automaton to describe it"
     ],
     config=types.GenerateContentConfig(
         tools=[types.Tool(code_execution=types.ToolCodeExecution)]
     ),
 )
 
-print('response \n',response.text)
+parts_text = []
 
 for part in response.candidates[0].content.parts:
     if part.text is not None:
         print('part.text \n',part.text)
+        parts_text.append(part.text)
         print('--------------------------------')
     if part.executable_code is not None:
         print('part.executable_code.code \n',part.executable_code.code)
+        parts_text.append(part.executable_code.code)
         print('--------------------------------')
     if part.code_execution_result is not None:
         print('part.code_execution_result.output \n',part.code_execution_result.output)
+        parts_text.append(part.code_execution_result.output)
         print('--------------------------------')
+
+# save the response to a file, and read
+with open('partsresponse.txt', 'w') as f:
+    # 用分隔符连接各部分，保留换行符，更易阅读
+    separator = '\n\n'+'='*60+'\n\n'
+    f.write(separator.join(parts_text))
+print('response saved to partsresponse.txt')
+
+# save response to a file 
+response_text = response.text
+with open('response.txt', 'w') as f:
+    f.write(response_text)
+print('response saved to response.txt')
