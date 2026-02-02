@@ -223,6 +223,7 @@ def load_trace_data_from_filepath(file_path: str = "data_all/non_linear/duffing"
     import numpy as np
     import glob
     import re
+    train_num = 3
     
     try:
         dir_path = Path(file_path)
@@ -254,7 +255,7 @@ def load_trace_data_from_filepath(file_path: str = "data_all/non_linear/duffing"
         all_npz_data = {}
         
         # Load png and npz files for each sample using a for loop
-        for sample_id in sample_ids[:3]:
+        for sample_id in sample_ids[:train_num]:
             # Define file paths for this sample
             png_path = dir_path / f"sample_{sample_id}.png"
             npz_path = dir_path / f"sample_{sample_id}.npz"
