@@ -208,7 +208,7 @@ def load_markdown_from_filepath(file_path: str) -> MarkdownMessage:
                 "text": f"Error parsing markdown file: {str(e)}"
             }], str(file_path))
             
-def load_trace_data_from_filepath(file_path: str = "data_all/non_linear/duffing") -> MarkdownMessage:
+def load_trace_data_from_filepath(file_path: str = "data_all/non_linear/duffing",train_num: int = 3) -> MarkdownMessage:
     """
     Load trace data from a directory containing images and npz files.
     Returns OpenAI-compatible message content (same as load_markdown_from_filepath).
@@ -223,7 +223,6 @@ def load_trace_data_from_filepath(file_path: str = "data_all/non_linear/duffing"
     import numpy as np
     import glob
     import re
-    train_num = 3
     
     try:
         dir_path = Path(file_path)

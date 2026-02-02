@@ -246,13 +246,14 @@ def _create_HA_agent(Tools_list: List[type[Tool]],
 def get_managed_agents_list(managed_agents_list: List[str] = None,
                             managed_agents_list_model_id: str = None,
                             input_data_path: str = None,
-                            markdown_content: MarkdownMessage = None) -> List[MultiStepAgent]:
+                            markdown_content: MarkdownMessage = None,
+                            train_num: int = 3) -> List[MultiStepAgent]:
     if managed_agents_list is None:
         return []
 
     # Load trace data to get NPZ paths if not provided
     if markdown_content is None:
-        markdown_content = load_trace_data_from_filepath(input_data_path)
+        markdown_content = load_trace_data_from_filepath(input_data_path, train_num=train_num)
 
     # Get NPZ file paths from markdown_content
     # npz_paths is a dict like {"<image_0>": "/path/to/sample_0.npz", ...}
@@ -372,6 +373,7 @@ def create_agent(model_id: str = "gemini/gemini-flash-lite-latest",
                 tools_list: List[str] = [],
                 managed_agents_list: List[str] = None,
                 managed_agents_list_model_id: str = None,
+                train_num: int = 3,
                 **kwargs) -> ToolCallingAgent | CodeAgent:
     '''
     Create a Hybrid Automaton learning agent.
@@ -382,13 +384,14 @@ def create_agent(model_id: str = "gemini/gemini-flash-lite-latest",
         tools_list: List of tool names to use
         managed_agents_list: List of managed agent names
         managed_agents_list_model_id: Model ID for managed agents
+        train_num: Number of training samples to load
         **kwargs: Additional arguments (manager_type, image_tool_model, review_tool_model, etc.)
 
     Returns:
         Configured ToolCallingAgent or CodeAgent
     '''
     # Load trace data with high res images
-    markdown_content = load_trace_data_from_filepath(input_data_path)
+    markdown_content = load_trace_data_from_filepath(input_data_path, train_num=train_num)
 
     # create the manager agent
     ToolsList = [TOOLNAME2TOOL[x] for x in tools_list]
@@ -400,7 +403,8 @@ def create_agent(model_id: str = "gemini/gemini-flash-lite-latest",
             managed_agents_list,
             managed_agents_list_model_id,
             input_data_path,
-            markdown_content=markdown_content  # Pass markdown_content to reuse loaded npz paths
+            markdown_content=markdown_content,  # Pass markdown_content to reuse loaded npz paths
+            train_num=train_num
         ),
         **kwargs
     )
@@ -417,7 +421,8 @@ def obtain_task_and_images(input_data_path: str = None,
                            manager_type: str = "CodeAgent",
                            feedback: str = None, # Added feedback parameter
                            iteration: int = 1,
-                           use_json_schema: bool = True) -> tuple[str, list]:
+                           use_json_schema: bool = True,
+                           train_num: int = 3) -> tuple[str, list]:
     '''
     Generate task prompt and compressed images for HA learning agent.
 
@@ -432,6 +437,7 @@ def obtain_task_and_images(input_data_path: str = None,
         feedback: Feedback string from previous iteration (optional)
         iteration: Current iteration number (1-indexed)
         use_json_schema: If True, include JSON Schema in the prompt for structured output
+        train_num: Number of training samples to load
 
     Returns:
         Tuple of (task prompt string, list of compressed images)
@@ -439,7 +445,7 @@ def obtain_task_and_images(input_data_path: str = None,
     print(f"Generating task for iteration {iteration}, tools_list: {tools_list}")
 
     # Load trace data with high res images
-    markdown_content = load_trace_data_from_filepath(input_data_path)
+    markdown_content = load_trace_data_from_filepath(input_data_path, train_num=train_num)
     image_paths = markdown_content.image_paths## list(image_paths.keys())
     image_placeholders = list(image_paths.keys())
     npz_paths = markdown_content.npz_paths## list(npz_paths.keys())
@@ -1011,6 +1017,14 @@ def parse_args():
         help="Model ID for structured output conversion (default: gemini/gemini-3-flash-preview)",
     )
 
+    # Training data count
+    ap.add_argument(
+        "--train-num",
+        type=int,
+        default=3,
+        help="Number of training samples to load from trace data (default: 3)",
+    )
+
     args = ap.parse_args()
 
     if not args.input_data_path:
@@ -1064,6 +1078,7 @@ def main():
         summarize_tool_model=args.summarize_tool_model,
         managed_agents_list=args.managed_agents_list if hasattr(args, 'managed_agents_list') else None,
         managed_agents_list_model_id=args.managed_agents_list_model if hasattr(args, 'managed_agents_list_model') else None,
+        train_num=args.train_num,
         manager_type=args.manager_type,
     )
 
@@ -1114,7 +1129,8 @@ def main():
             manager_type=args.manager_type,
             feedback=current_feedback,
             iteration=iteration,
-            use_json_schema=args.use_json_schema
+            use_json_schema=args.use_json_schema,
+            train_num=args.train_num
         )
 
         # save the task to a file and set up output directory
