@@ -1,6 +1,9 @@
 import os
 import time
-from litellm import completion
+from google import genai
+from google.genai import types
+from PIL import Image
+from io import BytesIO
 from smolagents.default_tools import Tool
 from base64 import b64decode
 
@@ -33,7 +36,7 @@ class HybridAutomatonImageTool(Tool):
     # Allowed directory prefixes for security (relative to repo root)
     ALLOWED_PATH_PREFIXES = ['evaluation_results/', 'data_all/']
 
-    def __init__(self, worker_agent=None, vision_model_id: str = "gemini/gemini-flash-lite-latest", max_short_side_pixels: int=9999):
+    def __init__(self, worker_agent=None, vision_model_id: str = "gemini-2.5-flash-preview-05-20", max_short_side_pixels: int=9999):
         super().__init__()
         self.worker_agent = worker_agent  # Reference to the main agent for accessing markdown content
         self.api_key = os.getenv("GEMINI_API_KEY")
@@ -41,6 +44,8 @@ class HybridAutomatonImageTool(Tool):
         self.max_short_side_pixels = max_short_side_pixels  # Maximum image resolution for processing
         # Registry for iteration images (evaluator plots registered upstream)
         self._iteration_images: dict[int, bytes] = {}
+        # Initialize genai.Client for Google Gemini API
+        self.client = genai.Client(api_key=self.api_key)
 
     def _is_valid_file_path(self, path: str) -> tuple[bool, str]:
         """
@@ -247,13 +252,11 @@ class HybridAutomatonImageTool(Tool):
         if img_bytes is None:
             return f"Error: {error_msg}"
 
+        # Convert bytes to PIL.Image for genai.Client
+        img = Image.open(BytesIO(img_bytes))
+
         # Resize image if it exceeds maximum resolution for better processing
         if self.max_short_side_pixels is not None:
-            from PIL import Image
-            from io import BytesIO
-
-            # Check image size and resize if necessary
-            img = Image.open(BytesIO(img_bytes))
             width, height = img.size
             if min(width, height) > self.max_short_side_pixels:
                 scale = self.max_short_side_pixels / min(width, height)
@@ -261,51 +264,26 @@ class HybridAutomatonImageTool(Tool):
                 # Use BILINEAR resampling (ANTIALIAS deprecated in newer PIL versions)
                 img = img.resize(new_size, Image.Resampling.BILINEAR)
 
-                # Convert resized image back to bytes
-                buffer = BytesIO()
-                img.save(buffer, format='PNG')
-                img_bytes = buffer.getvalue()
-
-        # Convert image bytes to base64 for OpenAI API
-        import base64
-        base64_image = base64.b64encode(img_bytes).decode('utf-8')
-
-        # Prepare messages for vision model with system prompt and user query
-        messages = [
-            {
-                "role": "system",
-                "content": "You are a specialist in analyzing plots and visualizations of hybrid automata systems."
-            },
-            {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "image_url",
-                        "image_url": {
-                            "url": f"data:image/png;base64,{base64_image}"
-                        }
-                    },
-                    {
-                        "type": "text",
-                        "text": question
-                    }
-                ]
-            }
-        ]
+        # Prepare prompt with system context
+        full_prompt = (
+            "You are a specialist in analyzing plots and visualizations of hybrid automata systems.\n\n"
+            f"{question}"
+        )
 
         # Retry logic for robust image analysis
         max_try = 3
         for _ in range(max_try):
-            # Generate response from vision model
+            # Generate response from vision model using genai.Client
             try:
-                response = completion(
-                    api_key=self.api_key,
-                    model=self.vision_model_id,
-                    messages=messages,
-                    max_tokens=8192,
+                response = self.client.models.generate_content(
+                    model="gemini-3-flash-preview",
+                    contents=[img, full_prompt],
+                    config=types.GenerateContentConfig(
+                        tools=[types.Tool(code_execution=types.ToolCodeExecution)]),
                 )
-                if response.choices[0].message.content and response.choices[0].message.content.strip():
-                    return response.choices[0].message.content.strip()
+                # Extract response text
+                if response.text and response.text.strip():
+                    return response.text.strip()
             except Exception as e:
                 print(f"Error during vision model generation: {str(e)}")
                 time.sleep(5)  # Wait before retry
