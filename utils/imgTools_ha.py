@@ -281,9 +281,18 @@ class HybridAutomatonImageTool(Tool):
                     config=types.GenerateContentConfig(
                         tools=[types.Tool(code_execution=types.ToolCodeExecution)]),
                 )
+                parts_text = []
+                for part in response.candidates[0].content.parts:
+                    if part.text is not None:
+                        parts_text.append(part.text)
+                    if part.executable_code is not None:
+                        parts_text.append(part.executable_code.code)
+                    if part.code_execution_result is not None:
+                        parts_text.append(part.code_execution_result.output)
+                all_parts_text = '\n'.join(parts_text)
                 # Extract response text
-                if response.text and response.text.strip():
-                    return response.text.strip()
+                if all_parts_text and all_parts_text.strip():
+                    return all_parts_text.strip()
             except Exception as e:
                 print(f"Error during vision model generation: {str(e)}")
                 time.sleep(5)  # Wait before retry
