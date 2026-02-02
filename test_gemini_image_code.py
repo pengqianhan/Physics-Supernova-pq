@@ -46,10 +46,9 @@ for part in response.candidates[0].content.parts:
         print('--------------------------------')
 
 # save the response to a file, and read
+save_parts_text = '\n'.join(parts_text)
 with open('partsresponse.txt', 'w') as f:
-    # 用分隔符连接各部分，保留换行符，更易阅读
-    separator = '\n\n'+'='*60+'\n\n'
-    f.write(separator.join(parts_text))
+    f.write(save_parts_text)
 print('response saved to partsresponse.txt')
 
 # save response to a file 
