@@ -4,22 +4,26 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This repository combines **Physics Supernova** (an AI agent for physics problems) with **Hybrid Automaton Learning** capabilities. The codebase has two main components:
+**HA-Scientist** is an agentic workflow for autonomous Hybrid Automaton (HA) system identification from time-series trajectory data. Built on the **Physics Supernova** agent architecture, it uses an iterative "Scientist-Critic" loop to refine mathematical models capturing switching dynamics.
 
-1. **Physics Supernova Agent**: AI system for solving IPhO-level physics problems using multi-agent architecture with specialized tools
-2. **Hybrid Automaton Learning** (Dainarx_code): System for learning hybrid automaton specifications from trajectory data
+The codebase has two main components:
+
+1. **HA-Scientist Agent** (`run_llm_ha_gamma.py`): LLM-based iterative HA learning with visual/numerical analysis
+2. **Hybrid Automaton Learning** (Dainarx_code): Traditional HA learning from trajectory data
 
 ## Architecture Overview
 
-### Two Main Entry Points
+### Main Entry Points
 
-**1. Physics Problem Solving**
+**1. HA-Scientist (Primary)**
+- `run_llm_ha_gamma.py` - Main LLM-based HA learning agent with iterative refinement loop
+
+**2. Physics Problem Solving (Reference)**
 - `run.py` - General physics agent (supports OpenRouter, various models)
 - `run_gemini.py` - Gemini-specific physics agent
-- `run_llm_ha_alpha.py` - LLM agent for hybrid automaton learning/improvement
 
-**2. Hybrid Automaton Learning**
-- `utils/Dainarx_code/main.py` - Traditional HA learning from trajectory data
+**3. Traditional HA Learning**
+- `utils/Dainarx_code/main.py` - Non-LLM HA learning from trajectory data
 - `utils/Dainarx_code/HA_evaluation.py` - Evaluation framework for HA specifications
 
 ### Agent System Architecture
@@ -48,10 +52,18 @@ Tools can access parent agent via `self.worker_agent` to retrieve:
 - Other agent state/context as needed
 
 **Available Tools:**
+
+*Physics Agent Tools:*
 1. `WolframAlphaTool` - Mathematical computation, unit conversion
-2. `AskImageTool` / `HybridAutomatonImageTool` - Image analysis with vision models
-3. `ReviewRequestTool` / `ReviewRequestTool_ha` - Post-hoc answer checking
+2. `AskImageTool` - Image analysis with vision models
+3. `ReviewRequestTool` - Post-hoc answer checking
 4. `SummarizeMemoryTool` - Memory/answer summarization for long problems
+
+*HA-Scientist Tools* (in `TOOLNAME2TOOL` mapping):
+1. `hybrid_automaton_image_analysis` → `HybridAutomatonImageTool` - Analyzes trajectory plots, can register iteration overlay images
+2. `hybrid_automaton_review_expert` → `ReviewRequestTool_ha` - Reviews HA specification for correctness
+3. `summarize_hybrid_automaton_iterations` → `SummarizeMemoryTool` - Summarizes iteration history
+4. `validate_hybrid_automaton_specification` → `ValidateHASpecTool` - Syntax/semantic validation of HA JSON
 
 ### Hybrid Automaton System
 
@@ -143,20 +155,47 @@ python run_scripts/batchrun_IPhO.py
 python run_scripts/batchrun_wolftask.py
 ```
 
-### Running HA Learning
+### Running HA-Scientist (LLM-based HA Learning)
 
-**Traditional HA learning:**
+**Basic command:**
+```bash
+python run_llm_ha_gamma.py \
+  --input-data-path "data_all/ATVA/ball" \
+  --manager-model "gemini/gemini-flash-lite-latest" \
+  --max-iterations 3
+```
+
+**Full command with all options:**
+```bash
+python run_llm_ha_gamma.py \
+  --input-data-path "data_all/ATVA/ball" \
+  --manager-model "gemini/gemini-2.5-flash-lite" \
+  --manager-type CodeAgent \
+  --tools-list hybrid_automaton_image_analysis validate_hybrid_automaton_specification \
+  --managed-agents-list data_analysis_expert \
+  --max-iterations 5 \
+  --train-num 3 \
+  --eval-train-num 1 \
+  --target-error 0.001
+```
+
+**Key arguments:**
+- `--input-data-path`: Directory containing `.npz` trace data (training: `sample_*.npz`, ground truth: `*_g/ground_truth_*.npz`)
+- `--max-iterations`: Maximum refinement iterations (default: 3)
+- `--train-num`: Number of training samples to show agent (default: 3)
+- `--eval-train-num`: Number of ground truth files for evaluation (default: 1)
+- `--feedback-top-k`: Top-k best results to include in feedback context (default: 3)
+- `--target-error`: Mean difference threshold for early stopping (default: 0.001)
+
+### Traditional HA Learning
+
 ```bash
 cd utils/Dainarx_code
 python main.py  # Uses automata/non_linear/duffing.json by default
 ```
 
-**LLM-based HA learning:**
-```bash
-python run_llm_ha_alpha.py
-```
+### HA Evaluation API
 
-**Evaluate HA specification:**
 ```python
 import sys
 sys.path.insert(0, 'utils/Dainarx_code')
@@ -164,7 +203,7 @@ from HA_evaluation import HAEvaluator
 
 evaluator = HAEvaluator(
     ha_dict=ha_specification,
-    npz_file_path='utils/Dainarx_code/data_duffing/test_data0.npz',
+    npz_file_path='data_all/ATVA/ball_g/ground_truth_0.npz',
     dt=0.001,
     total_time=10.0
 )
@@ -175,6 +214,18 @@ results = evaluator(
     save_path='output_comparison.png',
     show_plot=False
 )
+```
+
+### Phoenix Tracing (Optional)
+
+Start Phoenix server for agent monitoring:
+```bash
+python -m phoenix.server.main serve  # Visit http://localhost:6006
+```
+
+Run with trace saving:
+```bash
+python run_llm_ha_gamma.py --save-traces-dir "phoenix_traces"
 ```
 
 ### Testing
@@ -373,51 +424,55 @@ model = LiteLLMModel(
 
 ```
 Physics-Supernova-pq/
-├── run.py, run_gemini.py, run_llm_ha_alpha.py  # Main entry points
+├── run_llm_ha_gamma.py                        # Main HA-Scientist entry point
+├── run.py, run_gemini.py                      # Physics agent entry points
 ├── utils/
-│   ├── imgTools.py, imgTools_ha.py             # Image analysis tools
-│   ├── reviewTools.py, reviewTools_ha.py       # Review tools
-│   ├── wolframTools.py, summemoryTools.py      # Other tools
-│   ├── markdown_utils.py                       # MarkdownMessage handling
-│   └── Dainarx_code/                           # HA learning system
-│       ├── main.py                             # Traditional HA learning
-│       ├── HA_evaluation.py                    # Evaluation framework
-│       ├── CreatData.py                        # Generate synthetic data
-│       ├── src/                                # Core HA components
-│       │   ├── HybridAutomata.py              # HA simulation
-│       │   ├── ODE_System.py                  # ODE integration
-│       │   ├── BuildSystem.py, GuardLearning.py
-│       │   └── Clustering.py, ChangePoints.py
-│       ├── automata/                           # HA specifications
-│       │   ├── linear/, non_linear/, ATVA/, FaMoS/
-│       │   └── json_readme.md                 # Format documentation
-│       └── data_*/                            # Generated trajectory data
-├── run_scripts/                               # Batch execution scripts
-│   ├── batchrun.py, batchrun_IPhO.py
-│   └── batchrun_wolftask.py
-├── examples/Problems/                         # Physics problems
-├── prompts_ha/                                # Prompts for HA learning
-└── learning_notes/                            # Documentation/examples
+│   ├── utils.py                               # HAHyperparameters, ResultsAggregator, IterationResult
+│   ├── prompt.py                              # HA spec examples and JSON schema documentation
+│   ├── ha_spec_validator.py                   # HA specification validation
+│   ├── ha_structured_output.py                # Two-stage structured output conversion
+│   ├── imgTools_ha.py                         # HybridAutomatonImageTool
+│   ├── reviewTools_ha.py                      # ReviewRequestTool_ha
+│   ├── validateTools_ha.py                    # ValidateHASpecTool
+│   ├── summemoryTools_ha.py                   # SummarizeMemoryTool
+│   ├── markdown_utils.py                      # MarkdownMessage, load_trace_data_from_filepath
+│   └── Dainarx_code/                          # HA learning/simulation core
+│       ├── HA_evaluation.py                   # HAEvaluator class
+│       ├── main.py                            # Traditional HA learning
+│       ├── src/                               # Core components
+│       │   ├── HybridAutomata.py              # HA simulation engine
+│       │   └── ODE_System.py                  # ODE integration
+│       └── automata/                          # HA JSON specifications
+├── data_all/                                  # Trajectory data organized by benchmark
+│   ├── ATVA/ball/, ATVA/ball_g/               # Training data + ground truth
+│   └── FaMoS/*, non_linear/*                  # Other benchmarks
+├── evaluation_results/                        # Output directory
+│   └── <benchmark>/<system>/runs/<run_id>/    # Per-run artifacts
+│       ├── iter_1/, iter_2/, ...              # Per-iteration results
+│       ├── best_iter_N/                       # Copy of best iteration
+│       └── best_ha_specification.json         # Final best HA spec
+└── task_prompts/                              # Generated task prompts per iteration
 ```
 
-## LLM-Based HA Learning (LLM-LEx)
+## HA-Scientist Iterative Loop
 
-This project implements LLM-based hybrid automaton learning using iterative refinement:
+The main workflow (`run_llm_ha_gamma.py`) implements an iterative refinement loop:
 
-**Method** (from `.cursor/rules/method.mdc`):
-- Uses experience buffer with island-based populations
-- Generates HA hypotheses via LLM prompting
-- Evaluates against trajectory data
-- Samples high-quality examples for in-context learning
-- Periodically resets worst-performing islands
+1. **Initial Prompt**: Agent receives trajectory plots, NPZ data access via managed agents, and HA JSON template
+2. **Hypothesis Generation**: Agent proposes HA specification (modes, ODEs, guards, resets)
+3. **Evaluation**: `HAEvaluator` simulates HA and computes metrics (mean_diff, max_diff, TC)
+4. **Feedback**: LLM summarizes errors + overlay plots registered for next iteration
+5. **Refinement**: Top-k best results fed back as context for next iteration
 
-**Key hyperparameters:**
-- `b = 4` equation programs per generation
-- `e = 4` parallel evaluators
-- `m = 10` islands for diversity
-- `τ = 0.8` generation temperature
-- Max 10 parameters per equation
-- 30s timeout, 2GB memory limit per evaluation
+**Key components:**
+- `ResultsAggregator` (`utils/utils.py`): Tracks iteration results, selects top-k diverse feedback
+- `HAHyperparameters`: Dataclass storing all experiment configuration
+- `evaluate_ha_specification_with_feedback()`: Evaluation + artifact generation + LLM summary
+
+**Early stopping conditions:**
+- Target error achieved (`--target-error`, default: 0.001)
+- No improvement for N iterations (`--no-improvement-patience`, default: 10)
+- Near-perfect fit (error < 0.0001)
 
 ## Important Caveats
 
@@ -433,10 +488,19 @@ This project implements LLM-based hybrid automaton learning using iterative refi
 
 6. **API Key Precedence**: Scripts load from `.env` file. Ensure correct API base is set for the model provider being used.
 
+## Data Organization
+
+**Training data** (`data_all/<benchmark>/<system>/`):
+- `sample_0.npz`, `sample_1.npz`, ... - Trajectory samples for agent to analyze
+- Corresponding plots generated and shown to agent
+
+**Ground truth** (`data_all/<benchmark>/<system>_g/`):
+- `ground_truth_0.npz`, `ground_truth_1.npz`, ... - Validation trajectories
+- Used by `HAEvaluator` to compute metrics
+
 ## Related Documentation
 
-- `README.md` - User-facing documentation, IPhO results
+- `README.md` - User-facing documentation
 - `utils/Dainarx_code/HA_evaluation_README.md` - Detailed HA evaluation API
 - `utils/Dainarx_code/automata/json_readme.md` - HA JSON format specification
-- `.cursor/rules/method.mdc` - LLM-SR algorithm details
 - Paper: [Physics Supernova ArXiv](https://arxiv.org/abs/2509.01659)
