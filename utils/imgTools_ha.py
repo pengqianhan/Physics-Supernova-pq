@@ -158,9 +158,10 @@ class HybridAutomatonImageTool(Tool):
         """
         Extract image bytes using placeholder reference.
 
-        Supports two placeholder types:
+        Supports placeholder types:
         - <image_N>: Original trace images from markdown content
         - <iter_image_N>: Evaluator plots registered via register_iteration_image()
+        - <iter_image_X_Y>: Compound format where index = X * 100 + Y (for multi-file evaluation)
 
         Args:
             image_ref: Image reference placeholder
@@ -168,11 +169,18 @@ class HybridAutomatonImageTool(Tool):
         Returns:
             Tuple of (image_bytes or None, error_message)
         """
-        # Handle <iter_image_N> placeholders (evaluator plots)
+        # Handle <iter_image_N> or <iter_image_X_Y> placeholders (evaluator plots)
         if image_ref.startswith("<iter_image_") and image_ref.endswith(">"):
+            inner = image_ref[len("<iter_image_"):-1]
             try:
-                idx = int(image_ref[len("<iter_image_"):-1])
-            except ValueError:
+                if '_' in inner:
+                    # Format: <iter_image_X_Y> -> index = X * 100 + Y
+                    parts = inner.split('_')
+                    idx = int(parts[0]) * 100 + int(parts[1])
+                else:
+                    # Format: <iter_image_N> (backward compatible)
+                    idx = int(inner)
+            except (ValueError, IndexError):
                 return None, f"Invalid iteration image placeholder format: {image_ref}"
 
             if idx not in self._iteration_images:
