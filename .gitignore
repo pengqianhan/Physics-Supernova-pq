@@ -15,7 +15,7 @@ batchrun_copy2.py
 utils/Dainarx_code/data*
 
 # output files
-evaluation_results_ball/
+evaluation_results_duffing/
 
 # data files
 data_all/
