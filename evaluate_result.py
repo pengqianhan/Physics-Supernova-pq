@@ -19,7 +19,7 @@ from typing import Dict, List, Any, Optional
 sys.path.insert(0, 'utils/Dainarx_code')
 from HA_evaluation import HAEvaluator
 
-EVAL_RESULTS_DIR = "evaluation_results_gemini3flash_260129"
+EVAL_RESULTS_DIR = "evaluation_results"
 DATA_DIR = "data_all"
 GT_START_INDEX = 3  # Use ground_truth_3.npz onwards
 GT_END_INDEX = 14   # Up to ground_truth_14.npz
