@@ -18,8 +18,8 @@ mkdir -p "$LOG_DIR"
 
 # All datasets
 DATASETS=(
-    # ATVA
-    "ATVA/ball"
+    # "ATVA/ball"
+    "non_linear/duffing"
 )
 
 # Function to run a single dataset
