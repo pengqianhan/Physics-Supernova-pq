@@ -265,9 +265,7 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
         npz_paths_list = [os.path.join(input_data_path, "sample_0.npz")]
 
     managed_agents = []
-    for agent_name in managed_agents_list:
-        # LLM model
-        model = LiteLLMModel(
+    model = LiteLLMModel(
             model_id=managed_agents_list_model_id,
             api_key=os.environ.get("GEMINI_API_KEY"),
             # max_completion_tokens=24576,
@@ -275,13 +273,7 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
             timeout=1200,
             thinking_level = "high" # high, low
         )
-
-        # Build file paths description for prompt
-        npz_files_description = "\n".join([f" {placeholders} - `{path}`" for placeholders, path in zip(npz_placeholders, npz_paths_list)])
-
-        managed_agent_description = f"""I am a managed agent with name {agent_name}. I can assist with code-related tasks."""
-        
-        authorized_imports_list = [
+    authorized_imports_list = [
             "os", "sys", "time", "argparse", "pathlib",
             "matplotlib.pyplot", "matplotlib", "pandas", "json",
             # numpy and all common submodules
@@ -294,6 +286,21 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
             # 
             "pysindy","gradient_free_optimizers","gradient_free_optimizers.BayesianOptimizer"
         ]
+    managed_agent_kwargs = dict(
+        model=model,
+        tools=[],
+        max_steps=80,
+        verbosity_level=2,
+        add_base_tools=True,
+        additional_authorized_imports=authorized_imports_list,
+    )
+
+    for agent_name in managed_agents_list:
+
+        # Build file paths description for prompt
+        npz_files_description = "\n".join([f" {placeholders} - `{path}`" for placeholders, path in zip(npz_placeholders, npz_paths_list)])
+
+        managed_agent_description = f"""I am a managed agent with name {agent_name}. I can assist with code-related tasks."""
         
         # use_e2b = bool(os.environ.get("E2B_API_KEY"))
         use_e2b = False
@@ -308,18 +315,11 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
                 managed_agent.python_executor.sandbox.files.write(sandbox_file_path, file_content)
                 sandbox_file_paths.append(sandbox_file_path)
                 print(f"✓ 文件已上传到 E2B 沙盒: {sandbox_file_path}")
-
-            managed_agent = CodeAgent(
-            tools=[],
-            executor_type="e2b",
-            model=model,
-            name=agent_name,
-            additional_authorized_imports=authorized_imports_list,
-            description=managed_agent_description,
-            instructions=managed_agent_instruction,
-            max_steps=80,
-            verbosity_level=2,
-        )
+            managed_agent_kwargs["executor_type"] = "e2b"
+            managed_agent_kwargs["name"] = agent_name
+            managed_agent_kwargs["description"] = managed_agent_description
+            managed_agent_kwargs["instructions"] = managed_agent_instruction
+            managed_agent = CodeAgent(**managed_agent_kwargs)
             # 注入所有文件路径到 agent 状态
             managed_agent.python_executor.state["DATA_FILE_PATHS"] = sandbox_file_paths
             managed_agent.python_executor.state["DATA_FILE_PATH"] = sandbox_file_paths[0] if sandbox_file_paths else ""
@@ -347,21 +347,13 @@ import numpy as np
 data = np.load(DATA_FILE_PATHS[0])
 
 # Or use the primary file
-data = np.load(DATA_FILE_PATH)
-```
 """
             # 本地执行器：将所有数据文件路径注入到 agent 的状态中
-            managed_agent = CodeAgent(
-            tools=[],
-            executor_type="local",
-            model=model,
-            name=agent_name,
-            additional_authorized_imports=authorized_imports_list,
-            description=managed_agent_description,
-            instructions=managed_agent_instruction,
-            max_steps=80,
-            verbosity_level=2,
-        )
+            managed_agent_kwargs["name"] = agent_name
+            managed_agent_kwargs["executor_type"] = "local"
+            managed_agent_kwargs["description"] = managed_agent_description
+            managed_agent_kwargs["instructions"] = managed_agent_instruction
+            managed_agent = CodeAgent(**managed_agent_kwargs)
             managed_agent.python_executor.state["DATA_FILE_PATHS"] = npz_paths_list
             managed_agent.python_executor.state["DATA_FILE_PATH"] = npz_paths_list[0] if npz_paths_list else ""
         managed_agents.append(managed_agent)
