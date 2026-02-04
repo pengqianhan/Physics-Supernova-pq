@@ -1238,10 +1238,6 @@ def main():
             # Use top-k diverse feedback instead of raw concatenation
             current_feedback = results_aggregator.get_top_k_feedback()
 
-            # Show dynamic target if available
-            dynamic_target = results_aggregator.get_dynamic_error_threshold()
-            print(f"  [Aggregator] Dynamic error target: {dynamic_target:.6f}")
-
         # Obtain task and images with feedback from previous iteration
         task, compressed_trace_images = obtain_task_and_images(
             input_data_path=args.input_data_path,
