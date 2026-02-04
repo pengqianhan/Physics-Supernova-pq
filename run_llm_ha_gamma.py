@@ -294,18 +294,14 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
         add_base_tools=True,
         additional_authorized_imports=authorized_imports_list,
     )
-
+    npz_files_description = "\n".join([f" {placeholder} - `DATA_FILE_PATHS[{i}]`" for i, placeholder in enumerate(npz_placeholders)])
     for agent_name in managed_agents_list:
-
-        # Build file paths description for prompt
-        npz_files_description = "\n".join([f" {placeholders} - `{path}`" for placeholders, path in zip(npz_placeholders, npz_paths_list)])
 
         managed_agent_description = f"""I am a managed agent with name {agent_name}. I can assist with code-related tasks."""
         common_instruction = """
 ### Quick Access via State Variables
 
 - `DATA_FILE_PATHS`: List of all available NPZ file paths
-- `DATA_FILE_PATH`: Path to the first/primary data file (for convenience)
 **Authorized_imports_list** is {authorized_imports_list}
 
 ### Example Usage
