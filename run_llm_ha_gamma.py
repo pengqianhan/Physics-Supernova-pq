@@ -335,6 +335,7 @@ You have access to the following NPZ data files:
 
 - `DATA_FILE_PATHS`: List of all available NPZ file paths
 - `DATA_FILE_PATH`: Path to the first/primary data file (for convenience)
+**Authorized_imports_list** is {authorized_imports_list}
 
 ### Example Usage
 
@@ -364,8 +365,8 @@ data = np.load(DATA_FILE_PATH)
             managed_agent.python_executor.state["DATA_FILE_PATH"] = npz_paths_list[0] if npz_paths_list else ""
         managed_agents.append(managed_agent)
         # save the instruction and description to file
-        # with open(f"managed_agent_{agent_name}_instruction.md", "w") as f:
-        #     f.write(managed_agent_instruction)
+        with open(f"managed_agent_{agent_name}_instruction.md", "w") as f:
+            f.write(managed_agent_instruction)
 
     return managed_agents
 
