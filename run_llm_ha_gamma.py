@@ -301,7 +301,22 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
         npz_files_description = "\n".join([f" {placeholders} - `{path}`" for placeholders, path in zip(npz_placeholders, npz_paths_list)])
 
         managed_agent_description = f"""I am a managed agent with name {agent_name}. I can assist with code-related tasks."""
-        
+        common_instruction = """
+### Quick Access via State Variables
+
+- `DATA_FILE_PATHS`: List of all available NPZ file paths
+- `DATA_FILE_PATH`: Path to the first/primary data file (for convenience)
+**Authorized_imports_list** is {authorized_imports_list}
+
+### Example Usage
+
+```python
+import numpy as np
+
+# Load a specific file
+data = np.load(DATA_FILE_PATHS[0])
+
+# Or use the primary file"""
         # use_e2b = bool(os.environ.get("E2B_API_KEY"))
         use_e2b = False
         if use_e2b:
@@ -330,24 +345,7 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
 
 You have access to the following NPZ data files:
 
-{npz_files_description}
-
-### Quick Access via State Variables
-
-- `DATA_FILE_PATHS`: List of all available NPZ file paths
-- `DATA_FILE_PATH`: Path to the first/primary data file (for convenience)
-**Authorized_imports_list** is {authorized_imports_list}
-
-### Example Usage
-
-```python
-import numpy as np
-
-# Load a specific file
-data = np.load(DATA_FILE_PATHS[0])
-
-# Or use the primary file
-"""
+{npz_files_description}""" + common_instruction
             # 本地执行器：将所有数据文件路径注入到 agent 的状态中
             managed_agent_kwargs["name"] = agent_name
             managed_agent_kwargs["executor_type"] = "local"
