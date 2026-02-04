@@ -279,6 +279,21 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
         npz_files_description = "\n".join([f" {placeholders} - `{path}`" for placeholders, path in zip(npz_placeholders, npz_paths_list)])
 
         managed_agent_description = f"""I am a managed agent with name {agent_name}. I can assist with code-related tasks."""
+        
+        authorized_imports_list = [
+            "os", "sys", "time", "argparse", "pathlib",
+            "matplotlib.pyplot", "matplotlib", "pandas", "json",
+            # numpy and all common submodules
+            "numpy", "numpy.linalg", "numpy.fft", "numpy.random", 
+            "numpy.polynomial", "numpy.ma", "numpy.lib",
+            # scipy and all common submodules
+            "scipy", "scipy.linalg", "scipy.optimize", "scipy.interpolate",
+            "scipy.integrate", "scipy.stats", "scipy.signal", "scipy.fft",
+            "scipy.sparse", "scipy.ndimage", "scipy.special"
+            # 
+            "pysindy","gradient_free_optimizers","gradient_free_optimizers.BayesianOptimizer"
+        ]
+        
         # use_e2b = bool(os.environ.get("E2B_API_KEY"))
         use_e2b = False
         if use_e2b:
@@ -298,19 +313,7 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
             executor_type="e2b",
             model=model,
             name=agent_name,
-            additional_authorized_imports=[
-            "os", "sys", "time", "argparse", "pathlib",
-            "matplotlib.pyplot", "matplotlib", "pandas", "json",
-            # numpy and all common submodules
-            "numpy", "numpy.linalg", "numpy.fft", "numpy.random", 
-            "numpy.polynomial", "numpy.ma", "numpy.lib",
-            # scipy and all common submodules
-            "scipy", "scipy.linalg", "scipy.optimize", "scipy.interpolate",
-            "scipy.integrate", "scipy.stats", "scipy.signal", "scipy.fft",
-            "scipy.sparse", "scipy.ndimage", "scipy.special"
-            # 
-            "pysindy","gradient_free_optimizers","gradient_free_optimizers.BayesianOptimizer"
-        ],
+            additional_authorized_imports=authorized_imports_list,
             description=managed_agent_description,
             instructions=managed_agent_instruction,
             max_steps=80,
@@ -351,19 +354,7 @@ data = np.load(DATA_FILE_PATH)
             executor_type="local",
             model=model,
             name=agent_name,
-            additional_authorized_imports=[
-            "os", "sys", "time", "argparse", "pathlib",
-            "matplotlib.pyplot", "matplotlib", "pandas", "json",
-            # numpy and all common submodules
-            "numpy", "numpy.linalg", "numpy.fft", "numpy.random", 
-            "numpy.polynomial", "numpy.ma", "numpy.lib",
-            # scipy and all common submodules
-            "scipy", "scipy.linalg", "scipy.optimize", "scipy.interpolate",
-            "scipy.integrate", "scipy.stats", "scipy.signal", "scipy.fft",
-            "scipy.sparse", "scipy.ndimage", "scipy.special"
-            # 
-            "pysindy","gradient_free_optimizers","gradient_free_optimizers.BayesianOptimizer"
-        ],
+            additional_authorized_imports=authorized_imports_list,
             description=managed_agent_description,
             instructions=managed_agent_instruction,
             max_steps=80,
