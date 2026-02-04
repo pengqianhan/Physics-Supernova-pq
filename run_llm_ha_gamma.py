@@ -322,19 +322,29 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
         else:
             # managed agent description with all available files
             
-            managed_agent_instruction = f"""## Available npz files\nYou have access to the following NPZ data files:
-            {npz_files_description}
-            **Quick Access via State Variables**
-            - `DATA_FILE_PATHS`: List of all available NPZ file paths
-            - `DATA_FILE_PATH`: Path to the first/primary data file (for convenience)
+            managed_agent_instruction = f"""## Available NPZ Files
 
-            **Example Usage**
-            ```python
-            import numpy as np
-            # Load a specific file
-            data = np.load(DATA_FILE_PATHS[0])
-            # Or use the primary file
-            data = np.load(DATA_FILE_PATH)"""
+You have access to the following NPZ data files:
+
+{npz_files_description}
+
+### Quick Access via State Variables
+
+- `DATA_FILE_PATHS`: List of all available NPZ file paths
+- `DATA_FILE_PATH`: Path to the first/primary data file (for convenience)
+
+### Example Usage
+
+```python
+import numpy as np
+
+# Load a specific file
+data = np.load(DATA_FILE_PATHS[0])
+
+# Or use the primary file
+data = np.load(DATA_FILE_PATH)
+```
+"""
             # 本地执行器：将所有数据文件路径注入到 agent 的状态中
             managed_agent = CodeAgent(
             tools=[],
@@ -363,8 +373,8 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
             managed_agent.python_executor.state["DATA_FILE_PATH"] = npz_paths_list[0] if npz_paths_list else ""
         managed_agents.append(managed_agent)
         # save the instruction and description to file
-        with open(f"managed_agent_{agent_name}_instruction.md", "w") as f:
-            f.write(managed_agent_instruction)
+        # with open(f"managed_agent_{agent_name}_instruction.md", "w") as f:
+        #     f.write(managed_agent_instruction)
 
     return managed_agents
 
