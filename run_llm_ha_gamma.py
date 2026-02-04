@@ -208,7 +208,7 @@ def _create_HA_agent(Tools_list: List[type[Tool]],
         name="ha_learning_agent",
         description="",
         managed_agents=managed_agents_list,
-        add_base_tools=False  # False means only use the 
+        add_base_tools=True 
     )
 
     if kwargs["manager_type"] == "CodeAgent":
