@@ -232,7 +232,7 @@ class ResultsAggregator:
         Inspired by reference_code.py's adaptive MAPE target adjustment.
         """
         if self.best_error >= float('inf') or self.best_error <= 0:
-            return 0.1  # Default threshold
+            return 0.001  # Default threshold
 
         # Set next target to one order of magnitude below current best
         next_target = 10 ** np.floor(np.log10(self.best_error))
