@@ -29,3 +29,13 @@ npz_file_path = os.path.join(test_data_base_path, test_data_files[0])
         )
 ```
 
+## thinking level 
+
+model = LiteLLMModel(
+        model_id=model_id,
+        api_key=os.environ.get("GEMINI_API_KEY"),
+        max_completion_tokens=24576,
+        num_retries=3,
+        timeout=1200,
+        thinking_level = "low" # high, low
+    )
