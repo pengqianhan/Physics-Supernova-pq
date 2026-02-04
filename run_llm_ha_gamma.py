@@ -322,8 +322,7 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
         else:
             # managed agent description with all available files
             
-            managed_agent_instruction = f"""## Available npz files
-            You have access to the following NPZ data files:
+            managed_agent_instruction = f"""## Available npz files\nYou have access to the following NPZ data files:
             {npz_files_description}
             **Quick Access via State Variables**
             - `DATA_FILE_PATHS`: List of all available NPZ file paths
@@ -363,6 +362,9 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
             managed_agent.python_executor.state["DATA_FILE_PATHS"] = npz_paths_list
             managed_agent.python_executor.state["DATA_FILE_PATH"] = npz_paths_list[0] if npz_paths_list else ""
         managed_agents.append(managed_agent)
+        # save the instruction and description to file
+        with open(f"managed_agent_{agent_name}_instruction.md", "w") as f:
+            f.write(managed_agent_instruction)
 
     return managed_agents
 
