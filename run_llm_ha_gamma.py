@@ -179,10 +179,10 @@ def _create_HA_agent(Tools_list: List[type[Tool]],
     model = LiteLLMModel(
         model_id=model_id,
         api_key=os.environ.get("GEMINI_API_KEY"),
-        max_completion_tokens=24576,
+        # max_completion_tokens=24576,
         num_retries=3,
         timeout=1200,
-        thinking_level = "low" # high, low
+        thinking_level = "high" # high, low
     )
 
     # tools for the manager agent
@@ -270,9 +270,10 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
         model = LiteLLMModel(
             model_id=managed_agents_list_model_id,
             api_key=os.environ.get("GEMINI_API_KEY"),
-            max_completion_tokens=24576,
+            # max_completion_tokens=24576,
             num_retries=3,
-            timeout=1200
+            timeout=1200,
+            thinking_level = "high" # high, low
         )
 
         # Build file paths description for prompt
