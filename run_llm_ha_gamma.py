@@ -278,7 +278,7 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
         # Build file paths description for prompt
         npz_files_description = "\n".join([f" {placeholders} - `{path}`" for placeholders, path in zip(npz_placeholders, npz_paths_list)])
 
-        
+        managed_agent_description = f"""I am a managed agent with name {agent_name}. I can assist with code-related tasks."""
         # use_e2b = bool(os.environ.get("E2B_API_KEY"))
         use_e2b = False
         if use_e2b:
@@ -321,7 +321,7 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
             managed_agent.python_executor.state["DATA_FILE_PATH"] = sandbox_file_paths[0] if sandbox_file_paths else ""
         else:
             # managed agent description with all available files
-            managed_agent_description = f"""I am a managed agent with name {agent_name}. I can assist with code-related tasks."""
+            
             managed_agent_instruction = f"""## Available npz files
             You have access to the following NPZ data files:
             {npz_files_description}
@@ -473,8 +473,8 @@ A Hybrid Automaton models a system with:
 
 
 ## Metrics (lower is better)
-- `Max Difference < 0.01`: good fit
-- `Mean Difference < 0.005`: accurate overall
+- `Max Difference < 0.002`: good fit
+- `Mean Difference < 0.001`: accurate overall
 - `TC (Change-Point Error) < 0.01s`: mode switch timing correct
 """
 
