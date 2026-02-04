@@ -52,9 +52,8 @@ def main():
     )
     
     # 数据文件路径
-    data_file_path = os.path.join(os.path.dirname(__file__), "utils", "Dainarx_code", "data_duffing", "sample_train_0.npz")
-    # data_file_path = "utils/Dainarx_code/data_duffing/sample_train_0.npz"
-    
+    data_file_path = 'data_all/non_linear/duffing/sample_0.npz'
+    data_file_paths = ['data_all/non_linear/duffing/sample_0.npz', 'data_all/non_linear/duffing/sample_1.npz']    
     # 验证文件是否存在
     if os.path.exists(data_file_path):
         print(f"✓ 数据文件存在: {data_file_path}")
@@ -75,11 +74,10 @@ def main():
     
     # 将数据文件路径注入到 agent 的状态中，让 agent 可以直接访问
     agent.python_executor.state["DATA_FILE_PATH"] = data_file_path
+    agent.python_executor.state["DATA_FILE_PATHS"] = data_file_paths
     
     # 定义任务：让 agent 直接写代码分析数据
     task = f"""
-数据文件路径已存储在变量 DATA_FILE_PATH 中:
-DATA_FILE_PATH = "{data_file_path}"
 
 请直接写 Python 代码完成以下任务：
 
@@ -87,16 +85,12 @@ DATA_FILE_PATH = "{data_file_path}"
    ```python
    import numpy as np
    data = np.load(DATA_FILE_PATH, allow_pickle=True)
-   ```
-
+   
 2. 分析数据结构:
-   - 列出所有数组的名称
-   - 打印每个数组的 shape 和 dtype
+   - 打印data 的shape 和 dtype
 
-3. 计算基本统计量:
-   - 每个数组的 min, max, mean, std
 
-4. 根据分析结果，推测这个数据可能用于什么场景
+3. 根据分析结果，推测这个数据可能用于什么场景
 """
     
     print("=" * 60)

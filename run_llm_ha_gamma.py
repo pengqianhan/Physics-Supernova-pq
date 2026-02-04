@@ -294,7 +294,7 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
         add_base_tools=True,
         additional_authorized_imports=authorized_imports_list,
     )
-    npz_files_description = "\n".join([f" {placeholder} - `DATA_FILE_PATHS[{i}]`" for i, placeholder in enumerate(npz_placeholders)])
+    npz_files_description = "\n".join([f" {placeholder} - `{path}` - `DATA_FILE_PATHS[{i}]`" for i, (placeholder, path) in enumerate(zip(npz_placeholders, npz_paths_list))])
     for agent_name in managed_agents_list:
 
         managed_agent_description = f"""I am a managed agent with name {agent_name}. I can assist with code-related tasks."""
@@ -309,7 +309,7 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
 ```python
 import numpy as np
 
-# Load a specific file
+# Load a the <npz_0>
 data = np.load(DATA_FILE_PATHS[0])
 
 # Or use the primary file"""
