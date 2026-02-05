@@ -504,3 +504,7 @@ The main workflow (`run_llm_ha_gamma.py`) implements an iterative refinement loo
 - `utils/Dainarx_code/HA_evaluation_README.md` - Detailed HA evaluation API
 - `utils/Dainarx_code/automata/json_readme.md` - HA JSON format specification
 - Paper: [Physics Supernova ArXiv](https://arxiv.org/abs/2509.01659)
+
+## Guideline 
+1. When modifying output formatting or display strings, show the exact expected output format before making changes. Ask for clarification if the desired format isn't explicit.
+2. For complex multi-step implementations, use @planning-with-files
