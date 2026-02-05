@@ -507,4 +507,5 @@ The main workflow (`run_llm_ha_gamma.py`) implements an iterative refinement loo
 
 ## Guideline 
 1. When modifying output formatting or display strings, show the exact expected output format before making changes. Ask for clarification if the desired format isn't explicit.
-2. For complex multi-step implementations, use @planning-with-files
+2. For complex multi-step implementations, use @planning-with-files 
+3. For the Gemini model, when testing, MUST use the 'gemini-2.5-flash-lite'
