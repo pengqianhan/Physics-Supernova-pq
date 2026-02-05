@@ -21,6 +21,7 @@ Example usage:
 
 import json
 import os
+import re
 import sys
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -277,7 +278,7 @@ def reconstruct_ha_spec(
 
 def create_objective_function(
     parameterized_spec_str: str,
-    npz_file_path: str,
+    npz_file_paths: List[str],
     dt: float,
     total_time: float,
     verbose: bool = False
@@ -287,7 +288,7 @@ def create_objective_function(
 
     Args:
         parameterized_spec_str: JSON string with {param_N} placeholders
-        npz_file_path: Path to ground truth NPZ file
+        npz_file_paths: List of paths to ground truth NPZ files (uses average mean_diff)
         dt: Time step for simulation
         total_time: Total simulation time
         verbose: Whether to print intermediate results
@@ -300,27 +301,37 @@ def create_objective_function(
             # Reconstruct HA spec with current parameters
             ha_spec = reconstruct_ha_spec(parameterized_spec_str, params, verbose=False)
 
-            # Create evaluator and compute metrics
-            evaluator = HAEvaluator(
-                ha_dict=ha_spec,
-                npz_file_path=npz_file_path,
-                dt=dt,
-                total_time=total_time
-            )
+            # Compute mean_diff for each NPZ file and average
+            mean_diffs = []
+            for npz_path in npz_file_paths:
+                evaluator = HAEvaluator(
+                    ha_dict=ha_spec,
+                    npz_file_path=npz_path,
+                    dt=dt,
+                    total_time=total_time
+                )
 
-            evaluator.load_ground_truth()
-            evaluator.simulate()
-            metrics = evaluator.compute_metrics()
+                evaluator.load_ground_truth()
+                evaluator.simulate()
+                metrics = evaluator.compute_metrics()
 
-            mean_diff = metrics.get('mean_diff', float('inf'))
-            if mean_diff is None:
-                mean_diff = float('inf')
+                mean_diff = metrics.get('mean_diff', float('inf'))
+                if mean_diff is None:
+                    mean_diff = float('inf')
+                mean_diffs.append(mean_diff)
+
+            # Compute average mean_diff across all files
+            avg_mean_diff = float(np.mean(mean_diffs)) if mean_diffs else float('inf')
 
             if verbose:
                 param_str = ", ".join([f"{p:.4f}" for p in params])
-                print(f"  params=[{param_str}] -> mean_diff={mean_diff:.6f}")
+                if len(npz_file_paths) > 1:
+                    diffs_str = ", ".join([f"{d:.6f}" for d in mean_diffs])
+                    print(f"  params=[{param_str}] -> mean_diffs=[{diffs_str}] avg={avg_mean_diff:.6f}")
+                else:
+                    print(f"  params=[{param_str}] -> mean_diff={avg_mean_diff:.6f}")
 
-            return mean_diff
+            return avg_mean_diff
 
         except Exception as e:
             if verbose:
@@ -336,11 +347,12 @@ def create_objective_function(
 
 def optimize_ha_parameters_generic(
     ha_spec: Dict[str, Any],
-    npz_file_path: str,
+    input_data_path: str,
     budget: int = 100,
     model_id: str = "gemini/gemini-2.5-flash-lite",
     api_key: Optional[str] = None,
-    verbose: bool = True
+    verbose: bool = True,
+    train_num: int = 1
 ) -> Dict[str, Any]:
     """
     Optimize parameters in ANY Hybrid Automaton specification using LLM extraction + Nevergrad.
@@ -349,11 +361,13 @@ def optimize_ha_parameters_generic(
 
     Args:
         ha_spec: The HA specification dictionary (any valid HA JSON)
-        npz_file_path: Path to ground truth trajectory data (NPZ format)
+        input_data_path: Path to data directory (e.g., "data_all/ATVA/ball").
+                         Ground truth files are found in "{input_data_path}_g/" directory.
         budget: Number of optimization iterations
         model_id: LLM model for parameter extraction
         api_key: Gemini API key (reads from env if None)
         verbose: Whether to print progress
+        train_num: Number of ground truth files to use (averages mean_diff across [:train_num] files)
 
     Returns:
         Dictionary containing:
@@ -411,10 +425,42 @@ def optimize_ha_parameters_generic(
     dt = ha_spec.get('config', {}).get('dt', 0.001)
     total_time = ha_spec.get('config', {}).get('total_time', 10.0)
 
+    # Step 4: Resolve NPZ file paths from input_data_path + '_g' directory
+    # Ground truth files are in a folder with "_g" suffix (e.g., "data_all/ATVA/ball_g")
+    ground_truth_path = input_data_path.rstrip('/') + '_g'
+
+    if not os.path.isdir(ground_truth_path):
+        raise RuntimeError(f"Ground truth directory not found: {ground_truth_path}")
+
+    # Find ground_truth_*.npz files
+    gt_files = [f for f in os.listdir(ground_truth_path)
+                if f.startswith('ground_truth') and f.endswith('.npz')]
+
+    if not gt_files:
+        raise RuntimeError(f"No ground_truth_*.npz files found in: {ground_truth_path}")
+
+    # Sort by numeric index (ground_truth_0.npz, ground_truth_1.npz, ...)
+    def extract_index(filename: str) -> float:
+        match = re.search(r'ground_truth_(\d+)\.npz', filename)
+        return int(match.group(1)) if match else float('inf')
+
+    gt_files.sort(key=extract_index)
+
+    # Use [:train_num] files
+    npz_file_paths = [os.path.join(ground_truth_path, f) for f in gt_files[:train_num]]
+
+    if not npz_file_paths:
+        raise RuntimeError(f"No ground truth NPZ files found at: {ground_truth_path}")
+
+    if verbose:
+        print(f"\n[Step 3] Using {len(npz_file_paths)} ground truth file(s) for optimization:")
+        for p in npz_file_paths:
+            print(f"    - {p}")
+
     # Step 4: Create objective function
     objective_fn = create_objective_function(
         parameterized_spec_str=extraction_result.parameterized_spec,
-        npz_file_path=npz_file_path,
+        npz_file_paths=npz_file_paths,
         dt=dt,
         total_time=total_time,
         verbose=verbose
@@ -422,7 +468,7 @@ def optimize_ha_parameters_generic(
 
     # Step 5: Run optimization
     if verbose:
-        print(f"\n[Step 3] Running optimization (budget={budget})...")
+        print(f"\n[Step 4] Running optimization (budget={budget})...")
         print("-" * 60)
 
     def nevergrad_objective(**kwargs):
@@ -468,13 +514,14 @@ def optimize_ha_parameters_generic(
 # ============================================================================
 
 if __name__ == "__main__":
-    # Path to ground truth data
-    npz_file = "data_all/ATVA/ball_g/ground_truth_0.npz"
+    # Path to data directory (ground truth will be found in data_all/ATVA/ball_g/)
+    input_data_path = "data_all/ATVA/ball"
+    ground_truth_dir = input_data_path + '_g'
 
-    # Check if file exists
-    if not os.path.exists(npz_file):
-        print(f"Error: Ground truth file not found: {npz_file}")
-        print("Please ensure the data_all/ATVA/ball_g/ directory contains ground truth files.")
+    # Check if directory exists
+    if not os.path.isdir(ground_truth_dir):
+        print(f"Error: Ground truth directory not found: {ground_truth_dir}")
+        print("Please ensure the data_all/ATVA/ball_g/ directory exists with ground truth files.")
         sys.exit(1)
 
     print("=" * 70)
@@ -530,10 +577,11 @@ if __name__ == "__main__":
     try:
         result = optimize_ha_parameters_generic(
             ha_spec=initial_ha_spec,
-            npz_file_path=npz_file,
+            input_data_path=input_data_path,
             budget=100,  # Increased for better convergence
             model_id="gemini/gemini-2.5-flash-lite",  # Per CLAUDE.md: use flash-lite for testing
-            verbose=True
+            verbose=True,
+            train_num=1  # Use first ground truth file
         )
 
         print()
