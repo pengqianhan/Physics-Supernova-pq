@@ -464,44 +464,6 @@ def optimize_ha_parameters_generic(
 
 
 # ============================================================================
-# Legacy Bouncing Ball Functions (for backwards compatibility)
-# ============================================================================
-
-def create_bouncing_ball_ha_spec(gravity: float, restitution: float) -> dict:
-    """
-    Create a Hybrid Automaton specification for a bouncing ball.
-    Kept for backwards compatibility and testing.
-    """
-    return {
-        "automaton": {
-            "var": "x1, x2",
-            "mode": [
-                {
-                    "id": 1,
-                    "eq": f"x1[1] = x2[0], x2[1] = -{gravity}"
-                }
-            ],
-            "edge": [
-                {
-                    "direction": "1 -> 1",
-                    "condition": "x1 <= 0",
-                    "reset": {
-                        "x1": ["0"],
-                        "x2": [f"-{restitution} * x2[0]"]
-                    }
-                }
-            ]
-        },
-        "config": {
-            "dt": 0.01,
-            "total_time": 10.0,
-            "order": 1,
-            "self_loop": True
-        }
-    }
-
-
-# ============================================================================
 # Example Usage / Demo
 # ============================================================================
 
