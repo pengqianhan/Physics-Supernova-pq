@@ -57,7 +57,7 @@ class ExtractedParameter(BaseModel):
     name: str = Field(..., description="Descriptive name, e.g., 'gravity', 'restitution_coefficient'")
     value: float = Field(..., description="Current numeric value in the spec")
     location: str = Field(..., description="Where it appears: 'mode_eq', 'edge_condition', or 'edge_reset'")
-    context: str = Field(..., description="The expression containing this parameter, e.g., 'x2[1] = -9.8'")
+    context: str = Field(..., description="The expression containing this parameter, e.g., 'x2[1] = -8.0'")
     lower_bound: float = Field(..., description="Suggested lower bound for optimization")
     upper_bound: float = Field(..., description="Suggested upper bound for optimization")
     description: str = Field(..., description="Physical interpretation of this parameter")
