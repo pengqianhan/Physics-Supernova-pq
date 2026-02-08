@@ -100,9 +100,9 @@ Example:
   Result:    "x[2] = u - {param_3} * x[1] + {param_4} * x[0] - {param_5} * x[0] ** 3"
   Extracted: param_3=0.5, param_4=1.0, param_5=1.0
 
-  Original:  "x2[1] = -9.8 + 0.5 * x1[0]"
+  Original:  "x2[1] = -7.8 + 0.5 * x1[0]"
   Result:    "x2[1] = -{param_0} + {param_1} * x1[0]"
-  Extracted: param_0=9.8, param_1=0.5
+  Extracted: param_0=7.8, param_1=0.5
 
 ═══════════════════════════════════════════════════════════
 LOCATION 2: edge.condition — Guard conditions
