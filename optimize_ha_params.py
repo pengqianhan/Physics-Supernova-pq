@@ -150,11 +150,15 @@ PARAMETERIZED SPEC FORMAT — CRITICAL RULES:
 - The "parameterized_spec" field MUST be a single valid JSON object string (no extra text, no markdown)
 - Use double quotes for all JSON strings
 
-BOUNDS ESTIMATION:
-- For physical coefficients (gravity ~10): ±50% around value, e.g., value=9.8 → lower=4.9, upper=14.7
-- For small coefficients (0-1 range): lower=0.01, upper=2.0
-- For general coefficients: use symmetric range [value*0.5, value*1.5], ensuring lower > 0 if value > 0
-- For threshold values: ±50% around value
+BOUNDS ESTIMATION — USE WIDE RANGES to avoid excluding the true solution:
+- For ODE coefficients (damping, stiffness, etc.): use [max(0.01, value * 0.1), max(value * 5.0, 2.0)]
+  Example: value=0.3 → lower=0.03, upper=2.0; value=9.8 → lower=0.98, upper=49.0
+- For reset/restitution coefficients: ALWAYS use [0.01, 2.0] regardless of current value,
+  because restitution can range from near-zero (heavy damping) to >1 (energy gain)
+- For guard/threshold values: use [max(0.01, value * 0.2), value * 5.0]
+  Example: value=0.9 → lower=0.18, upper=4.5
+- General rule: when in doubt, use WIDER bounds. It is much better to have
+  a large search space than to accidentally exclude the true parameter value.
 
 IMPORTANT: The parameterized_spec field must contain ONLY the JSON object, nothing else."""
 
@@ -227,6 +231,19 @@ Extract parameters, suggest optimization bounds, and create a parameterized vers
             return None, "Error: LLM returned empty response"
 
         result = ParameterExtractionResult.model_validate_json(content)
+
+        # Widen bounds programmatically to ensure sufficient search range
+        for p in result.parameters:
+            val = abs(p.value) if p.value != 0 else 1.0
+            if 'reset' in p.location or 'restitution' in p.name.lower():
+                # Reset/restitution coefficients: always [0.01, 2.0]
+                min_lo, min_hi = 0.01, 2.0
+            else:
+                # General: at least [value*0.1, value*5] with floor of 2.0 on upper
+                min_lo = max(0.01, val * 0.1)
+                min_hi = max(val * 5.0, 2.0)
+            p.lower_bound = min(p.lower_bound, min_lo)
+            p.upper_bound = max(p.upper_bound, min_hi)
 
         # Validate and clean up parameterized spec
         param_spec = result.parameterized_spec.strip()
@@ -640,7 +657,7 @@ if __name__ == "__main__":
         result = optimize_ha_parameters_generic(
             ha_spec=initial_ha_spec,
             input_data_path=input_data_path,
-            budget=100,  # Increased for better convergence
+            budget=1000,  # Increased for better convergence
             model_id="gemini/gemini-3-flash-preview",  # Per CLAUDE.md: use flash-lite for testing
             verbose=True,
             train_num=1  # Use first ground truth file
