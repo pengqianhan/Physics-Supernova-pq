@@ -32,6 +32,7 @@ import nevergrad as ng
 
 # Pydantic for structured LLM output
 from pydantic import BaseModel, Field
+from sqlalchemy import true
 
 # LiteLLM for Gemini API calls
 try:
@@ -76,36 +77,84 @@ def _get_parameter_extraction_prompt() -> str:
     """System prompt for LLM parameter extraction."""
     return """You are an expert at analyzing Hybrid Automaton (HA) specifications.
 
-Your task: Extract all TUNABLE NUMERIC PARAMETERS from the given HA JSON specification.
+Your task: Systematically replace ALL numeric coefficients in the HA spec with {param_N} placeholders (N is 0-indexed, assigned sequentially across ALL locations).
 
-RULES FOR PARAMETER IDENTIFICATION:
-1. Extract coefficients and constants from ODE equations in mode.eq
-   - Example: "x2[1] = -9.8" → parameter "gravity" with value 9.8
-   - Example: "x1[1] = 0.5 * x2[0]" → parameter with value 0.5
+You MUST parameterize the following THREE locations, and ONLY these three:
 
-2. Extract coefficients from reset expressions in edge.reset
-   - Example: "x2": ["-0.9 * x2[0]"] → parameter "restitution" with value 0.9
+═══════════════════════════════════════════════════════════
+LOCATION 1: mode.eq — ODE equations (RIGHT-HAND SIDE ONLY)
+═══════════════════════════════════════════════════════════
+For each term on the RIGHT side of '=', EXCEPT terms that are purely the input variable 'u' alone:
+- Replace the numeric coefficient in front of each term with {param_N}.
+- If a term has NO explicit coefficient (implicit coefficient of 1), you MUST insert "{param_N} * " in front of it.
+- If a term has a negative sign with no explicit coefficient (implicit -1), use "-{param_N} * ".
+- The input variable 'u' standing alone (without any coefficient) is kept as-is. But if u has a coefficient like "0.5 * u", replace the 0.5 with {param_N}.
+- Exponents (powers) are NOT coefficients — do NOT replace them.
 
-3. Extract threshold values from edge.condition (optional, usually fixed)
-   - Example: "x1 <= 0" → the 0 is usually a fixed boundary, not a parameter
+Example:
+  Original:  "x[2] = u - 0.3 * x[1] + x[0] - 1 * x[0] ** 3"
+  Result:    "x[2] = u - {param_0} * x[1] + {param_1} * x[0] - {param_2} * x[0] ** 3"
+  Extracted: param_0=0.3, param_1=1.0, param_2=1.0
 
-4. DO NOT extract:
-   - Mode IDs (integers like id: 1)
-   - Variable indices (x1[0], x2[1])
-   - Config values (dt, total_time) unless explicitly requested
+  Original:  "x[2] = u - 0.5 * x[1] + x[0] - 1 * x[0] ** 3"
+  Result:    "x[2] = u - {param_3} * x[1] + {param_4} * x[0] - {param_5} * x[0] ** 3"
+  Extracted: param_3=0.5, param_4=1.0, param_5=1.0
 
-PARAMETERIZED SPEC FORMAT - CRITICAL:
-- Replace ONLY the numeric value with {param_N} where N is the 0-indexed position
-- Keep operators and signs OUTSIDE: "-{param_0}" for "-9.8", NOT "{param_0}"
-- For reset like "-0.75 * x2[0]", parameterize as "-{param_1} * x2[0]"
-- The parameterized_spec MUST be a single valid JSON object (no extra text)
+  Original:  "x2[1] = -9.8 + 0.5 * x1[0]"
+  Result:    "x2[1] = -{param_0} + {param_1} * x1[0]"
+  Extracted: param_0=9.8, param_1=0.5
+
+═══════════════════════════════════════════════════════════
+LOCATION 2: edge.condition — Guard conditions
+═══════════════════════════════════════════════════════════
+Replace every numeric literal (thresholds, constants) in the condition with {param_N}.
+
+Example:
+  Original:  "abs(x) <= 0.9"
+  Result:    "abs(x) <= {param_6}"
+  Extracted: param_6=0.9
+
+  Original:  "abs(x) >= 1.2"
+  Result:    "abs(x) >= {param_7}"
+  Extracted: param_7=1.2
+
+═══════════════════════════════════════════════════════════
+LOCATION 3: edge.reset — Reset maps
+═══════════════════════════════════════════════════════════
+Replace every numeric value in reset expressions with {param_N}.
+
+Example:
+  Original:  "x": ["", "x[1] * 0.3"]
+  Result:    "x": ["", "x[1] * {param_8}"]
+  Extracted: param_8=0.3
+
+  Original:  "x2": ["-0.9 * x2[0]"]
+  Result:    "x2": ["-{param_5} * x2[0]"]
+  Extracted: param_5=0.9
+
+═══════════════════════════════════════════════════════════
+DO NOT PARAMETERIZE (keep exactly as-is):
+═══════════════════════════════════════════════════════════
+- The entire "config" section (dt, total_time, order, need_reset, dim, other_items, etc.)
+- Mode IDs (e.g., "id": 1)
+- Variable indices in brackets (e.g., x[0], x[1], x1[0], x2[1])
+- Exponents / powers (e.g., the 3 in "x[0] ** 3")
+- The direction string in edges (e.g., "1 -> 2")
+- The variable names (var, input fields)
+
+═══════════════════════════════════════════════════════════
+PARAMETERIZED SPEC FORMAT — CRITICAL RULES:
+═══════════════════════════════════════════════════════════
+- {param_N} indices MUST be sequential starting from 0, assigned in order: first all modes (mode 1 eq left-to-right, mode 2 eq left-to-right, ...), then all edges (edge 1 condition, edge 1 reset, edge 2 condition, edge 2 reset, ...)
+- Keep sign operators OUTSIDE the placeholder: write "-{param_0}" NOT "{param_0}" for a negative value
+- The "parameterized_spec" field MUST be a single valid JSON object string (no extra text, no markdown)
 - Use double quotes for all JSON strings
-- Escape any quotes inside strings if needed
 
 BOUNDS ESTIMATION:
-- For physical coefficients (gravity ~10): lower=1.0, upper=20.0
-- For restitution/friction (0-1 range): lower=0.01, upper=0.99
-- For general coefficients: use symmetric range around value
+- For physical coefficients (gravity ~10): ±50% around value, e.g., value=9.8 → lower=4.9, upper=14.7
+- For small coefficients (0-1 range): lower=0.01, upper=2.0
+- For general coefficients: use symmetric range [value*0.5, value*1.5], ensuring lower > 0 if value > 0
+- For threshold values: ±50% around value
 
 IMPORTANT: The parameterized_spec field must contain ONLY the JSON object, nothing else."""
 
@@ -515,7 +564,7 @@ def optimize_ha_parameters_generic(
 
 if __name__ == "__main__":
     # Path to data directory (ground truth will be found in data_all/ATVA/ball_g/)
-    input_data_path = "data_all/ATVA/ball"
+    input_data_path = "data_all/non_linear/duffing"
     ground_truth_dir = input_data_path + '_g'
 
     # Check if directory exists
@@ -536,32 +585,43 @@ if __name__ == "__main__":
     # The LLM will extract these and Nevergrad will optimize them
     # Ground truth: gravity=9.8, restitution=0.9
     initial_ha_spec = {
-        "automaton": {
-            "var": "x1, x2",
-            "mode": [
-                {
-                    "id": 1,
-                    "eq": "x1[1] = x2[0], x2[1] = -10.5"  # Wrong gravity (true: 9.8)
-                }
-            ],
-            "edge": [
-                {
-                    "direction": "1 -> 1",
-                    "condition": "x1 <= 0",
-                    "reset": {
-                        "x1": ["0"],
-                        "x2": ["-0.75 * x2[0]"]  # Wrong restitution (true: 0.9)
-                    }
-                }
-            ]
-        },
-        "config": {
-            "dt": 0.001,  # Match ground truth dt
-            "total_time": 10.0,
-            "order": 1,
-            "self_loop": True
+  "automaton": {
+    "var": "x",
+    "input": "u",
+    "mode": [
+      {
+        "id": 1,
+        "eq": "x[2] = u - 0.3 * x[1] + x[0] - 1* x[0] ** 3"
+      },
+      {
+        "id": 2,
+        "eq": "x[2] = u - 0.5 * x[1] + x[0] - 1* x[0] ** 3"
+      }
+    ],
+    "edge": [
+      {
+        "direction": "1 -> 2",
+        "condition": "abs(x) <= 0.9",
+        "reset": {
+          "x": ["", "x[1] * 0.3"]
         }
-    }
+      },
+      {
+        "direction": "2 -> 1",
+        "condition": "abs(x) >= 1.2",
+        "reset": {
+          "x": ["", "x[1] * 0.95"]
+        }
+      }
+    ]
+  },
+  "config": {
+    "dt": 0.001,
+    "total_time": 10.0,
+    "order": 2,
+    "need_reset": True
+  }
+}
 
     print("Initial HA Specification (with WRONG parameters):")
     print("-" * 70)
@@ -579,7 +639,7 @@ if __name__ == "__main__":
             ha_spec=initial_ha_spec,
             input_data_path=input_data_path,
             budget=100,  # Increased for better convergence
-            model_id="gemini/gemini-2.5-flash-lite",  # Per CLAUDE.md: use flash-lite for testing
+            model_id="gemini/gemini-3-flash-preview",  # Per CLAUDE.md: use flash-lite for testing
             verbose=True,
             train_num=1  # Use first ground truth file
         )
