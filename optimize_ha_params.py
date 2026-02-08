@@ -272,7 +272,9 @@ Extract parameters, suggest optimization bounds, and create a parameterized vers
                 for mode in preview_spec.get('automaton', {}).get('mode', []):
                     print(f"      Mode {mode.get('id')}: {mode.get('eq')}")
                 for edge in preview_spec.get('automaton', {}).get('edge', []):
+                    print(f"      Edge {edge.get('direction')}:")
                     print(f"      Edge reset: {edge.get('reset')}")
+                    print(f"      Edge condition: {edge.get('condition')}")
             except Exception as parse_err:
                 print(f"      Parse error: {parse_err}")
                 print(f"      Raw: {result.parameterized_spec[:300]}...")
