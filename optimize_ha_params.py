@@ -486,7 +486,7 @@ def optimize_ha_parameters_generic(
     optimizer = ng.optimizers.NGOpt(
         parametrization=parametrization,
         budget=budget,
-        num_workers=1
+        num_workers=12
     )
 
     # Step 3: Get config values for simulation
