@@ -173,19 +173,19 @@ Background (from Nevergrad/CMA-ES literature):
 - However, each evaluation involves ODE simulation, so we balance precision vs. compute
 
 Rules:
-- Base rule: budget = N_params * 200  (minimum 200)
+- Base rule: budget = N_params * 500  (minimum 500)
 - If bounds are very wide (upper/lower ratio > 10 for most params), multiply by 1.5
 - If there are many parameters (>8), multiply by 1.5 additionally
-- Cap at 5000 to avoid excessive computation
-- Round to the nearest 50
+- Cap at 10000 to avoid excessive computation
+- Round to the nearest 100
 
 Examples:
-  2 parameters, moderate bounds → budget = 400
-  5 parameters, moderate bounds → budget = 1000
-  5 parameters, wide bounds    → budget = 1500
-  10 parameters, moderate bounds → budget = 3000
-  10 parameters, wide bounds   → budget = 4500
-  15 parameters, wide bounds   → budget = 5000
+  2 parameters, moderate bounds → budget = 1000
+  5 parameters, moderate bounds → budget = 2500
+  5 parameters, wide bounds    → budget = 3800
+  10 parameters, moderate bounds → budget = 5000
+  10 parameters, wide bounds   → budget = 7500
+  15 parameters, wide bounds   → budget = 10000
 
 IMPORTANT: The parameterized_spec field must contain ONLY the JSON object, nothing else."""
 
