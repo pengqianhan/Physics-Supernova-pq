@@ -14,8 +14,7 @@ Example usage:
     from optimize_ha_params import optimize_ha_parameters_generic
     result = optimize_ha_parameters_generic(
         ha_spec=your_ha_dict,
-        npz_file_path="path/to/ground_truth.npz",
-        budget=100
+        input_data_path="data_all/ATVA/ball"
     )
 """
 
@@ -67,6 +66,7 @@ class ParameterExtractionResult(BaseModel):
     """Result of LLM parameter extraction."""
     parameters: List[ExtractedParameter] = Field(..., description="List of all extracted parameters")
     parameterized_spec: str = Field(..., description="HA spec JSON with {param_0}, {param_1}, etc. placeholders")
+    budget: int = Field(..., description="Suggested optimization budget (number of evaluations) based on parameter count and search space complexity")
 
 
 # ============================================================================
@@ -159,6 +159,33 @@ BOUNDS ESTIMATION — USE WIDE RANGES to avoid excluding the true solution:
   Example: value=0.9 → lower=0.18, upper=4.5
 - General rule: when in doubt, use WIDER bounds. It is much better to have
   a large search space than to accidentally exclude the true parameter value.
+
+═══════════════════════════════════════════════════════════
+BUDGET ESTIMATION — Optimization evaluation budget
+═══════════════════════════════════════════════════════════
+You MUST suggest an optimization budget (number of function evaluations) in the "budget" field.
+The budget should scale with the number of parameters and the difficulty of the search space.
+
+Background (from Nevergrad/CMA-ES literature):
+- NGOpt meta-optimizer requires at least 12×d evaluations to enable advanced strategies
+- CMA-ES considers "moderate budget" as ≥100×d evaluations
+- For full CMA convergence, Nevergrad docs recommend 1000×d evaluations
+- However, each evaluation involves ODE simulation, so we balance precision vs. compute
+
+Rules:
+- Base rule: budget = N_params * 200  (minimum 200)
+- If bounds are very wide (upper/lower ratio > 10 for most params), multiply by 1.5
+- If there are many parameters (>8), multiply by 1.5 additionally
+- Cap at 5000 to avoid excessive computation
+- Round to the nearest 50
+
+Examples:
+  2 parameters, moderate bounds → budget = 400
+  5 parameters, moderate bounds → budget = 1000
+  5 parameters, wide bounds    → budget = 1500
+  10 parameters, moderate bounds → budget = 3000
+  10 parameters, wide bounds   → budget = 4500
+  15 parameters, wide bounds   → budget = 5000
 
 IMPORTANT: The parameterized_spec field must contain ONLY the JSON object, nothing else."""
 
@@ -280,7 +307,7 @@ Extract parameters, suggest optimization bounds, and create a parameterized vers
                 print(f"[LLM] Raw spec: {param_spec[:500]}...")
 
         if verbose:
-            print(f"[LLM] ✓ Extracted {len(result.parameters)} parameters:")
+            print(f"[LLM] ✓ Extracted {len(result.parameters)} parameters (suggested budget: {result.budget}):")
             for i, p in enumerate(result.parameters):
                 print(f"      {i}: {p.name} = {p.value} (bounds: [{p.lower_bound}, {p.upper_bound}])")
             print(f"\n[LLM] Parameterized spec preview:")
@@ -416,7 +443,6 @@ def create_objective_function(
 def optimize_ha_parameters_generic(
     ha_spec: Dict[str, Any],
     input_data_path: str,
-    budget: int = 100,
     model_id: str = "gemini/gemini-2.5-flash-lite",
     api_key: Optional[str] = None,
     verbose: bool = True,
@@ -426,12 +452,13 @@ def optimize_ha_parameters_generic(
     Optimize parameters in ANY Hybrid Automaton specification using LLM extraction + Nevergrad.
 
     This is the main entry point for generic HA parameter optimization.
+    The optimization budget is automatically determined by the LLM based on
+    the number and complexity of extracted parameters.
 
     Args:
         ha_spec: The HA specification dictionary (any valid HA JSON)
         input_data_path: Path to data directory (e.g., "data_all/ATVA/ball").
                          Ground truth files are found in "{input_data_path}_g/" directory.
-        budget: Number of optimization iterations
         model_id: LLM model for parameter extraction
         api_key: Gemini API key (reads from env if None)
         verbose: Whether to print progress
@@ -465,6 +492,11 @@ def optimize_ha_parameters_generic(
 
     if len(extraction_result.parameters) == 0:
         raise RuntimeError("No parameters found to optimize")
+
+    # Use LLM-suggested budget
+    budget = extraction_result.budget
+    if verbose:
+        print(f"[LLM] Suggested optimization budget: {budget}")
 
     # Step 2: Build Nevergrad parametrization
     if verbose:
@@ -657,7 +689,6 @@ if __name__ == "__main__":
         result = optimize_ha_parameters_generic(
             ha_spec=initial_ha_spec,
             input_data_path=input_data_path,
-            budget=1000,  # Increased for better convergence
             model_id="gemini/gemini-3-flash-preview",  # Per CLAUDE.md: use flash-lite for testing
             verbose=True,
             train_num=1  # Use first ground truth file
