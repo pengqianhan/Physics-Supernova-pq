@@ -355,6 +355,10 @@ You have access to the following NPZ data files:
         with open(f"managed_agent_{agent_name}_instruction.md", "w") as f:
             f.write(managed_agent_instruction)
 
+        # managed_agent_prompt = managed_agent.prompt_templates["system_prompt"]
+        # with open(f"managed_agent_{agent_name}_prompt.md", "w") as f:
+        #     f.write(managed_agent_prompt)
+
     return managed_agents
 
 
