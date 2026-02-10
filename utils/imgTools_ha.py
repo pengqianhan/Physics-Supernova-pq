@@ -17,6 +17,7 @@ class HybridAutomatonImageTool(Tool):
 
     name = "hybrid_automaton_image_analysis"
     description = (
+        "An advanced image expert tool equipped with a Python Code Execution Environment."
         "Given an image placeholder and a question, return the image expert's answer about that image. "
         "Accepts placeholders only: (1) <image_N> for original trace images from markdown, or "
         "(2) <iter_image_N> for evaluator plots registered during iteration. "
