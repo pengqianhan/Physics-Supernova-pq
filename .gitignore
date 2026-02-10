@@ -15,8 +15,7 @@ batchrun_copy2.py
 utils/Dainarx_code/data*
 
 # output files
-evaluation_results_duffing/
-evaluation_results_duffing_gemini3pro/
+evaluation_results_duffing*/
 task_prompts/
 
 # data files
