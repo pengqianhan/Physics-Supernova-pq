@@ -678,7 +678,7 @@ Keep the summary under 200 words. Be direct and technical."""
 
 ## Task
 Analyze the evaluation results and the {plot_description} (ground truth vs simulated).
-Identify the main sources of error and suggest specific improvements to the ODE equations or guard conditions."""
+Identify the main sources of error and suggest specific improvements to the JSON specification including mode and edge."""
 
     # Build message content - add all images first, then text
     content = []
