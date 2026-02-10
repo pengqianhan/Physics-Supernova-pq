@@ -36,7 +36,7 @@ class HybridAutomatonImageTool(Tool):
     # Allowed directory prefixes for security (relative to repo root)
     ALLOWED_PATH_PREFIXES = ['evaluation_results/', 'data_all/']
 
-    def __init__(self, worker_agent=None, vision_model_id: str = "gemini-2.5-flash-preview-05-20", max_short_side_pixels: int=9999):
+    def __init__(self, worker_agent=None, vision_model_id: str = "gemini-3-flash-preview", max_short_side_pixels: int=9999):
         super().__init__()
         self.worker_agent = worker_agent  # Reference to the main agent for accessing markdown content
         self.api_key = os.getenv("GEMINI_API_KEY")
