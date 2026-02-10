@@ -352,8 +352,8 @@ You have access to the following NPZ data files:
             managed_agent.python_executor.state["DATA_FILE_PATH"] = npz_paths_list[0] if npz_paths_list else ""
         managed_agents.append(managed_agent)
         # save the instruction and description to file
-        with open(f"managed_agent_{agent_name}_instruction.md", "w") as f:
-            f.write(managed_agent_instruction)
+        # with open(f"managed_agent_{agent_name}_instruction.md", "w") as f:
+        #     f.write(managed_agent_instruction)
 
         # managed_agent_prompt = managed_agent.prompt_templates["system_prompt"]
         # with open(f"managed_agent_{agent_name}_prompt.md", "w") as f:
