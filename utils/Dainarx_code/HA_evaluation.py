@@ -357,10 +357,13 @@ class TrajectoryPlotter:
             ValueError: If mode is invalid
         """
         if mode == "single":
+            # single: Plot simulated trajectory only.
             return self.plot_single()
         elif mode == "overlay":
+            # overlay: Plot simulated and ground truth on the same axis.
             return self.plot_overlay()
         elif mode == "stacked":
+            # stacked: Plot simulated (top) and ground truth (bottom) in separate subplots.
             return self.plot_stacked()
         else:
             raise ValueError(f"Invalid plot mode: {mode}. Must be 'single', 'overlay', or 'stacked'")
