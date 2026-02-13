@@ -18,16 +18,20 @@ Example usage:
     )
 """
 
+import hashlib
 import json
+import math
 import os
 import re
 import sys
+import functools
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 
 # Nevergrad for optimization
 import nevergrad as ng
+from loky import ProcessPoolExecutor
 
 # Pydantic for structured LLM output
 from pydantic import BaseModel, Field
@@ -333,6 +337,43 @@ Extract parameters, suggest optimization bounds, and create a parameterized vers
 
 
 # ============================================================================
+# Extraction Result Caching
+# ============================================================================
+
+def _get_cache_path(ha_spec: Dict[str, Any], cache_dir: str = ".extraction_cache") -> str:
+    """Get cache file path based on a hash of the HA spec."""
+    spec_str = json.dumps(ha_spec, sort_keys=True)
+    spec_hash = hashlib.md5(spec_str.encode()).hexdigest()[:12]
+    os.makedirs(cache_dir, exist_ok=True)
+    return os.path.join(cache_dir, f"extraction_{spec_hash}.json")
+
+
+def _save_extraction_result(result: ParameterExtractionResult, cache_path: str, verbose: bool = True) -> None:
+    """Save extraction result to a local JSON cache file."""
+    with open(cache_path, 'w') as f:
+        json.dump(result.model_dump(), f, indent=2)
+    if verbose:
+        print(f"[Cache] Saved extraction result to {cache_path}")
+
+
+def _load_extraction_result(cache_path: str, verbose: bool = True) -> Optional[ParameterExtractionResult]:
+    """Load extraction result from a local JSON cache file if it exists."""
+    if not os.path.exists(cache_path):
+        return None
+    try:
+        with open(cache_path, 'r') as f:
+            data = json.load(f)
+        result = ParameterExtractionResult.model_validate(data)
+        if verbose:
+            print(f"[Cache] Loaded extraction result from {cache_path} ({len(result.parameters)} parameters)")
+        return result
+    except Exception as e:
+        if verbose:
+            print(f"[Cache] Failed to load cache ({e}), will re-extract with LLM")
+        return None
+
+
+# ============================================================================
 # Parameterization and Reconstruction
 # ============================================================================
 
@@ -436,6 +477,60 @@ def create_objective_function(
     return objective
 
 
+def _nevergrad_objective(
+    *,
+    parameterized_spec_str: str,
+    npz_file_paths: List[str],
+    dt: float,
+    total_time: float,
+    verbose: bool,
+    param_count: int,
+    **kwargs
+) -> float:
+    """Top-level objective for multiprocessing compatibility."""
+    params = np.array([kwargs[f"param_{i}"] for i in range(param_count)])
+    try:
+        # Reconstruct HA spec with current parameters
+        ha_spec = reconstruct_ha_spec(parameterized_spec_str, params, verbose=False)
+
+        # Compute mean_diff for each NPZ file and average
+        mean_diffs = []
+        for npz_path in npz_file_paths:
+            evaluator = HAEvaluator(
+                ha_dict=ha_spec,
+                npz_file_path=npz_path,
+                dt=dt,
+                total_time=total_time
+            )
+
+            evaluator.load_ground_truth()
+            evaluator.simulate()
+            metrics = evaluator.compute_metrics()
+
+            mean_diff = metrics.get('mean_diff', float('inf'))
+            if mean_diff is None:
+                mean_diff = float('inf')
+            mean_diffs.append(mean_diff)
+
+        # Compute average mean_diff across all files
+        avg_mean_diff = float(np.mean(mean_diffs)) if mean_diffs else float('inf')
+
+        if verbose:
+            param_str = ", ".join([f"{p:.4f}" for p in params])
+            if len(npz_file_paths) > 1:
+                diffs_str = ", ".join([f"{d:.6f}" for d in mean_diffs])
+                print(f"  params=[{param_str}] -> mean_diffs=[{diffs_str}] avg={avg_mean_diff:.6f}")
+            else:
+                print(f"  params=[{param_str}] -> mean_diff={avg_mean_diff:.6f}")
+
+        return avg_mean_diff
+
+    except Exception as e:
+        if verbose:
+            print(f"  params={params} -> ERROR: {e}")
+        return float('inf')
+
+
 # ============================================================================
 # Generic Optimization Function
 # ============================================================================
@@ -446,7 +541,8 @@ def optimize_ha_parameters_generic(
     model_id: str = "gemini/gemini-2.5-flash-lite",
     api_key: Optional[str] = None,
     verbose: bool = True,
-    train_num: int = 1
+    train_num: int = 1,
+    num_workers: Optional[int] = None
 ) -> Dict[str, Any]:
     """
     Optimize parameters in ANY Hybrid Automaton specification using LLM extraction + Nevergrad.
@@ -463,6 +559,8 @@ def optimize_ha_parameters_generic(
         api_key: Gemini API key (reads from env if None)
         verbose: Whether to print progress
         train_num: Number of ground truth files to use (averages mean_diff across [:train_num] files)
+        num_workers: Parallel worker count for Nevergrad evaluation.
+            If None, uses a conservative shared-server default.
 
     Returns:
         Dictionary containing:
@@ -476,27 +574,33 @@ def optimize_ha_parameters_generic(
         print("Generic HA Parameter Optimization")
         print("=" * 60)
 
-    # Step 1: Extract parameters using LLM
+    # Step 1: Extract parameters using LLM (with local caching)
     if verbose:
         print("\n[Step 1] Extracting parameters with LLM...")
 
-    extraction_result, status = extract_parameters_with_llm(
-        ha_spec=ha_spec,
-        model_id=model_id,
-        api_key=api_key,
-        verbose=verbose
-    )
+    cache_path = _get_cache_path(ha_spec)
+    extraction_result = _load_extraction_result(cache_path, verbose=verbose)
 
     if extraction_result is None:
-        raise RuntimeError(f"Parameter extraction failed: {status}")
+        extraction_result, status = extract_parameters_with_llm(
+            ha_spec=ha_spec,
+            model_id=model_id,
+            api_key=api_key,
+            verbose=verbose
+        )
+
+        if extraction_result is None:
+            raise RuntimeError(f"Parameter extraction failed: {status}")
+
+        _save_extraction_result(extraction_result, cache_path, verbose=verbose)
 
     if len(extraction_result.parameters) == 0:
         raise RuntimeError("No parameters found to optimize")
 
-    # Use LLM-suggested budget
-    budget = extraction_result.budget
+    # Use LLM-suggested budget (designed for num_workers=1)
+    base_budget = extraction_result.budget
     if verbose:
-        print(f"[LLM] Suggested optimization budget: {budget}")
+        print(f"[LLM] Suggested base budget (for sequential): {base_budget}")
 
     # Step 2: Build Nevergrad parametrization
     if verbose:
@@ -515,10 +619,28 @@ def optimize_ha_parameters_generic(
     parametrization = ng.p.Instrumentation(**ng_params)
 
     # Create optimizer
+    if num_workers is None:
+        cpu_count = os.cpu_count() or 1
+        # Default: use 1/4 of CPUs, capped at 16 for good speed/accuracy balance
+        num_workers = max(1, min(16, cpu_count // 4))
+
+    # Scale budget by sqrt(num_workers) to compensate for parallel information loss.
+    # Theory (Nevergrad/CMA-ES): parallel batches waste ~sqrt(N) evaluations,
+    # so we need sqrt(N) more total evaluations to match sequential accuracy.
+    # Net wall-clock speedup: num_workers / sqrt(num_workers) = sqrt(num_workers).
+    if num_workers > 1:
+        budget = int(base_budget * math.sqrt(num_workers))
+        if verbose:
+            print(f"[Parallel] num_workers={num_workers}, "
+                  f"adjusted budget: {base_budget} × √{num_workers} = {budget}")
+            print(f"[Parallel] Expected wall-clock speedup: ~{math.sqrt(num_workers):.1f}x")
+    else:
+        budget = base_budget
+
     optimizer = ng.optimizers.NGOpt(
         parametrization=parametrization,
         budget=budget,
-        num_workers=12
+        num_workers=num_workers
     )
 
     # Step 3: Get config values for simulation
@@ -557,26 +679,30 @@ def optimize_ha_parameters_generic(
         for p in npz_file_paths:
             print(f"    - {p}")
 
-    # Step 4: Create objective function
-    objective_fn = create_objective_function(
+    # Step 4: Run optimization
+    if verbose:
+        print(f"\n[Step 4] Running optimization (budget={budget}, num_workers={num_workers})...")
+        print("-" * 60)
+
+    objective_fn = functools.partial(
+        _nevergrad_objective,
         parameterized_spec_str=extraction_result.parameterized_spec,
         npz_file_paths=npz_file_paths,
         dt=dt,
         total_time=total_time,
-        verbose=verbose
+        verbose=verbose,
+        param_count=len(extraction_result.parameters)
     )
 
-    # Step 5: Run optimization
-    if verbose:
-        print(f"\n[Step 4] Running optimization (budget={budget})...")
-        print("-" * 60)
-
-    def nevergrad_objective(**kwargs):
-        # Extract params from Nevergrad's call format
-        params = np.array([kwargs[f"param_{i}"] for i in range(len(extraction_result.parameters))])
-        return objective_fn(params)
-
-    recommendation = optimizer.minimize(nevergrad_objective)
+    if optimizer.num_workers > 1:
+        with ProcessPoolExecutor(max_workers=optimizer.num_workers) as executor:
+            recommendation = optimizer.minimize(
+                objective_fn,
+                executor=executor,
+                batch_mode=False
+            )
+    else:
+        recommendation = optimizer.minimize(objective_fn)
 
     # Step 6: Extract results
     optimal_params = {
