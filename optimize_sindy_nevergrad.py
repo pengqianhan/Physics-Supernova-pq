@@ -10,6 +10,7 @@ Usage:
     python optimize_sindy_nevergrad.py  # Runs duffing oscillator demo
 """
 
+import hashlib
 import json
 import math
 import os
@@ -26,8 +27,36 @@ from pysindy.optimizers import STLSQ
 import nevergrad as ng
 from loky import ProcessPoolExecutor
 
+from pydantic import BaseModel, Field
+
+try:
+    import litellm
+    from dotenv import load_dotenv
+    HAS_LITELLM = True
+except ImportError:
+    HAS_LITELLM = False
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'utils/Dainarx_code'))
 from HA_evaluation import HAEvaluator
+
+
+# ============================================================================
+# Pydantic Schemas for LLM Edge Estimation
+# ============================================================================
+
+class EdgeBound(BaseModel):
+    """A single estimated edge parameter with bounds."""
+    name: str = Field(..., description="Descriptive name, e.g., 'guard_threshold_1_to_2', 'reset_coef_x1'")
+    value: float = Field(..., description="Estimated numeric value based on transition statistics")
+    lower_bound: float = Field(..., description="Suggested lower bound for Nevergrad optimization")
+    upper_bound: float = Field(..., description="Suggested upper bound for Nevergrad optimization")
+    reasoning: str = Field(..., description="Brief explanation of how this value was estimated")
+
+
+class EdgeEstimationResult(BaseModel):
+    """Result of LLM-based edge parameter estimation."""
+    updated_edges: str = Field(..., description="JSON string of the updated edges list with estimated numeric values")
+    bounds: List[EdgeBound] = Field(..., description="List of estimated edge parameters with bounds, one per numeric value in edges")
 
 
 # ============================================================================
@@ -324,29 +353,25 @@ def sindy_fit_modes(
 
 
 # ============================================================================
-# Data-Driven Edge Parameter Estimation
+# Transition Statistics Collection
 # ============================================================================
 
-def estimate_edge_params_from_data(
+def collect_transition_statistics(
     ha_spec: Dict[str, Any],
     npz_file_paths: List[str],
-    verbose: bool = True,
-) -> Dict[str, Any]:
+) -> Dict[Tuple[int, int], List[Dict]]:
     """
-    Estimate edge (guard + reset) parameters directly from change point data.
+    Collect transition statistics from change points in trajectory data.
 
-    At each change point we can observe:
-      - The state values where transitions fire (→ guard thresholds)
-      - The ratio of derivatives before/after the transition (→ reset coefficients)
+    For each change point, records state values and derivatives just before
+    and after the transition. This data can be used to estimate guard thresholds
+    and reset coefficients.
 
     Returns:
-        Updated HA spec with data-estimated edge parameters
+        Dict mapping (from_mode, to_mode) -> list of observation dicts.
+        Each observation dict has keys like '{var}_vals_before' and '{var}_vals_after',
+        each containing a list of [value, 1st_deriv, ..., nth_deriv].
     """
-    if verbose:
-        print("\n" + "=" * 60)
-        print("[Data-Driven] Estimating edge parameters from change points")
-        print("=" * 60)
-
     automaton = ha_spec['automaton']
     config = ha_spec.get('config', {})
     dt = config.get('dt', 0.001)
@@ -356,8 +381,6 @@ def estimate_edge_params_from_data(
     var_names = [v.strip() for v in var_str.split(',') if v.strip()]
     n_vars = len(var_names)
 
-    # Collect transition data from all NPZ files
-    # transition_data[(from_mode, to_mode)] = list of {state_before, deriv_before, state_after, deriv_after}
     transition_data: Dict[Tuple[int, int], List[Dict]] = {}
 
     for npz_path in npz_file_paths:
@@ -390,199 +413,336 @@ def estimate_edge_params_from_data(
             entry = {}
             for v in range(n_vars):
                 vn = var_names[v]
-                # State and derivatives just before transition
                 entry[f'{vn}_vals_before'] = [all_derivs[v][k][cp_idx - 1] for k in range(order + 1)]
-                # State and derivatives just after transition
                 entry[f'{vn}_vals_after'] = [all_derivs[v][k][min(cp_idx, len(mode) - 1)] for k in range(order + 1)]
 
             transition_data.setdefault((m_before, m_after), []).append(entry)
 
-    if verbose:
-        for key, entries in sorted(transition_data.items()):
-            print(f"  Transition {key[0]}->{key[1]}: {len(entries)} observations")
-
-    # Now update edge parameters based on collected data
-    updated_spec = json.loads(json.dumps(ha_spec))
-    for edge in updated_spec['automaton'].get('edge', []):
-        direction = edge.get('direction', '')
-        match = re.match(r'(\d+)\s*->\s*(\d+)', direction)
-        if not match:
-            continue
-        from_mode, to_mode = int(match.group(1)), int(match.group(2))
-        key = (from_mode, to_mode)
-
-        if key not in transition_data or not transition_data[key]:
-            if verbose:
-                print(f"  Edge {from_mode}->{to_mode}: no transition data, keeping original")
-            continue
-
-        entries = transition_data[key]
-
-        # --- Estimate guard threshold ---
-        if 'condition' in edge:
-            cond = edge['condition']
-            estimated_cond = _estimate_guard_from_data(cond, entries, var_names, verbose)
-            if estimated_cond:
-                edge['condition'] = estimated_cond
-                if verbose:
-                    print(f"  Edge {from_mode}->{to_mode} guard: '{cond}' -> '{estimated_cond}'")
-
-        # --- Estimate reset coefficients ---
-        if 'reset' in edge:
-            estimated_reset = _estimate_reset_from_data(
-                edge['reset'], entries, var_names, order, verbose
-            )
-            if estimated_reset:
-                edge['reset'] = estimated_reset
-                if verbose:
-                    print(f"  Edge {from_mode}->{to_mode} reset: {estimated_reset}")
-
-    return updated_spec
+    return transition_data
 
 
-def _estimate_guard_from_data(
-    condition: str,
-    entries: List[Dict],
-    var_names: List[str],
-    verbose: bool,
-) -> Optional[str]:
-    """
-    Estimate the guard threshold from transition observations.
+# ============================================================================
+# LLM-Based Edge Parameter Estimation
+# ============================================================================
 
-    Supports patterns like:
-      - "abs(x) <= 0.9"  → estimate threshold from |x| at transition points
-      - "x >= 1.2"       → estimate from x values
-      - "x1 <= 5"        → estimate from x1 values
-    """
-    # Parse the condition to find variable and comparison
-    # Pattern: optional abs(), variable name, comparison, number
-    m = re.match(
-        r'(abs\()?\s*([a-zA-Z_]\w*(?:\[\d+\])?)\s*\)?\s*(<=|>=|<|>|==)\s*([\d.eE+-]+)',
-        condition.strip()
-    )
-    if not m:
-        return None
-
-    has_abs = m.group(1) is not None
-    var_ref = m.group(2)
-    comparator = m.group(3)
-
-    # Find which variable this refers to
-    # var_ref could be "x", "x1", "x[0]", etc.
-    var_idx = 0
-    deriv_idx = 0
-    for i, vn in enumerate(var_names):
-        if var_ref.startswith(vn):
-            var_idx = i
-            # Check for derivative index: x[1] means first derivative
-            bracket_match = re.search(r'\[(\d+)\]', var_ref)
-            if bracket_match:
-                deriv_idx = int(bracket_match.group(1))
-            break
-
-    # Collect the variable values at each transition
-    vn = var_names[var_idx]
-    values = []
-    for e in entries:
-        before_vals = e.get(f'{vn}_vals_before', [])
-        if deriv_idx < len(before_vals):
-            val = before_vals[deriv_idx]
-            values.append(abs(val) if has_abs else val)
-
-    if not values:
-        return None
-
-    # Use median as robust estimate
-    threshold = float(np.median(values))
-
-    if verbose:
-        print(f"    Guard '{condition}': observed values {[f'{v:.4f}' for v in values[:5]]}... "
-              f"-> median={threshold:.6f}")
-
-    abs_prefix = "abs(" if has_abs else ""
-    abs_suffix = ")" if has_abs else ""
-    return f"{abs_prefix}{var_ref}{abs_suffix} {comparator} {threshold:.6f}"
-
-
-def _estimate_reset_from_data(
-    reset: Dict[str, Any],
-    entries: List[Dict],
+def format_transition_stats_for_llm(
+    transition_data: Dict[Tuple[int, int], List[Dict]],
     var_names: List[str],
     order: int,
-    verbose: bool,
+) -> str:
+    """
+    Format transition statistics into a readable summary for the LLM prompt.
+
+    For each transition direction, shows:
+      - State values at transition: median, std, range
+      - Derivative ratios (after/before): median, std
+      - Number of observations
+    """
+    lines = []
+    for (from_m, to_m), entries in sorted(transition_data.items()):
+        lines.append(f"Transition {from_m} -> {to_m} ({len(entries)} observations):")
+
+        for vn in var_names:
+            lines.append(f"  Variable '{vn}':")
+            for k in range(order + 1):
+                label = f"{vn}[{k}]" if k > 0 else vn
+                # Collect before-values for this derivative order
+                before_vals = [e[f'{vn}_vals_before'][k] for e in entries
+                               if f'{vn}_vals_before' in e and k < len(e[f'{vn}_vals_before'])]
+                after_vals = [e[f'{vn}_vals_after'][k] for e in entries
+                              if f'{vn}_vals_after' in e and k < len(e[f'{vn}_vals_after'])]
+
+                if before_vals:
+                    bv = np.array(before_vals)
+                    lines.append(f"    {label} before transition: median={np.median(bv):.6f}, "
+                                 f"std={np.std(bv):.6f}, range=[{np.min(bv):.6f}, {np.max(bv):.6f}]")
+                if after_vals:
+                    av = np.array(after_vals)
+                    lines.append(f"    {label} after transition:  median={np.median(av):.6f}, "
+                                 f"std={np.std(av):.6f}, range=[{np.min(av):.6f}, {np.max(av):.6f}]")
+
+                # Derivative ratios (after/before)
+                if before_vals and after_vals:
+                    ratios = []
+                    for bv_i, av_i in zip(before_vals, after_vals):
+                        if abs(bv_i) > 1e-8:
+                            ratios.append(av_i / bv_i)
+                    if ratios:
+                        rv = np.array(ratios)
+                        lines.append(f"    {label} ratio (after/before): median={np.median(rv):.6f}, "
+                                     f"std={np.std(rv):.6f}")
+
+        lines.append("")
+
+    return "\n".join(lines)
+
+
+def _get_edge_estimation_prompt() -> str:
+    """System prompt for LLM-based edge parameter estimation."""
+    return """You are an expert at analyzing Hybrid Automaton (HA) transition dynamics.
+
+Your task: Given an HA specification and transition statistics observed from ground truth data,
+estimate the numeric values for edge parameters (guard conditions and reset coefficients).
+
+TRANSITION STATISTICS INTERPRETATION:
+- "before transition" values = state/derivative values just before the guard fires
+- "after transition" values = state/derivative values just after the reset is applied
+- "ratio (after/before)" = how derivatives change across the transition (indicates reset coefficients)
+
+GUARD CONDITION ESTIMATION:
+- The guard threshold should be near the MEDIAN of state values at which transitions fire
+- For conditions like "abs(x) <= threshold", use the median of |x| before transition
+- For conditions like "x >= threshold", use the median of x before transition
+- If the standard deviation is high, the guard may involve multiple variables or be complex
+
+RESET COEFFICIENT ESTIMATION:
+- Reset coefficients multiply state/derivative values: "x[k] * coef"
+- Estimate coef from the MEDIAN derivative ratio (after/before) at the corresponding order
+- For velocity resets (e.g., "x[1] * coef"), use the x[1] ratio
+- Restitution coefficients are typically in [0.01, 2.0]
+
+BOUNDS ESTIMATION:
+- Wide bounds when std is high relative to median (uncertain estimate)
+- Narrow bounds when std is low (confident estimate)
+- Guard thresholds: [median - 3*std, median + 3*std], minimum width of 20% of value
+- Reset coefficients: always at least [0.01, 2.0] (physically motivated range)
+- General: never make bounds narrower than +/-20% of the estimated value
+
+OUTPUT FORMAT:
+- updated_edges: A JSON string containing the edges list with your estimated numeric values
+  replacing the original ones. Maintain the exact same structure (direction, condition format,
+  reset format), only change the numeric values.
+- bounds: One EdgeBound per numeric parameter in the edges, in the order they appear
+  (first all condition parameters left-to-right, then all reset parameters left-to-right,
+  for each edge in order).
+
+IMPORTANT: Only change numeric values. Do NOT change the structural form of conditions
+or resets (e.g., don't change "abs(x) <= N" to "x >= N")."""
+
+
+# ============================================================================
+# Edge Estimation Caching
+# ============================================================================
+
+def _get_edge_estimation_cache_path(
+    ha_spec: Dict[str, Any],
+    transition_stats_str: str,
+    cache_dir: str = ".edge_estimation_cache",
+) -> str:
+    """Get cache file path based on MD5 of spec + transition stats."""
+    combined = json.dumps(ha_spec, sort_keys=True) + transition_stats_str
+    cache_hash = hashlib.md5(combined.encode()).hexdigest()[:12]
+    os.makedirs(cache_dir, exist_ok=True)
+    return os.path.join(cache_dir, f"edge_estimation_{cache_hash}.json")
+
+
+def _save_edge_estimation_cache(
+    result: Dict[str, Any],
+    cache_path: str,
+    verbose: bool = True,
+) -> None:
+    """Save edge estimation result to a local JSON cache file."""
+    with open(cache_path, 'w') as f:
+        json.dump(result, f, indent=2)
+    if verbose:
+        print(f"[Cache] Saved edge estimation to {cache_path}")
+
+
+def _load_edge_estimation_cache(
+    cache_path: str,
+    verbose: bool = True,
 ) -> Optional[Dict[str, Any]]:
+    """Load edge estimation result from cache if it exists."""
+    if not os.path.exists(cache_path):
+        return None
+    try:
+        with open(cache_path, 'r') as f:
+            data = json.load(f)
+        if verbose:
+            print(f"[Cache] Loaded edge estimation from {cache_path}")
+        return data
+    except Exception as e:
+        if verbose:
+            print(f"[Cache] Failed to load cache ({e}), will re-estimate with LLM")
+        return None
+
+
+# ============================================================================
+# LLM Edge Estimation Function
+# ============================================================================
+
+def estimate_edge_params_with_llm(
+    ha_spec: Dict[str, Any],
+    npz_file_paths: List[str],
+    model_id: str = "gemini/gemini-2.5-flash-lite",
+    api_key: Optional[str] = None,
+    timeout: int = 60,
+    verbose: bool = True,
+) -> Tuple[Dict[str, Any], Optional[List[Dict]]]:
     """
-    Estimate reset coefficients from before/after derivative ratios.
+    Use LLM to estimate edge parameters from transition statistics.
 
-    For a reset like "x[1] * coef", computes coef = deriv_after / deriv_before.
+    The LLM receives the HA spec and observed transition statistics, then
+    estimates guard thresholds and reset coefficients with informed bounds.
+
+    Args:
+        ha_spec: HA specification dict
+        npz_file_paths: Paths to ground truth NPZ files
+        model_id: LiteLLM model identifier
+        api_key: API key (reads from GEMINI_API_KEY env var if None)
+        timeout: API call timeout in seconds
+        verbose: Print progress
+
+    Returns:
+        Tuple of (updated_ha_spec, list_of_bound_dicts_or_None).
+        On failure, returns the original spec unchanged (deep copy) with None bounds,
+        so Nevergrad still works with default bounds.
     """
-    estimated = {}
-    for var_name, reset_val in reset.items():
-        if not isinstance(reset_val, list):
-            estimated[var_name] = reset_val
-            continue
+    if not HAS_LITELLM:
+        if verbose:
+            print("[LLM Edge] litellm not available, returning original spec unchanged")
+        return json.loads(json.dumps(ha_spec)), None
 
-        new_list = []
-        for k, item in enumerate(reset_val):
-            if not isinstance(item, str) or not item.strip():
-                new_list.append(item)
-                continue
+    # Load API key
+    if api_key is None:
+        load_dotenv(override=True)
+        api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        if verbose:
+            print("[LLM Edge] No GEMINI_API_KEY found, returning original spec unchanged")
+        return json.loads(json.dumps(ha_spec)), None
 
-            # Try to detect pattern: "var[k] * coef" or "coef * var[k]"
-            # and estimate coef from data
-            coef_match = re.search(
-                r'([a-zA-Z_]\w*)\[(\d+)\]\s*\*\s*([\d.eE+-]+)', item
+    try:
+        if verbose:
+            print("\n" + "=" * 60)
+            print("[LLM Edge] Estimating edge parameters with LLM")
+            print("=" * 60)
+
+        # Step 1: Collect transition statistics
+        automaton = ha_spec['automaton']
+        var_str = automaton.get('var', 'x')
+        var_names = [v.strip() for v in var_str.split(',') if v.strip()]
+        order = ha_spec.get('config', {}).get('order', 2)
+
+        transition_data = collect_transition_statistics(ha_spec, npz_file_paths)
+
+        if not transition_data:
+            if verbose:
+                print("  No transitions found in data, returning original spec unchanged")
+            return json.loads(json.dumps(ha_spec)), None
+
+        if verbose:
+            for key, entries in sorted(transition_data.items()):
+                print(f"  Transition {key[0]}->{key[1]}: {len(entries)} observations")
+
+        # Step 2: Format stats for LLM
+        stats_str = format_transition_stats_for_llm(transition_data, var_names, order)
+
+        # Step 3: Check cache
+        cache_path = _get_edge_estimation_cache_path(ha_spec, stats_str)
+        cached = _load_edge_estimation_cache(cache_path, verbose)
+        if cached is not None:
+            updated_spec = json.loads(json.dumps(ha_spec))
+            updated_spec['automaton']['edge'] = cached['edges']
+            bounds = cached.get('bounds')
+            return updated_spec, bounds
+
+        # Step 4: Build prompt and call LLM
+        ha_spec_str = json.dumps(ha_spec, indent=2)
+        user_prompt = f"""Analyze this Hybrid Automaton specification and the observed transition statistics
+to estimate edge parameter values (guard thresholds and reset coefficients).
+
+HA Specification:
+```json
+{ha_spec_str}
+```
+
+Observed Transition Statistics:
+```
+{stats_str}
+```
+
+Estimate the numeric values for all edge conditions and resets based on the statistics above.
+Provide updated edges with your estimates and suggested optimization bounds."""
+
+        if verbose:
+            print("\n[LLM Edge] Calling LLM for edge estimation...")
+
+        response = litellm.completion(
+            model=model_id,
+            messages=[
+                {"role": "system", "content": _get_edge_estimation_prompt()},
+                {"role": "user", "content": user_prompt}
+            ],
+            api_key=api_key,
+            timeout=timeout,
+            response_format={
+                "type": "json_schema",
+                "json_schema": {
+                    "name": "EdgeEstimationResult",
+                    "schema": EdgeEstimationResult.model_json_schema(),
+                    "strict": True,
+                }
+            }
+        )
+
+        content = response.choices[0].message.content
+        if content is None:
+            raise ValueError("LLM returned empty response")
+
+        result = EdgeEstimationResult.model_validate_json(content)
+
+        # Step 5: Parse and apply estimated values
+        try:
+            estimated_edges = json.loads(result.updated_edges)
+        except json.JSONDecodeError as e:
+            raise ValueError(f"LLM returned invalid edges JSON: {e}")
+
+        # Validate edge count matches
+        original_edges = ha_spec['automaton'].get('edge', [])
+        if len(estimated_edges) != len(original_edges):
+            raise ValueError(
+                f"Edge count mismatch: LLM returned {len(estimated_edges)}, "
+                f"expected {len(original_edges)}"
             )
-            if not coef_match:
-                coef_match_rev = re.search(
-                    r'([\d.eE+-]+)\s*\*\s*([a-zA-Z_]\w*)\[(\d+)\]', item
-                )
-                if coef_match_rev:
-                    ref_var = coef_match_rev.group(2)
-                    deriv_k = int(coef_match_rev.group(3))
-                else:
-                    new_list.append(item)
-                    continue
-            else:
-                ref_var = coef_match.group(1)
-                deriv_k = int(coef_match.group(2))
 
-            # Find the matching variable index
-            v_idx = None
-            for i, vn in enumerate(var_names):
-                if ref_var == vn:
-                    v_idx = i
-                    break
-            if v_idx is None:
-                new_list.append(item)
-                continue
+        # Build updated spec
+        updated_spec = json.loads(json.dumps(ha_spec))
+        updated_spec['automaton']['edge'] = estimated_edges
 
-            # Compute ratio of after/before for this derivative
-            vn = var_names[v_idx]
-            ratios = []
-            for e in entries:
-                before = e.get(f'{vn}_vals_before', [])
-                after = e.get(f'{vn}_vals_after', [])
-                if deriv_k < len(before) and deriv_k < len(after):
-                    b_val = before[deriv_k]
-                    a_val = after[deriv_k]
-                    if abs(b_val) > 1e-8:
-                        ratios.append(a_val / b_val)
+        # Convert bounds to list of dicts
+        bounds_list = [
+            {
+                'name': b.name,
+                'value': b.value,
+                'lower': b.lower_bound,
+                'upper': b.upper_bound,
+                'reasoning': b.reasoning,
+            }
+            for b in result.bounds
+        ]
 
-            if ratios:
-                coef = float(np.median(ratios))
-                if verbose:
-                    print(f"    Reset {var_name}[{k}]: ratios={[f'{r:.4f}' for r in ratios[:5]]}... "
-                          f"-> median coef={coef:.6f}")
-                # Check for negative sign prefix in original
-                neg_prefix = "-" if item.strip().startswith("-") else ""
-                new_list.append(f"{neg_prefix}{ref_var}[{deriv_k}] * {abs(coef):.6f}")
-            else:
-                new_list.append(item)
+        if verbose:
+            print(f"[LLM Edge] Estimated {len(bounds_list)} edge parameters:")
+            for b in bounds_list:
+                print(f"    {b['name']}: {b['value']:.6f} [{b['lower']:.4f}, {b['upper']:.4f}] — {b['reasoning']}")
+            print(f"\n[LLM Edge] Updated edges:")
+            for edge in estimated_edges:
+                print(f"    {edge.get('direction')}: condition='{edge.get('condition')}', reset={edge.get('reset')}")
 
-        estimated[var_name] = new_list
+        # Step 6: Save to cache
+        _save_edge_estimation_cache(
+            {'edges': estimated_edges, 'bounds': bounds_list},
+            cache_path, verbose
+        )
 
-    return estimated
+        return updated_spec, bounds_list
+
+    except Exception as e:
+        if verbose:
+            print(f"[LLM Edge] Failed: {type(e).__name__}: {e}")
+            print("[LLM Edge] Returning original spec unchanged")
+        return json.loads(json.dumps(ha_spec)), None
 
 
 # ============================================================================
@@ -791,6 +951,7 @@ def nevergrad_optimize_edges(
     npz_file_paths: List[str],
     budget: Optional[int] = None,
     num_workers: Optional[int] = None,
+    llm_bounds: Optional[List[Dict]] = None,
     verbose: bool = True,
 ) -> Dict[str, Any]:
     """
@@ -801,6 +962,9 @@ def nevergrad_optimize_edges(
         npz_file_paths: Ground truth NPZ file paths
         budget: Optimization budget (auto-calculated if None)
         num_workers: Parallel workers (auto if None)
+        llm_bounds: Optional LLM-suggested bounds (list of dicts with 'value', 'lower', 'upper').
+                    When provided and count matches extracted edge params, overrides the
+                    default +/-30% bounds with LLM-informed bounds.
         verbose: Print progress
 
     Returns:
@@ -821,6 +985,29 @@ def nevergrad_optimize_edges(
         if verbose:
             print("  No edge parameters to optimize.")
         return {'ha_spec': ha_spec, 'error': None, 'edge_params': {}}
+
+    # Override bounds with LLM-suggested bounds if available and count matches
+    if llm_bounds is not None and len(llm_bounds) == len(edge_params):
+        if verbose:
+            print(f"  Using LLM-suggested bounds for {len(llm_bounds)} parameters:")
+        for i, (ep, lb) in enumerate(zip(edge_params, llm_bounds)):
+            old_lower, old_upper = ep['lower'], ep['upper']
+            new_lower, new_upper = lb['lower'], lb['upper']
+            # Enforce minimum bound width: at least 20% of value on each side
+            val = abs(ep['value']) if ep['value'] != 0 else 1.0
+            min_width = val * 0.2
+            if new_upper - new_lower < min_width:
+                center = (new_lower + new_upper) / 2
+                new_lower = center - min_width / 2
+                new_upper = center + min_width / 2
+            ep['lower'] = new_lower
+            ep['upper'] = new_upper
+            if verbose:
+                print(f"    {ep['name']}: [{old_lower:.4f}, {old_upper:.4f}] -> [{new_lower:.4f}, {new_upper:.4f}]")
+    elif llm_bounds is not None:
+        if verbose:
+            print(f"  LLM bounds count ({len(llm_bounds)}) doesn't match param count "
+                  f"({len(edge_params)}), using default +/-30% bounds")
 
     # Build Nevergrad parametrization with init values at data-estimated centers
     ng_params = {}
@@ -916,6 +1103,7 @@ def optimize_ha_sindy_nevergrad(
     sindy_threshold: float = 0.05,
     nevergrad_budget: Optional[int] = None,
     num_workers: Optional[int] = None,
+    edge_estimation_model: str = "gemini/gemini-flash-lite-latest",
     verbose: bool = True,
 ) -> Dict[str, Any]:
     """
@@ -929,6 +1117,7 @@ def optimize_ha_sindy_nevergrad(
         sindy_threshold: SINDy sparsity threshold
         nevergrad_budget: Edge optimization budget (auto if None)
         num_workers: Parallel workers for Nevergrad
+        edge_estimation_model: LiteLLM model ID for edge estimation LLM calls
         verbose: Print progress
 
     Returns:
@@ -982,21 +1171,23 @@ def optimize_ha_sindy_nevergrad(
             except Exception as e:
                 print(f"  {os.path.basename(npz_path)}: evaluation failed: {e}")
 
-    # --- Phase 1.5: Data-driven edge estimation ---
-    data_spec = estimate_edge_params_from_data(
+    # --- Phase 1.5: LLM-based edge parameter estimation ---
+    edge_spec, llm_bounds = estimate_edge_params_with_llm(
         ha_spec=sindy_spec,
         npz_file_paths=npz_paths,
+        model_id=edge_estimation_model,
         verbose=verbose,
     )
 
-    # Evaluate after data-driven estimation
+    # Evaluate after edge estimation
     if verbose:
+        estimation_method = "LLM" if llm_bounds is not None else "fallback (unchanged)"
         print("\n" + "-" * 60)
-        print("[Evaluation] After data-driven edge estimation:")
+        print(f"[Evaluation] After {estimation_method} edge estimation:")
         for npz_path in npz_paths:
             try:
-                ev = HAEvaluator(data_spec, npz_path, dt=data_spec['config']['dt'],
-                                 total_time=data_spec['config']['total_time'])
+                ev = HAEvaluator(edge_spec, npz_path, dt=edge_spec['config']['dt'],
+                                 total_time=edge_spec['config']['total_time'])
                 ev.load_ground_truth()
                 ev.simulate()
                 m = ev.compute_metrics()
@@ -1004,17 +1195,18 @@ def optimize_ha_sindy_nevergrad(
             except Exception as e:
                 print(f"  {os.path.basename(npz_path)}: evaluation failed: {e}")
 
-    # --- Phase 2: Nevergrad refinement (fine-tuning around data estimates) ---
+    # --- Phase 2: Nevergrad refinement (fine-tuning around estimates) ---
     result = nevergrad_optimize_edges(
-        ha_spec=data_spec,
+        ha_spec=edge_spec,
         npz_file_paths=npz_paths,
         budget=nevergrad_budget,
         num_workers=num_workers,
+        llm_bounds=llm_bounds,
         verbose=verbose,
     )
 
     result['sindy_spec'] = sindy_spec
-    result['data_estimated_spec'] = data_spec
+    result['edge_estimated_spec'] = edge_spec
 
     if verbose:
         print("\n" + "=" * 70)
@@ -1087,6 +1279,7 @@ if __name__ == "__main__":
         train_num=1,
         poly_degree=3,
         sindy_threshold=0.05,
+        edge_estimation_model="gemini/gemini-flash-lite-latest",
         verbose=True,
     )
 
