@@ -34,7 +34,6 @@ Early stopping: target error achieved, no improvement for N iterations, or near-
 
 Uses **smolagents** (HuggingFace) with **CodeAgent** (can execute code + use tools) or **ToolCallingAgent** (function-calling only).
 
-**Important: Always use the CodeAgent class for creating the agents, including the manager agent and the managed agents.**
 **Critical pattern — delayed tool injection:**
 ```python
 for toolName in managerAgent.tools:
@@ -217,10 +216,11 @@ Conventions:
 
 5. **Some source files contain Chinese comments** (notably `ha_structured_output.py`).
 
-6. **Model Configuration**: Use `openrouter/google/gemini-2.5-pro` for complex reasoning, `gemini/gemini-2.5-flash-lite` for faster/cheaper operations. LiteLLM manages API routing.
 
 ## Guideline
 
 1. When modifying output formatting or display strings, show the exact expected output format before making changes. Ask for clarification if the desired format isn't explicit.
 2. For complex multi-step implementations, use @planning-with-files
-3. For the Gemini model, when testing, MUST use the 'gemini-2.5-flash-lite'
+3. Use `gemini/gemini-flash-lite-latest` for testing. LiteLLM manages API routing.
+4. Always use the CodeAgent class for creating the agents, including the manager agent and the managed agents.
+5. Remember, every time you write test code, you should consider all the automata, NOT JUST ONE AUTOMATA.
