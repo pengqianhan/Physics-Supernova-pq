@@ -223,4 +223,4 @@ Conventions:
 2. For complex multi-step implementations, use @planning-with-files
 3. Use `gemini/gemini-flash-lite-latest` for testing. LiteLLM manages API routing.
 4. Always use the CodeAgent class for creating the agents, including the manager agent and the managed agents.
-5. Remember, every time you write test code, you should consider all the automata, NOT JUST ONE AUTOMATA.
+5. Remember, every time you write test code, you should consider all the automata, NOT JUST ONE AUTOMATA. Use the ball as a simple example, and duffing as the complex example.
