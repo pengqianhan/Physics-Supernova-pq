@@ -38,8 +38,8 @@ SINDyPI = getattr(ps_optimizers, "SINDyPI", None)  # Requires cvxpy
 MIOSR = getattr(ps_optimizers, "MIOSR", None)  # Requires pysindy[miosr] (Gurobi backend)
 SBR = getattr(ps_optimizers, "SBR", None)  # Requires numpyro / pysindy[sbr]
 
+# Here is an example of how to use the sindy template to fit a model to data.
 # ── Feature Libraries ──────────────────────────────────────────────────────────
-
 # Polynomial terms to capture higher-order dynamics
 poly_lib = PolynomialLibrary(degree=4, include_interaction=True, include_bias=True)
 
