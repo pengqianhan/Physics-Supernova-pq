@@ -34,6 +34,7 @@ Early stopping: target error achieved, no improvement for N iterations, or near-
 
 Uses **smolagents** (HuggingFace) with **CodeAgent** (can execute code + use tools) or **ToolCallingAgent** (function-calling only).
 
+**Important: Always use the CodeAgent class for creating the agents, including the manager agent and the managed agents.**
 **Critical pattern — delayed tool injection:**
 ```python
 for toolName in managerAgent.tools:
