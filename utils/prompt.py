@@ -29,8 +29,8 @@ one_mode_reset_ha_spec_prompt = """{
         ]
     },
     "config": {
-        "dt": 0.001,
-        "total_time": 10.0,
+        "dt": 0.0001,
+        "total_time": 2.0,
         "order": 1,
         "need_reset": true,
         "non_linear_items": ""

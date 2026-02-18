@@ -149,8 +149,8 @@ def generate_dynamic_ha_template(num_variables: int, num_inputs: int) -> str:
         "edge": []
     }},
     "config": {{
-        "dt": 0.001,
-        "total_time": 10.0,
+        "dt":,
+        "total_time":,
         "order": {dim},
         "need_reset": false,
         "non_linear_items": ""
@@ -470,7 +470,6 @@ A Hybrid Automaton models a system with:
 ## Metrics (lower is better)
 - `Max Difference < 0.002`: good fit
 - `Mean Difference < 0.001`: accurate overall
-- `TC (Change-Point Error) < 0.01s`: mode switch timing correct
 """
 
     task += "\n## Tool and Sub-Agents Resources:\n"
