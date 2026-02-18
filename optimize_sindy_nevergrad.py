@@ -1,13 +1,24 @@
 """
 Combined SINDy + Nevergrad Hybrid Automaton Parameter Optimization
 
-Pipeline:
-  1. SINDy Agent: Fits mode ODEs (mode.eq) from trajectory data using PySINDy
-  2. Nevergrad Agent: Optimizes edge parameters (edge.condition & edge.reset)
-     using gradient-free optimization against ground truth
+Works with ANY hybrid automaton specification — not limited to Duffing.
+The pipeline is fully driven by the HA JSON spec (var names, modes, edges, order).
 
-Usage:
-    python optimize_sindy_nevergrad.py  # Runs duffing oscillator demo
+Pipeline:
+  1. SINDy Agent:    Fits mode ODEs (mode.eq) from trajectory data using PySINDy
+  2. LLM Agent:      Estimates edge parameters (guards & resets) from transition stats
+  3. Nevergrad Agent: Refines edge parameters via gradient-free optimization
+
+Usage (arbitrary HA):
+    python optimize_sindy_nevergrad.py \\
+        --ha-spec-file my_ha.json \\
+        --input-data-path data_all/my_system \\
+        --train-num 3
+
+Usage (built-in Duffing demo):
+    python optimize_sindy_nevergrad.py
+
+Run with --help to see all options.
 """
 
 import hashlib
@@ -1222,15 +1233,13 @@ def optimize_ha_sindy_nevergrad(
 # ============================================================================
 
 if __name__ == "__main__":
-    input_data_path = "data_all/non_linear/duffing"
-    gt_dir = input_data_path + '_g'
+    import argparse
 
-    if not os.path.isdir(gt_dir):
-        print(f"Error: Ground truth directory not found: {gt_dir}")
-        sys.exit(1)
-
-    # Same initial_ha_spec from optimize_ha_params.py
-    initial_ha_spec = {
+    # ------------------------------------------------------------------ #
+    # Default HA spec used when no --ha-spec-file is supplied (Duffing).  #
+    # For any other system, pass a JSON file via --ha-spec-file.           #
+    # ------------------------------------------------------------------ #
+    _DUFFING_SPEC = {
         "automaton": {
             "var": "x",
             "input": "u",
@@ -1269,18 +1278,129 @@ if __name__ == "__main__":
         }
     }
 
-    print("Initial HA Specification (with WRONG parameters):")
-    print(json.dumps(initial_ha_spec, indent=2))
-    print()
+    parser = argparse.ArgumentParser(
+        description=(
+            "SINDy + Nevergrad Hybrid Automaton Parameter Optimization.\n"
+            "Works with any HA system — pass a JSON spec via --ha-spec-file.\n"
+            "Defaults to the Duffing oscillator demo if no spec is given."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "--ha-spec-file",
+        type=str,
+        default=None,
+        metavar="PATH",
+        help=(
+            "Path to a JSON file containing the initial HA specification. "
+            "If omitted, the built-in Duffing oscillator demo spec is used."
+        ),
+    )
+    parser.add_argument(
+        "--input-data-path",
+        type=str,
+        default="data_all/non_linear/duffing",
+        metavar="PATH",
+        help=(
+            "Path to the data directory. Ground truth files are expected in "
+            "{PATH}_g/ground_truth_*.npz  (default: data_all/non_linear/duffing)"
+        ),
+    )
+    parser.add_argument(
+        "--train-num",
+        type=int,
+        default=1,
+        metavar="N",
+        help="Number of ground truth NPZ files to use for training (default: 1)",
+    )
+    parser.add_argument(
+        "--poly-degree",
+        type=int,
+        default=3,
+        metavar="D",
+        help="Maximum polynomial degree for the SINDy feature library (default: 3)",
+    )
+    parser.add_argument(
+        "--sindy-threshold",
+        type=float,
+        default=0.05,
+        metavar="T",
+        help="STLSQ sparsity threshold for SINDy (default: 0.05)",
+    )
+    parser.add_argument(
+        "--nevergrad-budget",
+        type=int,
+        default=None,
+        metavar="B",
+        help="Nevergrad optimization budget (auto-calculated from param count if omitted)",
+    )
+    parser.add_argument(
+        "--num-workers",
+        type=int,
+        default=None,
+        metavar="W",
+        help="Number of parallel Nevergrad workers (auto if omitted)",
+    )
+    parser.add_argument(
+        "--edge-model",
+        type=str,
+        default="gemini/gemini-flash-lite-latest",
+        metavar="MODEL",
+        help="LiteLLM model ID used for LLM-based edge estimation (default: gemini/gemini-flash-lite-latest)",
+    )
+    parser.add_argument(
+        "--output-file",
+        type=str,
+        default=None,
+        metavar="PATH",
+        help="Optional path to save the final optimized HA spec as a JSON file",
+    )
+    parser.add_argument(
+        "--quiet",
+        action="store_true",
+        help="Suppress verbose progress output",
+    )
+
+    args = parser.parse_args()
+    verbose = not args.quiet
+
+    # Load HA spec
+    if args.ha_spec_file is not None:
+        with open(args.ha_spec_file, 'r') as f:
+            initial_ha_spec = json.load(f)
+        if verbose:
+            print(f"Loaded HA spec from: {args.ha_spec_file}")
+    else:
+        if verbose:
+            print("No --ha-spec-file provided — using built-in Duffing oscillator demo.")
+        initial_ha_spec = _DUFFING_SPEC
+
+    # Validate ground truth directory
+    gt_dir = args.input_data_path.rstrip('/') + '_g'
+    if not os.path.isdir(gt_dir):
+        print(f"Error: Ground truth directory not found: {gt_dir}")
+        sys.exit(1)
+
+    if verbose:
+        print("\nInitial HA Specification:")
+        print(json.dumps(initial_ha_spec, indent=2))
+        print()
 
     result = optimize_ha_sindy_nevergrad(
         ha_spec=initial_ha_spec,
-        input_data_path=input_data_path,
-        train_num=1,
-        poly_degree=3,
-        sindy_threshold=0.05,
-        edge_estimation_model="gemini/gemini-flash-lite-latest",
-        verbose=True,
+        input_data_path=args.input_data_path,
+        train_num=args.train_num,
+        poly_degree=args.poly_degree,
+        sindy_threshold=args.sindy_threshold,
+        nevergrad_budget=args.nevergrad_budget,
+        num_workers=args.num_workers,
+        edge_estimation_model=args.edge_model,
+        verbose=verbose,
     )
 
     print(f"\nFinal error: {result.get('error', 'N/A')}")
+
+    if args.output_file:
+        with open(args.output_file, 'w') as f:
+            json.dump(result['ha_spec'], f, indent=2)
+        print(f"Optimized HA spec saved to: {args.output_file}")
