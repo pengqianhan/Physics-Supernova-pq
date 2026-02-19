@@ -20,13 +20,13 @@ class HybridAutomatonImageTool(Tool):
         "An advanced image expert tool equipped with a Python Code Execution Environment."
         "Given an image placeholder and a question, return the image expert's answer about that image. "
         "Accepts placeholders only: (1) <image_N> for original trace images from markdown, or "
-        "(2) <iter_image_N> for evaluator plots registered during iteration. "
+        "(2) <iter_image_X_Y> for evaluator plots registered during iteration. "
         "When you need to measure quantities or analyze trajectory comparisons, you MUST call this tool."
     )
     inputs = {
         "image_ref": {
             "type": "string",
-            "description": "Image placeholder: <image_N> for trace images or <iter_image_N> for evaluator plots"
+            "description": "Image placeholder: <image_N> for trace images or <iter_image_X_Y> for evaluator plots"
         },
         "question": {"type": "string", "description": "Question to ask about the image"},
     }
@@ -129,7 +129,7 @@ class HybridAutomatonImageTool(Tool):
             # Register from file path
             tool.register_iteration_image(0, "evaluation_results/run_1/overlay.png")
             # Then analyze using placeholder
-            tool.forward("<iter_image_0>", "What does this plot show?")
+            tool.forward("<iter_image_1_0>", "What does this plot show?")
         """
         if isinstance(source, bytes):
             self._iteration_images[index] = source

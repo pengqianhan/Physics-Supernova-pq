@@ -469,7 +469,7 @@ A Hybrid Automaton models a system with:
 
 ## Metrics (lower is better)
 - `Max Difference < 0.002`: good fit
-- `Mean Difference < 0.001`: accurate overall
+- `Mean Difference < 0.001`: good fit
 """
 
     task += "\n## Tool and Sub-Agents Resources:\n"
@@ -557,7 +557,7 @@ Each NPZ file contains:
 
     # Add feedback from previous iteration if available
     if feedback:
-        task += f""""\n## Previously Explored HA Specifications with Feedback:\nUse these as inspiration to guide your next refinement.\nUse the `hybrid_automaton_image_analysis` tool to analyze the comparison plot through the `Placeholder` in the `Evaluation Plot` section.\n
+        task += f""""\n## Previously Explored HA Specifications with Feedback:\nUse these as inspiration to guide your next refinement.\nUse the `hybrid_automaton_image_analysis` tool to analyze the comparison plot through the `Placeholder` in the `Evaluation Plot` section.\n If you want to check the fit performance of the HA specification, you can use the `hybrid_automaton_image_analysis` tool to analyze the comparison plot through the `Placeholder` in the `Evaluation Plot` section. For example, `hybrid_automaton_image_analysis(image_ref='<iter_image_2_0>', question='How is the fit performance of the HA specification?')` means to analyze the '2nd iteration, 0th file' comparison plot.`.
 {feedback}"""
 
     return task, compressed_trace_images

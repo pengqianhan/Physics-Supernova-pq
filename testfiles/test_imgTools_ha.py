@@ -25,8 +25,10 @@ mock_agent = MockWorkerAgent()
 image_tool = HybridAutomatonImageTool(worker_agent=mock_agent)
 
 
+success, error_msg = image_tool.register_iteration_image(100, "evaluation_results/ATVA/ball/runs/20260219_144321_ddaf/iter_1/overlay_0.png")
+
 feedback = image_tool.forward(
-    image_ref="<image_0>",
+    image_ref="<iter_image_1_0>",
     question="What is the title of the image?"
 )
 
