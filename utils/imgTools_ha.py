@@ -247,7 +247,7 @@ class HybridAutomatonImageTool(Tool):
 
     def forward(self, image_ref: str, question: str) -> str:  # type: ignore[override]
         """Process image analysis request and return expert response."""
-        # Extract image bytes from placeholder (<image_N> or <iter_image_N>)
+        # Extract image bytes from placeholder (<image_N> or <iter_image_X_Y>)
         img_bytes, error_msg = self._extract_image_bytes(image_ref)
 
         if img_bytes is None:
