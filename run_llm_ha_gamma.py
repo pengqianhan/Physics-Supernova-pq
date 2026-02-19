@@ -553,6 +553,12 @@ Each NPZ file contains:
 
 **WARNING**: Do NOT use placeholder names like `<npz_0>` as file paths! Use the `data_analysis_expert` agent which has access to the actual file paths.
 
+### Detecting Mode Transitions via Numerical Analysis
+For higher-order systems (order >= 2), position trajectories may appear smooth even when mode transitions occur, because resets often affect **derivatives** (velocity, acceleration) rather than position directly. Use the `data_analysis_expert` agent to:
+1. **Compute numerical derivatives**: `velocity = np.diff(state, axis=1) / dt` and `acceleration = np.diff(velocity, axis=1) / dt`
+2. **Detect discontinuities**: sudden jumps in velocity or acceleration indicate potential mode transition points and resets
+3. **Segment-wise analysis**: once candidate transition points are identified, analyze each segment's dynamics separately to infer mode-specific ODEs and guard conditions
+
 """
 
     # Add feedback from previous iteration if available

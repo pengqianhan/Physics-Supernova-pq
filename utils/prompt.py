@@ -48,7 +48,15 @@ second_order_ha_spec_prompt = """{
                 "eq": "x1[2] = x1[1] + x1[0] + x1[0] ** 2 + u1"
             }
         ],
-        "edge": []
+        "edge": [
+            {
+                "direction": "1 -> 1",
+                "condition": "x1 <= 0",
+                "reset": {
+                    "x1": ["", "x[1] * 0.8"],
+                }
+            }
+        ]
     },
     "config": {
         "dt": 0.001,
