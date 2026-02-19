@@ -596,7 +596,7 @@ def gen_summary(
     actionable feedback for improving the hybrid automaton model.
 
     Args:
-        metrics_dict: Dictionary containing evaluation metrics (mean_diff, max_diff, tc, etc.)
+        metrics_dict: Dictionary containing evaluation metrics (mean_diff, max_diff, etc.)
         ha_specification: The HA specification dictionary being evaluated
         plot_paths: Path(s) to overlay plot image(s) - can be a single string or list of strings
         model_id: LiteLLM model ID (default: gemini/gemini-3-flash-preview)
@@ -743,7 +743,6 @@ def build_artifact_manifest(
 
     manifest = {
         "Evaluation Metrics (Averaged)": {
-            "TC (Change-Point Error)": metrics.get('tc', None),
             "Max Difference": metrics.get('max_diff', None),
             "Mean Difference": metrics.get('mean_diff', None),
             "Num Ground Truth Files": metrics.get('num_evaluations', 1),
@@ -917,7 +916,6 @@ def evaluate_ha_specification_with_feedback(
                 "ground_truth_index": file_idx,
                 "ground_truth_file": test_file,
                 "plot_placeholder": plot_placeholder,
-                "tc": file_metrics.get('tc'),
                 "max_diff": file_metrics.get('max_diff'),
                 "mean_diff": file_metrics.get('mean_diff')
             })
@@ -925,7 +923,6 @@ def evaluate_ha_specification_with_feedback(
         # Compute aggregated metrics
         aggregated_metrics = compute_aggregated_metrics(all_metrics)
         print(f"\n--- Aggregated Metrics (over {len(all_metrics)} files) ---")
-        print(f"  Mean TC: {aggregated_metrics.get('tc', 'N/A'):.6f}" if aggregated_metrics.get('tc') is not None else "  Mean TC: N/A")
         print(f"  Mean Max Diff: {aggregated_metrics.get('max_diff', 'N/A'):.6f}" if aggregated_metrics.get('max_diff') is not None else "  Mean Max Diff: N/A")
         print(f"  Mean Mean Diff: {aggregated_metrics.get('mean_diff', 'N/A'):.6f}" if aggregated_metrics.get('mean_diff') is not None else "  Mean Mean Diff: N/A")
 
@@ -942,7 +939,6 @@ def evaluate_ha_specification_with_feedback(
 
             # Write aggregated metrics
             f.write("Aggregated Metrics:\n")
-            f.write(f"  Mean TC: {aggregated_metrics.get('tc', 'N/A')}\n")
             f.write(f"  Mean Max Diff: {aggregated_metrics.get('max_diff', 'N/A')}\n")
             f.write(f"  Mean Mean Diff: {aggregated_metrics.get('mean_diff', 'N/A')}\n\n")
 
