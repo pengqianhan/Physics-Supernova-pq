@@ -167,6 +167,21 @@ TOOLNAME2TOOL = {
     'validate_hybrid_automaton_specification': ValidateHASpecTool,
 }
 
+# Shared authorized imports for both manager and managed agents
+AUTHORIZED_IMPORTS_LIST = [
+    "os", "sys", "time", "argparse", "pathlib",
+    "matplotlib.pyplot", "matplotlib", "pandas", "json",
+    # numpy and all common submodules
+    "numpy", "numpy.linalg", "numpy.fft", "numpy.random",
+    "numpy.polynomial", "numpy.ma", "numpy.lib","numpy.diff",
+    # scipy and all common submodules
+    "scipy", "scipy.linalg", "scipy.optimize", "scipy.interpolate",
+    "scipy.integrate", "scipy.stats", "scipy.signal", "scipy.fft",
+    "scipy.sparse", "scipy.ndimage", "scipy.special",
+    # optimization and system identification
+    "pysindy", "gradient_free_optimizers", "gradient_free_optimizers.BayesianOptimizer",
+]
+
 
 def _create_HA_agent(Tools_list: List[type[Tool]],
                      markdown_content: MarkdownMessage,
@@ -212,17 +227,7 @@ def _create_HA_agent(Tools_list: List[type[Tool]],
     )
 
     if kwargs["manager_type"] == "CodeAgent":
-        manager_agent_kwargs["additional_authorized_imports"] = [
-            "os", "sys", "time", "argparse", "pathlib",
-            "matplotlib.pyplot", "matplotlib", "pandas", "json",
-            # numpy and all common submodules
-            "numpy", "numpy.linalg", "numpy.fft", "numpy.random", 
-            "numpy.polynomial", "numpy.ma", "numpy.lib",
-            # scipy and all common submodules
-            "scipy", "scipy.linalg", "scipy.optimize", "scipy.interpolate",
-            "scipy.integrate", "scipy.stats", "scipy.signal", "scipy.fft",
-            "scipy.sparse", "scipy.ndimage", "scipy.special"
-        ]
+        manager_agent_kwargs["additional_authorized_imports"] = AUTHORIZED_IMPORTS_LIST
         managerAgent = CodeAgent(**manager_agent_kwargs)
     elif kwargs["manager_type"] == "ToolCallingAgent":
         manager_agent_kwargs["max_tool_threads"] = 1
@@ -273,26 +278,13 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
             timeout=1200,
             thinking_level = "high" # high, low
         )
-    authorized_imports_list = [
-            "os", "sys", "time", "argparse", "pathlib",
-            "matplotlib.pyplot", "matplotlib", "pandas", "json",
-            # numpy and all common submodules
-            "numpy", "numpy.linalg", "numpy.fft", "numpy.random", 
-            "numpy.polynomial", "numpy.ma", "numpy.lib",
-            # scipy and all common submodules
-            "scipy", "scipy.linalg", "scipy.optimize", "scipy.interpolate",
-            "scipy.integrate", "scipy.stats", "scipy.signal", "scipy.fft",
-            "scipy.sparse", "scipy.ndimage", "scipy.special"
-            # 
-            "pysindy","gradient_free_optimizers","gradient_free_optimizers.BayesianOptimizer"
-        ]
     managed_agent_kwargs = dict(
         model=model,
         tools=[],
         max_steps=80,
         verbosity_level=2,
         add_base_tools=True,
-        additional_authorized_imports=authorized_imports_list,
+        additional_authorized_imports=AUTHORIZED_IMPORTS_LIST,
     )
     npz_files_description = "\n".join([f" {placeholder} - `{path}` - `DATA_FILE_PATHS[{i}]`" for i, (placeholder, path) in enumerate(zip(npz_placeholders, npz_paths_list))])
     for agent_name in managed_agents_list:
@@ -302,7 +294,6 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
 ### Quick Access via State Variables
 
 - `DATA_FILE_PATHS`: List of all available NPZ file paths
-**Authorized_imports_list** is {authorized_imports_list}
 
 ### Example Usage
 
