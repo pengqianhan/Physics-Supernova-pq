@@ -112,14 +112,10 @@ class HybridAutomatonImageTool(Tool):
             return None, f"Failed to read file: {str(e)}"
 
     def register_iteration_image(self, index: int, source: str | bytes) -> tuple[bool, str]:
-        """
-        Register an evaluator plot image for later analysis via <iter_image_N> placeholder.
-
-        Call this method upstream (before forward()) to make evaluator plots available
-        for analysis using consistent placeholder-based references.
-
+        f"""
+        Register an evaluator plot image for later analysis via <iter_image_X_Y>, use 100 * X + Y as the index.
         Args:
-            index: The iteration image index (used in <iter_image_N> placeholder)
+            index: The iteration image index (used in <iter_image_X_Y> placeholder)
             source: Either raw image bytes or a file path to load from
 
         Returns:
