@@ -6,7 +6,9 @@
 # Configuration
 MAX_PARALLEL=4
 DATA_BASE="data_all"
-MODEL="gemini/gemini-3-flash-preview"
+MODEL="openai/kimi-k2.5"                    # Main agent model (LiteLLM-routed)
+IMAGE_TOOL_MODEL="gemini-3-flash-preview"    # Image tool model (Google genai SDK, not LiteLLM)
+SUMMARY_MODEL="openai/kimi-k2.5"            # Summary model (LiteLLM-routed)
 MAX_ITERATIONS=50
 FEEDBACK_TOP_K=50
 TARGET_ERROR=0.001
@@ -33,8 +35,8 @@ run_dataset() {
         --input-data-path "$DATA_BASE/$dataset" \
         --manager-model "$MODEL" \
         --tools-list hybrid_automaton_image_analysis \
-        --image-tool-model "$MODEL" \
-        --summary-model "$MODEL" \
+        --image-tool-model "$IMAGE_TOOL_MODEL" \
+        --summary-model "$SUMMARY_MODEL" \
         --managed-agents-list data_analysis_expert \
         --managed-agents-list-model "$MODEL" \
         --max-iterations $MAX_ITERATIONS \
@@ -55,7 +57,7 @@ run_dataset() {
 
 # Export function and variables for parallel execution
 export -f run_dataset
-export LOG_DIR DATA_BASE MODEL MAX_ITERATIONS FEEDBACK_TOP_K TARGET_ERROR NO_IMPROVEMENT_PATIENCE
+export LOG_DIR DATA_BASE MODEL IMAGE_TOOL_MODEL SUMMARY_MODEL MAX_ITERATIONS FEEDBACK_TOP_K TARGET_ERROR NO_IMPROVEMENT_PATIENCE
 
 echo "========================================"
 echo "Running all datasets with $MAX_PARALLEL parallel jobs"
