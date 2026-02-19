@@ -184,7 +184,6 @@ class ReviewRequestTool_ha(Tool):
                 response = self.client.chat.completions.create(
                     model=self.review_model_id,
                     messages=messages,
-                    max_tokens=8192,
                 )
                 if response.choices[0].message.content and response.choices[0].message.content.strip():
                     return response.choices[0].message.content.strip()
