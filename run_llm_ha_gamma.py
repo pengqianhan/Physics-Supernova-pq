@@ -183,6 +183,37 @@ AUTHORIZED_IMPORTS_LIST = [
 ]
 
 
+def get_litellm_kwargs(model_id: str) -> dict:
+    """
+    Return the appropriate api_key and api_base for a given model_id.
+
+    Supports:
+    - moonshot/*, openai/kimi*: Moonshot API (MOONSHOT_API_KEY)
+    - gemini/*: Google Gemini API (GEMINI_API_KEY)
+    - Other providers: rely on litellm's env-var auto-detection
+    """
+    if not model_id:
+        return {}
+
+    if (
+        model_id.startswith("moonshot/")
+        or model_id.startswith("openai/kimi")
+        or model_id.startswith("openai/moonshot")
+        or model_id.startswith("kimi")
+    ):
+        return {
+            "api_key": os.environ.get("MOONSHOT_API_KEY"),
+            "api_base": os.environ.get("MOONSHOT_API_BASE", "https://api.moonshot.cn/v1"),
+        }
+    elif model_id.startswith("gemini/"):
+        return {
+            "api_key": os.environ.get("GEMINI_API_KEY"),
+        }
+    else:
+        # For other providers (openrouter, anthropic, etc.), let litellm handle it
+        return {}
+
+
 def _create_HA_agent(Tools_list: List[type[Tool]],
                      markdown_content: MarkdownMessage,
                      model_id: str = "gemini/gemini-flash-lite-latest",
@@ -191,13 +222,13 @@ def _create_HA_agent(Tools_list: List[type[Tool]],
                      **kwargs) -> ToolCallingAgent | CodeAgent:
 
     # LLM to use for the agent
+    llm_kwargs = get_litellm_kwargs(model_id)
     model = LiteLLMModel(
         model_id=model_id,
-        api_key=os.environ.get("GEMINI_API_KEY"),
+        **llm_kwargs,
         # max_completion_tokens=24576,
         num_retries=3,
         timeout=1200,
-        thinking_level = "high" # high, low
     )
 
     # tools for the manager agent
@@ -270,13 +301,13 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
         npz_paths_list = [os.path.join(input_data_path, "sample_0.npz")]
 
     managed_agents = []
+    llm_kwargs = get_litellm_kwargs(managed_agents_list_model_id)
     model = LiteLLMModel(
             model_id=managed_agents_list_model_id,
-            api_key=os.environ.get("GEMINI_API_KEY"),
+            **llm_kwargs,
             # max_completion_tokens=24576,
             num_retries=3,
             timeout=1200,
-            thinking_level = "high" # high, low
         )
     managed_agent_kwargs = dict(
         model=model,
@@ -691,12 +722,13 @@ Identify the main sources of error and suggest specific improvements to the HA J
     max_retries = 3
     for attempt in range(max_retries):
         try:
+            llm_kwargs = get_litellm_kwargs(model_id)
             response = completion(
                 model=model_id,
                 messages=messages,
                 max_tokens=1024,
                 temperature=0.3,
-                api_key=os.environ.get("GEMINI_API_KEY")
+                **llm_kwargs,
             )
             summary = response.choices[0].message.content.strip()
             if summary:
@@ -998,8 +1030,8 @@ def parse_args():
     ap.add_argument(
         "--manager-model",
         type=str,
-        default="gemini/gemini-flash-lite-latest",
-        help="Model ID to use for the agent.",
+        default="openai/kimi-k2.5",
+        help="Model ID to use for the agent (e.g. 'openai/kimi-k2.5', 'gemini/gemini-3-flash-preview').",
     )
 
     # Choose between ToolCallingAgent and CodeAgent for the manager agent
