@@ -11,6 +11,27 @@ from smolagents.models import ChatMessage, MessageRole
 from smolagents.memory import AgentMemory
 from smolagents.agents import MultiStepAgent
 
+def _get_litellm_kwargs(model_id: str) -> dict:
+    """Return api_key and api_base based on model_id prefix."""
+    if not model_id:
+        return {}
+
+    if (
+        model_id.startswith("moonshot/")
+        or model_id.startswith("openai/kimi")
+        or model_id.startswith("openai/moonshot")
+        or model_id.startswith("kimi")
+    ):
+        return {
+            "api_key": os.environ.get("MOONSHOT_API_KEY"),
+            "api_base": os.environ.get("MOONSHOT_API_BASE", "https://api.moonshot.cn/v1"),
+        }
+    elif model_id.startswith("gemini/"):
+        return {"api_key": os.environ.get("GEMINI_API_KEY")}
+    else:
+        return {}
+
+
 # Debug flag for development and troubleshooting
 DEBUGGING = False
 
@@ -142,11 +163,11 @@ class SummarizeMemoryTool(Tool):
     def __init__(self, worker_agent=None, summarize_model_id: str = "gemini/gemini-2.5-flash-lite"):
         super().__init__()
         self.worker_agent = worker_agent  # Reference to the main agent for memory access
-        api_key = os.environ.get("GEMINI_API_KEY")
+        llm_kwargs = _get_litellm_kwargs(summarize_model_id)
         # Initialize summarization model with higher token limit for comprehensive HA iteration summaries
         self.summarize_model = LiteLLMModel(
             model_id=summarize_model_id,
-            api_key=api_key,
+            **llm_kwargs,
             max_completion_tokens=16384,
             num_retries=3,
             timeout=1200,
