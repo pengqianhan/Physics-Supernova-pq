@@ -11,7 +11,7 @@ IMAGE_TOOL_MODEL="gemini-3-flash-preview"    # Image tool model (Google genai SD
 SUMMARY_MODEL="openai/kimi-k2.5"            # Summary model (LiteLLM-routed)
 MAX_ITERATIONS=50
 FEEDBACK_TOP_K=50
-TARGET_ERROR=0.001
+TARGET_ERROR=0.005
 NO_IMPROVEMENT_PATIENCE=20
 
 # Log directory
