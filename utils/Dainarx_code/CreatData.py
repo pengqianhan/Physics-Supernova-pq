@@ -203,11 +203,11 @@ def creat_all_data(automata_dir: str = None, output_dir: str = None, default_dt:
 
 if __name__ == "__main__":
     # Example: create data for a single automaton
-    # creat_data('automata/non_linear/duffing.json', 'data_duffing', 0.001, 10)
+    creat_data('automata/non_linear/duffing.json', 'data_duffing', 0.001, 10)
     # creat_data('automata/ATVA/ball.json', 'data_ball', 0.01, 10)
     # creat_data('automata/non_linear/lander.json', 'data_lander', 0.01, 10)
     # creat_data('automata/non_linear/sys_bio.json', 'data_sys_bio', 0.001, 2)
-    creat_data('automata/FaMoS/buck_converter.json', 'data_buck_converter', 1E-5, 0.02)
+    # creat_data('automata/FaMoS/buck_converter.json', 'data_buck_converter', 1E-5, 0.02)
 
     # Create data for all automata
     # creat_all_data()
