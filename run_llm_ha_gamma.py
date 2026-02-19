@@ -538,7 +538,7 @@ When constructing the HA specification dictionary in Python code:
 Generate an improved HA specification that better matches the observed trajectory data.
 - **Keep `var: "{var_names}"` and `input: "{input_names if num_inputs > 0 else ''}"` exactly as shown!**
 - Make sure the HA specification is valid and complete according to the JSON Schema.
-- Refine the HA specification to improve trajectory matching and reduce `Max Difference`, `Mean Difference`, and `TC (Change-Point Error)`.
+- Refine the HA specification to improve trajectory matching and reduce `Max Difference`, `Mean Difference`.
 
 ## Available Data
 - **Trace visualizations**: {image_placeholders}, use the `hybrid_automaton_image_analysis` tool to analyze the image if you want to obtain more detailed information about the system.
@@ -576,7 +576,7 @@ def compute_aggregated_metrics(metrics_list: List[Dict]) -> Dict:
     if not metrics_list:
         return {}
     avg = {}
-    for key in ['tc', 'max_diff', 'mean_diff']:
+    for key in ['max_diff', 'mean_diff']:
         vals = [m.get(key) for m in metrics_list if m.get(key) is not None]
         if vals:
             avg[key] = sum(vals) / len(vals)
@@ -1290,7 +1290,7 @@ def main():
         current_error = float('inf')
         if success and isinstance(metrics, dict) and 'mean_diff' in metrics:
             current_error = metrics['mean_diff']
-            print(f"Iteration {iteration} mean_diff: {current_error:.6f}, max_diff: {metrics.get('max_diff', float('inf')):.6f}, tc: {metrics.get('tc', float('inf')):.6f}")
+            print(f"Iteration {iteration} mean_diff: {current_error:.6f}, max_diff: {metrics.get('max_diff', float('inf')):.6f}")
         else:
             print(f"Iteration {iteration} FAILED - evaluation did not produce valid metrics")
 
