@@ -12,9 +12,8 @@ A Hybrid Automaton models a system with:
 
 
 ## Metrics (lower is better)
-- `Max Difference < 0.01`: good fit
-- `Mean Difference < 0.005`: accurate overall
-- `TC (Change-Point Error) < 0.01s`: mode switch timing correct
+- `Max Difference < 0.002`: good fit
+- `Mean Difference < 0.001`: good fit
 
 ## Tool and Sub-Agents Resources:
 
@@ -247,7 +246,15 @@ Your output MUST conform to this JSON Schema:
                 "eq": "x1[2] = x1[1] + x1[0] + x1[0] ** 2 + u1"
             }
         ],
-        "edge": []
+        "edge": [
+            {
+                "direction": "1 -> 1",
+                "condition": "x1 <= 0",
+                "reset": {
+                    "x1": ["", "x[1] * 0.8"],
+                }
+            }
+        ]
     },
     "config": {
         "dt": 0.001,
@@ -319,8 +326,8 @@ Your output MUST conform to this JSON Schema:
         ]
     },
     "config": {
-        "dt": 0.001,
-        "total_time": 10.0,
+        "dt": 0.0001,
+        "total_time": 2.0,
         "order": 1,
         "need_reset": true,
         "non_linear_items": ""
@@ -351,20 +358,20 @@ When constructing the HA specification dictionary in Python code:
 ```json
 {
     "automaton": {
-        "var": "x1, x2",
-        "input": "",
+        "var": "x1",
+        "input": "u1",
         "mode": [
             {
                 "id": 1,
-                "eq": "x1[1] = -0.5 * x1[0] + x2[0], x2[1] = -0.5 * x2[0]"
+                "eq": "x1[2] = x1[1] + x1[0] + u1"
             }
         ],
         "edge": []
     },
     "config": {
-        "dt": 0.001,
-        "total_time": 10.0,
-        "order": 1,
+        "dt":,
+        "total_time":,
+        "order": 2,
         "need_reset": false,
         "non_linear_items": ""
     }
@@ -373,9 +380,9 @@ When constructing the HA specification dictionary in Python code:
 
 ## Your Task
 Generate an improved HA specification that better matches the observed trajectory data.
-- **Keep `var: "x1, x2"` and `input: ""` exactly as shown!**
+- **Keep `var: "x1"` and `input: "u1"` exactly as shown!**
 - Make sure the HA specification is valid and complete according to the JSON Schema.
-- Refine the HA specification to improve trajectory matching and reduce `Max Difference`, `Mean Difference`, and `TC (Change-Point Error)`.
+- Refine the HA specification to improve trajectory matching and reduce `Max Difference`, `Mean Difference`.
 
 ## Available Data
 - **Trace visualizations**: ['<image_0>', '<image_1>', '<image_2>'], use the `hybrid_automaton_image_analysis` tool to analyze the image if you want to obtain more detailed information about the system.
@@ -390,11 +397,17 @@ Each NPZ file contains:
 
 **WARNING**: Do NOT use placeholder names like `<npz_0>` as file paths! Use the `data_analysis_expert` agent which has access to the actual file paths.
 
+### Detecting Mode Transitions via Numerical Analysis
+For higher-order systems (order >= 2), position trajectories may appear smooth even when mode transitions occur, because resets often affect **derivatives** (velocity, acceleration) rather than position directly. Use the `data_analysis_expert` agent to:
+1. **Compute numerical derivatives**: `velocity = np.diff(state, axis=1) / dt` and `acceleration = np.diff(velocity, axis=1) / dt`
+2. **Detect discontinuities**: sudden jumps in velocity or acceleration indicate potential mode transition points and resets
+3. **Segment-wise analysis**: once candidate transition points are identified, analyze each segment's dynamics separately to infer mode-specific ODEs and guard conditions
+
 "
 ## Previously Explored HA Specifications with Feedback:
 Use these as inspiration to guide your next refinement.
 Use the `hybrid_automaton_image_analysis` tool to analyze the comparison plot through the `Placeholder` in the `Evaluation Plot` section.
-
+ If you want to check the fit performance of the HA specification, you can use the `hybrid_automaton_image_analysis` tool to analyze the comparison plot through the `Placeholder` in the `Evaluation Plot` section. For example, `hybrid_automaton_image_analysis(image_ref='<iter_image_2_0>', question='How is the fit performance of the HA specification?')` means to analyze the '2nd iteration, 0th file' comparison plot.`.
 
 -----------------------------------------
 
@@ -403,21 +416,34 @@ The 1th attempt result:
 ```json
 {
   "automaton": {
-    "var": "x1, x2",
-    "input": "",
+    "var": "x1",
+    "input": "u1",
     "mode": [
       {
         "id": 1,
-        "eq": "x1[1] = -0.5 * x1[0] + x2[0], x2[1] = -0.5 * x2[0]"
+        "eq": "x1[2] = -0.2 * x1[1] - 0.5 * x1[0] ** 3 + u1"
+      },
+      {
+        "id": 2,
+        "eq": "x1[2] = -0.54 * x1[1] - 1.5 * x1[0] ** 3 + u1"
       }
     ],
     "edge": [
       {
-        "direction": "1 -> 1",
-        "condition": "x1 <= 0.15",
+        "direction": "1 -> 2",
+        "condition": "abs(x1) >= 1.2",
         "reset": {
-          "x2": [
-            "-0.95*x2[0]"
+          "x1[1]": [
+            "0.95*x1[1]"
+          ]
+        }
+      },
+      {
+        "direction": "2 -> 1",
+        "condition": "abs(x1) <= 0.8",
+        "reset": {
+          "x1[1]": [
+            "0.95*x1[1]"
           ]
         }
       }
@@ -426,17 +452,15 @@ The 1th attempt result:
   "config": {
     "dt": 0.001,
     "total_time": 10.0,
-    "order": 1,
-    "self_loop": true
+    "order": 2
   }
 }
 ```
   2. Evaluation Feedback:
 {
   "Evaluation Metrics (Averaged)": {
-    "TC (Change-Point Error)": 0.0,
-    "Max Difference": 1.1872617279685356,
-    "Mean Difference": 0.2517504167759214,
+    "Max Difference": 0.9382943236339885,
+    "Mean Difference": 0.31368359980371213,
     "Num Ground Truth Files": 3
   },
   "Evaluation Plot": {
@@ -445,32 +469,117 @@ The 1th attempt result:
       "<iter_image_1_1>",
       "<iter_image_1_2>"
     ],
-    "Summary": "The system identification shows a **moderate fit quality** ($\\text{max\\_diff} = 1.187$, $\\text{mean\\_diff} = 0.252$).\n\n**Visual Analysis:**\nThe simulation significantly **underestimates the amplitude** of the oscillations, particularly for $x_2$ (light blue). The simulated trajectory ($x_2$ dashed line) decays much faster and exhibits smaller swings than the ground truth. The phase relationship appears generally correct, but the damping is too aggressive.\n\n**Specific Issues:**\n1.  **Excessive Damping:** The simulated system converges to zero too quickly compared to the ground truth, indicating the damping terms in the mode equation are too large.\n2.  **Inaccurate Reset:** The reset condition for $x_2$ ($\\text{reset}: x_2 = -0.95 x_2[0]$) likely contributes to the rapid decay observed in the simulation.\n\n**Suggestions for Improvement:**\n1.  **Adjust Mode Dynamics (Damping):** The coefficients in the mode equation ($\\text{eq}: x1[1] = -0.5 x1[0] + x2[0], x2[1] = -0.5 x2[0]$) are likely too aggressive. **Reduce the magnitude of the coefficients** (e.g., change $-0.5$ to a value closer to $-0.1$ or $0.0$) to decrease damping.\n2.  **Refine Reset Condition:** The reset factor of $-0.95$ for $x_2$ is likely too high. **Decrease the magnitude of the reset factor** (e.g., try $-0.8$ or $-0.7$) to allow larger swings after mode switches.\n3.  **Review Guard Condition:** The guard condition ($\\text{condition}: x1 \\le 0.15$) seems to trigger mode switches appropriately based on the sharp transitions, but verify if the threshold needs slight tuning if the phase timing is slightly off."
+    "Summary": "The identification results show a **poor fit** characterized by significant **phase lead** and frequency mismatch. The simulated trajectory oscillates consistently faster than the ground truth, leading to a `max_diff` of ~0.94 and rapid divergence in phase.\n\n**Specific Issues:**\n1.  **Frequency Mismatch:** The simulated system's \"stiffness\" is too high. The cubic terms ($-0.5x_1^3$ and $-1.5x_1^3$) drive the state"
   },
   "Per-File Results": [
     {
       "ground_truth_index": 0,
       "ground_truth_file": "ground_truth_0.npz",
       "plot_placeholder": "<iter_image_1_0>",
-      "tc": 0.0,
-      "max_diff": 1.2221778440448183,
-      "mean_diff": 0.2919458722745749
+      "max_diff": 0.8100110251062057,
+      "mean_diff": 0.3249686635199039
     },
     {
       "ground_truth_index": 1,
       "ground_truth_file": "ground_truth_1.npz",
       "plot_placeholder": "<iter_image_1_1>",
-      "tc": 0.0,
-      "max_diff": 1.209988618134495,
-      "mean_diff": 0.24509516222849706
+      "max_diff": 1.0165515235952371,
+      "mean_diff": 0.31988232698076347
     },
     {
       "ground_truth_index": 2,
       "ground_truth_file": "ground_truth_2.npz",
       "plot_placeholder": "<iter_image_1_2>",
-      "tc": 0.0,
-      "max_diff": 1.1296187217262936,
-      "mean_diff": 0.2182102158246923
+      "max_diff": 0.9883204222005224,
+      "mean_diff": 0.29619980891046893
+    }
+  ]
+}
+
+
+-----------------------------------------
+
+The 2th attempt result:
+  1. HA JSON Specification:
+```json
+{
+  "automaton": {
+    "var": "x1",
+    "input": "u1",
+    "mode": [
+      {
+        "id": 1,
+        "eq": "x1[2] = -0.4 * x1[1] + 1.1 * x1[0] - 1.5 * x1[0] ** 3 + u1"
+      },
+      {
+        "id": 2,
+        "eq": "x1[2] = -0.4 * x1[1] + 1.1 * x1[0] - 1.5 * x1[0] ** 3 + u1"
+      }
+    ],
+    "edge": [
+      {
+        "direction": "1 -> 2",
+        "condition": "abs(x1) >= 1.2",
+        "reset": {
+          "x1[1]": [
+            "0.8*x1[1]"
+          ]
+        }
+      },
+      {
+        "direction": "2 -> 1",
+        "condition": "abs(x1) <= 0.8",
+        "reset": {
+          "x1[1]": [
+            "0.8*x1[1]"
+          ]
+        }
+      }
+    ]
+  },
+  "config": {
+    "dt": 0.001,
+    "total_time": 10.0,
+    "order": 2
+  }
+}
+```
+  2. Evaluation Feedback:
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.9175786057211607,
+    "Mean Difference": 0.32062428280624006,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_2_0>",
+      "<iter_image_2_1>",
+      "<iter_image_2_2>"
+    ],
+    "Summary": "The HA model exhibits poor fit quality, characterized by significant **phase lead** and **frequency mismatch** across all trajectories. The simulated system oscillates consistently faster than the ground truth, indicating that the stiffness"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_2_0>",
+      "max_diff": 0.4654657833571948,
+      "mean_diff": 0.2728891282734458
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_2_1>",
+      "max_diff": 1.1571310555521488,
+      "mean_diff": 0.34116566339768295
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_2_2>",
+      "max_diff": 1.1301389782541387,
+      "mean_diff": 0.34781805674759136
     }
   ]
 }

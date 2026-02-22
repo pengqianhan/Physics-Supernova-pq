@@ -12,9 +12,8 @@ A Hybrid Automaton models a system with:
 
 
 ## Metrics (lower is better)
-- `Max Difference < 0.01`: good fit
-- `Mean Difference < 0.005`: accurate overall
-- `TC (Change-Point Error) < 0.01s`: mode switch timing correct
+- `Max Difference < 0.002`: good fit
+- `Mean Difference < 0.001`: good fit
 
 ## Tool and Sub-Agents Resources:
 
@@ -247,7 +246,15 @@ Your output MUST conform to this JSON Schema:
                 "eq": "x1[2] = x1[1] + x1[0] + x1[0] ** 2 + u1"
             }
         ],
-        "edge": []
+        "edge": [
+            {
+                "direction": "1 -> 1",
+                "condition": "x1 <= 0",
+                "reset": {
+                    "x1": ["", "x[1] * 0.8"],
+                }
+            }
+        ]
     },
     "config": {
         "dt": 0.001,
@@ -319,8 +326,8 @@ Your output MUST conform to this JSON Schema:
         ]
     },
     "config": {
-        "dt": 0.001,
-        "total_time": 10.0,
+        "dt": 0.0001,
+        "total_time": 2.0,
         "order": 1,
         "need_reset": true,
         "non_linear_items": ""
@@ -351,20 +358,20 @@ When constructing the HA specification dictionary in Python code:
 ```json
 {
     "automaton": {
-        "var": "x1, x2",
-        "input": "",
+        "var": "x1",
+        "input": "u1",
         "mode": [
             {
                 "id": 1,
-                "eq": "x1[1] = -0.5 * x1[0] + x2[0], x2[1] = -0.5 * x2[0]"
+                "eq": "x1[2] = x1[1] + x1[0] + u1"
             }
         ],
         "edge": []
     },
     "config": {
-        "dt": 0.001,
-        "total_time": 10.0,
-        "order": 1,
+        "dt":,
+        "total_time":,
+        "order": 2,
         "need_reset": false,
         "non_linear_items": ""
     }
@@ -373,9 +380,9 @@ When constructing the HA specification dictionary in Python code:
 
 ## Your Task
 Generate an improved HA specification that better matches the observed trajectory data.
-- **Keep `var: "x1, x2"` and `input: ""` exactly as shown!**
+- **Keep `var: "x1"` and `input: "u1"` exactly as shown!**
 - Make sure the HA specification is valid and complete according to the JSON Schema.
-- Refine the HA specification to improve trajectory matching and reduce `Max Difference`, `Mean Difference`, and `TC (Change-Point Error)`.
+- Refine the HA specification to improve trajectory matching and reduce `Max Difference`, `Mean Difference`.
 
 ## Available Data
 - **Trace visualizations**: ['<image_0>', '<image_1>', '<image_2>'], use the `hybrid_automaton_image_analysis` tool to analyze the image if you want to obtain more detailed information about the system.
@@ -389,4 +396,10 @@ Each NPZ file contains:
   - Access: `u1 = data['input'][0, :]`
 
 **WARNING**: Do NOT use placeholder names like `<npz_0>` as file paths! Use the `data_analysis_expert` agent which has access to the actual file paths.
+
+### Detecting Mode Transitions via Numerical Analysis
+For higher-order systems (order >= 2), position trajectories may appear smooth even when mode transitions occur, because resets often affect **derivatives** (velocity, acceleration) rather than position directly. Use the `data_analysis_expert` agent to:
+1. **Compute numerical derivatives**: `velocity = np.diff(state, axis=1) / dt` and `acceleration = np.diff(velocity, axis=1) / dt`
+2. **Detect discontinuities**: sudden jumps in velocity or acceleration indicate potential mode transition points and resets
+3. **Segment-wise analysis**: once candidate transition points are identified, analyze each segment's dynamics separately to infer mode-specific ODEs and guard conditions
 
