@@ -17,6 +17,7 @@ utils/Dainarx_code/data*
 # output files
 evaluation_results_duffing*/
 task_prompts/
+evaluation_results_20260223/
 
 # data files
 data_all/
