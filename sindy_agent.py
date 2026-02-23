@@ -92,7 +92,9 @@ train_num = 3
 markdown_content = load_trace_data_from_filepath(input_data_path, train_num=train_num)
 managed_agents_list = ["sindy_agent"]
 managed_agents_list_model_id = "openai/kimi-k2.5"
-image_plot_path_list =  ['analysis_plots_train/non_linear/duffing/sample_0_analysis.png','analysis_plots_train/non_linear/duffing/sample_1_analysis.png','analysis_plots_train/non_linear/duffing/sample_2_analysis.png']
+dataset_subpath = input_data_path.replace("data_all/", "", 1) if input_data_path.startswith("data_all/") else input_data_path
+image_plot_path_list = [os.path.join("analysis_plots_train", dataset_subpath, f"sample_{i}_analysis.png") for i in range(train_num)]
+
 def get_managed_agents_list(managed_agents_list: List[str] = None,
                             managed_agents_list_model_id: str = None,
                             input_data_path: str = None,
@@ -110,7 +112,8 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
     npz_paths_list = list(markdown_content.npz_paths.values()) if markdown_content.npz_paths else []
     npz_placeholders = list(markdown_content.npz_paths.keys())
 
-    image_plot_path_list =  ['analysis_plots_train/non_linear/duffing/sample_0_analysis.png','analysis_plots_train/non_linear/duffing/sample_1_analysis.png','analysis_plots_train/non_linear/duffing/sample_2_analysis.png']
+    dataset_subpath = input_data_path.replace("data_all/", "", 1) if input_data_path.startswith("data_all/") else input_data_path
+    image_plot_path_list = [os.path.join("analysis_plots_train", dataset_subpath, f"sample_{i}_analysis.png") for i in range(train_num)]
 
     # Fallback to default path if no npz files found
     if not npz_paths_list:
@@ -133,11 +136,11 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
         add_base_tools=True,
         additional_authorized_imports=AUTHORIZED_IMPORTS_LIST,
     )
-    managed_image_tool_model_id = "gemini/gemini-flash-lite-latest"
+    managed_image_tool_model_id = llm_kwargs["model_id"] 
     if managed_agents_list_model_id and managed_agents_list_model_id.startswith("gemini/"):
         managed_image_tool_model_id = managed_agents_list_model_id
     npz_files_description = "\n".join([f" {placeholder} - `{path}` - `DATA_FILE_PATHS[{i}]`" for i, (placeholder, path) in enumerate(zip(npz_placeholders, npz_paths_list))])
-    image_plot_description = "\n".join([f" {path}` - `IMAGE_PLOT_PATHS[{i}]`" for i, path in enumerate(image_plot_path_list)])
+    image_plot_description = "\n".join([f" `{path}` - `IMAGE_PLOT_PATHS[{i}]`" for i, path in enumerate(image_plot_path_list)])
     for agent_name in managed_agents_list:
 
         managed_agent_description = f"""I am a managed agent with name {agent_name}. I can analyze the change points and dynamics of the data from the image plot. According to the change points, segment the data into different segments, these segments are saved in the a list called "SEG_DATA_LIST". For each segment, fit the data using SINDy, the SINDy model is saved in the a list called "SEG_MODEL_LIST". If the SINDy model is similar between different segments, merge the SINDy model into one. Return the SINDy model for the whole data."""
@@ -146,86 +149,17 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
 #### Available Files
 - `DATA_FILE_PATHS`: List of all available NPZ file paths
 - `IMAGE_PLOT_PATHS`: List of all available image plot file paths
-The plot image is drawn by these code 
-```python 
-def analyze_dataset(dataset, sample_idx, output_root):
-    data_dir = os.path.join(DATA_ROOT, dataset)
-    npz_path = os.path.join(data_dir, f"sample_{sample_idx}.npz")
-    if not os.path.exists(npz_path):
-        print(f"  [SKIP] {npz_path} not found")
-        return
+Each image plot contains the following subplots (top to bottom), all sharing the same x-axis (time in seconds):
 
-    data = np.load(npz_path)
-    state = data["state"]       # (num_vars, num_steps)
-    inp = data["input"]         # (num_inputs, num_steps) or (num_steps,)
+For each state variable xi:
+- **Position** (row 1): raw state value `state[i]` from the NPZ file
+- **Velocity** (row 2): first derivative `dx_i/dt`, computed via `np.gradient(state[i], dt)`
+- **Acceleration** (row 3): second derivative `d²x_i/dt²`, computed via `np.gradient(velocity, dt)`
 
-    num_vars = state.shape[0]
-    num_steps = state.shape[1]
+After all state variables, if inputs exist:
+- **Input** (final rows): each input signal `u1, u2, ...` from the NPZ `input` array
 
-    # Ensure input is 2D
-    if inp.ndim == 1:
-        inp = inp.reshape(1, -1)
-    num_inputs = inp.shape[0]
-    has_input = num_inputs > 0 and inp.size > 0
-
-    # Load config for dt and var names
-    cfg = load_config(dataset)
-    if cfg:
-        dt = cfg["dt"]
-        var_names = cfg["var_names"]
-    else:
-        dt = 0.01
-        var_names = [f"x{i+1}" for i in range(num_vars)]
-
-    while len(var_names) < num_vars:
-        var_names.append(f"x{len(var_names)+1}")
-
-    t = np.arange(num_steps) * dt
-
-    # Layout: for each state var -> 3 rows (pos, vel, acc), plus input rows
-    input_rows = num_inputs if has_input else 0
-    total_rows = num_vars * 3 + input_rows
-    fig_height = max(8, total_rows * 2.8)
-    fig, axes = plt.subplots(total_rows, 1, figsize=(14, fig_height), sharex=True)
-    if total_rows == 1:
-        axes = [axes]
-
-    system_name = dataset.split("/")[-1]
-    fig.suptitle(f"{system_name} — Training Data (sample {sample_idx})",
-                 fontsize=14, fontweight="bold", y=0.998)
-
-    row = 0
-    for vi in range(num_vars):
-        x = state[vi]
-        x_dot = np.gradient(x, dt)
-        x_ddot = np.gradient(x_dot, dt)
-        vname = var_names[vi]
-        color = SIGNAL_COLORS[vi % len(SIGNAL_COLORS)]
-
-        plot_signal(axes[row], t, x,      f"{vname}\n(position)", color)
-        row += 1
-        plot_signal(axes[row], t, x_dot,  f"d{vname}/dt\n(velocity)", color)
-        row += 1
-        plot_signal(axes[row], t, x_ddot, f"d\u00b2{vname}/dt\u00b2\n(accel.)", color)
-        row += 1
-
-    for ui in range(input_rows):
-        u = inp[ui]
-        plot_signal(axes[row], t, u, f"u{ui+1}\n(input)", "tab:olive")
-        row += 1
-
-    axes[-1].set_xlabel("Time (s)", fontsize=12)
-
-    # Save with matching directory structure
-    out_dir = os.path.join(output_root, dataset)
-    os.makedirs(out_dir, exist_ok=True)
-    out_path = os.path.join(out_dir, f"sample_{sample_idx}_analysis.png")
-    plt.tight_layout()
-    plt.savefig(out_path, dpi=150, bbox_inches="tight")
-    plt.close()
-    print(f"  Saved: {out_path}")
-
-```
+Use these plots to identify change points (abrupt changes in velocity or acceleration indicate mode transitions).
 #### Available Tools
 - `local_image_qa(image_path, question)`: Analyze the change points and dynamics of the data
 
@@ -237,18 +171,19 @@ def analyze_dataset(dataset, sample_idx, output_root):
 ```python
 SEG_MODEL_LIST = []
 for seg_data in SEG_DATA_LIST:
-    fit the data using SINDy.
     model = ps.SINDy(feature_library=feature_library, optimizer=optimizer)
-    model.fit(seg_data, t=dt)
+    # feature_names is a parameter of fit(), NOT __init__()
+    # u= is optional control input; pass it if the data has external forcing
+    model.fit(seg_data, t=dt, feature_names=['x1', 'x2'], u=control_input)
     model.print()
     SEG_MODEL_LIST.append(model)
 ```
-4. If the SINDy model is similar between different segments, merge the SINDy model into one.
-```python
-merged_model = merge_models(SEG_MODEL_LIST)
-```
+4. If the SINDy model is similar between different segments, merge them.
+   Compare the coefficient matrices (`model.coefficients()`) between segments.
+   If two segments have similar coefficients (e.g., small Frobenius norm difference),
+   treat them as the same mode and re-fit a single SINDy model on their combined data.
 
-5. Return the SINDy model for the whole data.
+5. Return the SINDy model for each distinct mode.
 
 ### Example Usage
 
@@ -256,17 +191,16 @@ merged_model = merge_models(SEG_MODEL_LIST)
 import os
 import numpy as np
 
-#### Load the data
-data = np.load(DATA_FILE_PATHS)
+#### Load the data (DATA_FILE_PATHS is a list; index to get a single path)
+data = np.load(DATA_FILE_PATHS[0])
 
-#### Load the image plot file
-image_plot_paths = IMAGE_PLOT_PATHS
-
+#### Load the image plot file (IMAGE_PLOT_PATHS is a list of paths)
+image_plot_path = IMAGE_PLOT_PATHS[0]
 
 #### Ask a vision model about the data
 answer = local_image_qa(
-    image_path=image_plot_paths[i],
-    question="What is the change points of the data?"
+    image_path=image_plot_path,
+    question="What are the change points of the data?"
 )
 ```
 #### Here is the example of the SINDy model usage:
@@ -282,32 +216,8 @@ __SINDY_CODE_EXAMPLE__
         managed_tools = []
         if agent_name == "sindy_agent":
             managed_tools.append(LocalImageQATool(model_id=managed_image_tool_model_id))
-        # use_e2b = bool(os.environ.get("E2B_API_KEY"))
-        use_e2b = False
-        if use_e2b:
-            print("使用 E2B 云沙盒执行器，正在上传数据文件...")
-            # 上传所有文件到 E2B 沙盒
-            sandbox_file_paths = []
-            for i, npz_path in enumerate(npz_paths_list):
-                with open(npz_path, "rb") as f:
-                    file_content = f.read()
-                sandbox_file_path = f"/tmp/sample_{i}.npz"
-                managed_agent.python_executor.sandbox.files.write(sandbox_file_path, file_content)
-                sandbox_file_paths.append(sandbox_file_path)
-                print(f"✓ 文件已上传到 E2B 沙盒: {sandbox_file_path}")
-            managed_agent_kwargs["executor_type"] = "e2b"
-            managed_agent_kwargs["name"] = agent_name
-            managed_agent_kwargs["description"] = managed_agent_description
-            managed_agent_kwargs["instructions"] = managed_agent_instruction
-            managed_agent_kwargs["tools"] = managed_tools
-            managed_agent = CodeAgent(**managed_agent_kwargs)
-            # 注入所有文件路径到 agent 状态
-            managed_agent.python_executor.state["DATA_FILE_PATHS"] = sandbox_file_paths
-            managed_agent.python_executor.state["DATA_FILE_PATH"] = sandbox_file_paths[0] if sandbox_file_paths else ""
-        else:
-            # managed agent description with all available files
-            
-            managed_agent_instruction = f"""## Available NPZ Files
+        # Build instruction (shared by both E2B and local executors)
+        managed_agent_instruction = f"""## Available NPZ Files
 
 You have access to the following NPZ data files:
 
@@ -316,7 +226,32 @@ and the following image plot files:
 {image_plot_description}
 
 """ + common_instruction
-            # 本地执行器：将所有数据文件路径注入到 agent 的状态中
+
+        # use_e2b = bool(os.environ.get("E2B_API_KEY"))
+        use_e2b = False
+        if use_e2b:
+            print("Using E2B cloud sandbox executor, uploading data files...")
+            # Upload all files to E2B sandbox
+            sandbox_file_paths = []
+            for i, npz_path in enumerate(npz_paths_list):
+                with open(npz_path, "rb") as f:
+                    file_content = f.read()
+                sandbox_file_path = f"/tmp/sample_{i}.npz"
+                managed_agent.python_executor.sandbox.files.write(sandbox_file_path, file_content)
+                sandbox_file_paths.append(sandbox_file_path)
+                print(f"  File uploaded to E2B sandbox: {sandbox_file_path}")
+            managed_agent_kwargs["executor_type"] = "e2b"
+            managed_agent_kwargs["name"] = agent_name
+            managed_agent_kwargs["description"] = managed_agent_description
+            managed_agent_kwargs["instructions"] = managed_agent_instruction
+            managed_agent_kwargs["tools"] = managed_tools
+            managed_agent = CodeAgent(**managed_agent_kwargs)
+            # Inject all file paths into agent state
+            managed_agent.python_executor.state["DATA_FILE_PATHS"] = sandbox_file_paths
+            managed_agent.python_executor.state["DATA_FILE_PATH"] = sandbox_file_paths[0] if sandbox_file_paths else ""
+            managed_agent.python_executor.state["IMAGE_PLOT_PATHS"] = image_plot_path_list
+        else:
+            # Local executor: inject all data file paths into agent state
             managed_agent_kwargs["name"] = agent_name
             managed_agent_kwargs["executor_type"] = "local"
             managed_agent_kwargs["description"] = managed_agent_description

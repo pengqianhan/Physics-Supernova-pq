@@ -79,6 +79,13 @@ if __name__ == "__main__":
         np.cos(2 * np.pi * t) + 0.1 * np.random.randn(500),  # x2: noisy oscillation
     ])
 
+    # IMPORTANT: SINDy.__init__ only accepts: optimizer, feature_library, differentiation_method
+    # feature_names goes in fit(), NOT __init__()
+    # fit() does NOT have a 'quiet' parameter
     model = ps.SINDy(feature_library=feature_library, optimizer=optimizer)
-    model.fit(x, t=dt)
+
+    # fit(x, t, x_dot=None, u=None, feature_names=None)
+    # - u: control input array, shape (n_samples, n_control_features)
+    # - feature_names: list of strings for state variables, e.g. ['x1', 'x2']
+    model.fit(x, t=dt, feature_names=['x0', 'x1', 'x2'])
     model.print()
