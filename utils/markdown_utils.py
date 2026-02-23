@@ -344,7 +344,7 @@ def markdown_to_plaintext(markdown_content: MarkdownMessage) -> str:
         # image_url blocks are ignored: placeholder already in preceding text
     return "\n".join(parts)
     
-def markdown_images_compress(markdown_content: MarkdownMessage, max_short_side_pixels: int = 1000):
+def markdown_images_compress(markdown_content: MarkdownMessage, max_short_side_pixels: int = 1080):
     """Extract and compress images from MarkdownMessage, returning list of PIL Images."""
     from PIL import Image
     import io
