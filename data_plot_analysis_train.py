@@ -5,11 +5,11 @@ no mode labels), plus input signals, to visually inspect where derivative
 discontinuities occur — potential mode transition points.
 
 Usage:
-    python data_plot_analysis.py                                # default: duffing, sample 0
-    python data_plot_analysis.py --dataset non_linear/duffing --sample 0
-    python data_plot_analysis.py --dataset ATVA/ball --sample 3
-    python data_plot_analysis.py --all                          # ALL datasets, sample 0
-    python data_plot_analysis.py --all --sample 5
+    python data_plot_analysis_train.py                                # default: duffing, sample 0
+    python data_plot_analysis_train.py --dataset non_linear/duffing --sample 0
+    python data_plot_analysis_train.py --dataset ATVA/ball --sample 3
+    python data_plot_analysis_train.py --all                          # ALL datasets, sample 0
+    python data_plot_analysis_train.py --all --sample 5
 """
 
 import argparse
