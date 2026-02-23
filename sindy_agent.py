@@ -13,6 +13,7 @@ from litellm import completion
 from utils.markdown_utils import load_trace_data_from_filepath, markdown_to_plaintext, markdown_images_compress
 
 import argparse
+from PIL import Image
 
 # for type hints
 from typing import List, Dict, Tuple, Optional, Union
@@ -91,7 +92,7 @@ train_num = 3
 markdown_content = load_trace_data_from_filepath(input_data_path, train_num=train_num)
 managed_agents_list = ["sindy_agent"]
 managed_agents_list_model_id = "openai/kimi-k2.5"
-
+image_plot_path_list =  ['analysis_plots_train/non_linear/duffing/sample_0_analysis.png','analysis_plots_train/non_linear/duffing/sample_1_analysis.png','analysis_plots_train/non_linear/duffing/sample_2_analysis.png']
 def get_managed_agents_list(managed_agents_list: List[str] = None,
                             managed_agents_list_model_id: str = None,
                             input_data_path: str = None,
@@ -140,19 +141,114 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
     for agent_name in managed_agents_list:
 
         managed_agent_description = f"""I am a managed agent with name {agent_name}. I can assist with code-related tasks."""
-        common_instruction = f"""
+        common_instruction = """
 ### Quick Access via State Variables
-
+#### Available Files
 - `DATA_FILE_PATHS`: List of all available NPZ file paths
+- `IMAGE_PLOT_PATHS`: List of all available image plot file paths
+The plot image is drawn by these code 
+```python 
+def analyze_dataset(dataset, sample_idx, output_root):
+    data_dir = os.path.join(DATA_ROOT, dataset)
+    npz_path = os.path.join(data_dir, f"sample_{sample_idx}.npz")
+    if not os.path.exists(npz_path):
+        print(f"  [SKIP] {npz_path} not found")
+        return
+
+    data = np.load(npz_path)
+    state = data["state"]       # (num_vars, num_steps)
+    inp = data["input"]         # (num_inputs, num_steps) or (num_steps,)
+
+    num_vars = state.shape[0]
+    num_steps = state.shape[1]
+
+    # Ensure input is 2D
+    if inp.ndim == 1:
+        inp = inp.reshape(1, -1)
+    num_inputs = inp.shape[0]
+    has_input = num_inputs > 0 and inp.size > 0
+
+    # Load config for dt and var names
+    cfg = load_config(dataset)
+    if cfg:
+        dt = cfg["dt"]
+        var_names = cfg["var_names"]
+    else:
+        dt = 0.01
+        var_names = [f"x{i+1}" for i in range(num_vars)]
+
+    while len(var_names) < num_vars:
+        var_names.append(f"x{len(var_names)+1}")
+
+    t = np.arange(num_steps) * dt
+
+    # Layout: for each state var -> 3 rows (pos, vel, acc), plus input rows
+    input_rows = num_inputs if has_input else 0
+    total_rows = num_vars * 3 + input_rows
+    fig_height = max(8, total_rows * 2.8)
+    fig, axes = plt.subplots(total_rows, 1, figsize=(14, fig_height), sharex=True)
+    if total_rows == 1:
+        axes = [axes]
+
+    system_name = dataset.split("/")[-1]
+    fig.suptitle(f"{system_name} — Training Data (sample {sample_idx})",
+                 fontsize=14, fontweight="bold", y=0.998)
+
+    row = 0
+    for vi in range(num_vars):
+        x = state[vi]
+        x_dot = np.gradient(x, dt)
+        x_ddot = np.gradient(x_dot, dt)
+        vname = var_names[vi]
+        color = SIGNAL_COLORS[vi % len(SIGNAL_COLORS)]
+
+        plot_signal(axes[row], t, x,      f"{vname}\n(position)", color)
+        row += 1
+        plot_signal(axes[row], t, x_dot,  f"d{vname}/dt\n(velocity)", color)
+        row += 1
+        plot_signal(axes[row], t, x_ddot, f"d\u00b2{vname}/dt\u00b2\n(accel.)", color)
+        row += 1
+
+    for ui in range(input_rows):
+        u = inp[ui]
+        plot_signal(axes[row], t, u, f"u{ui+1}\n(input)", "tab:olive")
+        row += 1
+
+    axes[-1].set_xlabel("Time (s)", fontsize=12)
+
+    # Save with matching directory structure
+    out_dir = os.path.join(output_root, dataset)
+    os.makedirs(out_dir, exist_ok=True)
+    out_path = os.path.join(out_dir, f"sample_{sample_idx}_analysis.png")
+    plt.tight_layout()
+    plt.savefig(out_path, dpi=150, bbox_inches="tight")
+    plt.close()
+    print(f"  Saved: {out_path}")
+
+```
+#### Available Tools
 - `local_image_qa(image_path, question)`: Analyze the change points and dynamics of the data
+
 
 ### Guidelines
 1. Analyze the change points and dynamics of the data from the image plot.
-2. According to the change points, segment the data into different segments.
-3. For each segment, fit the data using SINDy.
-4. Return the SINDy model for each segment.
-5. If the SINDy model is similar between different segments, merge the SINDy model into one.
-6. Return the SINDy model for the whole data.
+2. According to the change points, segment the data into different segments, these segments are saved in the a list called "SEG_DATA_LIST".
+3. For each segment, fit the data using SINDy, the SINDy model is saved in the a list called "SEG_MODEL_LIST".
+```python
+SEG_MODEL_LIST = []
+for seg_data in SEG_DATA_LIST:
+    fit the data using SINDy.
+    model = ps.SINDy(feature_library=feature_library, optimizer=optimizer)
+    model.fit(seg_data, t=dt)
+    model.print()
+    SEG_MODEL_LIST.append(model)
+```
+4. If the SINDy model is similar between different segments, merge the SINDy model into one.
+```python
+merged_model = merge_models(SEG_MODEL_LIST)
+```
+
+5. Return the SINDy model for the whole data.
 
 ### Example Usage
 
@@ -161,24 +257,25 @@ import os
 import numpy as np
 
 #### Load the data
-data = np.load(DATA_FILE_PATHS[0])
+data = np.load(DATA_FILE_PATHS)
 
 #### Load the image plot file
-image_plot_path = IMAGE_PLOT_PATHS[0]
+image_plot_paths = IMAGE_PLOT_PATHS
 
 
 #### Ask a vision model about the data
 answer = local_image_qa(
-    image_path=image_plot_path,
+    image_path=image_plot_paths[i],
     question="What is the change points of the data?"
 )
 ```
 #### Here is the example of the SINDy model usage:
 ```python
-{sindy_code_example
-}
+__SINDY_CODE_EXAMPLE__
 ```
+
 """
+        common_instruction = common_instruction.replace("__SINDY_CODE_EXAMPLE__", sindy_code_example)
         managed_tools = []
         if agent_name == "sindy_agent":
             managed_tools.append(LocalImageQATool(model_id=managed_image_tool_model_id))
@@ -234,5 +331,12 @@ print(managed_agents)
 
 # run the managed agents
 task = "Analyze the change points and dynamics of the data from the image plot. According to the change points, segment the data into different segments. For each segment, fit the data using SINDy. Return the SINDy model for each segment. If the SINDy model is similar between different segments, merge the SINDy model into one. Return the SINDy model for the whole data."
+
+agent_images = []
+for image_plot_path in image_plot_path_list:
+    with Image.open(image_plot_path) as img:
+        # smolagents expects PIL-like objects for `images`, not raw bytes.
+        agent_images.append(img.copy())
+
 for managed_agent in managed_agents:
-    managed_agent.run(task=task)
+    managed_agent.run(task=task, images=agent_images)
