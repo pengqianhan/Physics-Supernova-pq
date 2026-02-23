@@ -9,8 +9,8 @@ DATA_BASE="data_all"
 MODEL="openai/kimi-k2.5"                    # Main agent model (LiteLLM-routed)
 IMAGE_TOOL_MODEL="gemini-3-flash-preview"    # Image tool model (Google genai SDK, not LiteLLM)
 SUMMARY_MODEL="openai/kimi-k2.5"            # Summary model (LiteLLM-routed)
-MAX_ITERATIONS=50
-FEEDBACK_TOP_K=50
+MAX_ITERATIONS=1
+FEEDBACK_TOP_K=1
 TARGET_ERROR=0.005
 NO_IMPROVEMENT_PATIENCE=20
 

@@ -1,6 +1,7 @@
 # Import all custom tools available for the hybrid automaton agent
 from .markdown_utils import MarkdownMessage, load_markdown_from_filepath, markdown_to_plaintext, markdown_images_compress  # Markdown processing utilities
 from .imgTools_ha import HybridAutomatonImageTool  # Image analysis tool for hybrid automaton
+from .local_image_qa_tool import LocalImageQATool  # Local image question-answering tool
 from .reviewTools_ha import ReviewRequestTool_ha  # Expert review tool for hybrid automaton
 from .summemoryTools_ha import SummarizeMemoryTool  # Memory summarization tool for hybrid automaton
 from .validateTools_ha import ValidateHASpecTool  # Validation tool for hybrid automaton
