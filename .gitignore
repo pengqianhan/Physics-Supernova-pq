@@ -22,6 +22,8 @@ evaluation_results/
 # data files
 data_all/
 data_*/
+analysis_plots/
+analysis_plots_groundtruth/
 
 # phoenix traces
 phoenix_traces/
