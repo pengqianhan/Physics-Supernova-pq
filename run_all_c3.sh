@@ -18,35 +18,16 @@ mkdir -p "$LOG_DIR"
 
 # All datasets
 DATASETS=(
-    # ATVA
-    "ATVA/ball"
-    "ATVA/cell"
-    "ATVA/oci"
-    "ATVA/tanks"
-    # FaMoS
-    "FaMoS/buck_converter"
-    "FaMoS/complex_tank"
-    "FaMoS/multi_room_heating"
-    "FaMoS/simple_heating_system"
-    "FaMoS/three_state_ha"
-    "FaMoS/two_state_ha"
-    "FaMoS/variable_heating_system"
-    # linear
     "linear/complex_underdamped_system"
-    "linear/dc_motor_position_PID"
-    "linear/linear_1"
-    "linear/loop"
-    "linear/one_legged_jumper"
-    "linear/two_tank"
-    "linear/underdamped_system"
-    # non_linear
-    "non_linear/duffing"
-    "non_linear/lander"
+    "FaMoS/multi_room_heating"
+    "FaMoS/variable_heating_system"
     "non_linear/lotkaVolterra"
-    "non_linear/oscillator"
+    "FaMoS/two_state_ha"
+    "FaMoS/three_state_ha"
+    "linear/two_tank"
     "non_linear/simple_non_linear"
-    "non_linear/simple_non_poly"
-    "non_linear/spacecraft"
+    "FaMoS/buck_converter"
+    "non_linear/duffing"
     "non_linear/sys_bio"
 )
 
