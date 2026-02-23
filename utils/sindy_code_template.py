@@ -63,8 +63,14 @@ feature_library = GeneralizedLibrary([poly_lib, custom_exp_lib, fourier_lib])
 
 # ── Optimizer ─────────────────────────────────────────────────────────────────
 
-# SR3 with threshold tunable on validation performance
-optimizer = SR3(reg_weight_lam=0.03)
+# STLSQ: the standard SINDy optimizer — stable, fast, no convergence issues.
+# threshold controls sparsity: terms with |coeff| < threshold are set to zero.
+# Start with threshold=0.1; increase if too many spurious terms remain.
+optimizer = STLSQ(threshold=0.1)
+
+# Alternative: SR3 for better coefficient accuracy on noisy data,
+# but may fail to converge on some problems.
+# optimizer = SR3(reg_weight_lam=0.03)
 
 # ── Quick smoke-test (optional) ───────────────────────────────────────────────
 if __name__ == "__main__":
@@ -79,7 +85,14 @@ if __name__ == "__main__":
         np.cos(2 * np.pi * t) + 0.1 * np.random.randn(500),  # x2: noisy oscillation
     ])
 
+    # IMPORTANT: SINDy.__init__ only accepts: optimizer, feature_library, differentiation_method
+    # feature_names goes in fit(), NOT __init__()
+    # fit() does NOT have a 'quiet' parameter
     model = ps.SINDy(feature_library=feature_library, optimizer=optimizer)
-    model.fit(x, t=dt)
+
+    # fit(x, t, x_dot=None, u=None, feature_names=None)
+    # - u: control input array, shape (n_samples, n_control_features)
+    # - feature_names: list of strings for state variables, e.g. ['x1', 'x2']
+    model.fit(x, t=dt, feature_names=['x0', 'x1', 'x2'])
     model.print()
 """
