@@ -140,7 +140,7 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
     image_plot_description = "\n".join([f" {path}` - `IMAGE_PLOT_PATHS[{i}]`" for i, path in enumerate(image_plot_path_list)])
     for agent_name in managed_agents_list:
 
-        managed_agent_description = f"""I am a managed agent with name {agent_name}. I can assist with code-related tasks."""
+        managed_agent_description = f"""I am a managed agent with name {agent_name}. I can analyze the change points and dynamics of the data from the image plot. According to the change points, segment the data into different segments, these segments are saved in the a list called "SEG_DATA_LIST". For each segment, fit the data using SINDy, the SINDy model is saved in the a list called "SEG_MODEL_LIST". If the SINDy model is similar between different segments, merge the SINDy model into one. Return the SINDy model for the whole data."""
         common_instruction = """
 ### Quick Access via State Variables
 #### Available Files
@@ -276,6 +276,9 @@ __SINDY_CODE_EXAMPLE__
 
 """
         common_instruction = common_instruction.replace("__SINDY_CODE_EXAMPLE__", sindy_code_example)
+        # save the common_instruction to file
+        with open(f"common_instruction_{agent_name}.md", "w") as f:
+            f.write(common_instruction)
         managed_tools = []
         if agent_name == "sindy_agent":
             managed_tools.append(LocalImageQATool(model_id=managed_image_tool_model_id))
