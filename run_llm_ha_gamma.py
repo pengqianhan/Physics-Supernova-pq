@@ -473,7 +473,7 @@ def obtain_task_and_images(input_data_path: str = None,
 
     # Get task and images (to parse into agents) from the markdown content
     trace_data_text = markdown_to_plaintext(markdown_content)
-    compressed_trace_images = markdown_images_compress(markdown_content, max_short_side_pixels=1080)
+    compressed_trace_images = markdown_images_compress(markdown_content, max_short_side_pixels=2086)
 
     # Base task prompt - Professional system identification framing
     task = f"""# HYBRID AUTOMATON SYSTEM IDENTIFICATION TASK
