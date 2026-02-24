@@ -37,7 +37,7 @@ run_dataset() {
         --tools-list hybrid_automaton_image_analysis \
         --image-tool-model "$IMAGE_TOOL_MODEL" \
         --summary-model "$SUMMARY_MODEL" \
-        --managed-agents-list data_analysis_expert \
+        --managed-agents-list data_analysis_expert sindy_agent\
         --managed-agents-list-model "$MODEL" \
         --max-iterations $MAX_ITERATIONS \
         --feedback-top-k $FEEDBACK_TOP_K \
