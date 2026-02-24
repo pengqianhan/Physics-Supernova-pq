@@ -622,10 +622,34 @@ A Hybrid Automaton models a system with:
     task += HA_IMAGE_TOOL_PROMPT
     task += REVIEW_TOOL_PROMPT
     task += VALIDATE_TOOL_PROMPT
-    # Add managed agents prompt
+    # Add managed agents prompt — adaptive to which sub-agents are available
     if managed_agents_list and len(managed_agents_list) > 0:
-        MANAGE_AGENT_PROMPT = f"""
-\nYou have access to managed Code Agent: `{managed_agents_list}` to analyze the npz data files."""
+        # Role descriptions for known agent types; unknown agents get a generic description
+        AGENT_ROLE_DESCRIPTIONS = {
+            "data_analysis_expert": (
+                "General-purpose data analysis agent. Use it to load and inspect NPZ data, "
+                "compute numerical derivatives, detect mode transitions, and perform exploratory analysis."
+            ),
+            "sindy_agent": (
+                "SINDy model fitting specialist. Use it to analyze trajectory plots via vision, "
+                "segment data by change points, and fit SINDy models to each segment to discover "
+                "the ODE structure and coefficients for each mode."
+            ),
+        }
+        agent_lines = []
+        for agent_name in managed_agents_list:
+            role_desc = AGENT_ROLE_DESCRIPTIONS.get(
+                agent_name,
+                f"Managed code agent that can assist with code-related tasks."
+            )
+            agent_lines.append(f"- **`{agent_name}`**: {role_desc}")
+
+        MANAGE_AGENT_PROMPT = (
+            "\n### Managed Sub-Agents\n"
+            "You have access to the following managed Code Agents:\n"
+            + "\n".join(agent_lines)
+            + "\n\nDelegate tasks to the appropriate agent by name."
+        )
         task += MANAGE_AGENT_PROMPT
 
 
@@ -675,7 +699,7 @@ Generate an improved HA specification that better matches the observed trajector
 
 ## Available Data
 - **Trace visualizations**: {image_placeholders}, use the `hybrid_automaton_image_analysis` tool to analyze the image if you want to obtain more detailed information about the system.
-- **Raw data files**: If you want to use the npz data to analyze the system, you MUST use the `{managed_agents_list[0] if managed_agents_list else 'data_analysis_expert'}` agent to analyze the data. You can not analyze the npz data directly.
+- **Raw data files**: If you want to use the npz data to analyze the system, you MUST delegate to a managed agent. You can not analyze the npz data directly.{f" Use `{managed_agents_list[0]}`" if managed_agents_list and len(managed_agents_list) == 1 else " Use `data_analysis_expert` for general analysis or `sindy_agent` for SINDy model fitting — whichever is available." if managed_agents_list else ""}
 
 ### NPZ Data Format (for reference - use via managed agent)
 Each NPZ file contains:
@@ -684,10 +708,10 @@ Each NPZ file contains:
 - `input`: numpy array, shape `(num_inputs, num_steps)` - input signals (if applicable)
   - Access: `u1 = data['input'][0, :]`
 
-**WARNING**: Do NOT use placeholder names like `<npz_0>` as file paths! Use the `{managed_agents_list[0] if managed_agents_list else 'data_analysis_expert'}` agent which has access to the actual file paths.
+**WARNING**: Do NOT use placeholder names like `<npz_0>` as file paths! Managed agents (`{', '.join(f'`{a}`' for a in managed_agents_list) if managed_agents_list else '`data_analysis_expert`'}`) have access to the actual file paths via their `DATA_FILE_PATHS` variable.
 
 ### Detecting Mode Transitions via Numerical Analysis
-For higher-order systems (order >= 2), position trajectories may appear smooth even when mode transitions occur, because resets often affect **derivatives** (velocity, acceleration) rather than position directly. Use the `{managed_agents_list[0] if managed_agents_list else 'data_analysis_expert'}` agent to:
+For higher-order systems (order >= 2), position trajectories may appear smooth even when mode transitions occur, because resets often affect **derivatives** (velocity, acceleration) rather than position directly.{(' Use `sindy_agent`' if 'sindy_agent' in managed_agents_list else f' Use `{managed_agents_list[0]}`') if managed_agents_list else ' Use a managed agent'} to:
 1. **Compute numerical derivatives**: `velocity = np.diff(state, axis=1) / dt` and `acceleration = np.diff(velocity, axis=1) / dt`
 2. **Detect discontinuities**: sudden jumps in velocity or acceleration indicate potential mode transition points and resets
 3. **Segment-wise analysis**: once candidate transition points are identified, analyze each segment's dynamics separately to infer mode-specific ODEs and guard conditions
@@ -1196,7 +1220,7 @@ def parse_args():
         "--managed-agents-list",
         type=str,
         nargs='*',
-        default=['data_analysis_expert'],
+        default=['data_analysis_expert','sindy_agent'],
         help="List of managed agents to use in the agent.",
     )
 
