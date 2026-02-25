@@ -177,20 +177,13 @@ class ResultsAggregator:
                 context_lines.append(feedback_content)
 
         # 2. Failed iterations — include HA spec + error so the LLM can learn from mistakes
+        #    The feedback string already contains the HA spec and error from _build_failure_feedback()
         failed_results = [r for r in self.results if not r.success]
         for result in failed_results:
             context_lines.append("\n-----------------------------------------\n")
             feedback_content = result.feedback if isinstance(result.feedback, str) else str(result.feedback)
-            # Build informative failure block
-            failure_block = f"The {result.iteration}th attempt FAILED:\n"
-            # Only add HA spec separately if it's not already embedded in the feedback
-            if result.ha_specification and "```json" not in feedback_content:
-                failure_block += f"  1. HA JSON Specification attempted:\n```json\n{json.dumps(result.ha_specification, indent=2)}\n```\n"
-                failure_block += f"  2. Error:\n{feedback_content}\n"
-            else:
-                failure_block += feedback_content + "\n"
-            failure_block += "Please avoid making the same mistake. Fix the issues identified above.\n"
-            context_lines.append(failure_block)
+            context_lines.append(feedback_content)
+            context_lines.append("Please avoid making the same mistake. Fix the issues identified above.\n")
 
         if not context_lines:
             return ""

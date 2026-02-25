@@ -944,6 +944,16 @@ def build_artifact_manifest(
     return manifest
 
 
+def _build_failure_feedback(iteration: int, ha_specification: Optional[Dict], error_msg: str) -> str:
+    """Build a consistent feedback string for failed evaluations,
+    always including the attempted HA spec and error details."""
+    feedback = f"The {iteration}th attempt result:\n"
+    if ha_specification is not None:
+        feedback += f"  1. HA JSON Specification:\n```json\n{json.dumps(ha_specification, indent=2)}\n```\n"
+    feedback += f"  2. Evaluation Error:\n{error_msg}\n"
+    return feedback
+
+
 def evaluate_ha_specification_with_feedback(
     agent_result,
     input_data_path: str,
@@ -996,13 +1006,14 @@ def evaluate_ha_specification_with_feedback(
 
     if not is_valid:
         error_msg = "HA specification validation failed. " + validation_message
-        if ha_specification is not None:
-             error_msg += f"\nPartially extracted spec: {json.dumps(ha_specification, indent=2)[:500]}..."
-        return False, {}, error_msg, ha_specification
+        feedback = _build_failure_feedback(iteration, ha_specification, error_msg)
+        return False, {}, feedback, ha_specification
 
     # Final structure check
     if ha_specification is None or 'automaton' not in ha_specification or 'config' not in ha_specification:
-        return False, {}, "Could not extract valid HA specification from agent output (missing 'automaton' or 'config').", None
+        error_msg = "Could not extract valid HA specification from agent output (missing 'automaton' or 'config')."
+        feedback = _build_failure_feedback(iteration, ha_specification, error_msg)
+        return False, {}, feedback, None
 
     # Find test data files
     # Ground truth files are in a folder with the same name but with "_g" suffix
@@ -1018,7 +1029,9 @@ def evaluate_ha_specification_with_feedback(
         test_data_base_path = input_data_path
 
     if not test_data_files:
-        return False, {}, f"No .npz test data files found in {ground_truth_path} or {input_data_path}", ha_specification
+        error_msg = f"No .npz test data files found in {ground_truth_path} or {input_data_path}"
+        feedback = _build_failure_feedback(iteration, ha_specification, error_msg)
+        return False, {}, feedback, ha_specification
 
     # Sort files by numeric index (ground_truth_0.npz, ground_truth_1.npz, ...)
     def extract_index(filename):
@@ -1041,8 +1054,9 @@ def evaluate_ha_specification_with_feedback(
     ha_num_vars = len([v.strip() for v in var_str.split(',') if v.strip()])
 
     if ha_num_vars != gt_num_vars:
-        msg = f"Variable count mismatch! HA spec has {ha_num_vars}, ground truth has {gt_num_vars}. Check state-space vs higher-order ODE format."
-        return False, {}, msg, ha_specification
+        error_msg = f"Variable count mismatch! HA spec has {ha_num_vars}, ground truth has {gt_num_vars}. Check state-space vs higher-order ODE format."
+        feedback = _build_failure_feedback(iteration, ha_specification, error_msg)
+        return False, {}, feedback, ha_specification
 
     # Set up output directory
     if output_dir is None:
@@ -1167,9 +1181,8 @@ def evaluate_ha_specification_with_feedback(
     except Exception as e:
         import traceback
         traceback.print_exc()
-        feedback = f"```json\n{json.dumps(ha_specification, indent=2)}\n```\n"
-        # feedback = f"```json\n{agent_result}\n```\n"
-        feedback += f"Evaluation Results:\nThe HA specification is not valid. Please try to generate a valid specification. Here is the error message: {str(e)}"
+        error_msg = f"Simulation/evaluation runtime error: {str(e)}"
+        feedback = _build_failure_feedback(iteration, ha_specification, error_msg)
         return False, {}, feedback, ha_specification
 
 
@@ -1437,12 +1450,13 @@ def main():
         try:
             result = managerAgent.run(task, images=compressed_trace_images)
         except Exception as e:
-            # Create failed iteration result
+            # Create failed iteration result with consistent feedback format
+            feedback = _build_failure_feedback(iteration, None, f"Agent execution failed: {str(e)}")
             failed_result = IterationResult(
                 iteration=iteration,
                 ha_specification=None,
                 metrics={},
-                feedback=f"Agent execution failed to get result: {str(e)}",
+                feedback=feedback,
                 success=False,
                 error_value=float('inf')
             )
