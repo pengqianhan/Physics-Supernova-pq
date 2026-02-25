@@ -853,25 +853,46 @@ Identify the main sources of error and suggest specific improvements to the HA J
         {"role": "user", "content": content}
     ]
 
-    # Call LLM with retry
-    max_retries = 3
-    for attempt in range(max_retries):
-        try:
-            llm_kwargs = get_litellm_kwargs(model_id)
-            response = completion(
-                model=model_id,
-                messages=messages,
-                max_tokens=1024,
-                **llm_kwargs,
-            )
-            summary = response.choices[0].message.content.strip()
-            if summary:
-                return summary
-        except Exception as e:
-            print(f"[gen_summary] Attempt {attempt + 1}/{max_retries} failed: {e}")
-            if attempt < max_retries - 1:
-                import time
-                time.sleep(2)
+    # Build text-only fallback messages for models that don't support vision
+    text_only_content = [{"type": "text", "text": user_prompt}]
+    text_only_messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": text_only_content}
+    ]
+
+
+    def _try_completion(msgs, retries=3):
+        """Attempt LLM completion with retry logic. Returns summary or empty string."""
+        for attempt in range(retries):
+            try:
+                llm_kwargs = get_litellm_kwargs(model_id)
+                response = completion(
+                    model=model_id,
+                    messages=msgs,
+                    **llm_kwargs,
+                )
+                raw = response.choices[0].message.content
+                summary = raw.strip() if raw else ""
+                if summary:
+                    return summary
+            except Exception as e:
+                print(f"[gen_summary] Attempt {attempt + 1}/{retries} failed: {e}")
+                if attempt < retries - 1:
+                    import time
+                    time.sleep(2)
+        return ""
+
+    # Try with images first
+    result = _try_completion(messages)
+    if result:
+        return result
+
+    # If images were included and all attempts returned empty, retry text-only
+    if image_contents:
+        print("[gen_summary] Empty response with images, retrying text-only")
+        result = _try_completion(text_only_messages)
+        if result:
+            return result
 
     return "LLM summary generation failed after all retries."
 
