@@ -149,40 +149,52 @@ class ResultsAggregator:
 
     def get_top_k_feedback(self) -> str:
         """
-        Generate feedback context from top-k best-performing specifications.
+        Generate feedback context from top-k best-performing specifications,
+        plus any failed iterations so the LLM can learn from errors.
 
-        Selects top-k results sorted by error value (ascending).
+        Selects top-k successful results sorted by error value (ascending),
+        then appends failed results with their HA specs and error messages.
 
         Returns:
             Formatted feedback string with sorted results
         """
-        # Filter successful results with valid error values
+        context_lines = []
+
+        # 1. Top-k successful results
         valid_results = [
             r for r in self.results
             if r.success and r.error_value is not None and r.error_value < float('inf')
         ]
 
-        if not valid_results:
-            return ""
+        if valid_results:
+            # Sort by error value (ascending - best first)
+            sorted_results = sorted(valid_results, key=lambda x: x.error_value)
+            distinct_results = sorted_results[:self.top_k]
 
-        # Sort by error value (ascending - best first)
-        sorted_results = sorted(valid_results, key=lambda x: x.error_value)
+            for i, result in enumerate(distinct_results, 1):
+                context_lines.append("\n-----------------------------------------\n")
+                feedback_content = result.feedback if isinstance(result.feedback, str) else str(result.feedback)
+                context_lines.append(feedback_content)
 
-        # Select top-k results by error value (no diversity filtering)
-        distinct_results = sorted_results[:self.top_k]
-
-        if not distinct_results:
-            return ""
-
-        # Build structured feedback context
-        context_lines = []
-
-        for i, result in enumerate(distinct_results, 1):
+        # 2. Failed iterations — include HA spec + error so the LLM can learn from mistakes
+        failed_results = [r for r in self.results if not r.success]
+        for result in failed_results:
             context_lines.append("\n-----------------------------------------\n")
-            # Ensure feedback is a string (defensive check)
             feedback_content = result.feedback if isinstance(result.feedback, str) else str(result.feedback)
-            context_lines.append(feedback_content)
-        
+            # Build informative failure block
+            failure_block = f"The {result.iteration}th attempt FAILED:\n"
+            # Only add HA spec separately if it's not already embedded in the feedback
+            if result.ha_specification and "```json" not in feedback_content:
+                failure_block += f"  1. HA JSON Specification attempted:\n```json\n{json.dumps(result.ha_specification, indent=2)}\n```\n"
+                failure_block += f"  2. Error:\n{feedback_content}\n"
+            else:
+                failure_block += feedback_content + "\n"
+            failure_block += "Please avoid making the same mistake. Fix the issues identified above.\n"
+            context_lines.append(failure_block)
+
+        if not context_lines:
+            return ""
+
         return "\n".join(context_lines)
 
 
