@@ -422,7 +422,7 @@ __SINDY_CODE_EXAMPLE__
             managed_tools = [LocalImageQATool(model_id=managed_image_tool_model_id)]
             agent_image_plot_paths = image_plot_path_list
 
-        else:
+        elif agent_name == "data_analysis_expert":
             # Generic data_analysis_expert (or other named agents)
             managed_agent_description = f"I am a managed agent with name {agent_name}. I can assist with code-related tasks."
             common_instruction = """
