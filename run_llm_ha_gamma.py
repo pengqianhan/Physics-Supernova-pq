@@ -1065,8 +1065,8 @@ def evaluate_ha_specification_with_feedback(
             evaluator = HAEvaluator(
                 ha_dict=ha_specification,
                 npz_file_path=npz_file_path,
-                dt=ha_specification['config'].get('dt', 0.001),
-                total_time=ha_specification['config'].get('total_time', 10.0)
+                dt=ha_specification['config']['dt'],
+                total_time=ha_specification['config']['total_time']
             )
 
             # Run evaluation - save as overlay_0.png, overlay_1.png, etc.
