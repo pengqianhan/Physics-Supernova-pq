@@ -289,9 +289,9 @@ class HybridAutomatonImageTool(Tool):
                 for part in response.candidates[0].content.parts:
                     if part.text is not None:
                         parts_text.append(part.text)
-                    if part.executable_code is not None:
+                    if part.executable_code is not None and part.executable_code.code is not None:
                         parts_text.append(part.executable_code.code)
-                    if part.code_execution_result is not None:
+                    if part.code_execution_result is not None and part.code_execution_result.output is not None:
                         parts_text.append(part.code_execution_result.output)
                 all_parts_text = '\n'.join(parts_text)
                 if all_parts_text and all_parts_text.strip():
