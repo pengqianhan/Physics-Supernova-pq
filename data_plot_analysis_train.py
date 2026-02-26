@@ -10,6 +10,7 @@ Usage:
     python data_plot_analysis_train.py --dataset ATVA/ball --sample 3
     python data_plot_analysis_train.py --all                          # ALL datasets, sample 0
     python data_plot_analysis_train.py --all --sample 5
+    python data_plot_analysis_train.py --plot-input                   # include input signal subplots
 """
 
 import argparse
@@ -52,7 +53,7 @@ def plot_signal(ax, t, y, ylabel, color):
     ax.grid(True, alpha=0.3)
 
 
-def analyze_dataset(dataset, sample_idx, output_root):
+def analyze_dataset(dataset, sample_idx, output_root, plot_input=False):
     """Generate the derivative analysis plot for one training sample."""
     data_dir = os.path.join(DATA_ROOT, dataset)
     npz_path = os.path.join(data_dir, f"sample_{sample_idx}.npz")
@@ -71,7 +72,7 @@ def analyze_dataset(dataset, sample_idx, output_root):
     if inp.ndim == 1:
         inp = inp.reshape(1, -1)
     num_inputs = inp.shape[0]
-    has_input = num_inputs > 0 and inp.size > 0
+    has_input = plot_input and num_inputs > 0 and inp.size > 0
 
     # Load config for dt and var names
     cfg = load_config(dataset)
@@ -150,19 +151,23 @@ def main():
                         help="Sample index (default: 0)")
     parser.add_argument("--all", action="store_true",
                         help="Generate plots for ALL datasets")
+    parser.add_argument("--plot-input", action="store_true",
+                        help="Include input signal subplots (off by default)")
     parser.add_argument("--output", type=str, default=OUTPUT_ROOT,
                         help=f"Output root directory (default: {OUTPUT_ROOT})")
     args = parser.parse_args()
+
+    plot_input = args.plot_input
 
     if args.all:
         datasets = discover_datasets()
         print(f"Found {len(datasets)} datasets, generating sample {args.sample} for each...")
         for ds in datasets:
             print(f"\n[{ds}]")
-            analyze_dataset(ds, args.sample, args.output)
+            analyze_dataset(ds, args.sample, args.output, plot_input=plot_input)
     else:
         print(f"[{args.dataset}] sample {args.sample}")
-        analyze_dataset(args.dataset, args.sample, args.output)
+        analyze_dataset(args.dataset, args.sample, args.output, plot_input=plot_input)
 
 
 if __name__ == "__main__":
