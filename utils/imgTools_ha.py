@@ -1,11 +1,14 @@
 import os
 import time
+import base64
 from google import genai
 from google.genai import types
 from PIL import Image
 from io import BytesIO
 from smolagents.default_tools import Tool
 from base64 import b64decode
+
+from litellm import completion as litellm_completion
 
 # Import smolagents components for message handling
 from .markdown_utils import MarkdownMessage
@@ -45,8 +48,33 @@ class HybridAutomatonImageTool(Tool):
         self.max_short_side_pixels = max_short_side_pixels  # Maximum image resolution for processing
         # Registry for iteration images (evaluator plots registered upstream)
         self._iteration_images: dict[int, bytes] = {}
-        # Initialize genai.Client for Google Gemini API
+        # Initialize genai.Client for Google Gemini API (used only for Gemini models)
         self.client = genai.Client(api_key=self.api_key)
+
+    def _is_gemini_model(self) -> bool:
+        """Check if the current vision_model_id is a Gemini model."""
+        model = self.vision_model_id
+        return (
+            model.startswith("gemini")
+            or model.startswith("gemini/")
+        )
+
+    def _get_litellm_kwargs(self) -> dict:
+        """Return litellm routing kwargs for non-Gemini models (e.g., Kimi/Moonshot)."""
+        model = self.vision_model_id
+        if (
+            model.startswith("moonshot/")
+            or model.startswith("openai/kimi")
+            or model.startswith("openai/moonshot")
+            or model.startswith("kimi")
+        ):
+            return {
+                "api_key": os.environ.get("MOONSHOT_API_KEY"),
+                "api_base": os.environ.get("MOONSHOT_API_BASE", "https://api.moonshot.cn/v1"),
+            }
+        if model.startswith("gemini/"):
+            return {"api_key": os.environ.get("GEMINI_API_KEY")}
+        return {}
 
     def _is_valid_file_path(self, path: str) -> tuple[bool, str]:
         """
@@ -241,39 +269,18 @@ class HybridAutomatonImageTool(Tool):
         """
         return self._extract_image_bytes_from_placeholder(image_ref)
 
-    def forward(self, image_ref: str, question: str) -> str:  # type: ignore[override]
-        """Process image analysis request and return expert response."""
-        # Extract image bytes from placeholder (<image_N> or <iter_image_X_Y>)
-        img_bytes, error_msg = self._extract_image_bytes(image_ref)
+    def _forward_gemini(self, img: Image.Image, full_prompt: str) -> str:
+        """Call Gemini via native genai.Client (supports code_execution)."""
+        # Strip "gemini/" prefix if present — genai.Client expects bare model names
+        model_name = self.vision_model_id
+        if model_name.startswith("gemini/"):
+            model_name = model_name[len("gemini/"):]
 
-        if img_bytes is None:
-            return f"Error: {error_msg}"
-
-        # Convert bytes to PIL.Image for genai.Client
-        img = Image.open(BytesIO(img_bytes))
-
-        # Resize image if it exceeds maximum resolution for better processing
-        if self.max_short_side_pixels is not None:
-            width, height = img.size
-            if min(width, height) > self.max_short_side_pixels:
-                scale = self.max_short_side_pixels / min(width, height)
-                new_size = (int(width * scale), int(height * scale))
-                # Use BILINEAR resampling (ANTIALIAS deprecated in newer PIL versions)
-                img = img.resize(new_size, Image.Resampling.BILINEAR)
-
-        # Prepare prompt with system context
-        full_prompt = (
-            "You are a specialist in analyzing plots and visualizations of hybrid automata systems.\n\n"
-            f"{question}"
-        )
-
-        # Retry logic for robust image analysis
         max_try = 3
         for _ in range(max_try):
-            # Generate response from vision model using genai.Client
             try:
                 response = self.client.models.generate_content(
-                    model="gemini-3-flash-preview",
+                    model=model_name,
                     contents=[img, full_prompt],
                     config=types.GenerateContentConfig(
                         tools=[types.Tool(code_execution=types.ToolCodeExecution)]),
@@ -287,13 +294,96 @@ class HybridAutomatonImageTool(Tool):
                     if part.code_execution_result is not None:
                         parts_text.append(part.code_execution_result.output)
                 all_parts_text = '\n'.join(parts_text)
-                # Extract response text
                 if all_parts_text and all_parts_text.strip():
                     return all_parts_text.strip()
             except Exception as e:
-                print(f"Error during vision model generation: {str(e)}")
-                time.sleep(5)  # Wait before retry
+                print(f"Error during Gemini vision generation: {str(e)}")
+                time.sleep(5)
         return "No response"
+
+    def _forward_litellm(self, img_bytes: bytes, full_prompt: str) -> str:
+        """Call non-Gemini models (e.g., kimi-k2.5) via litellm."""
+        image_b64 = base64.b64encode(img_bytes).decode("utf-8")
+        # Guess MIME type from image header bytes
+        mime_type = "image/png"
+        if img_bytes[:3] == b'\xff\xd8\xff':
+            mime_type = "image/jpeg"
+        elif img_bytes[:4] == b'RIFF' and img_bytes[8:12] == b'WEBP':
+            mime_type = "image/webp"
+
+        messages = [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": full_prompt},
+                    {
+                        "type": "image_url",
+                        "image_url": {"url": f"data:{mime_type};base64,{image_b64}"},
+                    },
+                ],
+            }
+        ]
+
+        max_try = 3
+        for _ in range(max_try):
+            try:
+                response = litellm_completion(
+                    model=self.vision_model_id,
+                    messages=messages,
+                    **self._get_litellm_kwargs(),
+                )
+                content = response.choices[0].message.content
+                if isinstance(content, str) and content.strip():
+                    return content.strip()
+                if isinstance(content, list):
+                    texts = [b.get("text", "") for b in content if isinstance(b, dict) and b.get("type") == "text"]
+                    joined = "\n".join(t for t in texts if t.strip())
+                    if joined.strip():
+                        return joined.strip()
+            except Exception as e:
+                print(f"Error during litellm vision generation: {str(e)}")
+                time.sleep(5)
+        return "No response"
+
+    def forward(self, image_ref: str, question: str) -> str:  # type: ignore[override]
+        """Process image analysis request and return expert response."""
+        # Extract image bytes from placeholder (<image_N> or <iter_image_X_Y>)
+        img_bytes, error_msg = self._extract_image_bytes(image_ref)
+
+        if img_bytes is None:
+            return f"Error: {error_msg}"
+
+        # Prepare prompt with system context
+        full_prompt = (
+            "You are a specialist in analyzing plots and visualizations of hybrid automata systems.\n\n"
+            f"{question}"
+        )
+
+        # Route to the appropriate backend based on the vision model
+        if self._is_gemini_model():
+            # Gemini: convert to PIL.Image for genai.Client (supports code_execution)
+            img = Image.open(BytesIO(img_bytes))
+            if self.max_short_side_pixels is not None:
+                width, height = img.size
+                if min(width, height) > self.max_short_side_pixels:
+                    scale = self.max_short_side_pixels / min(width, height)
+                    new_size = (int(width * scale), int(height * scale))
+                    img = img.resize(new_size, Image.Resampling.BILINEAR)
+            return self._forward_gemini(img, full_prompt)
+        else:
+            # Non-Gemini (e.g., kimi-k2.5): resize then call via litellm
+            img = Image.open(BytesIO(img_bytes))
+            if self.max_short_side_pixels is not None:
+                width, height = img.size
+                if min(width, height) > self.max_short_side_pixels:
+                    scale = self.max_short_side_pixels / min(width, height)
+                    new_size = (int(width * scale), int(height * scale))
+                    img = img.resize(new_size, Image.Resampling.BILINEAR)
+                    # Re-encode resized image to bytes for litellm
+                    buf = BytesIO()
+                    img.save(buf, format="PNG")
+                    img_bytes = buf.getvalue()
+            return self._forward_litellm(img_bytes, full_prompt)
 
 if __name__ == "__main__":
     tool = HybridAutomatonImageTool()
