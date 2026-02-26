@@ -1327,14 +1327,6 @@ def parse_args():
         help="Number of training samples to load from trace data (default: 3)",
     )
 
-    # Evaluation ground truth count
-    ap.add_argument(
-        "--eval-train-num",
-        type=int,
-        default=1,
-        help="Number of ground truth files to evaluate against (default: 1). "
-             "When >1, metrics are averaged across all files and multiple overlay plots are generated.",
-    )
 
     args = ap.parse_args()
 
