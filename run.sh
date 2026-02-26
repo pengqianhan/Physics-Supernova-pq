@@ -7,10 +7,10 @@
 MAX_PARALLEL=4
 DATA_BASE="data_all"
 MODEL="openai/kimi-k2.5"                    # Main agent model (LiteLLM-routed)
-IMAGE_TOOL_MODEL="gemini-3-flash-preview"    # Image tool model (Google genai SDK, not LiteLLM)
+IMAGE_TOOL_MODEL="openai/kimi-k2.5"    # Image tool model (Google genai SDK, not LiteLLM)
 SUMMARY_MODEL="openai/kimi-k2.5"            # Summary model (LiteLLM-routed)
-MAX_ITERATIONS=2
-FEEDBACK_TOP_K=2
+MAX_ITERATIONS=5
+FEEDBACK_TOP_K=5
 TARGET_ERROR=0.005
 NO_IMPROVEMENT_PATIENCE=20
 
@@ -37,7 +37,7 @@ run_dataset() {
         --tools-list hybrid_automaton_image_analysis \
         --image-tool-model "$IMAGE_TOOL_MODEL" \
         --summary-model "$SUMMARY_MODEL" \
-        --managed-agents-list data_analysis_expert sindy_agent\
+        --managed-agents-list data_analysis_expert\
         --managed-agents-list-model "$MODEL" \
         --max-iterations $MAX_ITERATIONS \
         --feedback-top-k $FEEDBACK_TOP_K \
