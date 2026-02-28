@@ -9,7 +9,7 @@ DATA_BASE="data_all"
 MODEL="gemini/gemini-3-flash-preview"
 MAX_ITERATIONS=50
 FEEDBACK_TOP_K=50
-TARGET_ERROR=0.001
+TARGET_ERROR=0.005 # 0.001 is the default value, 0.005 is the value with noise
 NO_IMPROVEMENT_PATIENCE=20
 
 # Log directory
