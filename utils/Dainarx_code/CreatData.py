@@ -89,6 +89,18 @@ def creat_data(json_path: str, data_path: str, dT: float, times: float, ground_t
             change_points.shape:  13
             ----------------------------
             '''
+
+            # Add measurement noise scaled by each dimension's standard deviation
+            noise_level = 0.05
+            if noise_level > 0:
+                for dim in range(state_data.shape[0]):
+                    dim_std = np.std(state_data[dim])
+                    if dim_std > 0:
+                        noise = np.random.normal(0, noise_level * dim_std, size=state_data.shape[1])
+                    else:
+                        noise = np.random.normal(0, noise_level, size=state_data.shape[1])
+                    state_data[dim] += noise
+
             # plot data using TrajectoryPlotter
             system_title = os.path.splitext(os.path.basename(json_path))[0]
             title_suffix = f" Sample {cnt - 1}" if cnt is not None else ""
