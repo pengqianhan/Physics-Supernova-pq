@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.08565011502818538,
+    "Mean Difference": 0.0056445411511841905,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_8_0>",
+      "<iter_image_8_1>",
+      "<iter_image_8_2>"
+    ],
+    "Summary": "$ dynamics in Mode 2 and 4 include $u_1$ and $x_1[0]$. Ensure the coupling coefficients are optimized.\n\n    *   *Draft:* The"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_8_0>",
+      "max_diff": 0.13552064010034634,
+      "mean_diff": 0.007987914911892052
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_8_1>",
+      "max_diff": 0.06847698377549774,
+      "mean_diff": 0.005109439663535273
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_8_2>",
+      "max_diff": 0.0529527212087121,
+      "mean_diff": 0.003836268878125247
+    }
+  ]
+}

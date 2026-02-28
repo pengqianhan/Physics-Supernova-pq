@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.26869174733421736,
+    "Mean Difference": 0.007098889015180558,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_46_0>",
+      "<iter_image_46_1>",
+      "<iter_image_46_2>"
+    ],
+    "Summary": "**Evaluation Summary**\n\nThe identified Hybrid Automaton (HA) demonstrates high precision with a **mean_diff of 0.007**, indicating that the continuous dynamics within modes are well-captured. However, the **max_diff of 0.268** highlights localized tracking errors during mode transitions.\n\n**Visual Analysis:**\n*   **Mode Switch Timing:** A critical transition occurs at $t \\approx 1.5s$. In Plot 3, $x_5$ (brown) and $x_9$ (light blue) show a distinct phase lag and amplitude divergence immediately following this switch.\n*   **Saturation Errors:** $x_8$ (yellow) in Plot 2 exhibits overshoot near $t=1.75s$, suggesting the transition to a \"steady-state\" or \"saturation\" mode is delayed or the damping in the subsequent mode is underestimated.\n*   **Coupling:** High-magnitude coefficients in the equations for $x_6, x_8, x_9$ suggest stiff dynamics, making the simulation sensitive to small errors in the guard conditions.\n\n**Recommendations:**\n1.  **Refine Guards:** Adjust the guard conditions for the transition at $t=1.5s$. The current switching logic likely triggers late, causing the observed phase lag in $x_5$.\n2.  **Reset Maps:** Implement explicit reset maps (identity or affine) to ensure state continuity during the $1.5s$ transition.\n3.  **Mode Expansion:** Consider adding a third mode for the post-$1.8s$ interval to better capture the leveling off"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_46_0>",
+      "max_diff": 0.21629390805005044,
+      "mean_diff": 0.005396022334392203
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_46_1>",
+      "max_diff": 0.1530185059025734,
+      "mean_diff": 0.005140834205843175
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_46_2>",
+      "max_diff": 0.43676282805002825,
+      "mean_diff": 0.010759810505306295
+    }
+  ]
+}

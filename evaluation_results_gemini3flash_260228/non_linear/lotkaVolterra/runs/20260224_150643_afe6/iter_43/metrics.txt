@@ -1,0 +1,97 @@
+Hybrid Automaton Evaluation Results
+================================================================================
+Timestamp: 20260225_165639
+Iteration: 43
+Run ID: 20260224_150643_afe6
+Number of Ground Truth Files: 3
+
+Aggregated Metrics:
+  Mean Max Diff: 0.10537515506987616
+  Mean Mean Diff: 0.025799257077247718
+
+Per-File Metrics:
+
+  [0] ground_truth_0.npz:
+      TC (Change-Point Error):0.570000 seconds
+  Max Difference:0.162260
+  Mean Difference:0.039791
+
+  [1] ground_truth_1.npz:
+      TC (Change-Point Error):0.030000 seconds
+  Max Difference:0.008454
+  Mean Difference:0.002015
+
+  [2] ground_truth_2.npz:
+      TC (Change-Point Error):0.510000 seconds
+  Max Difference:0.145411
+  Mean Difference:0.035593
+
+HA Specification:
+{
+  "automaton": {
+    "var": "x1, x2",
+    "input": "",
+    "mode": [
+      {
+        "id": 1,
+        "eq": "x1[1] = 2.988 * x1[0] - 2.988 * x1[0] * x2[0], x2[1] = 0.996 * x1[0] * x2[0] - 0.996 * x2[0]"
+      },
+      {
+        "id": 2,
+        "eq": "x1[1] = 1.992 * x1[0] - 1.992 * x1[0] * x2[0], x2[1] = 0.498 * x1[0] * x2[0] - 0.498 * x2[0]"
+      }
+    ],
+    "edge": [
+      {
+        "direction": "1 -> 2",
+        "condition": "x2 < 0.86"
+      },
+      {
+        "direction": "2 -> 1",
+        "condition": "x2 >= 0.86"
+      }
+    ]
+  },
+  "config": {
+    "dt": 0.01,
+    "total_time": 10.0,
+    "order": 1
+  }
+}
+
+Experiment Hyperparameters
+============================================================
+
+--- Manager Agent ---
+Model: gemini/gemini-3-flash-preview
+Type: CodeAgent
+
+--- Managed Agents ---
+Count: 1
+Agent Names: data_analysis_expert
+Model: gemini/gemini-3-flash-preview
+
+--- Tools ---
+Tools List: hybrid_automaton_image_analysis
+Image Tool Model: gemini/gemini-3-flash-preview
+Review Tool Model: gemini/gemini-flash-lite-latest
+Summarize Tool Model: gemini/gemini-flash-lite-latest
+
+--- Iteration Configuration ---
+Max Iterations: 50
+Feedback Top-K: 50
+Target Error: 0.001
+No Improvement Patience: 20
+
+--- Data Configuration ---
+Input Data Path: data_all/non_linear/lotkaVolterra
+System Name: 
+Num Variables: 2
+Num Inputs: 0
+
+--- Other ---
+Use JSON Schema: True
+Use Structured Output: True
+Structured Output Model: gemini/gemini-3-flash-preview
+============================================================
+

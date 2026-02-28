@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.02229689531199154,
+    "Mean Difference": 0.005543134897759751,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_44_0>",
+      "<iter_image_44_1>",
+      "<iter_image_44_2>"
+    ],
+    "Summary": "The identification shows a strong initial fit, but exhibits significant **phase lead** and slight **amplitude divergence** as time progresses. While the `mean_diff` (0.0055) is low, the cumulative phase error by $t=10s$ indicates the model's internal frequency is higher than the ground truth.\n\n**Specific Issues:**\n1.  **Frequency Mismatch:** The simulated peaks occur earlier than the ground truth, suggesting the growth/interaction coefficients in both modes are slightly overestimated.\n2.  **Mode Switching Sensitivity:** The narrow guard conditions ($x_1 \\in [0.95, 1.05]$) are sensitive to numerical drift. Small errors in state estimation lead to mistimed transitions, compounding the phase lag.\n3.  **Discretization Error:** A 1st-order discrete update for nonlinear oscillatory dynamics (Lotka-Volterra type) often introduces artificial energy/frequency shifts.\n\n**Suggestions for Improvement:**\n*   **Coefficient Tuning:** Reduce the growth terms (e.g., $2.9902$ and $2.4215$) to slow the oscillation frequency.\n*"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_44_0>",
+      "max_diff": 0.0023577944016863724,
+      "mean_diff": 0.0004914286988500368
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_44_1>",
+      "max_diff": 0.05495436123175991,
+      "mean_diff": 0.013814944669823087
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_44_2>",
+      "max_diff": 0.009578530302528344,
+      "mean_diff": 0.0023230313246061286
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+Hybrid Automaton Evaluation Results
+================================================================================
+Timestamp: 20260227_202544
+Iteration: 34
+Run ID: 20260227_054527_f06f
+Number of Ground Truth Files: 3
+
+Aggregated Metrics:
+  Mean Max Diff: 0.19026436156820434
+  Mean Mean Diff: 0.005663826339685221
+
+Per-File Metrics:
+
+  [0] ground_truth_0.npz:
+      TC (Change-Point Error):0.004000 seconds
+  Max Difference:0.137787
+  Mean Difference:0.003975
+
+  [1] ground_truth_1.npz:
+      TC (Change-Point Error):0.002000 seconds
+  Max Difference:0.054112
+  Mean Difference:0.003539
+
+  [2] ground_truth_2.npz:
+      TC (Change-Point Error):0.010000 seconds
+  Max Difference:0.378894
+  Mean Difference:0.009478
+
+HA Specification:
+{
+  "automaton": {
+    "var": "x1, x2, x3, x4, x5, x6, x7, x8, x9",
+    "input": "",
+    "mode": [
+      {
+        "id": 1,
+        "eq": "x1[1] = -2.3442 * x1[0] + 0.0126 * x2[0] + 2.707 * x3[0] - 0.2953 * x4[0] - 0.2412 * x5[0] - 0.8846 * x6[0] + 0.114 * x7[0] - 0.0034 * x8[0] + 0.0564 * x9[0] + 3.065, x2[1] = -0.0824 * x1[0] - 0.3272 * x2[0] - 1.28 * x3[0] + 0.8918 * x4[0] - 0.0754 * x5[0] + 0.2014 * x6[0] - 0.0208 * x7[0] + 0.0078 * x8[0] + 0.0227 * x9[0] + 0.576, x3[1] = 2.3442 * x1[0] - 0.0126 * x2[0] - 2.707 * x3[0] + 0.2953 * x4[0] + 0.2412 * x5[0] + 0.8846 * x6[0] - 0.114 * x7[0] + 0.0034 * x8[0] - 0.0564 * x9[0] - 3.065, x4[1] = -0.1929 * x1[0] + 0.9647 * x2[0] + 0.0795 * x3[0] - 0.8616 * x4[0] + 0.1583 * x5[0] + 0.7079 * x6[0] + 0.0375 * x7[0] - 0.054 * x8[0] - 0.0256 * x9[0] - 0.6884, x5[1] = 5.0 * x1[0] + 3.0 * x3[0] - 1.0 * x5[0], x6[1] = 11.3161 * x1[0] + 8.9877 * x2[0] + 4.2215 * x3[0] + 1.7847 * x4[0] + 1.6734 * x5[0] - 1.4421 * x6[0] - 3.1541 * x7[0] + 0.3166 * x8[0] - 0.118 * x9[0] - 22.0344, x7[1] = 1.0 * x2[0] + 5.0 * x4[0] - 0.5 * x7[0], x8[1] = 13.4526 * x1[0] + 9.9409 * x2[0] + 1.5877 * x3[0] + 1.2311 * x4[0] - 2.9221 * x5[0] + 1.149 * x6[0] + 1.768 * x7[0] + 0.066 * x8[0] + 0.7994 * x9[0] - 25.7833, x9[1] = -13.4539 * x1[0] - 9.9394 * x2[0] - 1.5878 * x3[0] - 1.2187 * x4[0] + 2.9224 * x5[0] - 1.1491 * x6[0] + 3.2306 * x7[0] - 0.266 * x8[0] - 0.7995 * x9[0] + 25.7859"
+      },
+      {
+        "id": 2,
+        "eq": "x1[1] = 1.052 * x1[0] + 0.0092 * x2[0] + 0.3979 * x3[0] + 1.9573 * x4[0] - 0.0914 * x5[0] - 0.0405 * x6[0] - 0.0358 * x7[0] - 0.051 * x8[0] - 0.1385 * x9[0] + 2.0628, x2[1] = 6.0648 * x1[0] - 2.2421 * x2[0] + 3.2576 * x3[0] - 3.6647 * x4[0] - 0.2225 * x5[0] - 1.8166 * x6[0] + 0.1764 * x7[0] - 0.2412 * x8[0] - 0.5503 * x9[0] + 9.4134, x3[1] = -5.8043 * x1[0] + 7.1041 * x2[0] - 4.0315 * x3[0] - 0.8089 * x4[0] + 0.3966 * x5[0] + 0.8805 * x6[0] + 1.7278 * x7[0] + 0.209 * x8[0] + 0.6226 * x9[0] - 22.1355, x4[1] = -9.9458 * x1[0] - 8.1454 * x2[0] - 2.8386 * x3[0] + 5.1578 * x4[0] + 0.6102 * x5[0] - 0.4204 * x6[0] - 1.1148 * x7[0] + 0.7176 * x8[0] + 0.8538 * x9[0] - 7.2375, x5[1] = 2.0 * x1[0] - 1.0 * x5[0] + 5.0 * x7[0], x6[1] = -23.5763 * x1[0] - 25.9087 * x2[0] - 7.5104 * x3[0] - 12.2877 * x4[0] + 2.2076 * x5[0] - 20.2998 * x6[0] + 6.2367 * x7[0] + 0.3221 * x8[0] + 4.4868 * x9[0] - 70.4898, x7[1] = 1.0 * x2[0] + 2.0 * x4[0] - 0.5 * x7[0], x8[1] = -24.8812 * x1[0] - 31.9369 * x2[0] - 9.4326 * x3[0] - 19.2525 * x4[0] - 0.2947 * x5[0] - 21.0976 * x6[0] + 12.3074 * x7[0] + 0.1301 * x8[0] + 7.0533 * x9[0] - 102.2978, x9[1] = 24.8774 * x1[0] + 31.9341 * x2[0] + 9.4312 * x3[0] + 19.2536 * x4[0] + 0.2946 * x5[0] + 21.0944 * x6[0] - 8.3076 * x7[0] - 0.33 * x8[0] - 7.5521 * x9[0] + 102.2823"
+      }
+    ],
+    "edge": [
+      {
+        "direction": "1 -> 2",
+        "condition": "x1 >= 1.5"
+      }
+    ]
+  },
+  "config": {
+    "dt": 0.001,
+    "total_time": 2.0,
+    "order": 1
+  }
+}
+
+Experiment Hyperparameters
+============================================================
+
+--- Manager Agent ---
+Model: gemini/gemini-3-flash-preview
+Type: CodeAgent
+
+--- Managed Agents ---
+Count: 1
+Agent Names: data_analysis_expert
+Model: gemini/gemini-3-flash-preview
+
+--- Tools ---
+Tools List: hybrid_automaton_image_analysis
+Image Tool Model: gemini/gemini-3-flash-preview
+Review Tool Model: gemini/gemini-flash-lite-latest
+Summarize Tool Model: gemini/gemini-flash-lite-latest
+
+--- Iteration Configuration ---
+Max Iterations: 50
+Feedback Top-K: 50
+Target Error: 0.001
+No Improvement Patience: 20
+
+--- Data Configuration ---
+Input Data Path: data_all/non_linear/sys_bio
+System Name: 
+Num Variables: 9
+Num Inputs: 0
+
+--- Other ---
+Use JSON Schema: True
+Use Structured Output: True
+Structured Output Model: gemini/gemini-3-flash-preview
+============================================================
+

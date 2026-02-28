@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.10537515506987616,
+    "Mean Difference": 0.025799257077247718,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_43_0>",
+      "<iter_image_43_1>",
+      "<iter_image_43_2>"
+    ],
+    "Summary": "The hybrid automaton successfully captures the oscillatory Lotka-Volterra dynamics but exhibits significant **phase lag** and **amplitude divergence** over time (max_diff: 0.105).\n\n### Analysis\n1.  **Phase Lag:** The simulated peaks for $x_1$ and $x_2$ progressively shift"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_43_0>",
+      "max_diff": 0.1622602531480015,
+      "mean_diff": 0.03979058575975375
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_43_1>",
+      "max_diff": 0.008454167354316165,
+      "mean_diff": 0.0020146124118819108
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_43_2>",
+      "max_diff": 0.14541104470731084,
+      "mean_diff": 0.0355925730601075
+    }
+  ]
+}

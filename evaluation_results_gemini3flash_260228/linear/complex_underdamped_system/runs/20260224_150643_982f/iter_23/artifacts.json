@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.08242984271237168,
+    "Mean Difference": 0.005088404330954391,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_23_0>",
+      "<iter_image_23_1>",
+      "<iter_image_23_2>"
+    ],
+    "Summary": "The identified hybrid automaton demonstrates excellent fit quality, with a mean difference of **0.005** and a max error of **0.082**. The $x_1$"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_23_0>",
+      "max_diff": 0.0888180596063769,
+      "mean_diff": 0.006440993418056042
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_23_1>",
+      "max_diff": 0.08019149794901956,
+      "mean_diff": 0.005006681429936935
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_23_2>",
+      "max_diff": 0.07827997058171858,
+      "mean_diff": 0.003817538144870196
+    }
+  ]
+}

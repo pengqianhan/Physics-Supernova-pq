@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.12374576138823266,
+    "Mean Difference": 0.005873820963636006,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_29_0>",
+      "<iter_image_29_1>",
+      "<iter_image_29_2>"
+    ],
+    "Summary": "The HA model demonstrates high fidelity with a low mean difference (0.0059). Tracking is excellent for $t < 1.5s$. However, a distinct mode transition occurs around"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_29_0>",
+      "max_diff": 0.08832773103298967,
+      "mean_diff": 0.005239769396525177
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_29_1>",
+      "max_diff": 0.11395150693470923,
+      "mean_diff": 0.004603865457205161
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_29_2>",
+      "max_diff": 0.16895804619699906,
+      "mean_diff": 0.007777828037177682
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.02201547484088783,
+    "Mean Difference": 0.005482567489385564,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_16_0>",
+      "<iter_image_16_1>",
+      "<iter_image_16_2>"
+    ],
+    "Summary": "The HA model demonstrates an **excellent fit** with a mean difference of 0.005 and max difference of 0.022. The simulated trajectories for $x_1$ and $x_2$ show high fidelity in both amplitude and phase over the 10"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_16_0>",
+      "max_diff": 0.0021977627419430623,
+      "mean_diff": 0.00047695444884853996
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_16_1>",
+      "max_diff": 0.05450562807130131,
+      "mean_diff": 0.013708864254758193
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_16_2>",
+      "max_diff": 0.009343033709419113,
+      "mean_diff": 0.0022618837645499586
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.33956839541426787,
+    "Mean Difference": 0.1401421670273029,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_34_0>",
+      "<iter_image_34_1>",
+      "<iter_image_34_2>"
+    ],
+    "Summary": "The current single-mode HA specification fails to capture the state-dependent frequency and damping characteristics, leading to significant **phase lag** and **amplitude divergence** after $t=3s$. While the cubic term attempts to model nonlinearity, the cumulative error in the trajectories indicates that the linear stiffness ($0.9020$) and damping ($-0.6562$) coefficients are poorly calibrated for the varying energy levels observed.\n\n**Technical Analysis:**\n1.  **Fit Quality:** Moderate. A `max_diff` of 0.34 relative to the"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_34_0>",
+      "max_diff": 0.4841231292581213,
+      "mean_diff": 0.1941329920494614
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_34_1>",
+      "max_diff": 0.3021715447470914,
+      "mean_diff": 0.12920781290166414
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_34_2>",
+      "max_diff": 0.23241051223759096,
+      "mean_diff": 0.09708569613078313
+    }
+  ]
+}

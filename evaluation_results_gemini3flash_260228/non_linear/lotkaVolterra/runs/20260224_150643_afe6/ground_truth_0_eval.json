@@ -1,0 +1,12 @@
+{
+  "gt_file": "ground_truth_0.npz",
+  "tc": 0.01,
+  "max_diff": 0.0025970335123964073,
+  "mean_diff": 0.0007590293030819797,
+  "clustering_error": 0,
+  "status": "success",
+  "dataset": "non_linear/lotkaVolterra",
+  "ha_spec_path": "evaluation_results/non_linear/lotkaVolterra/runs/20260224_150643_afe6/best_ha_specification.json",
+  "num_iterations": 37,
+  "max_iter": 50
+}

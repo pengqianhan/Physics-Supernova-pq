@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 6.288241481031789,
+    "Mean Difference": 0.11316324974978877,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_30_0>",
+      "<iter_image_30_1>",
+      "<iter_image_30_2>"
+    ],
+    "Summary": "The system identification shows high initial fidelity, but suffers from **catastrophic divergence** following a mode transition around $t \\approx 1.5s$. While the `mean_diff` is low (0.113), the `max_diff` (6.288) highlights significant instability in the second mode.\n\n**Key Issues:**\n1.  **Mode Switch Timing:** The \"kink\" in ground truth trajectories (especially $x_5, x_8, x_9$) occurs at $t \\approx 1.6s$, but simulated trajectories begin diverging earlier or exhibit incorrect slopes immediately after the switch.\n2.  **Unstable Mode 2 Dynamics:** In plots 2 and 3, variables $x_4$ and $x_1$ dive toward negative infinity while $x_8$ overshoots. This suggests the identified eigenvalues for Mode 2 are overly unstable or the affine terms (offsets) are incorrectly scaled.\n3.  **Coupling Errors:** Large coefficients in the HA (e.g., 13.414 for $x_8$) amplify small state errors, leading to the observed rapid divergence.\n\n**Concrete Suggestions:**\n*   **Refine Guards:** Tighten the transition conditions between Mode 1 and Mode 2 to better match the $t \\approx 1.6s$ inflection point.\n*   **Regularize Mode 2:** Re-estimate"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_30_0>",
+      "max_diff": 0.3832146643921203,
+      "mean_diff": 0.008160773105667506
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_30_1>",
+      "max_diff": 12.248213353524067,
+      "mean_diff": 0.20384902289107223
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_30_2>",
+      "max_diff": 6.233296425179177,
+      "mean_diff": 0.12747995325262657
+    }
+  ]
+}

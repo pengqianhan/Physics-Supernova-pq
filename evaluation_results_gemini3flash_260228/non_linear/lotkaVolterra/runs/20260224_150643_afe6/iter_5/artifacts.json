@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.07300479815936965,
+    "Mean Difference": 0.017868574032404515,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_5_0>",
+      "<iter_image_5_1>",
+      "<iter_image_5_2>"
+    ],
+    "Summary": "The simulation demonstrates a reasonably high-fidelity fit initially (mean error ~0.018), but exhibits a cumulative **phase lead** and slight **amplitude divergence** as time progresses, particularly visible after $t=6s$. The"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_5_0>",
+      "max_diff": 0.05232519442447489,
+      "mean_diff": 0.012386178736700703
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_5_1>",
+      "max_diff": 0.10656383276080807,
+      "mean_diff": 0.0268565093236249
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_5_2>",
+      "max_diff": 0.06012536729282597,
+      "mean_diff": 0.014363034036887943
+    }
+  ]
+}

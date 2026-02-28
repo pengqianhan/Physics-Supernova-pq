@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.17447530267618608,
+    "Mean Difference": 0.0053708966711758545,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_50_0>",
+      "<iter_image_50_1>",
+      "<iter_image_50_2>"
+    ],
+    "Summary": "The HA model demonstrates high fidelity with a low mean error (0.005), indicating successful identification of the piecewise affine dynamics. However, the max error (0.174) is concentrated at the mode transitions occurring between $t=1.5s$ and $t=1.7s$.\n\n**Visual Analysis:**\nTrajectories $x_5, x_8,$ and $x_9$ exhibit sharp \"kinks,\" signaling discrete state-"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_50_0>",
+      "max_diff": 0.12273034505028046,
+      "mean_diff": 0.0038531397959194803
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_50_1>",
+      "max_diff": 0.03751263071656643,
+      "mean_diff": 0.0030305969621096094
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_50_2>",
+      "max_diff": 0.3631829322617114,
+      "mean_diff": 0.009228953255498475
+    }
+  ]
+}

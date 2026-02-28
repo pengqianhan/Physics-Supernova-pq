@@ -1,0 +1,12 @@
+{
+  "gt_file": "ground_truth_0.npz",
+  "tc": 0.03,
+  "max_diff": 0.09221991228291683,
+  "mean_diff": 0.004858550771742767,
+  "clustering_error": 0,
+  "status": "success",
+  "dataset": "linear/complex_underdamped_system",
+  "ha_spec_path": "evaluation_results/linear/complex_underdamped_system/runs/20260224_150643_982f/best_ha_specification.json",
+  "num_iterations": 35,
+  "max_iter": 50
+}

@@ -1,0 +1,97 @@
+Hybrid Automaton Evaluation Results
+================================================================================
+Timestamp: 20260228_025253
+Iteration: 47
+Run ID: 20260227_005029_78e6
+Number of Ground Truth Files: 3
+
+Aggregated Metrics:
+  Mean Max Diff: 0.3329024706688155
+  Mean Mean Diff: 0.1476783938168999
+
+Per-File Metrics:
+
+  [0] ground_truth_0.npz:
+      TC (Change-Point Error):4.642000 seconds
+  Max Difference:0.524121
+  Mean Difference:0.226521
+
+  [1] ground_truth_1.npz:
+      TC (Change-Point Error):3.754000 seconds
+  Max Difference:0.274742
+  Mean Difference:0.126811
+
+  [2] ground_truth_2.npz:
+      TC (Change-Point Error):3.634000 seconds
+  Max Difference:0.199845
+  Mean Difference:0.089702
+
+HA Specification:
+{
+  "automaton": {
+    "var": "x1",
+    "input": "u1",
+    "mode": [
+      {
+        "id": 1,
+        "eq": "x1[2] = -0.65 * x1[1] + 1.25 * x1[0] - 1.50 * x1[0] ** 3 + 1.35 * u1 + 0.07"
+      },
+      {
+        "id": 2,
+        "eq": "x1[2] = -0.72 * x1[1] + 0.85 * x1[0] - 1.50 * x1[0] ** 3 + 1.15 * u1 + 0.15"
+      }
+    ],
+    "edge": [
+      {
+        "direction": "1 -> 2",
+        "condition": "abs(x1) > 4.5"
+      },
+      {
+        "direction": "2 -> 1",
+        "condition": "abs(x1) <= 4.0"
+      }
+    ]
+  },
+  "config": {
+    "dt": 0.001,
+    "total_time": 10.0,
+    "order": 2
+  }
+}
+
+Experiment Hyperparameters
+============================================================
+
+--- Manager Agent ---
+Model: gemini/gemini-3-flash-preview
+Type: CodeAgent
+
+--- Managed Agents ---
+Count: 1
+Agent Names: data_analysis_expert
+Model: gemini/gemini-3-flash-preview
+
+--- Tools ---
+Tools List: hybrid_automaton_image_analysis
+Image Tool Model: gemini/gemini-3-flash-preview
+Review Tool Model: gemini/gemini-flash-lite-latest
+Summarize Tool Model: gemini/gemini-flash-lite-latest
+
+--- Iteration Configuration ---
+Max Iterations: 50
+Feedback Top-K: 50
+Target Error: 0.001
+No Improvement Patience: 20
+
+--- Data Configuration ---
+Input Data Path: data_all/non_linear/duffing
+System Name: 
+Num Variables: 1
+Num Inputs: 1
+
+--- Other ---
+Use JSON Schema: True
+Use Structured Output: True
+Structured Output Model: gemini/gemini-3-flash-preview
+============================================================
+

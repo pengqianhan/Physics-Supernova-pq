@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.020410949924290392,
+    "Mean Difference": 0.0050795356446249095,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_46_0>",
+      "<iter_image_46_1>",
+      "<iter_image_46_2>"
+    ],
+    "Summary": "The evaluation shows a high-quality fit overall (mean_diff: 0.0051), but the second trajectory reveals a significant **phase lead** and **amplitude divergence** starting around $t=3s$. This indicates that while the Lotka-Volterra structure is correct, the discrete-time parameters in Mode 2 are slightly over-approximated, leading to faster-than-actual dynamics.\n\n**Specific Issues:**\n1.  **Phase Drift:** The simulated peaks in the second plot occur earlier than the ground truth, suggesting the growth/interaction coefficients in Mode 2 ($2.4168, -2.4895$) are too high.\n2.  **Guard Sensitivity:** The narrow guard ($x_1 \\in [0"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_46_0>",
+      "max_diff": 0.0024950129128156074,
+      "mean_diff": 0.0006978484553169831
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_46_1>",
+      "max_diff": 0.053072998006456214,
+      "mean_diff": 0.013345995389012743
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_46_2>",
+      "max_diff": 0.005664838853599354,
+      "mean_diff": 0.0011947630895450027
+    }
+  ]
+}

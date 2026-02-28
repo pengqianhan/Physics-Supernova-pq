@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.39770239139508295,
+    "Mean Difference": 0.14676746359069479,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_8_0>",
+      "<iter_image_8_1>",
+      "<iter_image_8_2>"
+    ],
+    "Summary": "The HA model achieves a moderate fit (mean_diff: 0.147), but visual analysis reveals significant **phase drift** and **frequency mismatch** across trajectories. While Plot 3 shows"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_8_0>",
+      "max_diff": 0.4967959475719887,
+      "mean_diff": 0.16118580345750014
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_8_1>",
+      "max_diff": 0.5557198025563627,
+      "mean_diff": 0.23502633840678722
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_8_2>",
+      "max_diff": 0.14059142405689753,
+      "mean_diff": 0.044090248907797
+    }
+  ]
+}

@@ -1,0 +1,151 @@
+Hybrid Automaton Evaluation Results
+================================================================================
+Timestamp: 20260225_145340
+Iteration: 30
+Run ID: 20260224_150643_982f
+Number of Ground Truth Files: 3
+
+Aggregated Metrics:
+  Mean Max Diff: 0.08230433361856043
+  Mean Mean Diff: 0.005174055667718465
+
+Per-File Metrics:
+
+  [0] ground_truth_0.npz:
+      TC (Change-Point Error):0.030000 seconds
+  Max Difference:0.102792
+  Mean Difference:0.006995
+
+  [1] ground_truth_1.npz:
+      TC (Change-Point Error):0.030000 seconds
+  Max Difference:0.071871
+  Mean Difference:0.004851
+
+  [2] ground_truth_2.npz:
+      TC (Change-Point Error):0.030000 seconds
+  Max Difference:0.072250
+  Mean Difference:0.003676
+
+HA Specification:
+{
+  "automaton": {
+    "var": "x1, x2",
+    "input": "u1",
+    "mode": [
+      {
+        "id": 1,
+        "eq": "x1[2] = -100 * (x1[1] - 1), x2[2] = -3.01 * x2[1] - 24.4 * x2[0] + 24.4"
+      },
+      {
+        "id": 2,
+        "eq": "x1[2] = -100 * (x1[1] - 1), x2[2] = -5.65 * x2[1] - 37.94 * x2[0] + 7.79 * u1"
+      },
+      {
+        "id": 3,
+        "eq": "x1[2] = -100 * (x1[1] + 1), x2[2] = -3.01 * x2[1] - 24.77 * x2[0]"
+      },
+      {
+        "id": 4,
+        "eq": "x1[2] = -100 * (x1[1] + 1), x2[2] = -3.00 * x2[1] - 26.0 * x2[0] + 5.19 * u1"
+      }
+    ],
+    "edge": [
+      {
+        "direction": "1 -> 2",
+        "condition": "x1 >= 5.0",
+        "reset": {
+          "x1[0]": [
+            "5.0"
+          ],
+          "x1[1]": [
+            "1.0"
+          ],
+          "x2[1]": [
+            "x2[1]-0.5313"
+          ]
+        }
+      },
+      {
+        "direction": "2 -> 3",
+        "condition": "x1 >= 10.0",
+        "reset": {
+          "x1[0]": [
+            "10.0"
+          ],
+          "x1[1]": [
+            "-1.0"
+          ]
+        }
+      },
+      {
+        "direction": "3 -> 4",
+        "condition": "x1 <= 5.0",
+        "reset": {
+          "x1[0]": [
+            "5.0"
+          ],
+          "x1[1]": [
+            "-1.0"
+          ],
+          "x2[1]": [
+            "x2[1]+0.5066"
+          ]
+        }
+      },
+      {
+        "direction": "4 -> 1",
+        "condition": "x1 <= 0.0",
+        "reset": {
+          "x1[0]": [
+            "0.0"
+          ],
+          "x1[1]": [
+            "1.0"
+          ]
+        }
+      }
+    ]
+  },
+  "config": {
+    "dt": 0.01,
+    "total_time": 20.0,
+    "order": 2
+  }
+}
+
+Experiment Hyperparameters
+============================================================
+
+--- Manager Agent ---
+Model: gemini/gemini-3-flash-preview
+Type: CodeAgent
+
+--- Managed Agents ---
+Count: 1
+Agent Names: data_analysis_expert
+Model: gemini/gemini-3-flash-preview
+
+--- Tools ---
+Tools List: hybrid_automaton_image_analysis
+Image Tool Model: gemini/gemini-3-flash-preview
+Review Tool Model: gemini/gemini-flash-lite-latest
+Summarize Tool Model: gemini/gemini-flash-lite-latest
+
+--- Iteration Configuration ---
+Max Iterations: 50
+Feedback Top-K: 50
+Target Error: 0.001
+No Improvement Patience: 20
+
+--- Data Configuration ---
+Input Data Path: data_all/linear/complex_underdamped_system
+System Name: 
+Num Variables: 2
+Num Inputs: 1
+
+--- Other ---
+Use JSON Schema: True
+Use Structured Output: True
+Structured Output Model: gemini/gemini-3-flash-preview
+============================================================
+

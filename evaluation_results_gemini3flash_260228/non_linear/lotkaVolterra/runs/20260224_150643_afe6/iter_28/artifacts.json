@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.03672387620331629,
+    "Mean Difference": 0.00941645345167477,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_28_0>",
+      "<iter_image_28_1>",
+      "<iter_image_28_2>"
+    ],
+    "Summary": "The hybrid automaton (HA) demonstrates a strong initial fit, but develops a cumulative **phase lag** starting around $t=6s$. While the `mean_diff` (0.0094) is low, the `max_diff` (0.0367) highlights a growing temporal misalignment where the simulated trajectory oscillates slower than the ground truth.\n\n**Technical Issues:**\n1"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_28_0>",
+      "max_diff": 0.05792201123558279,
+      "mean_diff": 0.01462577207401076
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_28_1>",
+      "max_diff": 0.0028485544288470764,
+      "mean_diff": 0.001121545850074417
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_28_2>",
+      "max_diff": 0.049401062945519,
+      "mean_diff": 0.012502042430939136
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.3897442763114938,
+    "Mean Difference": 0.14308695855484557,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_7_0>",
+      "<iter_image_7_1>",
+      "<iter_image_7_2>"
+    ],
+    "Summary": "The identification shows high accuracy (Mean Diff: 0.14), with Plot 3 achieving near-optimal tracking. Earlier iterations (Plots 1 & 2) suffered from significant frequency mismatches"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_7_0>",
+      "max_diff": 0.5014394126826522,
+      "mean_diff": 0.162841470624503
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_7_1>",
+      "max_diff": 0.5637991460699876,
+      "mean_diff": 0.2370440738975563
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_7_2>",
+      "max_diff": 0.1039942701818414,
+      "mean_diff": 0.029375331142477416
+    }
+  ]
+}

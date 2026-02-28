@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.22075981445601658,
+    "Mean Difference": 0.006262431206727211,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_37_0>",
+      "<iter_image_37_1>",
+      "<iter_image_37_2>"
+    ],
+    "Summary": "The identification demonstrates high overall accuracy with a low **mean_diff (0.006)**. However, the **max_diff (0.22)** and visual inspection reveal localized errors during mode transitions, particularly around **$t \\approx 1.6s$**.\n\n**Observations:**\n1.  **Transition Error:** A sharp change in dynamics for $x_5$ (brown) and $x_8$ (yellow) occurs at $1.6s$. The simulated trajectories show slight phase lag and amplitude mismatch immediately following this switch.\n2.  **Coupling Issues:** In Plot 3, $x_9$ (light blue) shows minor divergence from the ground truth toward the end of the horizon, suggesting accumulated error in the secondary mode.\n3.  **Mode Dynamics:** Mode 1 captures the slow-growth phase well, but the transition to the high-gain regime in Mode 2 is slightly delayed.\n\n**Actionable Suggestions:**\n*   **Refine Guards:** Adjust the `edge` guard conditions to trigger earlier. The current lag suggests the transition threshold is too high."
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_37_0>",
+      "max_diff": 0.17578522823874423,
+      "mean_diff": 0.004642492104166726
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_37_1>",
+      "max_diff": 0.09393457134008337,
+      "mean_diff": 0.004211867032037612
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_37_2>",
+      "max_diff": 0.3925596437892222,
+      "mean_diff": 0.009932934483977295
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 6.7629811575326935,
+    "Mean Difference": 0.12008455804215445,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_33_0>",
+      "<iter_image_33_1>",
+      "<iter_image_33_2>"
+    ],
+    "Summary": "The system exhibits high fidelity during the initial phase ($t < 1.5s$) but suffers from **catastrophic divergence** following the mode transition. While the `mean_diff` is low (0.12), the `max_diff` (6.76) confirms significant instability in the secondary mode.\n\n**Specific Issues:**\n*   **Instability:** In Mode 2, variables $x4$, $x5$, and $x8$ show exponential divergence. The identified discrete-time coefficients (e.g., $11.24$ for $x6$)"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_33_0>",
+      "max_diff": 0.4416237855417107,
+      "mean_diff": 0.009267834066317867
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_33_1>",
+      "max_diff": 13.128754300723969,
+      "mean_diff": 0.21400206138171324
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_33_2>",
+      "max_diff": 6.7185653863324015,
+      "mean_diff": 0.13698377867843228
+    }
+  ]
+}

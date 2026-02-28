@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.7119028357893359,
+    "Mean Difference": 0.22214616461247552,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_38_0>",
+      "<iter_image_38_1>",
+      "<iter_image_38_2>"
+    ],
+    "Summary": "The HA fails to capture the nonlinear frequency-amplitude relationship, resulting in significant **phase drift** and **amplitude mismatch** across all test cases. While the mean error is 0.22, the max error (0.71) highlights poor tracking in high-frequency regimes.\n\n**Specific Issues:**\n1.  **Redundant Modes:** All three modes share identical dynamics. The hybrid structure is currently only utilized for discrete resets, failing to model state-dependent parameter variations.\n2.  **Artificial Dissipation:** The reset map `0.95 * x1"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_38_0>",
+      "max_diff": 0.1795995407438376,
+      "mean_diff": 0.07471798628533029
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_38_1>",
+      "max_diff": 0.999525284515415,
+      "mean_diff": 0.28207096020252803
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_38_2>",
+      "max_diff": 0.9565836821087551,
+      "mean_diff": 0.30964954734956823
+    }
+  ]
+}

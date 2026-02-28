@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.4291362744675755,
+    "Mean Difference": 0.12169337797810198,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_50_0>",
+      "<iter_image_50_1>",
+      "<iter_image_50_2>"
+    ],
+    "Summary": "The hybrid automaton (HA) demonstrates a moderate fit (Mean Diff: 0.12) but suffers from significant **phase divergence** and **frequency mismatch**. While the initial cycles align, cumulative"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_50_0>",
+      "max_diff": 0.19748586200082957,
+      "mean_diff": 0.04591834036304668
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_50_1>",
+      "max_diff": 0.5306143156407435,
+      "mean_diff": 0.15249906081467873
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_50_2>",
+      "max_diff": 0.5593086457611535,
+      "mean_diff": 0.16666273275658056
+    }
+  ]
+}

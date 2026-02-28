@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": Infinity,
+    "Mean Difference": Infinity,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_30_0>",
+      "<iter_image_30_1>",
+      "<iter_image_30_2>"
+    ],
+    "Summary": "The identification failed, resulting in catastrophic numerical divergence (`inf` error). The simulated trajectory exhibits immediate exponential growth, reaching $10^{98}$ due to unstable mode dynamics and a missed guard condition"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_30_0>",
+      "max_diff": Infinity,
+      "mean_diff": Infinity
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_30_1>",
+      "max_diff": 39.15416680995891,
+      "mean_diff": 19.24516831903262
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_30_2>",
+      "max_diff": 39.44922545011823,
+      "mean_diff": 19.487963627970654
+    }
+  ]
+}

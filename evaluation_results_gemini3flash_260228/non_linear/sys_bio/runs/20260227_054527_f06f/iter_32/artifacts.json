@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.17447530267618608,
+    "Mean Difference": 0.0053708966711758545,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_32_0>",
+      "<iter_image_32_1>",
+      "<iter_image_32_2>"
+    ],
+    "Summary": "The HA model demonstrates high fidelity with an excellent mean error of **0.005**. The primary discrepancy (**max_diff 0.174**) is localized at the discrete transition point ($t \\approx 1.55s\u20131.65s$), where states $x_5, x_8,$ and $x_9$ exhibit sharp derivative changes.\n\n**Visual Analysis:**\n*   **Mode Switch Timing:** There is a slight misalignment in the transition onset, causing the \"kink\" in simulated trajectories to lag or lead the ground truth.\n*   **Post-Transition Slope:** In the third plot, $x_9$ (simulated) shows a slight divergence in slope after $t=1.6s$, suggesting the affine terms in Mode 2 require tuning.\n\n**Concrete Suggestions:**"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_32_0>",
+      "max_diff": 0.12273034505028046,
+      "mean_diff": 0.0038531397959194803
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_32_1>",
+      "max_diff": 0.03751263071656643,
+      "mean_diff": 0.0030305969621096094
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_32_2>",
+      "max_diff": 0.3631829322617114,
+      "mean_diff": 0.009228953255498475
+    }
+  ]
+}

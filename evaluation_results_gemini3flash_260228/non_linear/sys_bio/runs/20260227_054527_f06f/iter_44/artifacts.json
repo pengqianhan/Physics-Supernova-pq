@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.21445383966980291,
+    "Mean Difference": 0.0060255952508681656,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_44_0>",
+      "<iter_image_44_1>",
+      "<iter_image_44_2>"
+    ],
+    "Summary": "**Evaluation Summary:**\n\nThe identification shows excellent overall fit with a **mean difference of 0.006**, indicating highly accurate local affine dynamics. The **max_diff of 0.21** is concentrated at the mode transition near **$t \\approx 1.6s$**, where states $x_5$ (brown), $x_8$ (yellow), and $x_9$ (light blue) exhibit sharp slope discontinuities. \n\n**Key Observations:**\n* **Mode Switch Timing:** The simulation tracks the \"kink\" well, but slight phase misalignments at the switching boundary contribute to the peak error.\n* **State Coupling:** $x_1/x_3$ and $x_8/x_9$ appear to have"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_44_0>",
+      "max_diff": 0.1618876875104739,
+      "mean_diff": 0.0043305914521536695
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_44_1>",
+      "max_diff": 0.07627817078200551,
+      "mean_diff": 0.003793071844387858
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_44_2>",
+      "max_diff": 0.4051956607169293,
+      "mean_diff": 0.00995312245606297
+    }
+  ]
+}

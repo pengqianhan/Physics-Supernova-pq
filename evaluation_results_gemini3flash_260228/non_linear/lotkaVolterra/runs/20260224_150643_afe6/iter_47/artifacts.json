@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.019727778939673105,
+    "Mean Difference": 0.00505621992896075,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_47_0>",
+      "<iter_image_47_1>",
+      "<iter_image_47_2>"
+    ],
+    "Summary": "The system demonstrates a generally high-quality fit (mean_diff: 0.005), but the second trajectory reveals a significant **cumulative phase lag** and amplitude mismatch starting around $t=3s$. This indicates that the identified dynamics, particularly in Mode 2, under-approximate the system's natural frequency.\n\n**Specific Issues:**\n1.  **Phase Drift:** The"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_47_0>",
+      "max_diff": 0.003720710288403076,
+      "mean_diff": 0.0012470064117553457
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_47_1>",
+      "max_diff": 0.051367664770719725,
+      "mean_diff": 0.013035026620324063
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_47_2>",
+      "max_diff": 0.004094961759896512,
+      "mean_diff": 0.000886626754802841
+    }
+  ]
+}

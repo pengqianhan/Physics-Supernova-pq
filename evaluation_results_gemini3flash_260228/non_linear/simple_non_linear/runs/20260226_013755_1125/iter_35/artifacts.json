@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.0146154804132614,
+    "Mean Difference": 0.4943885745964334,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_35_0>",
+      "<iter_image_35_1>",
+      "<iter_image_35_2>"
+    ],
+    "Summary": "The simulation fails to capture the periodic limit cycle, diverging significantly after the first mode transition. Although the $1 \\to 2$ switch triggers correctly at $x_1 \\approx 125"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_35_0>",
+      "max_diff": 1.0204844707388758,
+      "mean_diff": 0.4894071902142091
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_35_1>",
+      "max_diff": 1.0164779042127994,
+      "mean_diff": 0.5006820458124431
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_35_2>",
+      "max_diff": 1.006884066288109,
+      "mean_diff": 0.49307648776264806
+    }
+  ]
+}

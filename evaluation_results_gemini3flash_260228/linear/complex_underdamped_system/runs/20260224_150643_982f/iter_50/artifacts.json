@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.08314921800944962,
+    "Mean Difference": 0.004760613300011983,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_50_0>",
+      "<iter_image_50_1>",
+      "<iter_image_50_2>"
+    ],
+    "Summary": "2$ transition.\n        3. **Guard Precision:** Ensure the guard conditions ($x_1 \\ge 5.0$, etc.) account for the $dt$ step size to prevent slight"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_50_0>",
+      "max_diff": 0.09888539337479155,
+      "mean_diff": 0.006383580174711101
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_50_1>",
+      "max_diff": 0.07747844274295483,
+      "mean_diff": 0.004454125961850362
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_50_2>",
+      "max_diff": 0.07308381791060245,
+      "mean_diff": 0.003444133763474485
+    }
+  ]
+}

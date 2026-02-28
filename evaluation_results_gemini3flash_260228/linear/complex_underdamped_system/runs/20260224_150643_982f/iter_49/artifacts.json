@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.10958567947274704,
+    "Mean Difference": 0.004794844854106332,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_49_0>",
+      "<iter_image_49_1>",
+      "<iter_image_49_2>"
+    ],
+    "Summary": "The HA model demonstrates **excellent fit quality**, with a mean error of 0.0048 and a maximum deviation of 0.11. Visual analysis across all three test cases confirms"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_49_0>",
+      "max_diff": 0.11255399891760576,
+      "mean_diff": 0.0052381361199064546
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_49_1>",
+      "max_diff": 0.07863567407960292,
+      "mean_diff": 0.004289018198193824
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_49_2>",
+      "max_diff": 0.13756736542103246,
+      "mean_diff": 0.004857380244218718
+    }
+  ]
+}

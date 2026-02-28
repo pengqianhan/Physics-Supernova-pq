@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.0178858482702344,
+    "Mean Difference": 0.09132652290126396,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_41_0>",
+      "<iter_image_41_1>",
+      "<iter_image_41_2>"
+    ],
+    "Summary": "The system exhibits **moderate fit quality** with significant late-horizon divergence. While initial tracking is acceptable, the simulation fails to capture sharp inflection points in high-amplitude states ($x_5, x_8, x_9$), particularly after $t=1.5s$.\n\n**Key Issues:**\n1.  **Mode Switch Timing:** The \"kinks\" in ground truth trajectories (e.g., $x_5$ at $t \\approx 1.6s$) are smoothed over or delayed in simulation, indicating inaccurate **guard conditions**.\n2.  **Cumulative Error/Divergence:** States $x_5$ and $x_9$ show high sensitivity to parameter errors. The linear approximations in the current modes fail to track the underlying nonlinearities or high-gain interactions ($x_5$ coefficients for $x_2, x_3$ are notably large).\n3.  **Phase Lag:** A visible shift in the final segment suggests the discrete-time step or the transition logic is not synchronized with the physical mode changes.\n\n**Concrete Suggestions:**\n*   **Refine Guards:** Use support vector machines (SVM) or decision trees to re-identify guard conditions (edges) based on the state-space regions where $x_5$ and $x_9$ diverge.\n*   **Increase Model Order:** Introduce additional modes to better approximate the nonlinear behavior observed in the $[1.5, 2.0]s$ interval.\n*   **Regularization:** Apply Ridge regression during parameter identification for the $A$ matrices to dampen the sensitivity"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_41_0>",
+      "max_diff": 1.9558564856527643,
+      "mean_diff": 0.14154034456312733
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_41_1>",
+      "max_diff": 0.7150281019191708,
+      "mean_diff": 0.07917040263642078
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_41_2>",
+      "max_diff": 0.3827729572387679,
+      "mean_diff": 0.05326882150424373
+    }
+  ]
+}

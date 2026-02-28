@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.8971563319578905,
+    "Mean Difference": 0.27748697303561365,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_46_0>",
+      "<iter_image_46_1>",
+      "<iter_image_46_2>"
+    ],
+    "Summary": "The HA identification shows poor fit quality (Mean Diff: 0.28, Max Diff: 0.90). Visual analysis reveals a severe **frequency mismatch** and rapidly accumulating **phase lag**. The simulated model oscillates significantly faster than the ground truth, indicating that the current stiffness coefficients ($3.2x_1 - 1.5x_1^3$) are over-approximated or the damping ($-0.35\\dot{x}_1$) is insufficient.\n\nThe single-mode specification fails to capture the state-dependent dynamics evident in the ground truth, where the oscillation period appears to vary with amplitude.\n\n**Concrete Suggestions:**\n1.  **Multi-mode HA:** Transition from a single mode to a hybrid structure. Introduce at least two modes to handle different energy regimes (e.g., high vs. low"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_46_0>",
+      "max_diff": 0.33708456449504914,
+      "mean_diff": 0.11075189803928286
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_46_1>",
+      "max_diff": 1.1925313843410446,
+      "mean_diff": 0.3469034543038467
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_46_2>",
+      "max_diff": 1.1618530470375779,
+      "mean_diff": 0.3748055667637114
+    }
+  ]
+}

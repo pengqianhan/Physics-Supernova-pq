@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.8717672381786173e+190,
+    "Mean Difference": 8.133188790972762e+186,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_36_0>",
+      "<iter_image_36_1>",
+      "<iter_image_36_2>"
+    ],
+    "Summary": "**Assessment:**\nThe identification is catastrophic, with a `max_diff` exceeding $10^{150}$. The trajectories remain flat until $t=1.9s$, followed by an instantaneous vertical explosion at $t=2.0s$. This indicates extreme numerical instability in the discrete-time state transition matrices.\n\n**Specific Issues:**\n1. **Unstable Dynamics:** The coefficients in Mode 2 (e.g., $>1700$) are physically unrealistic and guarantee a spectral radius $\\rho(A) \\gg 1$. Any non-zero state or noise triggers immediate exponential divergence.\n2. **Numerical Conditioning:** The 9-variable system is poorly conditioned. Small errors in the initial state or mode transitions are amplified by the massive gain coefficients.\n3. **Mode Transition:** The divergence at the final time step suggests a transition into an ill-defined or highly unstable mode (Mode 2) without proper damping or saturation.\n\n**Actionable Suggestions:**\n1."
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_36_0>",
+      "max_diff": 1.1192016973404961e+150,
+      "mean_diff": 5.323804703665183e+146
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_36_1>",
+      "max_diff": 2.60958493645448e+136,
+      "mean_diff": 1.0045982411303465e+133
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_36_2>",
+      "max_diff": 5.615301714535852e+190,
+      "mean_diff": 2.4399566372918287e+187
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.8877801805352795,
+    "Mean Difference": 0.3027868579938137,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_2_0>",
+      "<iter_image_2_1>",
+      "<iter_image_2_2>"
+    ],
+    "Summary": "140 words. Direct. Technical. Covers all points.\n\n    *   *Self-Correction during drafting:* Ensure I mention the cubic term specifically as it's a major driver of the"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_2_0>",
+      "max_diff": 0.6019716001031424,
+      "mean_diff": 0.2744372390573378
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_2_1>",
+      "max_diff": 1.0448538041905777,
+      "mean_diff": 0.3303670158974624
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_2_2>",
+      "max_diff": 1.0165151373121184,
+      "mean_diff": 0.303556319026641
+    }
+  ]
+}

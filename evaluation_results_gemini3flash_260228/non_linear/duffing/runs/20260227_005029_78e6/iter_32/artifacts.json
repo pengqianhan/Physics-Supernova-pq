@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.8657008072831416,
+    "Mean Difference": 0.30200507988373154,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_32_0>",
+      "<iter_image_32_1>",
+      "<iter_image_32_2>"
+    ],
+    "Summary": "The simulation exhibits significant **phase lead** and **amplitude divergence** across all test cases. While the initial transient is captured, the simulated frequency is consistently higher than the ground truth, leading to a cumulative phase mismatch.\n\n**Key Issues:**\n1.  **Energy Injection:** The reset logic `x1[1] * 1.0204` injects 2% kinetic energy at every mode transition. This is the primary driver for the observed amplitude overshoot and lack of stabilization.\n2.  **Frequency Mismatch:** The coefficients for $x1[0]$ and $x1[0]^3$ in both modes overestimate the restoring force, causing the oscillator to cycle too fast.\n3.  **Mode Switching:** The hard threshold at $|x1| = 1.0$ causes frequent switching (chatter), which, combined with the energy-injecting reset, destabilizes the trajectory.\n\n**Concrete Suggestions:**\n*   **Reset:** Change the reset multiplier to `1.0` (identity) or a value $<1.0$ to model energy loss during transitions.\n*   **Dynamics:** Reduce the magnitude of the cubic terms (e.g., $-1.5008$ in Mode 1) and tune the $x1[1]$ (damping) coefficients to better match the decay envelope.\n*   **Edges:** Implement **hysteresis** in the guard conditions (e.g., $1 \\to 2$ at $|x1| < 0.9$,"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_32_0>",
+      "max_diff": 0.5373905051511184,
+      "mean_diff": 0.2760668613345341
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_32_1>",
+      "max_diff": 1.0442540813423007,
+      "mean_diff": 0.32925859843497945
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_32_2>",
+      "max_diff": 1.0154578353560055,
+      "mean_diff": 0.30068977988168116
+    }
+  ]
+}

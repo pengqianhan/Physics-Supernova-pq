@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.18583681159828783,
+    "Mean Difference": 0.0056706161522045925,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_35_0>",
+      "<iter_image_35_1>",
+      "<iter_image_35_2>"
+    ],
+    "Summary": "The identification demonstrates an **excellent fit**, with a mean difference of 0.0057 and a max difference of 0.186. Visual analysis confirms the HA accurately captures the piecewise linear dynamics and the critical mode transition occurring between $t=1.5s$ and $1.6s$. The simulation tracks high-amplitude states ($x_5, x_8, x_9$) through the switch with negligible phase lag or timing error.\n\n**Specific Issues:**\n* **Terminal Divergence:** Minor divergence is visible in lower-magnitude states (e.g., $x_4$ in Plot"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_35_0>",
+      "max_diff": 0.12433989953060345,
+      "mean_diff": 0.003997027713433371
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_35_1>",
+      "max_diff": 0.038085258634636195,
+      "mean_diff": 0.003119683567938184
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_35_2>",
+      "max_diff": 0.3950852766296239,
+      "mean_diff": 0.009895137175242222
+    }
+  ]
+}

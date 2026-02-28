@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.8369382112710627,
+    "Mean Difference": 0.3340798417520044,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_2_0>",
+      "<iter_image_2_1>",
+      "<iter_image_2_2>"
+    ],
+    "Summary": "The identification fails to capture the triangle-wave dynamics of $x_1$. While the ground truth shows constant velocity with periodic sign flips, the simulated $x_1$ remains static at its initial"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_2_0>",
+      "max_diff": 1.162163285161848,
+      "mean_diff": 0.560849637402376
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_2_1>",
+      "max_diff": 0.7992007992007958,
+      "mean_diff": 0.2528267950024521
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_2_2>",
+      "max_diff": 0.5494505494505442,
+      "mean_diff": 0.1885630928511851
+    }
+  ]
+}

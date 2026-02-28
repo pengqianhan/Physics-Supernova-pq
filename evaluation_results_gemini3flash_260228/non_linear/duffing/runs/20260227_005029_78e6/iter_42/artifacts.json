@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.9848494560040312,
+    "Mean Difference": 0.3181690605979805,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_42_0>",
+      "<iter_image_42_1>",
+      "<iter_image_42_2>"
+    ],
+    "Summary": "The simulation exhibits significant **phase drift** and **frequency mismatch** across all trajectories, reflected in a `mean_diff` of 0.318. The simulated frequency is consistently higher than the ground truth, indicating that the stiffness"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_42_0>",
+      "max_diff": 0.8681732896049156,
+      "mean_diff": 0.3467952841497822
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_42_1>",
+      "max_diff": 1.0533561058241336,
+      "mean_diff": 0.311053546581611
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_42_2>",
+      "max_diff": 1.0330189725830445,
+      "mean_diff": 0.29665835106254834
+    }
+  ]
+}
