@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.04122856656412654,
+    "Mean Difference": 0.01253845040253779,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_48_0>",
+      "<iter_image_48_1>",
+      "<iter_image_48_2>"
+    ],
+    "Summary": "**Overall Fit Quality:**\nThe model demonstrates high fidelity with a low mean difference (0.0125). The continuous dynamics within modes are well-captured, as evidenced by the matching slopes in the linear regions.\n\n**Visual Patterns & Issues:**\n*   **Temporal Drift:** Plot 3 shows a clear phase lag/divergence over time. The simulated peaks (triangles) increasingly lag behind the ground truth (circles).\n*   **Mode Switch Timing:** The divergence is primarily driven by \"late\" transitions. The guard conditions are likely too restrictive or slightly offset, causing the system to stay in a charging/discharging mode longer than the physical system.\n*   **Peak Clipping/Overshoot:** In Plot 3, the simulated $x_3$ peaks slightly exceed ground truth, indicating the guard `x3 >= 26.0` may need downward calibration.\n\n**Concrete Suggestions:**\n1.  **Refine Guard Thresholds:** Adjust transition constants (e.g., `x1 >= 24.0`, `x3 >= 26.0`) based on a statistical analysis of the ground truth peaks to eliminate the cumulative phase lag.\n2.  **Coupling Terms:** Review the cross-variable coefficients (e.g., `0.0251`). The divergence suggests the interaction between variables during transitions is slightly under-modeled.\n3.  **Reset Maps:** If the physical system exhibits instantaneous energy loss during switches, incorporate reset maps (`x[1] = A*x[0] + b`) on the edges to re-sync state variables."
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_48_0>",
+      "max_diff": 0.013738237311859169,
+      "mean_diff": 0.004665083514918006
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_48_1>",
+      "max_diff": 0.02642359888255064,
+      "mean_diff": 0.006084222825497641
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_48_2>",
+      "max_diff": 0.08352386349796981,
+      "mean_diff": 0.026866044867197722
+    }
+  ]
+}

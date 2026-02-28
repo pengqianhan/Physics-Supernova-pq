@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.04235396805008649,
+    "Mean Difference": 0.013172892954129071,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_43_0>",
+      "<iter_image_43_1>",
+      "<iter_image_43_2>"
+    ],
+    "Summary": "The HA model demonstrates excellent fit quality (Mean Diff: 0.013). Visual analysis confirms the simulation accurately captures the cyclic switching logic and linear slopes for all three states ($x_1, x_2, x_3$).\n\n**Specific Issues:**\n*   **Phase Drift:** A minor cumulative phase lag is visible in the third trajectory plot. The simulated peaks begin to desynchronize from the ground truth over time.\n*   **Switching Timing:** The rigid guard conditions (e.g., `x1 >= 23.998`) likely interact with the discrete integration step, causing small temporal shifts in mode transitions that accumulate.\n\n**Concrete Suggestions:**\n1.  **Guard Refinement:** Adjust threshold constants (19."
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_43_0>",
+      "max_diff": 0.01818387225033763,
+      "mean_diff": 0.0050297536564578825
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_43_1>",
+      "max_diff": 0.025530555406779953,
+      "mean_diff": 0.0066045423861187235
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_43_2>",
+      "max_diff": 0.0833474764931419,
+      "mean_diff": 0.027884382819810608
+    }
+  ]
+}

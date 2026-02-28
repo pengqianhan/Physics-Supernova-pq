@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 283.25935073435284,
+    "Mean Difference": 31.098992680627546,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_2_0>",
+      "<iter_image_2_1>",
+      "<iter_image_2_2>"
+    ],
+    "Summary": "The system identification has failed to produce a stable hybrid automaton, resulting in **severe divergence**. While the ground truth remains near zero, the simulated trajectory exhibits exponentially growing oscillations, reaching magnitudes $>10^"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_2_0>",
+      "max_diff": 101.02474561550258,
+      "mean_diff": 11.200428089437633
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_2_1>",
+      "max_diff": 331.4871396477854,
+      "mean_diff": 36.421106645717686
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_2_2>",
+      "max_diff": 417.26616693977047,
+      "mean_diff": 45.675443306727324
+    }
+  ]
+}

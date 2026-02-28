@@ -1,0 +1,1267 @@
+[
+  {
+    "dataset": "FaMoS/buck_converter",
+    "ha_spec_path": "evaluation_results/FaMoS/buck_converter/runs/20260226_034923_22a4/best_ha_specification.json",
+    "num_files": 12,
+    "num_success": 12,
+    "num_iterations": 26,
+    "max_iter": 50,
+    "aggregate": {
+      "tc_mean": 7.666666666666667e-05,
+      "tc_std": 6.0736223860962e-05,
+      "max_diff_mean": 0.07905915576267356,
+      "max_diff_std": 0.11040242760264522,
+      "mean_diff_mean": 0.014412347630040727,
+      "mean_diff_std": 0.020233224954527968,
+      "success_rate": 1.0
+    },
+    "results": [
+      {
+        "gt_file": "ground_truth_10.npz",
+        "tc": 8e-05,
+        "max_diff": 0.11034527780301935,
+        "mean_diff": 0.02544605612989782,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_11.npz",
+        "tc": 0.00023,
+        "max_diff": 0.35027142621109225,
+        "mean_diff": 0.05292219830802743,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_12.npz",
+        "tc": 7.000000000000001e-05,
+        "max_diff": 0.10880926656328246,
+        "mean_diff": 0.020441732977138447,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_13.npz",
+        "tc": 3.0000000000000004e-05,
+        "max_diff": 0.01365393551796873,
+        "mean_diff": 0.002073689613210169,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_14.npz",
+        "tc": 6.000000000000001e-05,
+        "max_diff": 0.02890698736088958,
+        "mean_diff": 0.0016078146966466483,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_3.npz",
+        "tc": 5e-05,
+        "max_diff": 0.008319677622827874,
+        "mean_diff": 0.0018607480527251968,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_4.npz",
+        "tc": 0.00018,
+        "max_diff": 0.2693695089963911,
+        "mean_diff": 0.05924413972473972,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_5.npz",
+        "tc": 3.0000000000000004e-05,
+        "max_diff": 0.011947364019836598,
+        "mean_diff": 0.002193344368994616,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_6.npz",
+        "tc": 7.000000000000001e-05,
+        "max_diff": 0.024453726347960596,
+        "mean_diff": 0.0015847632530924432,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_7.npz",
+        "tc": 2e-05,
+        "max_diff": 0.007116023881628671,
+        "mean_diff": 0.0013722881553409143,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_8.npz",
+        "tc": 5e-05,
+        "max_diff": 0.00770447657153376,
+        "mean_diff": 0.0027400633850127834,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_9.npz",
+        "tc": 5e-05,
+        "max_diff": 0.007812198255651703,
+        "mean_diff": 0.001461332895662533,
+        "clustering_error": 0,
+        "status": "success"
+      }
+    ]
+  },
+  {
+    "dataset": "FaMoS/multi_room_heating",
+    "ha_spec_path": "evaluation_results/FaMoS/multi_room_heating/runs/20260224_150643_fbd1/best_ha_specification.json",
+    "num_files": 12,
+    "num_success": 12,
+    "num_iterations": 32,
+    "max_iter": 50,
+    "aggregate": {
+      "tc_mean": 0.35000000000000003,
+      "tc_std": 0.17057500793883415,
+      "max_diff_mean": 0.10274416345779042,
+      "max_diff_std": 0.0799095675758663,
+      "mean_diff_mean": 0.030060864969245222,
+      "mean_diff_std": 0.024502409929030914,
+      "success_rate": 1.0
+    },
+    "results": [
+      {
+        "gt_file": "ground_truth_10.npz",
+        "tc": 0.295,
+        "max_diff": 0.06093447339259797,
+        "mean_diff": 0.018288977844928507,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_11.npz",
+        "tc": 0.36,
+        "max_diff": 0.08349362813712502,
+        "mean_diff": 0.026854121311770684,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_12.npz",
+        "tc": 0.44,
+        "max_diff": 0.09170236176343936,
+        "mean_diff": 0.023635685735030623,
+        "clustering_error": 1,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_13.npz",
+        "tc": 0.42,
+        "max_diff": 0.27041322834811454,
+        "mean_diff": 0.07546156704506249,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_14.npz",
+        "tc": 0.08,
+        "max_diff": 0.015872669841982164,
+        "mean_diff": 0.003851120968523399,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_3.npz",
+        "tc": 0.47000000000000003,
+        "max_diff": 0.10428356065384756,
+        "mean_diff": 0.024776466654554068,
+        "clustering_error": 1,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_4.npz",
+        "tc": 0.28,
+        "max_diff": 0.058173972848346855,
+        "mean_diff": 0.017427738909019542,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_5.npz",
+        "tc": 0.1,
+        "max_diff": 0.020613340525637226,
+        "mean_diff": 0.005599883201375267,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_6.npz",
+        "tc": 0.655,
+        "max_diff": 0.23990165919596046,
+        "mean_diff": 0.07139950964683524,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_7.npz",
+        "tc": 0.35000000000000003,
+        "max_diff": 0.07501217077708609,
+        "mean_diff": 0.018279348689674842,
+        "clustering_error": 1,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_8.npz",
+        "tc": 0.58,
+        "max_diff": 0.17832681997360195,
+        "mean_diff": 0.0651418796582776,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_9.npz",
+        "tc": 0.17,
+        "max_diff": 0.03420207603574608,
+        "mean_diff": 0.010014079965890432,
+        "clustering_error": 0,
+        "status": "success"
+      }
+    ]
+  },
+  {
+    "dataset": "FaMoS/three_state_ha",
+    "ha_spec_path": "evaluation_results/FaMoS/three_state_ha/runs/20260226_002323_75a6/best_ha_specification.json",
+    "num_files": 12,
+    "num_success": 12,
+    "num_iterations": 16,
+    "max_iter": 44,
+    "aggregate": {
+      "tc_mean": 3.5974999999999997,
+      "tc_std": 2.3359549260776986,
+      "max_diff_mean": 0.7783331786558664,
+      "max_diff_std": 0.2708662641356599,
+      "mean_diff_mean": 0.15711195915303883,
+      "mean_diff_std": 0.05837013722969831,
+      "success_rate": 1.0
+    },
+    "results": [
+      {
+        "gt_file": "ground_truth_10.npz",
+        "tc": 0.7000000000000001,
+        "max_diff": 0.32029320960491303,
+        "mean_diff": 0.10847355767412264,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_11.npz",
+        "tc": 3.54,
+        "max_diff": 0.7920745225305506,
+        "mean_diff": 0.19490180893443676,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_12.npz",
+        "tc": 0.67,
+        "max_diff": 0.3989519711197157,
+        "mean_diff": 0.08686324337171367,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_13.npz",
+        "tc": 5.76,
+        "max_diff": 0.980679082487667,
+        "mean_diff": 0.1582133393544855,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_14.npz",
+        "tc": 6.67,
+        "max_diff": 0.989223166633012,
+        "mean_diff": 0.15140318923368637,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_3.npz",
+        "tc": 6.67,
+        "max_diff": 0.988504329078424,
+        "mean_diff": 0.15524749507451638,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_4.npz",
+        "tc": 0.46,
+        "max_diff": 0.25008270651835457,
+        "mean_diff": 0.07119629464705414,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_5.npz",
+        "tc": 4.78,
+        "max_diff": 0.9000945014665893,
+        "mean_diff": 0.18825151881618124,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_6.npz",
+        "tc": 1.06,
+        "max_diff": 0.9335780316090987,
+        "mean_diff": 0.09429004915644246,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_7.npz",
+        "tc": 4.28,
+        "max_diff": 0.971191530345873,
+        "mean_diff": 0.2531553706601684,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_8.npz",
+        "tc": 2.58,
+        "max_diff": 0.843278410053897,
+        "mean_diff": 0.2598549916423487,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_9.npz",
+        "tc": 6.0,
+        "max_diff": 0.9720466824223003,
+        "mean_diff": 0.1634926512713097,
+        "clustering_error": 0,
+        "status": "success"
+      }
+    ]
+  },
+  {
+    "dataset": "FaMoS/two_state_ha",
+    "ha_spec_path": "evaluation_results/FaMoS/two_state_ha/runs/20260225_215029_83a2/best_ha_specification.json",
+    "num_files": 12,
+    "num_success": 12,
+    "num_iterations": 23,
+    "max_iter": 50,
+    "aggregate": {
+      "tc_mean": 1.2333333333333334,
+      "tc_std": 0.9743145738871449,
+      "max_diff_mean": 0.40793070202899345,
+      "max_diff_std": 0.2854815442178361,
+      "mean_diff_mean": 0.18967786715102078,
+      "mean_diff_std": 0.15584104458749698,
+      "success_rate": 1.0
+    },
+    "results": [
+      {
+        "gt_file": "ground_truth_10.npz",
+        "tc": 0.51,
+        "max_diff": 0.21351416323229044,
+        "mean_diff": 0.0911554280867872,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_11.npz",
+        "tc": 2.9,
+        "max_diff": 0.8094353033031138,
+        "mean_diff": 0.41927058550067986,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_12.npz",
+        "tc": 0.48,
+        "max_diff": 0.2064262212452108,
+        "mean_diff": 0.08664018978749484,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_13.npz",
+        "tc": 0.66,
+        "max_diff": 0.27837482596800833,
+        "mean_diff": 0.12385296676403194,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_14.npz",
+        "tc": 2.52,
+        "max_diff": 0.7591456907469625,
+        "mean_diff": 0.3646928574253353,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_3.npz",
+        "tc": 0.28,
+        "max_diff": 0.08851235654692144,
+        "mean_diff": 0.033348416390001884,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_4.npz",
+        "tc": 2.18,
+        "max_diff": 0.8262067278890921,
+        "mean_diff": 0.4468659424665498,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_5.npz",
+        "tc": 2.61,
+        "max_diff": 0.7650696088427278,
+        "mean_diff": 0.37236866843800276,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_6.npz",
+        "tc": 1.06,
+        "max_diff": 0.34218578045455494,
+        "mean_diff": 0.10186919212033323,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_7.npz",
+        "tc": 0.98,
+        "max_diff": 0.4002558628501433,
+        "mean_diff": 0.17749427685760463,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_8.npz",
+        "tc": 0.45,
+        "max_diff": 0.14425034092117772,
+        "mean_diff": 0.03846855327441251,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_9.npz",
+        "tc": 0.17,
+        "max_diff": 0.06179154234771805,
+        "mean_diff": 0.02010732870101557,
+        "clustering_error": 0,
+        "status": "success"
+      }
+    ]
+  },
+  {
+    "dataset": "FaMoS/variable_heating_system",
+    "ha_spec_path": "evaluation_results/FaMoS/variable_heating_system/runs/20260224_150643_b862/best_ha_specification.json",
+    "num_files": 12,
+    "num_success": 12,
+    "num_iterations": 38,
+    "max_iter": 50,
+    "aggregate": {
+      "tc_mean": 0.4716666666666666,
+      "tc_std": 0.27306389158746147,
+      "max_diff_mean": 0.29263907236037834,
+      "max_diff_std": 0.1937245605160771,
+      "mean_diff_mean": 0.09375536652116302,
+      "mean_diff_std": 0.08535680686649433,
+      "success_rate": 1.0
+    },
+    "results": [
+      {
+        "gt_file": "ground_truth_10.npz",
+        "tc": 0.66,
+        "max_diff": 0.2923108350438091,
+        "mean_diff": 0.14171866578193532,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_11.npz",
+        "tc": 0.54,
+        "max_diff": 0.3076041931274172,
+        "mean_diff": 0.05212058051676886,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_12.npz",
+        "tc": 0.09,
+        "max_diff": 0.042298848408588705,
+        "mean_diff": 0.011169008893136444,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_13.npz",
+        "tc": 0.64,
+        "max_diff": 0.5640047643952842,
+        "mean_diff": 0.22990607864639004,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_14.npz",
+        "tc": 0.37,
+        "max_diff": 0.17595626422390898,
+        "mean_diff": 0.02950345168801348,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_3.npz",
+        "tc": 0.6900000000000001,
+        "max_diff": 0.5529174942065568,
+        "mean_diff": 0.23491775602024118,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_4.npz",
+        "tc": 0.7000000000000001,
+        "max_diff": 0.412649838522582,
+        "mean_diff": 0.08291024343486311,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_5.npz",
+        "tc": 0.4,
+        "max_diff": 0.21679150860086369,
+        "mean_diff": 0.04141710453850134,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_6.npz",
+        "tc": 0.02,
+        "max_diff": 0.014729093138802529,
+        "mean_diff": 0.0033501179926353473,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_7.npz",
+        "tc": 0.76,
+        "max_diff": 0.5041796074095859,
+        "mean_diff": 0.2153815107643512,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_8.npz",
+        "tc": 0.76,
+        "max_diff": 0.4115792673084375,
+        "mean_diff": 0.07783211857553518,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_9.npz",
+        "tc": 0.03,
+        "max_diff": 0.01664715393870281,
+        "mean_diff": 0.004837761401584817,
+        "clustering_error": 0,
+        "status": "success"
+      }
+    ]
+  },
+  {
+    "dataset": "linear/complex_underdamped_system",
+    "ha_spec_path": "evaluation_results/linear/complex_underdamped_system/runs/20260224_150643_982f/best_ha_specification.json",
+    "num_files": 12,
+    "num_success": 12,
+    "num_iterations": 35,
+    "max_iter": 50,
+    "aggregate": {
+      "tc_mean": 1.1866666666666665,
+      "tc_std": 1.2710844014287783,
+      "max_diff_mean": 0.21246001873154963,
+      "max_diff_std": 0.13893935254856393,
+      "mean_diff_mean": 0.011135760164938594,
+      "mean_diff_std": 0.007787330726196958,
+      "success_rate": 1.0
+    },
+    "results": [
+      {
+        "gt_file": "ground_truth_10.npz",
+        "tc": 0.03,
+        "max_diff": 0.03983207135336274,
+        "mean_diff": 0.0034206816659552997,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_11.npz",
+        "tc": 0.03,
+        "max_diff": 0.09300310059058146,
+        "mean_diff": 0.004747536553663635,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_12.npz",
+        "tc": 0.03,
+        "max_diff": 0.14002718557404517,
+        "mean_diff": 0.004864022766986447,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_13.npz",
+        "tc": 2.0100000000000002,
+        "max_diff": 0.18110213620862925,
+        "mean_diff": 0.012628503243225618,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_14.npz",
+        "tc": 3.0100000000000002,
+        "max_diff": 0.3375202898614247,
+        "mean_diff": 0.020735559521283004,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_3.npz",
+        "tc": 2.0100000000000002,
+        "max_diff": 0.4377036873756997,
+        "mean_diff": 0.02199336134301489,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_4.npz",
+        "tc": 3.0100000000000002,
+        "max_diff": 0.41912082492728936,
+        "mean_diff": 0.0253080203463266,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_5.npz",
+        "tc": 0.03,
+        "max_diff": 0.0614540806095002,
+        "mean_diff": 0.003493190699504055,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_6.npz",
+        "tc": 0.03,
+        "max_diff": 0.13911780988013775,
+        "mean_diff": 0.005036253136410113,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_7.npz",
+        "tc": 3.0100000000000002,
+        "max_diff": 0.30570296594451785,
+        "mean_diff": 0.016047549884119033,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_8.npz",
+        "tc": 1.01,
+        "max_diff": 0.3296429561020698,
+        "mean_diff": 0.011630530557384956,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_9.npz",
+        "tc": 0.03,
+        "max_diff": 0.06529311635133749,
+        "mean_diff": 0.0037239122613894953,
+        "clustering_error": 0,
+        "status": "success"
+      }
+    ]
+  },
+  {
+    "dataset": "linear/two_tank",
+    "ha_spec_path": "evaluation_results/linear/two_tank/runs/20260226_005013_6b36/best_ha_specification.json",
+    "num_files": 12,
+    "num_success": 12,
+    "num_iterations": 2,
+    "max_iter": 2,
+    "aggregate": {
+      "tc_mean": 1.7325,
+      "tc_std": 1.9370730712426245,
+      "max_diff_mean": 0.5956435539263385,
+      "max_diff_std": 0.6070930760577554,
+      "mean_diff_mean": 0.19513269886459972,
+      "mean_diff_std": 0.18382765070958326,
+      "success_rate": 1.0
+    },
+    "results": [
+      {
+        "gt_file": "ground_truth_10.npz",
+        "tc": 0.0,
+        "max_diff": 0.0,
+        "mean_diff": 0.0,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_11.npz",
+        "tc": 0.0,
+        "max_diff": 0.0,
+        "mean_diff": 0.0,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_12.npz",
+        "tc": 1.94,
+        "max_diff": 1.7644298451431062,
+        "mean_diff": 0.3896358977548037,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_13.npz",
+        "tc": 1.52,
+        "max_diff": 0.8964907107048108,
+        "mean_diff": 0.3566095622746757,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_14.npz",
+        "tc": 5.23,
+        "max_diff": 0.554785020804446,
+        "mean_diff": 0.2345350670649714,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_3.npz",
+        "tc": 4.67,
+        "max_diff": 0.5172413793103637,
+        "mean_diff": 0.3128317293799276,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_4.npz",
+        "tc": 1.69,
+        "max_diff": 1.5550935550935383,
+        "mean_diff": 0.5403704681134097,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_5.npz",
+        "tc": 4.67,
+        "max_diff": 0.7875722543352681,
+        "mean_diff": 0.18401380179596974,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_6.npz",
+        "tc": 0.0,
+        "max_diff": 0.0,
+        "mean_diff": 0.0,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_7.npz",
+        "tc": 0.0,
+        "max_diff": 0.0,
+        "mean_diff": 0.0,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_8.npz",
+        "tc": 1.07,
+        "max_diff": 1.0721098817245291,
+        "mean_diff": 0.3235958599914386,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_9.npz",
+        "tc": 0.0,
+        "max_diff": 0.0,
+        "mean_diff": 0.0,
+        "clustering_error": 0,
+        "status": "success"
+      }
+    ]
+  },
+  {
+    "dataset": "non_linear/duffing",
+    "ha_spec_path": "evaluation_results/non_linear/duffing/runs/20260227_005029_78e6/best_ha_specification.json",
+    "num_files": 12,
+    "num_success": 12,
+    "num_iterations": 24,
+    "max_iter": 50,
+    "aggregate": {
+      "tc_mean": 4.8237499999999995,
+      "tc_std": 0.14885962347124213,
+      "max_diff_mean": 0.2521282396330882,
+      "max_diff_std": 0.045793683428898495,
+      "mean_diff_mean": 0.09599892672611099,
+      "mean_diff_std": 0.013268377549940725,
+      "success_rate": 1.0
+    },
+    "results": [
+      {
+        "gt_file": "ground_truth_10.npz",
+        "tc": 4.946,
+        "max_diff": 0.27981470216293325,
+        "mean_diff": 0.10728967393591102,
+        "clustering_error": 1,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_11.npz",
+        "tc": 4.49,
+        "max_diff": 0.30352168829417325,
+        "mean_diff": 0.10433343268891081,
+        "clustering_error": 1,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_12.npz",
+        "tc": 4.662,
+        "max_diff": 0.2406161661889765,
+        "mean_diff": 0.09496022951670674,
+        "clustering_error": 1,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_13.npz",
+        "tc": 4.894,
+        "max_diff": 0.21866711458510754,
+        "mean_diff": 0.08094256252535037,
+        "clustering_error": 1,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_14.npz",
+        "tc": 4.88,
+        "max_diff": 0.15931517148464266,
+        "mean_diff": 0.07646929119754606,
+        "clustering_error": 1,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_3.npz",
+        "tc": 4.946,
+        "max_diff": 0.26653446438736245,
+        "mean_diff": 0.10154647007585164,
+        "clustering_error": 1,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_4.npz",
+        "tc": 4.865,
+        "max_diff": 0.22232344858301092,
+        "mean_diff": 0.09054644299910777,
+        "clustering_error": 1,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_5.npz",
+        "tc": 4.998,
+        "max_diff": 0.22374852432666167,
+        "mean_diff": 0.08240496014919824,
+        "clustering_error": 1,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_6.npz",
+        "tc": 4.821,
+        "max_diff": 0.3396210802856739,
+        "mean_diff": 0.1272792379056524,
+        "clustering_error": 1,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_7.npz",
+        "tc": 4.753,
+        "max_diff": 0.29577257365123427,
+        "mean_diff": 0.10189764641781274,
+        "clustering_error": 1,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_8.npz",
+        "tc": 4.978,
+        "max_diff": 0.2347288574088632,
+        "mean_diff": 0.08912349487353577,
+        "clustering_error": 1,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_9.npz",
+        "tc": 4.652,
+        "max_diff": 0.24087508423841889,
+        "mean_diff": 0.09519367842774838,
+        "clustering_error": 1,
+        "status": "success"
+      }
+    ]
+  },
+  {
+    "dataset": "non_linear/lotkaVolterra",
+    "ha_spec_path": "evaluation_results/non_linear/lotkaVolterra/runs/20260224_150643_afe6/best_ha_specification.json",
+    "num_files": 12,
+    "num_success": 12,
+    "num_iterations": 37,
+    "max_iter": 50,
+    "aggregate": {
+      "tc_mean": 0.22666666666666668,
+      "tc_std": 0.4455583263975909,
+      "max_diff_mean": 0.02861868681248556,
+      "max_diff_std": 0.023559788602418013,
+      "mean_diff_mean": 0.007417324536370569,
+      "mean_diff_std": 0.006499685231054977,
+      "success_rate": 1.0
+    },
+    "results": [
+      {
+        "gt_file": "ground_truth_10.npz",
+        "tc": 0.21,
+        "max_diff": 0.054026442056938684,
+        "mean_diff": 0.013473985098347567,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_11.npz",
+        "tc": 0.01,
+        "max_diff": 0.0025372750086454007,
+        "mean_diff": 0.0005769318333606595,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_12.npz",
+        "tc": 1.69,
+        "max_diff": 0.08531350279593541,
+        "mean_diff": 0.024187990223524167,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_13.npz",
+        "tc": 0.06,
+        "max_diff": 0.015314748246958729,
+        "mean_diff": 0.004014892141382799,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_14.npz",
+        "tc": 0.13,
+        "max_diff": 0.03313023461458301,
+        "mean_diff": 0.008423718835919528,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_3.npz",
+        "tc": 0.16,
+        "max_diff": 0.04061987812301138,
+        "mean_diff": 0.010266287617727148,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_4.npz",
+        "tc": 0.02,
+        "max_diff": 0.002496347308937297,
+        "mean_diff": 0.0005380930719555241,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_5.npz",
+        "tc": 0.02,
+        "max_diff": 0.00431869112102101,
+        "mean_diff": 0.0009427561374097582,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_6.npz",
+        "tc": 0.04,
+        "max_diff": 0.010150733369717491,
+        "mean_diff": 0.00267618068674687,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_7.npz",
+        "tc": 0.16,
+        "max_diff": 0.04057325426378266,
+        "mean_diff": 0.010254667000118279,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_8.npz",
+        "tc": 0.12,
+        "max_diff": 0.030619172668009006,
+        "mean_diff": 0.0075486600555830135,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_9.npz",
+        "tc": 0.1,
+        "max_diff": 0.024323962172286606,
+        "mean_diff": 0.0061037317343715205,
+        "clustering_error": 0,
+        "status": "success"
+      }
+    ]
+  },
+  {
+    "dataset": "non_linear/simple_non_linear",
+    "ha_spec_path": "evaluation_results/non_linear/simple_non_linear/runs/20260226_013755_1125/best_ha_specification.json",
+    "num_files": 12,
+    "num_success": 12,
+    "num_iterations": 19,
+    "max_iter": 47,
+    "aggregate": {
+      "tc_mean": 4.3925,
+      "tc_std": 0.23637699408642412,
+      "max_diff_mean": 0.9129088542745882,
+      "max_diff_std": 9.483212059970072e-05,
+      "mean_diff_mean": 0.1799494942910326,
+      "mean_diff_std": 0.014669115897053787,
+      "success_rate": 1.0
+    },
+    "results": [
+      {
+        "gt_file": "ground_truth_10.npz",
+        "tc": 4.108,
+        "max_diff": 0.912953713596859,
+        "mean_diff": 0.1913797486533407,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_11.npz",
+        "tc": 4.156,
+        "max_diff": 0.9129595987751327,
+        "mean_diff": 0.1977616467393209,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_12.npz",
+        "tc": 4.355,
+        "max_diff": 0.912959191420247,
+        "mean_diff": 0.18356729898442217,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_13.npz",
+        "tc": 4.454,
+        "max_diff": 0.9129569651753701,
+        "mean_diff": 0.17922353739555338,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_14.npz",
+        "tc": 4.171,
+        "max_diff": 0.9129598542084921,
+        "mean_diff": 0.1897669776275554,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_3.npz",
+        "tc": 4.146,
+        "max_diff": 0.9129610207139989,
+        "mean_diff": 0.1904917483879489,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_4.npz",
+        "tc": 4.218,
+        "max_diff": 0.9129621262219002,
+        "mean_diff": 0.1989360426436649,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_5.npz",
+        "tc": 4.3,
+        "max_diff": 0.91295996948483,
+        "mean_diff": 0.18556757945271637,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_6.npz",
+        "tc": 4.71,
+        "max_diff": 0.9126837970187796,
+        "mean_diff": 0.15584336631559126,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_7.npz",
+        "tc": 4.7010000000000005,
+        "max_diff": 0.912730197652124,
+        "mean_diff": 0.1606871298437247,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_8.npz",
+        "tc": 4.696,
+        "max_diff": 0.912859225443007,
+        "mean_diff": 0.16288759002021325,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_9.npz",
+        "tc": 4.695,
+        "max_diff": 0.9129605915843174,
+        "mean_diff": 0.16328126542833923,
+        "clustering_error": 0,
+        "status": "success"
+      }
+    ]
+  },
+  {
+    "dataset": "non_linear/sys_bio",
+    "ha_spec_path": "evaluation_results/non_linear/sys_bio/runs/20260227_054527_f06f/best_ha_specification.json",
+    "num_files": 12,
+    "num_success": 12,
+    "num_iterations": 24,
+    "max_iter": 50,
+    "aggregate": {
+      "tc_mean": 0.06858333333333334,
+      "tc_std": 0.06251327636768228,
+      "max_diff_mean": 4.543145706235802,
+      "max_diff_std": 9.492287457624602,
+      "mean_diff_mean": 0.11713220896589871,
+      "mean_diff_std": 0.1759834295317655,
+      "success_rate": 1.0
+    },
+    "results": [
+      {
+        "gt_file": "ground_truth_10.npz",
+        "tc": 0.032,
+        "max_diff": 0.6989052804558491,
+        "mean_diff": 0.03677218788656248,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_11.npz",
+        "tc": 0.138,
+        "max_diff": 2.100284117225892,
+        "mean_diff": 0.09669498681917794,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_12.npz",
+        "tc": 0.0,
+        "max_diff": 1.1547373499922393,
+        "mean_diff": 0.06589824337915977,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_13.npz",
+        "tc": 0.154,
+        "max_diff": 0.5925254737130454,
+        "mean_diff": 0.06317273735699998,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_14.npz",
+        "tc": 0.0,
+        "max_diff": 0.5719341238767055,
+        "mean_diff": 0.026657150505019444,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_3.npz",
+        "tc": 0.156,
+        "max_diff": 35.56235446868053,
+        "mean_diff": 0.689771127340389,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_4.npz",
+        "tc": 0.11900000000000001,
+        "max_diff": 2.338866894474616,
+        "mean_diff": 0.09103063039536764,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_5.npz",
+        "tc": 0.0,
+        "max_diff": 0.4694473451116385,
+        "mean_diff": 0.04504703480758701,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_6.npz",
+        "tc": 0.035,
+        "max_diff": 0.22766028108132075,
+        "mean_diff": 0.014512270460955023,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_7.npz",
+        "tc": 0.041,
+        "max_diff": 5.926080329467225,
+        "mean_diff": 0.12706868528382742,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_8.npz",
+        "tc": 0.134,
+        "max_diff": 3.9521511889783385,
+        "mean_diff": 0.11310415087304687,
+        "clustering_error": 0,
+        "status": "success"
+      },
+      {
+        "gt_file": "ground_truth_9.npz",
+        "tc": 0.014,
+        "max_diff": 0.9228016217722218,
+        "mean_diff": 0.035857302482691894,
+        "clustering_error": 0,
+        "status": "success"
+      }
+    ]
+  }
+]

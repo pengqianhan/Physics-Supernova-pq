@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.5992501478450639,
+    "Mean Difference": 0.29599751714983347,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_39_0>",
+      "<iter_image_39_1>",
+      "<iter_image_39_2>"
+    ],
+    "Summary": "The simulation fails to capture the limit cycle behavior of the ground truth, exhibiting severe **amplitude decay** and converging to a steady state near $x_1 \\approx 20-2"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_39_0>",
+      "max_diff": 0.599480347365464,
+      "mean_diff": 0.2829868776897396
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_39_1>",
+      "max_diff": 0.5751149399271699,
+      "mean_diff": 0.2911947654047494
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_39_2>",
+      "max_diff": 0.6231551562425578,
+      "mean_diff": 0.3138109083550114
+    }
+  ]
+}

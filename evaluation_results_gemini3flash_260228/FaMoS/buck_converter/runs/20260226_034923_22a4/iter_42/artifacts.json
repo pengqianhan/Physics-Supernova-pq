@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.04764447563221996,
+    "Mean Difference": 0.007338989893731391,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_42_0>",
+      "<iter_image_42_1>",
+      "<iter_image_42_2>"
+    ],
+    "Summary": "The HA model demonstrates excellent fidelity with a mean difference of **0.0073**. The simulation accurately captures both the initial transient and the steady-state limit cycle/chattering behavior across all tested initial conditions.\n\n**Key Observations:**\n*   **Phase Drift:** A minor phase lead is visible in the $x_1$ oscillations (e.g., Plot 1, $t >"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_42_0>",
+      "max_diff": 0.10661668712309745,
+      "mean_diff": 0.017266280708666367
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_42_1>",
+      "max_diff": 0.008939243315875032,
+      "mean_diff": 0.001103557387312888
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_42_2>",
+      "max_diff": 0.027377496457687417,
+      "mean_diff": 0.0036471315852149174
+    }
+  ]
+}

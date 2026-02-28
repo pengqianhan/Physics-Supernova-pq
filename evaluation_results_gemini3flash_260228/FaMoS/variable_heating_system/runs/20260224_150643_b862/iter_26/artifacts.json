@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.3433749742836935,
+    "Mean Difference": 0.13073909498338332,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_26_0>",
+      "<iter_image_26_1>",
+      "<iter_image_26_2>"
+    ],
+    "Summary": "The identification shows a **moderate to poor fit** characterized by significant **phase drift and frequency mismatch** over time. While the mean difference is low (~0.13), the trajectories (especially in plots 1 and 2) diverge temporally, indicating that the discrete-time dynamics do not perfectly capture the system's periodicity.\n\n**Specific Issues:**\n1.  **Phase Lag/Lead:** Small errors in the state transition coefficients lead to cumulative timing errors in mode switching.\n2.  **Mode 1 Decoupling:** The current specification treats $x_1$ and $x_2$ as independent in Mode 1. Ground truth suggests coupled dynamics.\n3.  **Switching Inaccuracy:** The hard guards ($x_1 \\ge 25.0$, $x_2 \\le 10.0$) do not perfectly align with the ground truth turn-around points, causing premature or delayed transitions.\n\n**Concrete Suggestions:**\n*   **Refine Dynamics:** Introduce coupling terms in Mode 1 (e.g., $x_1[k+"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_26_0>",
+      "max_diff": 0.27952409753077156,
+      "mean_diff": 0.10213193397377889
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_26_1>",
+      "max_diff": 0.5601257112042197,
+      "mean_diff": 0.21723657957417036
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_26_2>",
+      "max_diff": 0.1904751141160892,
+      "mean_diff": 0.07284877140220072
+    }
+  ]
+}

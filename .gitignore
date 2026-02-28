@@ -26,3 +26,5 @@ analysis_plots_train/
 
 # phoenix traces
 phoenix_traces/
+
+*.png

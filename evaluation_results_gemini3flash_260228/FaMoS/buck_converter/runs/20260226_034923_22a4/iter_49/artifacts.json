@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.022860064336657382,
+    "Mean Difference": 0.0026505743399463963,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_49_0>",
+      "<iter_image_49_1>",
+      "<iter_image_49_2>"
+    ],
+    "Summary": "The HA model demonstrates **excellent fit quality**, with a mean difference of 0.0026 and a max difference of 0.022. Visual inspection confirms that simulated trajectories track the"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_49_0>",
+      "max_diff": 0.04837452929918673,
+      "mean_diff": 0.005435347253004072
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_49_1>",
+      "max_diff": 0.01033166061859519,
+      "mean_diff": 0.0016079109211175288
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_49_2>",
+      "max_diff": 0.00987400309219023,
+      "mean_diff": 0.0009084648457175884
+    }
+  ]
+}

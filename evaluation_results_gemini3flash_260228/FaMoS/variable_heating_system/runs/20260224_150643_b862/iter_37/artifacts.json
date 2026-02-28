@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.3838686786771895,
+    "Mean Difference": 0.14121949691080968,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_37_0>",
+      "<iter_image_37_1>",
+      "<iter_image_37_2>"
+    ],
+    "Summary": "The evaluation shows a **significant phase and frequency mismatch** despite relatively low mean error. While the guard conditions ($x_1 \\ge 25.0, x_2 \\le 10"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_37_0>",
+      "max_diff": 0.4863835555453557,
+      "mean_diff": 0.15705906462918362
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_37_1>",
+      "max_diff": 0.5588544886439022,
+      "mean_diff": 0.234995688409897
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_37_2>",
+      "max_diff": 0.10636799184231056,
+      "mean_diff": 0.03160373769334844
+    }
+  ]
+}

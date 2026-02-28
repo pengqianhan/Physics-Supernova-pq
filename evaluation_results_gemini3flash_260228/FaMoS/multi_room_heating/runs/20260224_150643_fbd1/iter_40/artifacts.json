@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.04171921317086944,
+    "Mean Difference": 0.012426689520440765,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_40_0>",
+      "<iter_image_40_1>",
+      "<iter_image_40_2>"
+    ],
+    "Summary": "**Overall Fit Quality:**\nThe model demonstrates high precision with a low **mean_diff (0.0124)**. However, while Plots 1 and 2 show excellent alignment, Plot 3 reveals significant **cumulative phase lag** and **mode switch timing errors** as time progresses.\n\n**Visual Patterns & Issues:**\n*   **Phase Lag:** In Plot 3, simulated peaks and troughs consistently occur later than the ground truth. This suggests the discrete-time dynamics are slightly \"slower\" than the actual system.\n*   **Mode Switch Timing:** The divergence is primarily driven by delayed transitions. The guards (e.g., $"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_40_0>",
+      "max_diff": 0.016584312976274756,
+      "mean_diff": 0.004039540568157028
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_40_1>",
+      "max_diff": 0.025099855860760804,
+      "mean_diff": 0.006058965909768102
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_40_2>",
+      "max_diff": 0.08347347067557279,
+      "mean_diff": 0.027181562083397164
+    }
+  ]
+}

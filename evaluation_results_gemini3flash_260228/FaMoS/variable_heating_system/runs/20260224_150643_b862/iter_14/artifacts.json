@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.379927951879754,
+    "Mean Difference": 0.14667953176593282,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_14_0>",
+      "<iter_image_14_1>",
+      "<iter_image_14_2>"
+    ],
+    "Summary": "The identification process shows successful convergence, with the final iteration (Image 3) achieving an excellent fit (**mean_diff \u2248 0.147**). Early iterations (Images 1"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_14_0>",
+      "max_diff": 0.5300506683802874,
+      "mean_diff": 0.1956807444861079
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_14_1>",
+      "max_diff": 0.5482412982445495,
+      "mean_diff": 0.23422439456144883
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_14_2>",
+      "max_diff": 0.061491889014424955,
+      "mean_diff": 0.010133456250241698
+    }
+  ]
+}

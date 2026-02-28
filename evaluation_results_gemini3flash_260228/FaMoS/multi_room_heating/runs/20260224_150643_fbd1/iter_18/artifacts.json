@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.2853404263099544,
+    "Mean Difference": 0.07340600735787196,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_18_0>",
+      "<iter_image_18_1>",
+      "<iter_image_18_2>"
+    ],
+    "Summary": "The identification shows a strong initial fit (mean diff \u2248 0.07), but visual analysis reveals cumulative **phase drift** and minor **amplitude errors** over time.\n\n**Key Observations:**\n1.  **Dynamics Mismatch:** The simulated trajectories (dash-dot) exhibit a slight lag in reaching peaks compared to ground truth. This indicates the growth rates in Modes 2, 3, and 4 (coefficients like `0.151` and offset `0.302`) are slightly underestimated.\n2.  **Switching Timing:** Mode transitions occur slightly late in the simulation. The guards (e.g., `x1 <= 19.0`, `x1 >= 24.0`) do not perfectly capture the inflection points seen in the ground truth data.\n3.  **Coupling:** The decay rates in the non-active variables within each mode (e.g., `x2` and `x3` in Mode 2) show small deviations, suggesting the coupling coefficients (`0.025`) require refinement.\n\n**Actionable Suggestions:**\n*   **Refine Coefficients:** Re-estimate the $A$ and $B$"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_18_0>",
+      "max_diff": 0.31286318888835823,
+      "mean_diff": 0.04659192262546734
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_18_1>",
+      "max_diff": 0.26104887298969887,
+      "mean_diff": 0.09008986774874694
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_18_2>",
+      "max_diff": 0.282109217051806,
+      "mean_diff": 0.08353623169940161
+    }
+  ]
+}

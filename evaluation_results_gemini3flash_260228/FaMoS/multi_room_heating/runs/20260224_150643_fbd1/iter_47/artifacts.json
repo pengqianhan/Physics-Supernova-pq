@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.04307002108948901,
+    "Mean Difference": 0.012866592873786708,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_47_0>",
+      "<iter_image_47_1>",
+      "<iter_image_47_2>"
+    ],
+    "Summary": "**Overall Fit:** The model demonstrates high fidelity with a low mean difference (0.012). However, the max difference (0.043) highlights localized errors during mode transitions.\n\n**Visual"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_47_0>",
+      "max_diff": 0.020872969869791574,
+      "mean_diff": 0.005552188138732101
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_47_1>",
+      "max_diff": 0.024877035605988272,
+      "mean_diff": 0.006518382682986075
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_47_2>",
+      "max_diff": 0.08346005779268718,
+      "mean_diff": 0.02652920779964195
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.18721433014189562,
+    "Mean Difference": 0.08092202164801138,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_41_0>",
+      "<iter_image_41_1>",
+      "<iter_image_41_2>"
+    ],
+    "Summary": "The evaluation shows a high-fidelity fit in two scenarios but a **critical phase and frequency divergence** in the second plot. While the mean difference is low (0.081), the system fails"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_41_0>",
+      "max_diff": 0.017236544127517496,
+      "mean_diff": 0.0037325203967257885
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_41_1>",
+      "max_diff": 0.47217915700690827,
+      "mean_diff": 0.21702992080776445
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_41_2>",
+      "max_diff": 0.0722272892912611,
+      "mean_diff": 0.022003623739543888
+    }
+  ]
+}

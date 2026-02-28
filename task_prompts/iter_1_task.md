@@ -358,12 +358,12 @@ When constructing the HA specification dictionary in Python code:
 ```json
 {
     "automaton": {
-        "var": "x1",
-        "input": "u1",
+        "var": "x1, x2, x3, x4, x5, x6, x7, x8, x9",
+        "input": "",
         "mode": [
             {
                 "id": 1,
-                "eq": "x1[2] = x1[1] + x1[0] + u1"
+                "eq": "x1[1] = -0.5 * x1[0] + x2[0], x2[1] = -0.5 * x2[0] + x3[0], x3[1] = -0.5 * x3[0] + x4[0], x4[1] = -0.5 * x4[0] + x5[0], x5[1] = -0.5 * x5[0] + x6[0], x6[1] = -0.5 * x6[0] + x7[0], x7[1] = -0.5 * x7[0] + x8[0], x8[1] = -0.5 * x8[0] + x9[0], x9[1] = -0.5 * x9[0]"
             }
         ],
         "edge": []
@@ -371,7 +371,7 @@ When constructing the HA specification dictionary in Python code:
     "config": {
         "dt":,
         "total_time":,
-        "order": 2,
+        "order": 1,
         "need_reset": false,
         "non_linear_items": ""
     }
@@ -380,7 +380,7 @@ When constructing the HA specification dictionary in Python code:
 
 ## Your Task
 Generate an improved HA specification that better matches the observed trajectory data.
-- **Keep `var: "x1"` and `input: "u1"` exactly as shown!**
+- **Keep `var: "x1, x2, x3, x4, x5, x6, x7, x8, x9"` and `input: ""` exactly as shown!**
 - Make sure the HA specification is valid and complete according to the JSON Schema.
 - Refine the HA specification to improve trajectory matching and reduce `Max Difference`, `Mean Difference`.
 

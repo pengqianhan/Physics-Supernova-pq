@@ -358,12 +358,12 @@ When constructing the HA specification dictionary in Python code:
 ```json
 {
     "automaton": {
-        "var": "x1",
-        "input": "u1",
+        "var": "x1, x2, x3, x4, x5, x6, x7, x8, x9",
+        "input": "",
         "mode": [
             {
                 "id": 1,
-                "eq": "x1[2] = x1[1] + x1[0] + u1"
+                "eq": "x1[1] = -0.5 * x1[0] + x2[0], x2[1] = -0.5 * x2[0] + x3[0], x3[1] = -0.5 * x3[0] + x4[0], x4[1] = -0.5 * x4[0] + x5[0], x5[1] = -0.5 * x5[0] + x6[0], x6[1] = -0.5 * x6[0] + x7[0], x7[1] = -0.5 * x7[0] + x8[0], x8[1] = -0.5 * x8[0] + x9[0], x9[1] = -0.5 * x9[0]"
             }
         ],
         "edge": []
@@ -371,7 +371,7 @@ When constructing the HA specification dictionary in Python code:
     "config": {
         "dt":,
         "total_time":,
-        "order": 2,
+        "order": 1,
         "need_reset": false,
         "non_linear_items": ""
     }
@@ -380,7 +380,7 @@ When constructing the HA specification dictionary in Python code:
 
 ## Your Task
 Generate an improved HA specification that better matches the observed trajectory data.
-- **Keep `var: "x1"` and `input: "u1"` exactly as shown!**
+- **Keep `var: "x1, x2, x3, x4, x5, x6, x7, x8, x9"` and `input: ""` exactly as shown!**
 - Make sure the HA specification is valid and complete according to the JSON Schema.
 - Refine the HA specification to improve trajectory matching and reduce `Max Difference`, `Mean Difference`.
 
@@ -403,95 +403,3 @@ For higher-order systems (order >= 2), position trajectories may appear smooth e
 2. **Detect discontinuities**: sudden jumps in velocity or acceleration indicate potential mode transition points and resets
 3. **Segment-wise analysis**: once candidate transition points are identified, analyze each segment's dynamics separately to infer mode-specific ODEs and guard conditions
 
-"
-## Previously Explored HA Specifications with Feedback:
-Use these as inspiration to guide your next refinement.
-Use the `hybrid_automaton_image_analysis` tool to analyze the comparison plot through the `Placeholder` in the `Evaluation Plot` section.
- If you want to check the fit performance of the HA specification, you can use the `hybrid_automaton_image_analysis` tool to analyze the comparison plot through the `Placeholder` in the `Evaluation Plot` section. For example, `hybrid_automaton_image_analysis(image_ref='<iter_image_2_0>', question='How is the fit performance of the HA specification?')` means to analyze the '2nd iteration, 0th file' comparison plot.`.
-
------------------------------------------
-
-The 1th attempt result:
-  1. HA JSON Specification:
-```json
-{
-  "automaton": {
-    "var": "x1",
-    "input": "u1",
-    "mode": [
-      {
-        "id": 1,
-        "eq": "x1[2] = -0.2 * x1[1] - 0.5 * x1[0] ** 3 + u1"
-      },
-      {
-        "id": 2,
-        "eq": "x1[2] = -0.54 * x1[1] - 1.5 * x1[0] ** 3 + u1"
-      }
-    ],
-    "edge": [
-      {
-        "direction": "1 -> 2",
-        "condition": "abs(x1) >= 1.2",
-        "reset": {
-          "x1[1]": [
-            "0.95*x1[1]"
-          ]
-        }
-      },
-      {
-        "direction": "2 -> 1",
-        "condition": "abs(x1) <= 0.8",
-        "reset": {
-          "x1[1]": [
-            "0.95*x1[1]"
-          ]
-        }
-      }
-    ]
-  },
-  "config": {
-    "dt": 0.001,
-    "total_time": 10.0,
-    "order": 2
-  }
-}
-```
-  2. Evaluation Feedback:
-{
-  "Evaluation Metrics (Averaged)": {
-    "Max Difference": 0.9382943236339885,
-    "Mean Difference": 0.31368359980371213,
-    "Num Ground Truth Files": 3
-  },
-  "Evaluation Plot": {
-    "Placeholders": [
-      "<iter_image_1_0>",
-      "<iter_image_1_1>",
-      "<iter_image_1_2>"
-    ],
-    "Summary": "The identification results show a **poor fit** characterized by significant **phase lead** and frequency mismatch. The simulated trajectory oscillates consistently faster than the ground truth, leading to a `max_diff` of ~0.94 and rapid divergence in phase.\n\n**Specific Issues:**\n1.  **Frequency Mismatch:** The simulated system's \"stiffness\" is too high. The cubic terms ($-0.5x_1^3$ and $-1.5x_1^3$) drive the state"
-  },
-  "Per-File Results": [
-    {
-      "ground_truth_index": 0,
-      "ground_truth_file": "ground_truth_0.npz",
-      "plot_placeholder": "<iter_image_1_0>",
-      "max_diff": 0.8100110251062057,
-      "mean_diff": 0.3249686635199039
-    },
-    {
-      "ground_truth_index": 1,
-      "ground_truth_file": "ground_truth_1.npz",
-      "plot_placeholder": "<iter_image_1_1>",
-      "max_diff": 1.0165515235952371,
-      "mean_diff": 0.31988232698076347
-    },
-    {
-      "ground_truth_index": 2,
-      "ground_truth_file": "ground_truth_2.npz",
-      "plot_placeholder": "<iter_image_1_2>",
-      "max_diff": 0.9883204222005224,
-      "mean_diff": 0.29619980891046893
-    }
-  ]
-}

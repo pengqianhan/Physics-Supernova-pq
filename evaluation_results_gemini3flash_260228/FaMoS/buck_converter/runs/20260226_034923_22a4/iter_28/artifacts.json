@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.05645281549536871,
+    "Mean Difference": 0.0065414098102901394,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_28_0>",
+      "<iter_image_28_1>",
+      "<iter_image_28_2>"
+    ],
+    "Summary": "The identification shows high accuracy with a low mean difference (~0.0065). However, visual analysis reveals a consistent **phase lead** in the simulated $x_1$ trajectories during the switching regime (oscillatory phase)."
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_28_0>",
+      "max_diff": 0.058451056957262985,
+      "mean_diff": 0.00744141579628103
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_28_1>",
+      "max_diff": 0.048513228716123166,
+      "mean_diff": 0.0055958253976851405
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_28_2>",
+      "max_diff": 0.06239416081271997,
+      "mean_diff": 0.00658698823690425
+    }
+  ]
+}

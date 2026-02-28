@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.12237167768444213,
+    "Mean Difference": 0.023496446591088405,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_17_0>",
+      "<iter_image_17_1>",
+      "<iter_image_17_2>"
+    ],
+    "Summary": "The HA model demonstrates high fidelity with a mean difference of **0.023**. Visual analysis confirms excellent tracking of the oscillatory limit cycle across all three states ($x_1, x_2, x_3$). However, a cumulative **phase drift** becomes apparent after $t=8s$, where simulated peaks slightly lead the ground truth.\n\n**Specific Issues:**\n*   **Mode Switch Timing:** The simulated trajectories"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_17_0>",
+      "max_diff": 0.11524063586085101,
+      "mean_diff": 0.025545364824203123
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_17_1>",
+      "max_diff": 0.1685676432382983,
+      "mean_diff": 0.027649369473054693
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_17_2>",
+      "max_diff": 0.08330675395417705,
+      "mean_diff": 0.017294605476007394
+    }
+  ]
+}

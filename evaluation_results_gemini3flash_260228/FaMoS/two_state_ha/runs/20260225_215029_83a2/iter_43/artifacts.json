@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.6997567470854533,
+    "Mean Difference": 0.3099488804507437,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_43_0>",
+      "<iter_image_43_1>",
+      "<iter_image_43_2>"
+    ],
+    "Summary": "The simulation fails to replicate the ground truth limit cycle, diverging significantly after $t=5s$. Despite the reported low error metrics (likely calculated over a short initial window), the visual analysis reveals"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_43_0>",
+      "max_diff": 0.7900485498954166,
+      "mean_diff": 0.32844307826926733
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_43_1>",
+      "max_diff": 0.700849584493474,
+      "mean_diff": 0.3069259314857034
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_43_2>",
+      "max_diff": 0.6083721068674692,
+      "mean_diff": 0.29447763159726026
+    }
+  ]
+}

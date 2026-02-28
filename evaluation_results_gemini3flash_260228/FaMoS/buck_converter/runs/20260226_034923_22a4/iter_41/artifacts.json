@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.06355933313242818,
+    "Mean Difference": 0.006814420938362359,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_41_0>",
+      "<iter_image_41_1>",
+      "<iter_image_41_2>"
+    ],
+    "Summary": "The HA model demonstrates excellent fit quality (mean error $\\approx 0.0068$). It accurately captures the transient dynamics and the transition to a limit cycle across all three test cases. The \""
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_41_0>",
+      "max_diff": 0.10421020105653528,
+      "mean_diff": 0.011907506548977825
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_41_1>",
+      "max_diff": 0.02444307513449348,
+      "mean_diff": 0.0027241414407005813
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_41_2>",
+      "max_diff": 0.062024723206255766,
+      "mean_diff": 0.0058116148254086725
+    }
+  ]
+}

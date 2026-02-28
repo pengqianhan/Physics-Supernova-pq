@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.13750344677951298,
+    "Mean Difference": 0.035456126944994525,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_36_0>",
+      "<iter_image_36_1>",
+      "<iter_image_36_2>"
+    ],
+    "Summary": "The HA model demonstrates a strong initial fit in Plot 1 but suffers from significant **phase lag** and **amplitude divergence** in Plots 2 and 3. \n\n**Key Issues:**\n1.  **Amplitude Errors:** In Plot 2, $x_1$ undershoots significantly (simulated ~16 vs. ground truth ~18), indicating the transition guard $x_1 \\le 19.0$ is triggered"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_36_0>",
+      "max_diff": 0.013600854628437131,
+      "mean_diff": 0.0003005637077132384
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_36_1>",
+      "max_diff": 0.25949609756668784,
+      "mean_diff": 0.08062974547797175
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_36_2>",
+      "max_diff": 0.139413388143414,
+      "mean_diff": 0.025438071649298594
+    }
+  ]
+}

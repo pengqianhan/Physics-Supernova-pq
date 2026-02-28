@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.3839245548009045,
+    "Mean Difference": 0.14092161359530833,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_24_0>",
+      "<iter_image_24_1>",
+      "<iter_image_24_2>"
+    ],
+    "Summary": "The evaluation shows a moderate fit (mean diff ~0.14) but reveals significant **phase drift** and **frequency mismatch** in the trajectories. While the guard conditions ($x_"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_24_0>",
+      "max_diff": 0.4811867364216142,
+      "mean_diff": 0.1540583980345937
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_24_1>",
+      "max_diff": 0.5576905460837175,
+      "mean_diff": 0.23452997987355578
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_24_2>",
+      "max_diff": 0.11289638189738183,
+      "mean_diff": 0.03417646287777547
+    }
+  ]
+}

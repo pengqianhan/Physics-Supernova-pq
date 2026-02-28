@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.022860059506319436,
+    "Mean Difference": 0.0026505725326709563,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_32_0>",
+      "<iter_image_32_1>",
+      "<iter_image_32_2>"
+    ],
+    "Summary": "The system identification is **highly accurate**, with a mean difference of 0.0027 (approx. 0.02% of peak magnitude). The Hybrid Automaton (HA) successfully captures the transient dynamics, the hysteretic switching of $x_2$ around the 12.0 nominal value"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_32_0>",
+      "max_diff": 0.0483745145346792,
+      "mean_diff": 0.005435348736388015
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_32_1>",
+      "max_diff": 0.01033166061859519,
+      "mean_diff": 0.0016078999073608018
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_32_2>",
+      "max_diff": 0.009874003365683927,
+      "mean_diff": 0.0009084689542640511
+    }
+  ]
+}

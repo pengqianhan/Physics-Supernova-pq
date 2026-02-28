@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 149.97171008794987,
+    "Mean Difference": 15.38337666707605,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_50_0>",
+      "<iter_image_50_1>",
+      "<iter_image_50_2>"
+    ],
+    "Summary": "The evaluation shows a **critical failure in stability**, with the simulated trajectory diverging exponentially to approximately $-5000$ while the ground truth remains bounded near zero.\n\n### Analysis:\n1."
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_50_0>",
+      "max_diff": 97.85317265659633,
+      "mean_diff": 10.114084694106149
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_50_1>",
+      "max_diff": 166.71338482052533,
+      "mean_diff": 17.07128063471638
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_50_2>",
+      "max_diff": 185.34857278672794,
+      "mean_diff": 18.964764672405618
+    }
+  ]
+}

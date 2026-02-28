@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.5769494281703331,
+    "Mean Difference": 0.3488470887106326,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_3_0>",
+      "<iter_image_3_1>",
+      "<iter_image_3_2>"
+    ],
+    "Summary": "The identification shows poor long-term stability. While the mean difference is low (0.34), the trajectories exhibit significant **phase lag** and **catastrophic divergence** in $x_2$ across all evaluations.\n\n**Key Issues:**\n1.  **$x_2$ Inst"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_3_0>",
+      "max_diff": 1.721836014096112,
+      "mean_diff": 0.2723522414905897
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_3_1>",
+      "max_diff": 1.697678548446939,
+      "mean_diff": 0.45143597055244555
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_3_2>",
+      "max_diff": 1.3113337219679484,
+      "mean_diff": 0.32275305408886257
+    }
+  ]
+}

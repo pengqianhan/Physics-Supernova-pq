@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.04618989070239018,
+    "Mean Difference": 0.014334901607190571,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_20_0>",
+      "<iter_image_20_1>",
+      "<iter_image_20_2>"
+    ],
+    "Summary": "The system identification demonstrates high fidelity with a mean error of **0.014**. The trajectories follow a cyclic pattern where one state variable grows while others decay, accurately captured by the four-mode hybrid automaton.\n\n**Analysis of Issues:**\n*   **Switching Timing:** Minor phase offsets are visible at the peaks and troughs. The simulated transitions occasionally trigger early or late, suggesting the guard thresholds (e.g., $x_1 \\ge 24.0$, $x_3 \\ge 26.0$) are slightly misaligned with the physical switching boundaries."
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_20_0>",
+      "max_diff": 0.0197965989449645,
+      "mean_diff": 0.004779740760678204
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_20_1>",
+      "max_diff": 0.02975997199225777,
+      "mean_diff": 0.0076680159809913925
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_20_2>",
+      "max_diff": 0.08901310116994826,
+      "mean_diff": 0.030556948079902113
+    }
+  ]
+}

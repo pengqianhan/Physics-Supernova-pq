@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.06033162021073866,
+    "Mean Difference": 0.01779835401177699,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_1_0>",
+      "<iter_image_1_1>",
+      "<iter_image_1_2>"
+    ],
+    "Summary": "The fit is excellent, with a **mean difference of 0.017** and a **max error of 0.06**, indicating high-fidelity identification of the hybrid dynamics."
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_1_0>",
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_1_1>",
+      "max_diff": 0.09870632445716,
+      "mean_diff": 0.02887473614730827
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_1_2>",
+      "max_diff": 0.08228853617505599,
+      "mean_diff": 0.024520325888022703
+    }
+  ]
+}

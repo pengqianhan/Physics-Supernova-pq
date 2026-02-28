@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.1935264229519523,
+    "Mean Difference": 0.05690409965208177,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_9_0>",
+      "<iter_image_9_1>",
+      "<iter_image_9_2>"
+    ],
+    "Summary": "The HA model demonstrates a good overall fit with a low **mean_diff (~0.057)**, but visual analysis reveals a persistent **phase lag** and **mode-switch timing errors**. The simulated trajectories (dashed) consistently lag behind the ground truth, particularly during rapid transitions at peaks and troughs.\n\n**Specific Issues:**\n1.  **Phase Lag:** Cumulative timing errors suggest the discrete-time dynamics ($A$ and $B$ coefficients) slightly underestimate the state velocity.\n2.  **Switching Discontinuities:** The use of hard constant resets (e.g., `x1: [\"19.0\"]`) in the `edge` specification causes artificial jumps that do not match the smoother transitions in the ground truth.\n3.  **Guard Delay:** The guards (e.g., `x1 <= 19.0`) appear to trigger late, contributing to the phase shift.\n\n**Concrete Suggestions:**\n*   **Refine Dynamics:** Re-estimate the $A$ and $B$ coefficients in the `mode` equations using a higher-fidelity system identification method (e.g., SINDy) to better match the slopes.\n*"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_9_0>",
+      "max_diff": 0.23110811823103403,
+      "mean_diff": 0.07289527784286631
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_9_1>",
+      "max_diff": 0.2671889218938996,
+      "mean_diff": 0.08588823984434842
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_9_2>",
+      "max_diff": 0.08228222873092328,
+      "mean_diff": 0.011928781269030578
+    }
+  ]
+}

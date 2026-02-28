@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 427.58387609246944,
+    "Mean Difference": 43.640601048345395,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_46_0>",
+      "<iter_image_46_1>",
+      "<iter_image_46_2>"
+    ],
+    "Summary": "The simulation exhibits **catastrophic divergence**; while the ground truth remains near zero, the simulated trajectory oscillates with exponentially increasing amplitude, reaching errors exceeding $10^4$.\n\n**Key Issues:**"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_46_0>",
+      "max_diff": 158.3412531711232,
+      "mean_diff": 16.173519979641263
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_46_1>",
+      "max_diff": 504.02087497266956,
+      "mean_diff": 51.26299983117176
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_46_2>",
+      "max_diff": 620.3895001336156,
+      "mean_diff": 63.48528333422317
+    }
+  ]
+}

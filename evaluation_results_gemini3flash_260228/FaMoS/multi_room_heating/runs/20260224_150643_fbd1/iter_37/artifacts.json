@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.27618015132779444,
+    "Mean Difference": 0.07346730070996212,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_37_0>",
+      "<iter_image_37_1>",
+      "<iter_image_37_2>"
+    ],
+    "Summary": "The HA model achieves a reasonable mean fit (0.073), but the **max_diff (0.276)** reveals significant divergence at switching points. Visual analysis shows a"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_37_0>",
+      "max_diff": 0.30789423436734964,
+      "mean_diff": 0.046006160263828935
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_37_1>",
+      "max_diff": 0.2610569391678673,
+      "mean_diff": 0.09049678977162702
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_37_2>",
+      "max_diff": 0.2595892804481665,
+      "mean_diff": 0.08389895209443042
+    }
+  ]
+}

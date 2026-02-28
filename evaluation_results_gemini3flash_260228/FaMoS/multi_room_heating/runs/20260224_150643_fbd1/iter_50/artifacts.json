@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.04121658863946014,
+    "Mean Difference": 0.01228938819291813,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_50_0>",
+      "<iter_image_50_1>",
+      "<iter_image_50_2>"
+    ],
+    "Summary": "The HA identification demonstrates high fidelity, with a mean error of ~0.012. Simulated trajectories accurately capture the piecewise linear slopes and amplitudes across all modes.\n\n**Key Observations:**\n1."
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_50_0>",
+      "max_diff": 0.015146326443235615,
+      "mean_diff": 0.0042043854417843874
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_50_1>",
+      "max_diff": 0.025014463030249512,
+      "mean_diff": 0.00606326217483869
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_50_2>",
+      "max_diff": 0.0834889764448953,
+      "mean_diff": 0.02660051696213131
+    }
+  ]
+}

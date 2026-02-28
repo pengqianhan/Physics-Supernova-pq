@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.7009395666264201,
+    "Mean Difference": 0.3254112221368115,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_7_0>",
+      "<iter_image_7_1>",
+      "<iter_image_7_2>"
+    ],
+    "Summary": "The evaluation reveals significant modeling errors across the three iterations. While the metrics suggest a low final error, the visual trajectories highlight fundamental dynamical mismatches:\n\n1.  **Frequency and Phase Error (Plot"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_7_0>",
+      "max_diff": 1.0276112445718013,
+      "mean_diff": 0.3868816750765689
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_7_1>",
+      "max_diff": 0.5306588094938619,
+      "mean_diff": 0.3067064617159762
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_7_2>",
+      "max_diff": 0.5445486458135974,
+      "mean_diff": 0.28264552961788936
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.23293279109056245,
+    "Mean Difference": 0.09057631372779436,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_35_0>",
+      "<iter_image_35_1>",
+      "<iter_image_35_2>"
+    ],
+    "Summary": "x1[0]`) into edge conditions to prevent chattering or premature switching near thresholds.\n        2.  **State Augmentation:** Explicitly define a velocity state to transform the system"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_35_0>",
+      "max_diff": 0.4200082306432547,
+      "mean_diff": 0.1994329417578277
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_35_1>",
+      "max_diff": 0.19977590430968753,
+      "mean_diff": 0.04083855973677381
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_35_2>",
+      "max_diff": 0.07901423831874511,
+      "mean_diff": 0.03145743968878159
+    }
+  ]
+}

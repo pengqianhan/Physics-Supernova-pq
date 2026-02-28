@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.20832972237353853,
+    "Mean Difference": 0.07522081498910513,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_44_0>",
+      "<iter_image_44_1>",
+      "<iter_image_44_2>"
+    ],
+    "Summary": "$) to improve switching synchronization.\n            3.  **Refine Resets:** Remove or optimize the $x_1[1]$ reset to ensure velocity continuity unless the physical system dictates a jump."
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_44_0>",
+      "max_diff": 0.33943893447779233,
+      "mean_diff": 0.1421785156091596
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_44_1>",
+      "max_diff": 0.1644725234994818,
+      "mean_diff": 0.04996051561907346
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_44_2>",
+      "max_diff": 0.12107770914334141,
+      "mean_diff": 0.03352341373908234
+    }
+  ]
+}

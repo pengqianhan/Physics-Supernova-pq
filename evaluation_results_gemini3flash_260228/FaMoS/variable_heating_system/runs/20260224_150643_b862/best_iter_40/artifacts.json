@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.18721433014189562,
+    "Mean Difference": 0.08092202164801138,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_40_0>",
+      "<iter_image_40_1>",
+      "<iter_image_40_2>"
+    ],
+    "Summary": "The identification shows inconsistent performance across different initial conditions. While the third evaluation shows a high-fidelity fit, the first and second reveal significant **phase divergence** and **amplitude errors**, particularly in $x_2$.\n\n**Key Issues:**\n1.  **Dynamics Mismatch:** In Mode 1, the $x_2$ coefficient ($0.30045$) implies a rapid decay, yet the ground truth shows $x_2$ increasing alongside $x_1$. This structural error causes the simulated $x_2$ to undershoot significantly.\n2.  **Phase Lag"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_40_0>",
+      "max_diff": 0.017236544127517496,
+      "mean_diff": 0.0037325203967257885
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_40_1>",
+      "max_diff": 0.47217915700690827,
+      "mean_diff": 0.21702992080776445
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_40_2>",
+      "max_diff": 0.0722272892912611,
+      "mean_diff": 0.022003623739543888
+    }
+  ]
+}

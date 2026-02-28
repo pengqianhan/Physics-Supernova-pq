@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.28437756419708865,
+    "Mean Difference": 0.087143311299607,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_42_0>",
+      "<iter_image_42_1>",
+      "<iter_image_42_2>"
+    ],
+    "Summary": "The HA model achieves a moderate fit (Mean Diff: 0.087) but exhibits structural timing and frequency errors. \n\n**Analysis:**\n1. **Phase Lag & Timing:** Sc"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_42_0>",
+      "max_diff": 0.3067850911850007,
+      "mean_diff": 0.08004092937269922
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_42_1>",
+      "max_diff": 0.41717544773277443,
+      "mean_diff": 0.14686969913282275
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_42_2>",
+      "max_diff": 0.12917215367349072,
+      "mean_diff": 0.03451930539329901
+    }
+  ]
+}

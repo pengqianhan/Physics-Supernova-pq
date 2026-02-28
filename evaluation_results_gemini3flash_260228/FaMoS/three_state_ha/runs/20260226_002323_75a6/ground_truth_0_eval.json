@@ -1,0 +1,12 @@
+{
+  "gt_file": "ground_truth_0.npz",
+  "tc": 1.11,
+  "max_diff": 0.6794487288874174,
+  "mean_diff": 0.06963675142299908,
+  "clustering_error": 0,
+  "status": "success",
+  "dataset": "FaMoS/three_state_ha",
+  "ha_spec_path": "evaluation_results/FaMoS/three_state_ha/runs/20260226_002323_75a6/best_ha_specification.json",
+  "num_iterations": 16,
+  "max_iter": 44
+}

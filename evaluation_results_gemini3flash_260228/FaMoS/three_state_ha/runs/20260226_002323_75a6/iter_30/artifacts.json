@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 11.751330238122392,
+    "Mean Difference": 1.1863031531996207,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_30_0>",
+      "<iter_image_30_1>",
+      "<iter_image_30_2>"
+    ],
+    "Summary": "The HA model exhibits severe **exponential divergence** starting at $t \\approx 12.5s$. While the initial transient (0\u20135s) shows a reasonable qualitative match,"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_30_0>",
+      "max_diff": 2.3402436304502934,
+      "mean_diff": 0.23579417833584457
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_30_1>",
+      "max_diff": 11.186829856904597,
+      "mean_diff": 1.1245070784331144
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_30_2>",
+      "max_diff": 21.726917227012287,
+      "mean_diff": 2.198608202829903
+    }
+  ]
+}

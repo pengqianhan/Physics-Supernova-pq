@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.827951196327453,
+    "Mean Difference": 0.12162439504922089,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_37_0>",
+      "<iter_image_37_1>",
+      "<iter_image_37_2>"
+    ],
+    "Summary": "The system identification shows significant structural and parametric errors. While the initial transients (0\u20135s) show moderate alignment, the long-term behavior diverges drastically across all test cases.\n\n**Key Issues:**\n1.  **Divergence Mismatch:** In Plot 1, the simulation diverges negatively much faster than the ground truth, indicating the positive feedback in Mode 1/3 ($+0.5x_1$) is too aggressive.\n2.  **Mode Capture Failure:** In Plot 2, the ground truth diverges while the simulation remains trapped in a stable/oscillatory regime. This suggests the guard $x_1 \\le -10.0$ for the $2 \\to 3$ transition is never met, or Mode 2's dynamics are too damped.\n3.  **Phase and Frequency Errors:** Plot 3 exhibits a clear phase lag and frequency mismatch during the initial oscillation, pointing to incorrect second-order coefficients.\n\n**Suggested HA Improvements:**\n*   **Refine Dynamics:** Tune the $x_1[0]$ and $x"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_37_0>",
+      "max_diff": 0.6188499644936027,
+      "mean_diff": 0.06413993141443887
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_37_1>",
+      "max_diff": 0.9996708454570064,
+      "mean_diff": 0.10609603875805287
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_37_2>",
+      "max_diff": 0.8653327790317499,
+      "mean_diff": 0.1946372149751709
+    }
+  ]
+}

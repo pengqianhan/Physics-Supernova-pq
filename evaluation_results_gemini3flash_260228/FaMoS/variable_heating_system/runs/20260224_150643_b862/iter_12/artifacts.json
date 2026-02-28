@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.4238455162580023,
+    "Mean Difference": 0.15271865295811463,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_12_0>",
+      "<iter_image_12_1>",
+      "<iter_image_12_2>"
+    ],
+    "Summary": "The identification achieves a reasonable mean error (0.15), but visual analysis reveals significant **phase drift** and **frequency mismatch**. The simulated trajectories consistently lead or lag the ground truth, indicating that"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_12_0>",
+      "max_diff": 0.5327808720695517,
+      "mean_diff": 0.16602936587109512
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_12_1>",
+      "max_diff": 0.5319906813328229,
+      "mean_diff": 0.2327599217108369
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_12_2>",
+      "max_diff": 0.2067649953716322,
+      "mean_diff": 0.05936667129241181
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.05789004575098883,
+    "Mean Difference": 0.014414457063112536,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_44_0>",
+      "<iter_image_44_1>",
+      "<iter_image_44_2>"
+    ],
+    "Summary": "The HA model demonstrates strong structural alignment with a low mean difference (**0.0144**), but exhibits cumulative **phase lag** and temporal drift. Visual analysis shows that simulated peaks and valleys consistently lag behind the ground"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_44_0>",
+      "max_diff": 0.048866325666804766,
+      "mean_diff": 0.01223944002288551
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_44_1>",
+      "max_diff": 0.04122180673801325,
+      "mean_diff": 0.00948230271625429
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_44_2>",
+      "max_diff": 0.08358200484814848,
+      "mean_diff": 0.02152162845019781
+    }
+  ]
+}

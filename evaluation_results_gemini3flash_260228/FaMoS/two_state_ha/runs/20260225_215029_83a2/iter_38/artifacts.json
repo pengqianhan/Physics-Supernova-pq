@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.9663553935513388,
+    "Mean Difference": 0.43713294918092266,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_38_0>",
+      "<iter_image_38_1>",
+      "<iter_image_38_2>"
+    ],
+    "Summary": "The identification results show a significant **phase lag** and **amplitude divergence** that worsens over time. While the mean difference is low, the simulated trajectory fails to capture the system's natural frequency and switching points.\n\n**Key Issues:**\n1.  **Frequency Mismatch:** The simulated period is longer than the ground truth. The \"stiffness\" coefficients (0.2 and 0.5 for $x1[0]$) are too low, resulting in a lower natural frequency.\n2.  **Switching Timing:**"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_38_0>",
+      "max_diff": 0.9474917574032654,
+      "mean_diff": 0.4351166331565554
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_38_1>",
+      "max_diff": 0.9139335399226578,
+      "mean_diff": 0.4207580395529184
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_38_2>",
+      "max_diff": 1.0376408833280932,
+      "mean_diff": 0.4555241748332942
+    }
+  ]
+}

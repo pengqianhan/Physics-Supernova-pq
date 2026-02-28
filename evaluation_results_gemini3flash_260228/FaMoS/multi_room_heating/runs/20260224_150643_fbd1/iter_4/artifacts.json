@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.06033162021073866,
+    "Mean Difference": 0.01779835401177699,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_4_0>",
+      "<iter_image_4_1>",
+      "<iter_image_4_2>"
+    ],
+    "Summary": "The HA model demonstrates high structural fidelity with a low mean difference (0.017). However, visual analysis reveals a **cumulative phase lag** and slight **amplitude divergence** at the switching peaks"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_4_0>",
+      "max_diff": 0.0,
+      "mean_diff": 0.0
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_4_1>",
+      "max_diff": 0.09870632445716,
+      "mean_diff": 0.02887473614730827
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_4_2>",
+      "max_diff": 0.08228853617505599,
+      "mean_diff": 0.024520325888022703
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 497.83266849039757,
+    "Mean Difference": 50.19771632719513,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_43_0>",
+      "<iter_image_43_1>",
+      "<iter_image_43_2>"
+    ],
+    "Summary": "**Evaluation Summary:**\n\nThe identification is **poor**, characterized by catastrophic divergence. While ground truth trajectories remain stable or slightly damped near zero, the simulated trajectories exhibit exponential growth, reaching values $>30,"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_43_0>",
+      "max_diff": 18.85398129559417,
+      "mean_diff": 1.9040517975576496
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_43_1>",
+      "max_diff": 81.32865758192989,
+      "mean_diff": 8.203123274504017
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_43_2>",
+      "max_diff": 1393.3153665936686,
+      "mean_diff": 140.48597390952372
+    }
+  ]
+}

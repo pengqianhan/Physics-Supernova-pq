@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.10298992341734742,
+    "Mean Difference": 0.02062906972527026,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_35_0>",
+      "<iter_image_35_1>",
+      "<iter_image_35_2>"
+    ],
+    "Summary": "The HA model demonstrates high fidelity with a mean difference of **0.0206**. The simulation accurately captures the cyclic switching logic and the sawtooth-like trajectories of $x_1, x_2,$ and $x_3$.\n\n**Visual Analysis & Issues:**\n*   **Phase Drift:** A minor phase lag accumulates over time, most visible in the timing of peaks and troughs. This indicates that the discrete-time transition rates in the `mode"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_35_0>",
+      "max_diff": 0.11041385144950112,
+      "mean_diff": 0.026838611749759798
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_35_1>",
+      "max_diff": 0.11449342596904158,
+      "mean_diff": 0.023503878904495963
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_35_2>",
+      "max_diff": 0.08406249283349954,
+      "mean_diff": 0.011544718521555024
+    }
+  ]
+}

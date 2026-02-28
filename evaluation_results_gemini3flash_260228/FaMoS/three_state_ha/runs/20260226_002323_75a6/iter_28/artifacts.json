@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.13492265643774,
+    "Mean Difference": 0.25161582375815694,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_28_0>",
+      "<iter_image_28_1>",
+      "<iter_image_28_2>"
+    ],
+    "Summary": "The HA model fails to capture the **catastrophic divergence** observed in the ground truth (GT) trajectories after $t=10s$. While the simulation remains bounded, the GT exhibits"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_28_0>",
+      "max_diff": 1.0077542004166458,
+      "mean_diff": 0.10732529107062613
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_28_1>",
+      "max_diff": 1.0317723241213732,
+      "mean_diff": 0.12593044856224553
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_28_2>",
+      "max_diff": 1.3652414447752004,
+      "mean_diff": 0.5215917316415992
+    }
+  ]
+}
