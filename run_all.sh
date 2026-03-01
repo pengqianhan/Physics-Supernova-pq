@@ -4,7 +4,7 @@
 # Runs 4 datasets in parallel to respect Gemini API rate limits
 
 # Configuration
-MAX_PARALLEL=4
+MAX_PARALLEL=3
 DATA_BASE="data_all"
 MODEL="gemini/gemini-3-flash-preview"
 MAX_ITERATIONS=50
