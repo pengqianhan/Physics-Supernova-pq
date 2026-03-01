@@ -859,19 +859,16 @@ if __name__ == "__main__":
         }
         }
     data=json.load(open('utils/Dainarx_code/automata/ATVA/ball.json', 'r'))
-    # print(data)
     
-
-
     # Create evaluator using the new HAEvaluator class
     print("Testing HAEvaluator with __call__() method...")
     print("=" * 80)
 
     evaluator = HAEvaluator(
         ha_dict=data,
-        npz_file_path='data_all/ATVA/ball_g/ground_truth_0.npz',
-        dt=0.001,
-        total_time=10.0
+        npz_file_path='data_all_nonoise/ATVA/ball_g/ground_truth_0.npz',
+        dt=data['config']['dt'],
+        total_time=data['config']['total_time']
     )
     ## Because the ball system only has one mode, so the TC is always 0
 
