@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.1031545464061827,
+    "Mean Difference": 0.18225544437170713,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_19_0>",
+      "<iter_image_19_1>",
+      "<iter_image_19_2>"
+    ],
+    "Summary": "The identification shows poor fit quality (`max_diff` \u2248 1.1). The simulated $x_1$ is significantly overdamped, converging to a steady state while the ground truth"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_19_0>",
+      "max_diff": 1.2428385133462685,
+      "mean_diff": 0.21867721874924245
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_19_1>",
+      "max_diff": 1.2301452902407048,
+      "mean_diff": 0.19151122398594722
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_19_2>",
+      "max_diff": 0.8364798356315752,
+      "mean_diff": 0.13657789037993165
+    }
+  ]
+}

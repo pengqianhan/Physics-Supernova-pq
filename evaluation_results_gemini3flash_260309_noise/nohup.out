@@ -1,0 +1,64 @@
+========================================
+Running all datasets with 3 parallel jobs
+Log directory: logs_20260301_215925
+Total datasets: 26
+========================================
+
+Using bash job control (GNU parallel not found)
+[2026-03-01 21:59:25] Starting: ATVA/ball
+[2026-03-01 21:59:25] Starting: ATVA/cell
+[2026-03-01 21:59:25] Starting: ATVA/oci
+[2026-03-02 16:40:52] Completed: ATVA/cell (success)
+[2026-03-02 16:40:52] Starting: ATVA/tanks
+[2026-03-03 14:01:24] Completed: ATVA/oci (success)
+[2026-03-03 14:01:24] Starting: FaMoS/buck_converter
+[2026-03-03 15:12:48] Completed: ATVA/ball (success)
+[2026-03-03 15:12:48] Starting: FaMoS/complex_tank
+[2026-03-03 17:24:12] Completed: FaMoS/complex_tank (success)
+[2026-03-03 17:24:12] Starting: FaMoS/multi_room_heating
+[2026-03-03 19:14:44] Completed: FaMoS/buck_converter (success)
+[2026-03-03 19:14:44] Starting: FaMoS/simple_heating_system
+[2026-03-03 21:34:38] Completed: FaMoS/simple_heating_system (success)
+[2026-03-03 21:34:38] Starting: FaMoS/three_state_ha
+[2026-03-04 13:57:25] Completed: FaMoS/multi_room_heating (success)
+[2026-03-04 13:57:25] Starting: FaMoS/two_state_ha
+[2026-03-05 09:36:33] Completed: ATVA/tanks (success)
+[2026-03-05 09:36:33] Starting: FaMoS/variable_heating_system
+[2026-03-05 13:34:19] Completed: FaMoS/two_state_ha (success)
+[2026-03-05 13:34:19] Starting: linear/complex_underdamped_system
+[2026-03-05 18:22:57] Completed: linear/complex_underdamped_system (success)
+[2026-03-05 18:22:57] Starting: linear/dc_motor_position_PID
+[2026-03-05 22:26:36] Completed: linear/dc_motor_position_PID (success)
+[2026-03-05 22:26:36] Starting: linear/linear_1
+[2026-03-06 05:50:10] Completed: FaMoS/three_state_ha (success)
+[2026-03-06 05:50:10] Starting: linear/loop
+[2026-03-06 07:15:35] Completed: linear/linear_1 (success)
+[2026-03-06 07:15:35] Starting: linear/one_legged_jumper
+[2026-03-06 07:35:40] Completed: linear/loop (success)
+[2026-03-06 07:35:40] Starting: linear/two_tank
+[2026-03-06 20:55:58] Completed: linear/two_tank (success)
+[2026-03-06 20:55:58] Starting: linear/underdamped_system
+[2026-03-06 22:40:00] Completed: linear/underdamped_system (success)
+[2026-03-06 22:40:00] Starting: non_linear/duffing
+[2026-03-07 01:08:04] Completed: FaMoS/variable_heating_system (success)
+[2026-03-07 01:08:04] Starting: non_linear/lander
+[2026-03-07 07:25:17] Completed: linear/one_legged_jumper (success)
+[2026-03-07 07:25:17] Starting: non_linear/lotkaVolterra
+[2026-03-07 09:18:46] Completed: non_linear/lotkaVolterra (success)
+[2026-03-07 09:18:46] Starting: non_linear/oscillator
+[2026-03-07 13:25:00] Completed: non_linear/lander (success)
+[2026-03-07 13:25:00] Starting: non_linear/simple_non_linear
+[2026-03-07 15:55:01] Completed: non_linear/duffing (success)
+[2026-03-07 15:55:01] Starting: non_linear/simple_non_poly
+[2026-03-07 17:16:44] Completed: non_linear/oscillator (success)
+[2026-03-07 17:16:44] Starting: non_linear/spacecraft
+[2026-03-07 19:51:00] Completed: non_linear/simple_non_poly (success)
+[2026-03-07 19:51:00] Starting: non_linear/sys_bio
+[2026-03-08 00:11:16] Completed: non_linear/spacecraft (success)
+[2026-03-09 05:55:10] Completed: non_linear/sys_bio (success)
+[2026-03-09 14:37:00] Completed: non_linear/simple_non_linear (success)
+
+========================================
+All datasets completed!
+Check logs in: logs_20260301_215925
+========================================

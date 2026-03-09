@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.8478912994635188,
+    "Mean Difference": 0.22711942387412287,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_10_0>",
+      "<iter_image_10_1>",
+      "<iter_image_10_2>"
+    ],
+    "Summary": "LLM summary generation failed after all retries."
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_10_0>",
+      "max_diff": 1.896986112288637,
+      "mean_diff": 0.217138416732402
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_10_1>",
+      "max_diff": 1.8934977769327013,
+      "mean_diff": 0.22785687663445983
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_10_2>",
+      "max_diff": 1.7531900091692187,
+      "mean_diff": 0.23636297825550676
+    }
+  ]
+}

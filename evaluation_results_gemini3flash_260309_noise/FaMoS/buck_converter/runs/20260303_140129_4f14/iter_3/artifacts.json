@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.8716150088923951,
+    "Mean Difference": 0.10219945463754758,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_3_0>",
+      "<iter_image_3_1>",
+      "<iter_image_3_2>"
+    ],
+    "Summary": "The HA model fails to capture the **limit-cycle behavior** and transient overshoots. While the mean error is low, the simulation misses the periodic oscillations in $x_1$ and exhibits significant"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_3_0>",
+      "max_diff": 1.0,
+      "mean_diff": 0.11208713302148927
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_3_1>",
+      "max_diff": 0.6148450266771852,
+      "mean_diff": 0.08730878812379611
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_3_2>",
+      "max_diff": 1.0,
+      "mean_diff": 0.10720244276735737
+    }
+  ]
+}

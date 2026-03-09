@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.2570383686170654e+45,
+    "Mean Difference": 1.2049996317033482e+43,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_26_0>",
+      "<iter_image_26_1>",
+      "<iter_image_26_2>"
+    ],
+    "Summary": "The simulation exhibits **catastrophic divergence**, with errors reaching $10^{47}$. While the simulated trajectory appears stable initially, it undergoes sudden exponential growth at $t \\approx 9.5s$, whereas the ground truth remains bounded.\n\n**Specific Issues:**\n1.  **Inherent Instability:** Mode 1 contains a large positive coefficient for $x_1[1]$ ($+16.8855$), representing **negative damping**. This drives exponential instability once the state enters or persists in this mode.\n2.  **Accumulated Energy:** The reset logic ($x_1[1] = -1.0 \\cdot x_1[1]$) lacks a coefficient of restitution. Without energy dissipation ($|k| < 1$), numerical errors or unstable dynamics quickly amplify the"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_26_0>",
+      "max_diff": 9.500574070714982e+43,
+      "mean_diff": 9.107270344322668e+41
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_26_1>",
+      "max_diff": 1.5543147878665122e+45,
+      "mean_diff": 1.4899694342589916e+43
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_26_2>",
+      "max_diff": 2.1217945772775342e+45,
+      "mean_diff": 2.0339567574078264e+43
+    }
+  ]
+}

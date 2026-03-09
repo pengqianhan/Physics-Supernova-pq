@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.8389744588845565,
+    "Mean Difference": 0.23022319917155662,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_2_0>",
+      "<iter_image_2_1>",
+      "<iter_image_2_2>"
+    ],
+    "Summary": "The simulation exhibits significant **amplitude decay** and **phase lead** compared to the ground truth. While the hybrid structure correctly captures the bouncing ball dynamics, the energy dissipation parameters are overestimated, leading to a `max_diff` of ~1.84.\n\n**Specific Issues:**\n1.  **Excessive Continuous Damping:** The simulated peaks in $x_1$ decrease"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_2_0>",
+      "max_diff": 1.8081838194450048,
+      "mean_diff": 0.22849466991974185
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_2_1>",
+      "max_diff": 1.8437237563650477,
+      "mean_diff": 0.24155778162885333
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_2_2>",
+      "max_diff": 1.8650158008436168,
+      "mean_diff": 0.22061714596607465
+    }
+  ]
+}

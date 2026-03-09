@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.6899591579158713,
+    "Mean Difference": 0.29202906621166297,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_9_0>",
+      "<iter_image_9_1>",
+      "<iter_image_9_2>"
+    ],
+    "Summary": "The simulation captures the general trend but exhibits significant cumulative error, particularly in **$x_1$ and $x_3$**, which show a consistent **positive slope bias** (overshooting ground truth"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_9_0>",
+      "max_diff": 2.0463834950964284,
+      "mean_diff": 0.35467214828491295
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_9_1>",
+      "max_diff": 1.3389899978245385,
+      "mean_diff": 0.23249416186082072
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_9_2>",
+      "max_diff": 1.6845039808266462,
+      "mean_diff": 0.2889208884892552
+    }
+  ]
+}

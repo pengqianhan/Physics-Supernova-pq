@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.9115767234251402,
+    "Mean Difference": 0.7171204520134234,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_26_0>",
+      "<iter_image_26_1>",
+      "<iter_image_26_2>"
+    ],
+    "Summary": "0.01}$.\n    2.  **Refine Guards:** The ground truth peaks are noisy and often fall short of $0.67$. Lowering the threshold or adding a"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_26_0>",
+      "max_diff": 1.9121210050178599,
+      "mean_diff": 0.721203652686362
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_26_1>",
+      "max_diff": 1.9141515707392247,
+      "mean_diff": 0.7256741600440463
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_26_2>",
+      "max_diff": 1.908457594518336,
+      "mean_diff": 0.704483543309862
+    }
+  ]
+}

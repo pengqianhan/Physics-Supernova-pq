@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.9862161315765933,
+    "Mean Difference": 0.22210852612301898,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_24_0>",
+      "<iter_image_24_1>",
+      "<iter_image_24_2>"
+    ],
+    "Summary": "The HA model shows poor fit (mean_diff: 0.22) and structural divergence. The simulation exhibits an artificial high-frequency sawtooth pattern starting at $t \\approx 7.5"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_24_0>",
+      "max_diff": 0.9943287765596481,
+      "mean_diff": 0.2140680968453348
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_24_1>",
+      "max_diff": 0.9647943653412743,
+      "mean_diff": 0.2172250466385448
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_24_2>",
+      "max_diff": 0.9995252528288572,
+      "mean_diff": 0.23503243488517733
+    }
+  ]
+}

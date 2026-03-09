@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.6260532912471986,
+    "Mean Difference": 0.3520305701586399,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_7_0>",
+      "<iter_image_7_1>",
+      "<iter_image_7_2>"
+    ],
+    "Summary": "3$ to reduce steady-state tracking error.\n\n    *   *Draft:* The HA model exhibits significant divergence in $x_1$ and $x_3$, underestimating the"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_7_0>",
+      "max_diff": 1.6776531618628328,
+      "mean_diff": 0.31232883690919205
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_7_1>",
+      "max_diff": 1.4819055441493298,
+      "mean_diff": 0.3692463522261228
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_7_2>",
+      "max_diff": 1.718601167729433,
+      "mean_diff": 0.37451652134060487
+    }
+  ]
+}

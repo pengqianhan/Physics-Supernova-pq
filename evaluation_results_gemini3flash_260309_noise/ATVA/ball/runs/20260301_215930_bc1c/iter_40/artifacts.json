@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.8065884437146746,
+    "Mean Difference": 0.13995381580781882,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_40_0>",
+      "<iter_image_40_1>",
+      "<iter_image_40_2>"
+    ],
+    "Summary": "The HA model demonstrates moderate fit quality (Mean Diff: 0.14), but suffers from significant cumulative **phase lag** and **amplitude overestimation** as time progresses.\n\n**Key Issues:**"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_40_0>",
+      "max_diff": 1.8918322430848034,
+      "mean_diff": 0.13711212562932798
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_40_1>",
+      "max_diff": 1.7395457625134396,
+      "mean_diff": 0.10250605066904568
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_40_2>",
+      "max_diff": 1.788387325545781,
+      "mean_diff": 0.1802432711250828
+    }
+  ]
+}

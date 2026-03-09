@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.5753926038835149,
+    "Mean Difference": 0.1030371355010198,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_23_0>",
+      "<iter_image_23_1>",
+      "<iter_image_23_2>"
+    ],
+    "Summary": "_5, x_8, x_9$).\n        **Visual Analysis:**\n        1. **Slope Mismatch:** In Mode 1, constant derivatives for $x_8$"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_23_0>",
+      "max_diff": 0.5174565079875035,
+      "mean_diff": 0.0724536644447392
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_23_1>",
+      "max_diff": 0.450752333286671,
+      "mean_diff": 0.07570883493369807
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_23_2>",
+      "max_diff": 0.7579689703763701,
+      "mean_diff": 0.16094890712462215
+    }
+  ]
+}

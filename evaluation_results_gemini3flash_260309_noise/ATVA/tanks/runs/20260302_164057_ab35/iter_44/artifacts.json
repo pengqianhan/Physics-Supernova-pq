@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.143594745331692,
+    "Mean Difference": 0.23049187071543442,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_44_0>",
+      "<iter_image_44_1>",
+      "<iter_image_44_2>"
+    ],
+    "Summary": "The identification results show poor fit quality (max_diff: 1.14), characterized by significant phase lag and a failure to capture the high-frequency switching behavior seen in the ground truth. The"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_44_0>",
+      "max_diff": 1.1884976407011976,
+      "mean_diff": 0.23553348569001717
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_44_1>",
+      "max_diff": 1.3588682781388275,
+      "mean_diff": 0.24560810653328366
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_44_2>",
+      "max_diff": 0.8834183171550507,
+      "mean_diff": 0.2103340199230024
+    }
+  ]
+}

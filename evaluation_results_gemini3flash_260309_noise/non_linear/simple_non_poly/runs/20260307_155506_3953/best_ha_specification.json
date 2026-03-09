@@ -1,0 +1,36 @@
+{
+  "automaton": {
+    "var": "x1",
+    "input": "",
+    "mode": [
+      {
+        "id": 1,
+        "eq": "x1[2] = -5.0 * x1[1] + 0.625"
+      },
+      {
+        "id": 2,
+        "eq": "x1[2] = -5.0 * x1[1] - 2.725"
+      }
+    ],
+    "edge": [
+      {
+        "direction": "1 -> 2",
+        "condition": "x1 >= 10.0",
+        "reset": {
+          "x1": [
+            "x1[0]-1.0"
+          ]
+        }
+      },
+      {
+        "direction": "2 -> 1",
+        "condition": "x1 <= 3.0"
+      }
+    ]
+  },
+  "config": {
+    "dt": 0.01,
+    "total_time": 60.0,
+    "order": 2
+  }
+}

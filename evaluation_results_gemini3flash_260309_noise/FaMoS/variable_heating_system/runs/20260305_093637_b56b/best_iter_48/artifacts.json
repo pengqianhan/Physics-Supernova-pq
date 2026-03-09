@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.37209299704447174,
+    "Mean Difference": 0.12064586942441642,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_48_0>",
+      "<iter_image_48_1>",
+      "<iter_image_48_2>"
+    ],
+    "Summary": "The evaluation shows a significant failure in capturing long-term system behavior. While initial transients are roughly followed, the simulation **fails to sustain the limit cycle** present in the ground truth.\n\n**Key Issues:**\n1.  **Convergence to Fixed Point:** In all three trials, the simulated trajectories ($x_1, x_2$) quickly damp out and converge to a steady state ($x_1 \\approx 16.3, x_2 \\approx 13.2$).\n2.  **Guard Omission:** Because the dynamics are overly stable, the state never reaches the guard conditions ($x_1 \\geq 24.8$ or $x_1 \\leq 10.2$). Consequently, the automaton remains trapped in a single mode, missing all subsequent oscillations.\n3.  **Dynamics Mismatch:** The identified affine terms and coefficients create an attractor within the interior of the state space rather than driving the state toward the switching boundaries.\n\n**Suggestions for Improvement:**\n*   **Re-identify Mode Dynamics:** Re-fit the $A$ and $B$"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_48_0>",
+      "max_diff": 0.3488355147614391,
+      "mean_diff": 0.10970161960812456
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_48_1>",
+      "max_diff": 0.41275610852759337,
+      "mean_diff": 0.13272683612781366
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_48_2>",
+      "max_diff": 0.3546873678443828,
+      "mean_diff": 0.11950915253731104
+    }
+  ]
+}

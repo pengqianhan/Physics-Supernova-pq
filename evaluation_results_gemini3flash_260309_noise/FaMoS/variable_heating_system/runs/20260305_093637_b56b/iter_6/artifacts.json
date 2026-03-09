@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.48610321513883364,
+    "Mean Difference": 0.15074244693034314,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_6_0>",
+      "<iter_image_6_1>",
+      "<iter_image_6_2>"
+    ],
+    "Summary": "The HA fails to capture the limit cycle behavior of the ground truth. While initial tracking is fair (mean_diff \u2248 0.15), the simulation quickly diverges from the periodic oscillation and settles"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_6_0>",
+      "max_diff": 0.5364948612616739,
+      "mean_diff": 0.1667549713176856
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_6_1>",
+      "max_diff": 0.46498886230421066,
+      "mean_diff": 0.14795996206786466
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_6_2>",
+      "max_diff": 0.45682592185061655,
+      "mean_diff": 0.13751240740547913
+    }
+  ]
+}

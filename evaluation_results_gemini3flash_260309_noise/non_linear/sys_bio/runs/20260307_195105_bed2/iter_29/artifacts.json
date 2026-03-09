@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.775414656399358,
+    "Mean Difference": 0.1678723750940427,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_29_0>",
+      "<iter_image_29_1>",
+      "<iter_image_29_2>"
+    ],
+    "Summary": "The evaluation shows significant **steady-state divergence** and **mode-reachability issues**. While the initial transients (0\u20130.25s) show moderate alignment, the simulation prematurely"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_29_0>",
+      "max_diff": 0.7417538297934267,
+      "mean_diff": 0.14995466083797757
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_29_1>",
+      "max_diff": 0.7907684362433158,
+      "mean_diff": 0.158321629029531
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_29_2>",
+      "max_diff": 0.7937217031613315,
+      "mean_diff": 0.19534083541461955
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.494943867950525,
+    "Mean Difference": 0.49417440431819143,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_8_0>",
+      "<iter_image_8_1>",
+      "<iter_image_8_2>"
+    ],
+    "Summary": "The identification shows a significant structural mismatch. While the mean error is low, the simulation fails to capture the fundamental dynamics and switching logic.\n\n**Analysis:**\n1.  **Initial Instability:** The"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_8_0>",
+      "max_diff": 1.4833256573611058,
+      "mean_diff": 0.49390498352143664
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_8_1>",
+      "max_diff": 1.5293606296950235,
+      "mean_diff": 0.499504328297271
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_8_2>",
+      "max_diff": 1.4721453167954457,
+      "mean_diff": 0.48911390113586656
+    }
+  ]
+}

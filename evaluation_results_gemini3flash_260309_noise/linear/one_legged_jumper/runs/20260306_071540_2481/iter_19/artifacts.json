@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.6506704101413819,
+    "Mean Difference": 0.07882252704415722,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_19_0>",
+      "<iter_image_19_1>",
+      "<iter_image_19_2>"
+    ],
+    "Summary": "The HA demonstrates a high-quality fit (**Mean Diff: 0.079**), successfully capturing the hybrid dynamics across the 5s horizon. While early iterations showed significant divergence in $x"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_19_0>",
+      "max_diff": 1.383646557317404,
+      "mean_diff": 0.15453296576753045
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_19_1>",
+      "max_diff": 0.2558652070694145,
+      "mean_diff": 0.04637115992309312
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_19_2>",
+      "max_diff": 0.31249946603732714,
+      "mean_diff": 0.03556345544184813
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.0230769527209826,
+    "Mean Difference": 0.2116230724733481,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_21_0>",
+      "<iter_image_21_1>",
+      "<iter_image_21_2>"
+    ],
+    "Summary": "The evaluation shows a significant fit error (**max_diff: 1.023**), primarily due to structural and parameter mismatches in the HA specification.\n\n**Key Issues:**\n1"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_21_0>",
+      "max_diff": 1.0064665725398971,
+      "mean_diff": 0.2130730507291893
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_21_1>",
+      "max_diff": 1.0066173597859198,
+      "mean_diff": 0.20287473682627666
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_21_2>",
+      "max_diff": 1.0561469258371308,
+      "mean_diff": 0.2189214298645784
+    }
+  ]
+}

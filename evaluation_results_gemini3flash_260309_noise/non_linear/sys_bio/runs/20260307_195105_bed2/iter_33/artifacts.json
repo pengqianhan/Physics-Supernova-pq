@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.5469930224463827,
+    "Mean Difference": 0.10634329343303424,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_33_0>",
+      "<iter_image_33_1>",
+      "<iter_image_33_2>"
+    ],
+    "Summary": "The HA model achieves a mean difference of 0.106, but visual analysis reveals significant state divergence following the mode transition at $t \\approx 1.4s$. While the guard condition"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_33_0>",
+      "max_diff": 0.45142759278476113,
+      "mean_diff": 0.09288535994276817
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_33_1>",
+      "max_diff": 0.47009645487884255,
+      "mean_diff": 0.09671082381332961
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_33_2>",
+      "max_diff": 0.7194550196755444,
+      "mean_diff": 0.12943369654300493
+    }
+  ]
+}

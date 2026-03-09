@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.9899012430335103,
+    "Mean Difference": 0.2713976685297023,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_6_0>",
+      "<iter_image_6_1>",
+      "<iter_image_6_2>"
+    ],
+    "Summary": "**Evaluation Summary:**\nThe identification shows a critical failure to capture the system's growth dynamics and mode transitions. While ground truth trajectories for $x_5, x_8$, and $x"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_6_0>",
+      "max_diff": 0.9910569997360547,
+      "mean_diff": 0.2689778050549292
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_6_1>",
+      "max_diff": 0.971652082016014,
+      "mean_diff": 0.2582229594409377
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_6_2>",
+      "max_diff": 1.0069946473484623,
+      "mean_diff": 0.2869922410932401
+    }
+  ]
+}

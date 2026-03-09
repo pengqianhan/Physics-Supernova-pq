@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 54.160822199035586,
+    "Mean Difference": 7.7611237200064815,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_9_0>",
+      "<iter_image_9_1>",
+      "<iter_image_9_2>"
+    ],
+    "Summary": "The identification shows **catastrophic divergence** starting at $t \\approx 40$. While the ground truth remains near zero with a discrete reset at $t \\approx 88$, the"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_9_0>",
+      "max_diff": 53.43361374499266,
+      "mean_diff": 7.643791661357524
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_9_1>",
+      "max_diff": 59.29102765141909,
+      "mean_diff": 8.53139643171694
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_9_2>",
+      "max_diff": 49.757825200695,
+      "mean_diff": 7.108183066944981
+    }
+  ]
+}

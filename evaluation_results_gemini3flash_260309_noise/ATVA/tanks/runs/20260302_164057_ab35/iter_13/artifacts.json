@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.9389913540952174,
+    "Mean Difference": 0.19320467650462514,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_13_0>",
+      "<iter_image_13_1>",
+      "<iter_image_13_2>"
+    ],
+    "Summary": "The HA model exhibits poor fit quality, failing to capture the initial transient and steady-state oscillations. Key issues include significant amplitude errors in $x_1$ and a high-frequency \"saw"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_13_0>",
+      "max_diff": 1.1162919840966155,
+      "mean_diff": 0.21621172177479897
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_13_1>",
+      "max_diff": 1.0075113679978693,
+      "mean_diff": 0.20342423606972493
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_13_2>",
+      "max_diff": 0.6931707101911677,
+      "mean_diff": 0.15997807166935155
+    }
+  ]
+}

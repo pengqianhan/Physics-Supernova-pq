@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.8734966819688375,
+    "Mean Difference": 0.6250222553581722,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_33_0>",
+      "<iter_image_33_1>",
+      "<iter_image_33_2>"
+    ],
+    "Summary": "The simulation exhibits a severe **frequency mismatch**, oscillating significantly faster than the ground truth. This results in a massive phase lead and high error metrics (`mean_diff: 0.625`).\n\n**Key Issues:**\n1.  **Over-aggressive Dynamics:** The coefficients in the mode equations (e.g., -11.0, -13.0) are too large. The resulting state derivatives cause the system to hit guard conditions prematurely.\n2"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_33_0>",
+      "max_diff": 1.878812878910365,
+      "mean_diff": 0.6260472051574646
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_33_1>",
+      "max_diff": 1.8442957858256832,
+      "mean_diff": 0.6191004444647648
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_33_2>",
+      "max_diff": 1.8973813811704647,
+      "mean_diff": 0.6299191164522875
+    }
+  ]
+}

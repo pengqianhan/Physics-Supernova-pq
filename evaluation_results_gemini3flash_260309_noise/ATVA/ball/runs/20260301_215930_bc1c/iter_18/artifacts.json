@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.8722472766558147,
+    "Mean Difference": 0.19576822959642018,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_18_0>",
+      "<iter_image_18_1>",
+      "<iter_image_18_2>"
+    ],
+    "Summary": "The HA model captures the qualitative bouncing behavior but exhibits significant **phase lead** and **amplitude decay** errors (max_diff: 1.87). The simulated peaks are consistently lower and occur earlier than the ground truth, indicating inaccuracies in both the continuous dynamics and the discrete reset logic.\n\n**Key Issues:**\n1.  **Gravity Mismatch:** The acceleration $x_2' = -9.52$ appears slightly too high (in magnitude) or inconsistent with the ground truth, contributing to the timing drift.\n2.  **Restitution Error:** The coefficient of restitution (0.86) is too low, causing the simulated energy to dissipate faster than the ground truth.\n3.  **Guard Delay:** The condition `x1 < 0` allows state penetration before the reset, introducing numerical chattering and phase shifts.\n\n**Suggested Improvements:**\n*   **Mode 1:** Re-estimate the constant acceleration. Try values closer to $-9.81$ or perform a least-squares fit on the $x_2$ slopes.\n*   **Edge Reset:** Increase the restitution coefficient (e.g., to $-0.90$ or $-0.92$) to better match the peak heights of $x_1$.\n*   **Edge Guard:** Change the condition to `x1 <= 0` to trigger the"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_18_0>",
+      "max_diff": 1.8442148193180794,
+      "mean_diff": 0.19746921482684368
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_18_1>",
+      "max_diff": 1.874557270901785,
+      "mean_diff": 0.20741062373717994
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_18_2>",
+      "max_diff": 1.8979697397475799,
+      "mean_diff": 0.18242485022523697
+    }
+  ]
+}

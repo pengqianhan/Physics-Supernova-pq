@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.6961995093891705,
+    "Mean Difference": 0.06878508222313912,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_17_0>",
+      "<iter_image_17_1>",
+      "<iter_image_17_2>"
+    ],
+    "Summary": "The system identification shows a strong overall fit (mean_diff $\\approx$ 0.069), but a clear transient discrepancy exists in $x_4$ during the first 4 seconds."
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_17_0>",
+      "max_diff": 0.7200349502499451,
+      "mean_diff": 0.06874868894403341
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_17_1>",
+      "max_diff": 0.7479587583073928,
+      "mean_diff": 0.07226232771597672
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_17_2>",
+      "max_diff": 0.6206048196101739,
+      "mean_diff": 0.06534423000940723
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.2979183225154358,
+    "Mean Difference": 0.37978699364001556,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_43_0>",
+      "<iter_image_43_1>",
+      "<iter_image_43_2>"
+    ],
+    "Summary": "200 words? No, it's short.\n\n    *   *Refining for \"Expert\" tone:*\n        The model fails to capture the qualitative shift to instability. The primary"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_43_0>",
+      "max_diff": 1.0177174210325455,
+      "mean_diff": 0.11544897128317362
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_43_1>",
+      "max_diff": 1.069750131981709,
+      "mean_diff": 0.15560871223276063
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_43_2>",
+      "max_diff": 1.806287414532053,
+      "mean_diff": 0.8683032974041125
+    }
+  ]
+}

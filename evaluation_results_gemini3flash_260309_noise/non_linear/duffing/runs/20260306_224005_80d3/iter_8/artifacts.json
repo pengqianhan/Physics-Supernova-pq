@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 13.612121691364884,
+    "Mean Difference": 3.321082729499837,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_8_0>",
+      "<iter_image_8_1>",
+      "<iter_image_8_2>"
+    ],
+    "Summary": "The simulation exhibits **severe instability and frequency mismatch**, leading to exponential divergence. While the ground truth shows a bounded, low-frequency oscillation, the simulated trajectory blows up, reaching amplitudes >75 within 10 seconds.\n\n**Key Issues:**\n1.  **Unstable Dynamics:** The positive coefficient for the first derivative ($0.8364 \\cdot x_1[1]$) introduces negative damping, causing the observed exponential growth.\n2.  **Frequency Error:** The linear stiffness coefficient ($-1193.0946$) is significantly overestimated, resulting in a much higher oscillation frequency than the ground truth.\n3.  **Large Bias:**"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_8_0>",
+      "max_diff": 17.880589164280266,
+      "mean_diff": 3.7604986580531157
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_8_1>",
+      "max_diff": 11.124506228753454,
+      "mean_diff": 3.057382819243662
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_8_2>",
+      "max_diff": 11.83126968106093,
+      "mean_diff": 3.145366711202734
+    }
+  ]
+}

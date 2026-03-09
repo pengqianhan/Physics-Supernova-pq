@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 7.170671635933161,
+    "Mean Difference": 1.0860320190523087,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_2_0>",
+      "<iter_image_2_1>",
+      "<iter_image_2_2>"
+    ],
+    "Summary": "The HA captures **x1** dynamics (triangle wave) accurately, confirming that the switching logic (guards at 0.0 and 5.0) and constant rates ($\\pm"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_2_0>",
+      "max_diff": 4.907542350570038,
+      "mean_diff": 0.9614975752861789
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_2_1>",
+      "max_diff": 15.12094377070012,
+      "mean_diff": 1.9695570429794533
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_2_2>",
+      "max_diff": 1.483528786529326,
+      "mean_diff": 0.3270414388912938
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.5912082914494735,
+    "Mean Difference": 0.1964854346252317,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_49_0>",
+      "<iter_image_49_1>",
+      "<iter_image_49_2>"
+    ],
+    "Summary": "The hybrid automaton (HA) captures the general switching structure but suffers from significant **phase lag** and **amplitude divergence** in $x_2$.\n\n**Analysis:**\n1.  **Phase Lag:** The simulated trajectories consistently trail the ground truth. This cumulative timing error indicates that the discrete-time gradients (coefficients in the `eq` fields) are too small, leading to a lower frequency of oscillation.\n2.  **$x_2$ Divergence:** In Mode 2 (falling phase"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_49_0>",
+      "max_diff": 0.5608300227523806,
+      "mean_diff": 0.19286808767048913
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_49_1>",
+      "max_diff": 0.591544979555653,
+      "mean_diff": 0.20526009736466047
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_49_2>",
+      "max_diff": 0.6212498720403871,
+      "mean_diff": 0.19132811884054546
+    }
+  ]
+}

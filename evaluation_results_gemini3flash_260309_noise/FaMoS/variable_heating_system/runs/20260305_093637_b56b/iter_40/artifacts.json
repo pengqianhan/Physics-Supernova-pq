@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.3909112357503622,
+    "Mean Difference": 0.1429317947326541,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_40_0>",
+      "<iter_image_40_1>",
+      "<iter_image_40_2>"
+    ],
+    "Summary": "The HA model demonstrates a reasonable mean error (0.14) but suffers from significant **accumulated phase lag** and **switching time misalignment**, as evidenced by the divergent trajectories in the first two plots.\n\n**Key Issues:**\n1.  **Phase Drift:** The simulated frequency is lower than the ground truth. The linear coefficients in Mode 1 (rising phase) produce a slope that is too shallow, while Mode 2 (falling phase) lacks sufficient decay speed.\n2.  **Rigid Guard Conditions:** The fixed thresholds ($x_1 \\geq 25.0, x_1 \\leq 10.0$) do not perfectly align with the ground truth"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_40_0>",
+      "max_diff": 0.35106034016333354,
+      "mean_diff": 0.13141061548173946
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_40_1>",
+      "max_diff": 0.5949214853596934,
+      "mean_diff": 0.22362086190913538
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_40_2>",
+      "max_diff": 0.22675188172805982,
+      "mean_diff": 0.07376390680708747
+    }
+  ]
+}

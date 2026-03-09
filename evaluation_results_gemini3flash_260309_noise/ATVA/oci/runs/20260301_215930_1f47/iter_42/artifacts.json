@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.7257632301121006,
+    "Mean Difference": 0.17535356806507432,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_42_0>",
+      "<iter_image_42_1>",
+      "<iter_image_42_2>"
+    ],
+    "Summary": "The simulation captures the hybrid oscillatory behavior but suffers from significant **phase lag** that accumulates over time, leading to a high `max_diff` (0.726). While the amplitude is generally correct, the simulated frequency is lower than the ground truth, causing the trajectories to drift out of sync.\n\n**Specific Issues:**\n1.  **Phase Drift:** The simulated state reaches the switching thresholds later than the ground truth in every cycle.\n2.  **Mode Dynamics:** The discrete-time coefficients in"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_42_0>",
+      "max_diff": 0.7139483198845957,
+      "mean_diff": 0.16434824529890424
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_42_1>",
+      "max_diff": 0.5652252465796144,
+      "mean_diff": 0.12141678433211262
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_42_2>",
+      "max_diff": 0.8981161238720916,
+      "mean_diff": 0.24029567456420609
+    }
+  ]
+}

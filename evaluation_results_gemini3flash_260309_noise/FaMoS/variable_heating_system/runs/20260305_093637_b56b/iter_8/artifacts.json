@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.587841602708533,
+    "Mean Difference": 0.16536494146274996,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_8_0>",
+      "<iter_image_8_1>",
+      "<iter_image_8_2>"
+    ],
+    "Summary": "The HA specification captures the hybrid topology but suffers from a consistent **frequency mismatch**, where the simulation oscillates faster than the ground truth. While `mean_diff` is low (0.16"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_8_0>",
+      "max_diff": 0.5997984902167718,
+      "mean_diff": 0.16719746731037297
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_8_1>",
+      "max_diff": 0.5794472367626936,
+      "mean_diff": 0.16240967037028436
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_8_2>",
+      "max_diff": 0.5842790811461338,
+      "mean_diff": 0.16648768670759262
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+Hybrid Automaton Evaluation Results
+================================================================================
+Timestamp: 20260307_085546
+Iteration: 8
+Run ID: 20260307_010809_8b40
+Number of Ground Truth Files: 3
+
+Aggregated Metrics:
+  Mean Max Diff: 0.5286607907365709
+  Mean Mean Diff: 0.14081958744798853
+
+Per-File Metrics:
+
+  [0] ground_truth_0.npz:
+      TC (Change-Point Error):0.120000 seconds
+  Max Difference:0.513867
+  Mean Difference:0.139109
+
+  [1] ground_truth_1.npz:
+      TC (Change-Point Error):0.270000 seconds
+  Max Difference:0.523128
+  Mean Difference:0.137578
+
+  [2] ground_truth_2.npz:
+      TC (Change-Point Error):0.030000 seconds
+  Max Difference:0.548988
+  Mean Difference:0.145771
+
+HA Specification:
+{
+  "automaton": {
+    "var": "x1, x2, x3, x4",
+    "input": "",
+    "mode": [
+      {
+        "id": 1,
+        "eq": "x1[1] = -0.25 * x1[0] + x2[0], x2[1] = -0.18 * x2[0], x3[1] = 0, x4[1] = -0.28 * x4[0] + 0.56 * x3[0] + 35"
+      },
+      {
+        "id": 2,
+        "eq": "x1[1] = -0.22 * x1[0], x2[1] = -0.18 * x2[0], x3[1] = 0, x4[1] = -0.12 * x4[0] + 0.24 * x3[0]"
+      }
+    ],
+    "edge": [
+      {
+        "direction": "1 -> 2",
+        "condition": "x4 >= 2300"
+      }
+    ]
+  },
+  "config": {
+    "dt": 0.01,
+    "total_time": 10.0,
+    "order": 1
+  }
+}
+
+Experiment Hyperparameters
+============================================================
+
+--- Manager Agent ---
+Model: gemini/gemini-3-flash-preview
+Type: CodeAgent
+
+--- Managed Agents ---
+Count: 1
+Agent Names: data_analysis_expert
+Model: gemini/gemini-3-flash-preview
+
+--- Tools ---
+Tools List: hybrid_automaton_image_analysis
+Image Tool Model: gemini/gemini-3-flash-preview
+Review Tool Model: gemini/gemini-flash-lite-latest
+Summarize Tool Model: gemini/gemini-flash-lite-latest
+
+--- Iteration Configuration ---
+Max Iterations: 50
+Feedback Top-K: 50
+Target Error: 0.1
+No Improvement Patience: 20
+
+--- Data Configuration ---
+Input Data Path: data_all/non_linear/lander
+System Name: 
+Num Variables: 4
+Num Inputs: 0
+
+--- Other ---
+Use JSON Schema: True
+Use Structured Output: True
+Structured Output Model: gemini/gemini-3-flash-preview
+============================================================
+

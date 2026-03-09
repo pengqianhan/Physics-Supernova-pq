@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.39386676256899866,
+    "Mean Difference": 0.10647431790564586,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_9_0>",
+      "<iter_image_9_1>",
+      "<iter_image_9_2>"
+    ],
+    "Summary": "The identification captures the hybrid structure but exhibits significant **phase lag** and **slope mismatch**, leading to a `max_diff` of 0.39.\n\n**Key Issues:**\n1."
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_9_0>",
+      "max_diff": 0.3408461825589451,
+      "mean_diff": 0.07500175508466371
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_9_1>",
+      "max_diff": 0.16623464259982523,
+      "mean_diff": 0.051971091602537704
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_9_2>",
+      "max_diff": 0.6745194625482256,
+      "mean_diff": 0.19245010702973614
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 568263.869499531,
+    "Mean Difference": 42518.66056691073,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_42_0>",
+      "<iter_image_42_1>",
+      "<iter_image_42_2>"
+    ],
+    "Summary": "**Evaluation Summary:**\n\nThe identification is **failed**, characterized by catastrophic exponential divergence. While the ground truth remains stable near zero, the simulated trajectory diverges to $-5 \\times 10^7$ by $t=20$s. \n\n**Key Issues:**\n1.  **System Instability:** Mode 2 ($+0.2 \\cdot x1[1]$) and Mode 3 ($+0.45 \\cdot x1[0]$) are inherently unstable. The positive damping/stiffness coefficients create a runaway positive feedback loop.\n2.  **Guard Mis-specification:** The transition $1 \\to 2$ triggers if $x1 < 5.0$. Since the ground truth is near zero, the system immediately enters the unstable Mode 2.\n3.  **Magnitude Mismatch:** The metrics (`max_diff` $\\approx 5.6 \\times 10^5$) confirm the model fails to capture the quiescent nature of the target system.\n\n**Concrete Suggestions:**\n*   **Mode Dynamics:** Re-estimate coefficients to ensure dissipative dynamics (negative coefficients for $x1[1]$ and $x1[0]$) in all modes to prevent divergence.\n*   **Guard Refinement:** Narrow the guards for $1 \\to 2$. If the system is stable at zero, $x1 < 5.0$ is too permissive.\n*   **Bias Terms:** Re-evaluate the constant offsets (e.g., $56.548"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_42_0>",
+      "max_diff": 30126.621413511497,
+      "mean_diff": 2254.112974997689
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_42_1>",
+      "max_diff": 120276.04429132362,
+      "mean_diff": 8999.292097616004
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_42_2>",
+      "max_diff": 1554388.942793758,
+      "mean_diff": 116302.5766281185
+    }
+  ]
+}

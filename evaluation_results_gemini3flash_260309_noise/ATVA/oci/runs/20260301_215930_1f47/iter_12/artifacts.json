@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.887460777799789,
+    "Mean Difference": 0.6457755592241745,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_12_0>",
+      "<iter_image_12_1>",
+      "<iter_image_12_2>"
+    ],
+    "Summary": "The evaluation reveals a **severe frequency mismatch** and poor fit quality (`mean_diff: 0.646`). While the ground truth exhibits slow, smooth oscillations (period $\\approx 3.5s$), the simulated trajectory oscillates at a much higher frequency, hitting guard conditions prematurely.\n\n**Main Issues:**\n1.  **Dynamics Over-estimation:** The discrete-time coefficients in the HA modes are too aggressive for the $dt=0.01$ timestep. Large negative coefficients (e.g., $-8.44$ for $x_2$) create high-gain feedback, causing the rapid \"sawtooth\" behavior seen in the plot.\n2.  **Phase and Frequency Lead:** The simulated system reaches the switching thresholds ($x_1 = \\pm 0.66$) significantly faster than the ground truth, indicating the linear approximations for $\\dot{x}$ are scaled incorrectly."
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_12_0>",
+      "max_diff": 1.9076956441236006,
+      "mean_diff": 0.6463423116748892
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_12_1>",
+      "max_diff": 1.8605308727629448,
+      "mean_diff": 0.6401421634760721
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_12_2>",
+      "max_diff": 1.8941558165128216,
+      "mean_diff": 0.6508422025215621
+    }
+  ]
+}

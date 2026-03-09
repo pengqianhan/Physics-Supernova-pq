@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.40961448054228233,
+    "Mean Difference": 0.03198355134613013,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_1_0>",
+      "<iter_image_1_1>",
+      "<iter_image_1_2>"
+    ],
+    "Summary": "The identification shows a strong overall fit (mean diff ~0.03), but significant transient errors (max diff ~0.41) occur at mode transitions. \n\n**Analysis:**\n1.  **$x_1$ Dynamics:** The piecewise linear ramps are well-captured, though a slight phase lag is visible at the peaks ($t \\approx 12s$), suggesting the guard conditions or the $x_1$ rates are marginally misaligned with the ground truth sampling.\n2.  **$x_2"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_1_0>",
+      "max_diff": 0.4312454743439073,
+      "mean_diff": 0.02874762467977061
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_1_1>",
+      "max_diff": 0.3101421488993545,
+      "mean_diff": 0.03775158526882216
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_1_2>",
+      "max_diff": 0.48745581838358515,
+      "mean_diff": 0.02945144408979763
+    }
+  ]
+}

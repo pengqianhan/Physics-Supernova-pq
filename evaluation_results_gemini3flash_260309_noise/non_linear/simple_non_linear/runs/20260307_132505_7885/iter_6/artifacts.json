@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 2.878089215830912,
+    "Mean Difference": 1.9312503254068127,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_6_0>",
+      "<iter_image_6_1>",
+      "<iter_image_6_2>"
+    ],
+    "Summary": "The simulation exhibits **catastrophic divergence** after the first mode transition ($t \\approx 0.5s$). While the initial rise in Mode 1 is captured, the system fails"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_6_0>",
+      "max_diff": 3.0126800876717965,
+      "mean_diff": 2.0392516595194072
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_6_1>",
+      "max_diff": 2.799896393820062,
+      "mean_diff": 1.8937686214713423
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_6_2>",
+      "max_diff": 2.8216911660008783,
+      "mean_diff": 1.8607306952296887
+    }
+  ]
+}

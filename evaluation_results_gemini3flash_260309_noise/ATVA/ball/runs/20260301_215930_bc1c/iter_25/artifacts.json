@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.852606022165607,
+    "Mean Difference": 0.19867320434665095,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_25_0>",
+      "<iter_image_25_1>",
+      "<iter_image_25_2>"
+    ],
+    "Summary": "The identification captures the bouncing ball topology but exhibits significant **cumulative phase lag** and **amplitude mismatch**. With a `max_diff` of 1.85, the simulation diverges temporally from the ground truth.\n\n**Key Issues:**\n1.  **Phase Drift:** The simulated impacts occur progressively earlier than the ground truth. This suggests the continuous acceleration (gravity + damping) is slightly overestimated.\n2.  **Amplitude Decay:** Simulated peaks for $x_1$ and $x_2$ are consistently lower than the ground truth, indicating the damping coefficient ($0.2633$) is too high or the coefficient of restitution ($0.9406$) is too low.\n3.  **Discretization Errors:** At $dt=0.01$, the first-order Euler approximation in the mode equation contributes to the integration drift.\n\n**Concrete Suggestions:**\n*   **Mode Dynamics:** Refine the $x_2$ derivative. Try reducing the damping term (e.g., to $-0.15 \\cdot x_2$) and adjusting the constant to match $g \\approx 9.81$.\n*   **Edge Reset:** Increase the coefficient of restitution in the"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_25_0>",
+      "max_diff": 1.8821228335303424,
+      "mean_diff": 0.19749978824803072
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_25_1>",
+      "max_diff": 1.8279506830894883,
+      "mean_diff": 0.20731290116741874
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_25_2>",
+      "max_diff": 1.8477445498769913,
+      "mean_diff": 0.19120692362450348
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.37756922604684257,
+    "Mean Difference": 0.1153208722992247,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_7_0>",
+      "<iter_image_7_1>",
+      "<iter_image_7_2>"
+    ],
+    "Summary": "The HA model exhibits significant **mode switch divergence** and **state trajectory misalignment**. The simulation fails to capture the ground truth's switching frequency and peak magnitudes, particularly in the later stages of the 2"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_7_0>",
+      "max_diff": 0.7278475736540372,
+      "mean_diff": 0.19183540174183217
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_7_1>",
+      "max_diff": 0.19096926276454798,
+      "mean_diff": 0.07481609137935166
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_7_2>",
+      "max_diff": 0.2138908417219425,
+      "mean_diff": 0.07931112377649026
+    }
+  ]
+}

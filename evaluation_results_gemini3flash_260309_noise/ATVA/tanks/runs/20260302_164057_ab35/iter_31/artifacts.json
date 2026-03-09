@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.8139216079499697,
+    "Mean Difference": 0.19471156184903063,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_31_0>",
+      "<iter_image_31_1>",
+      "<iter_image_31_2>"
+    ],
+    "Summary": "The HA model demonstrates poor fit (Max Diff: 0.81), characterized by significant phase lag and frequency divergence. The simulation fails to capture the initial transient oscillations and settles into a high"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_31_0>",
+      "max_diff": 0.8735424941963218,
+      "mean_diff": 0.21007758382539354
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_31_1>",
+      "max_diff": 0.8622276278412699,
+      "mean_diff": 0.19088381644383645
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_31_2>",
+      "max_diff": 0.7059947018123174,
+      "mean_diff": 0.18317328527786186
+    }
+  ]
+}

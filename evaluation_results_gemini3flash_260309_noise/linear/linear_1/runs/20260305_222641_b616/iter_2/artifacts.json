@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 445254.7264513283,
+    "Mean Difference": 12854.152386706757,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_2_0>",
+      "<iter_image_2_1>",
+      "<iter_image_2_2>"
+    ],
+    "Summary": "The HA model exhibits poor fit quality, characterized by significant phase lag (Plot 1) and catastrophic divergence (Plot 2). The massive `max_diff` ($4.45 \\times"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_2_0>",
+      "max_diff": 1.4278393206961366,
+      "mean_diff": 0.2873883204736977
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_2_1>",
+      "max_diff": 1335761.8271009163,
+      "mean_diff": 38561.850135349
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_2_2>",
+      "max_diff": 0.9244137481154523,
+      "mean_diff": 0.319636450795898
+    }
+  ]
+}

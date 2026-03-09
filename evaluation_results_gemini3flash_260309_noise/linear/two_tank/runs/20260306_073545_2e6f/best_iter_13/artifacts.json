@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.238060338335191,
+    "Mean Difference": 0.0708726382678208,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_13_0>",
+      "<iter_image_13_1>",
+      "<iter_image_13_2>"
+    ],
+    "Summary": "The evaluation metrics (mean diff ~0.07) mask significant structural mismatches. While the system captures the piecewise linear nature, it suffers from **slope inaccuracies** and **incorrect switching logic**.\n\n**Key Issues:**\n1.  **Slope Mismatch:** Mode 1 ($\\dot{x}_1 = 8.0$) is too aggressive; ground truth suggests a slope closer to"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_13_0>",
+      "max_diff": 0.45543836966041856,
+      "mean_diff": 0.1067019663386667
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_13_1>",
+      "max_diff": 0.16339498047610243,
+      "mean_diff": 0.07327380805716292
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_13_2>",
+      "max_diff": 0.09534766486905198,
+      "mean_diff": 0.03264214040763278
+    }
+  ]
+}

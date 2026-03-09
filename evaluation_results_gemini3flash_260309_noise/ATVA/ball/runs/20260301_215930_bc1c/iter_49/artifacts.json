@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.8080119825412453,
+    "Mean Difference": 0.14072923265309567,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_49_0>",
+      "<iter_image_49_1>",
+      "<iter_image_49_2>"
+    ],
+    "Summary": "The HA captures the fundamental bouncing dynamics but exhibits significant **cumulative phase lag** and **amplitude divergence**. While the mean error is low (0.14), the `max_diff` of"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_49_0>",
+      "max_diff": 1.891795601241845,
+      "mean_diff": 0.13810626903603168
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_49_1>",
+      "max_diff": 1.7411990482825637,
+      "mean_diff": 0.10719362334386723
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_49_2>",
+      "max_diff": 1.7910412980993273,
+      "mean_diff": 0.1768878055793881
+    }
+  ]
+}

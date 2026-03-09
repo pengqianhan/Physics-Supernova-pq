@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 32168967.076554257,
+    "Mean Difference": 1617312.654181048,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_38_0>",
+      "<iter_image_38_1>",
+      "<iter_image_38_2>"
+    ],
+    "Summary": "The simulation exhibits **catastrophic exponential divergence** starting around $t=15$s, with errors reaching $10^9$. While the ground truth remains stable and near zero, the"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_38_0>",
+      "max_diff": 1280594.633159167,
+      "mean_diff": 64382.65336830725
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_38_1>",
+      "max_diff": 3980856.2932231403,
+      "mean_diff": 200139.7947410771
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_38_2>",
+      "max_diff": 91245450.30328047,
+      "mean_diff": 4587415.514433759
+    }
+  ]
+}

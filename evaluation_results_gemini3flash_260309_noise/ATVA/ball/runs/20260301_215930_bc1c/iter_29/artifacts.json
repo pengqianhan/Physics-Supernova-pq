@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.7991839268632954,
+    "Mean Difference": 0.14820128000819563,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_29_0>",
+      "<iter_image_29_1>",
+      "<iter_image_29_2>"
+    ],
+    "Summary": "**Evaluation Summary**\n\nThe identified Hybrid Automaton (HA) captures the fundamental bouncing ball dynamics but suffers from significant **cumulative phase lag** and **timing errors**. While the `mean_diff` (0.148) is low, the `max_diff` (1."
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_29_0>",
+      "max_diff": 1.8888176128165013,
+      "mean_diff": 0.14393223012604403
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_29_1>",
+      "max_diff": 1.7308959635805348,
+      "mean_diff": 0.11835305105346905
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_29_2>",
+      "max_diff": 1.7778382041928502,
+      "mean_diff": 0.18231855884507378
+    }
+  ]
+}

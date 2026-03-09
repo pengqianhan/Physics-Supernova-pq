@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.038766307009532,
+    "Mean Difference": 0.20866380121807446,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_32_0>",
+      "<iter_image_32_1>",
+      "<iter_image_32_2>"
+    ],
+    "Summary": "The identification shows significant **structural divergence** and **mode-switching errors**. While metrics report low mean error, visual analysis reveals the simulation fails to capture the late-stage negative divergence seen in the ground truth.\n\n**Key Issues:**\n1.  **Mode 2 Instability:** The high stiffness coefficient (`-4817.44`) in Mode 2 causes the high-frequency chatter/oscillation observed in Image 3. This mode is numerically stiff and physically unrepresentative of the smooth GT decay."
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_32_0>",
+      "max_diff": 0.9983829199519999,
+      "mean_diff": 0.10405275761584704
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_32_1>",
+      "max_diff": 0.9959341764033525,
+      "mean_diff": 0.10976006333803737
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_32_2>",
+      "max_diff": 1.121981824673244,
+      "mean_diff": 0.41217858270033897
+    }
+  ]
+}

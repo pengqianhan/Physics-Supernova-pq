@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.1201002043286723,
+    "Mean Difference": 0.2180395536689259,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_1_0>",
+      "<iter_image_1_1>",
+      "<iter_image_1_2>"
+    ],
+    "Summary": "The HA model fails to capture the high-frequency switching behavior observed in the ground truth, resulting in a high **max_diff of 1.12**. While the ground truth exhibits a distinct limit"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_1_0>",
+      "max_diff": 1.092981164048998,
+      "mean_diff": 0.2232588951323323
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_1_1>",
+      "max_diff": 1.279449743405155,
+      "mean_diff": 0.23012381431441434
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_1_2>",
+      "max_diff": 0.9878697055318644,
+      "mean_diff": 0.2007359515600311
+    }
+  ]
+}

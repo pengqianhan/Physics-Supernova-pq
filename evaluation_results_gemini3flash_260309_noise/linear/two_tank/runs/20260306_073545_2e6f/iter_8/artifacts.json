@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.46290100643730003,
+    "Mean Difference": 0.12235347809754486,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_8_0>",
+      "<iter_image_8_1>",
+      "<iter_image_8_2>"
+    ],
+    "Summary": "The HA model exhibits significant **mode mismatch and phase lag**, particularly after $t=12.5s$. While the metrics suggest low local error, the simulation fails to capture the **reversal"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_8_0>",
+      "max_diff": 0.4278565807114389,
+      "mean_diff": 0.09227145463384481
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_8_1>",
+      "max_diff": 0.19512400604355812,
+      "mean_diff": 0.06870794955762909
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_8_2>",
+      "max_diff": 0.7657224325569032,
+      "mean_diff": 0.2060810301011607
+    }
+  ]
+}

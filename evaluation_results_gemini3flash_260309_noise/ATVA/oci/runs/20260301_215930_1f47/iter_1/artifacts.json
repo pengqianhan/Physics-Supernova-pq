@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.308288968238543,
+    "Mean Difference": 0.5648111436749581,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_1_0>",
+      "<iter_image_1_1>",
+      "<iter_image_1_2>"
+    ],
+    "Summary": "The identification results show a significant qualitative failure. While the ground truth exhibits a clear **limit cycle** (oscillatory behavior), the simulated trajectories converge to a **stable equilibrium point** ($x_1 \\approx 0.22, x_2 \\approx -0.13$) within 2 seconds.\n\n**Key Issues:**\n1. **Mode Entrapment:** The simulation remains stuck in Mode 1. The guard `x1 > 0.62` is too restrictive; ground truth only briefly exceeds this value, and the identified Mode 1 dynamics are locally stable, preventing the state from ever"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_1_0>",
+      "max_diff": 1.3105729910995163,
+      "mean_diff": 0.5633090241032918
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_1_1>",
+      "max_diff": 1.3114268115650538,
+      "mean_diff": 0.5574109138149597
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_1_2>",
+      "max_diff": 1.3028671020510592,
+      "mean_diff": 0.5737134931066229
+    }
+  ]
+}

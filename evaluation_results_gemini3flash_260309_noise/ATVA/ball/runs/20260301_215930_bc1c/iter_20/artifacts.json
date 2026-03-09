@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.8082965718649273,
+    "Mean Difference": 0.1407732111799403,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_20_0>",
+      "<iter_image_20_1>",
+      "<iter_image_20_2>"
+    ],
+    "Summary": "The HA model captures the bouncing ball dynamics with moderate accuracy (Mean Diff: 0.14) but suffers from significant **cumulative phase lead** (Max Diff: 1.8). The simulated trajectories drift ahead of the ground truth, with impacts occurring increasingly early.\n\n**Specific Issues:**\n1.  **Phase Lead:** The simulated frequency is too high, suggesting the gravitational constant or restitution coefficient is overestimated.\n2.  **Amplitude Decay:**"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_20_0>",
+      "max_diff": 1.8917475941751758,
+      "mean_diff": 0.1381595273673848
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_20_1>",
+      "max_diff": 1.741528737129998,
+      "mean_diff": 0.10725651341804048
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_20_2>",
+      "max_diff": 1.791613384289608,
+      "mean_diff": 0.17690359275439563
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.7931671053477014,
+    "Mean Difference": 0.18734331545700497,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_39_0>",
+      "<iter_image_39_1>",
+      "<iter_image_39_2>"
+    ],
+    "Summary": "The HA identifies a bouncing ball system but exhibits significant cumulative error. While the `mean_diff` is 0.18, the `max_diff` of 1.79 highlights a widening gap in trajectory alignment over time.\n\n**Visual"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_39_0>",
+      "max_diff": 1.835754283707934,
+      "mean_diff": 0.1954477947344639
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_39_1>",
+      "max_diff": 1.8873192532412368,
+      "mean_diff": 0.1915304841932705
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_39_2>",
+      "max_diff": 1.6564277790939337,
+      "mean_diff": 0.17505166744328052
+    }
+  ]
+}

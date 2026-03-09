@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 2.310412350549474,
+    "Mean Difference": 1.009672175008687,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_1_0>",
+      "<iter_image_1_1>",
+      "<iter_image_1_2>"
+    ],
+    "Summary": "**Overall Fit:** Poor. The simulation fails to capture the limit cycle behavior of the ground truth, resulting in significant divergence (Mean Diff: 1.01). While ground truth oscillates between"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_1_0>",
+      "max_diff": 2.2630908089663246,
+      "mean_diff": 0.9914020242508463
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_1_1>",
+      "max_diff": 2.14758373225723,
+      "mean_diff": 1.0849759549443891
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_1_2>",
+      "max_diff": 2.5205625104248677,
+      "mean_diff": 0.9526385458308257
+    }
+  ]
+}

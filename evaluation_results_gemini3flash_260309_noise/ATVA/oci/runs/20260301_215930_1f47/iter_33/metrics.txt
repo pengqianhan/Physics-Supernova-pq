@@ -1,0 +1,113 @@
+Hybrid Automaton Evaluation Results
+================================================================================
+Timestamp: 20260303_020958
+Iteration: 33
+Run ID: 20260301_215930_1f47
+Number of Ground Truth Files: 3
+
+Aggregated Metrics:
+  Mean Max Diff: 1.8734966819688375
+  Mean Mean Diff: 0.6250222553581722
+
+Per-File Metrics:
+
+  [0] ground_truth_0.npz:
+      TC (Change-Point Error):0.720000 seconds
+  Max Difference:1.878813
+  Mean Difference:0.626047
+
+  [1] ground_truth_1.npz:
+      TC (Change-Point Error):0.750000 seconds
+  Max Difference:1.844296
+  Mean Difference:0.619100
+
+  [2] ground_truth_2.npz:
+      TC (Change-Point Error):0.750000 seconds
+  Max Difference:1.897381
+  Mean Difference:0.629919
+
+HA Specification:
+{
+  "automaton": {
+    "var": "x1, x2",
+    "input": "",
+    "mode": [
+      {
+        "id": 1,
+        "eq": "x1[1] = -11.0 * x1[0] - 13.0 * x2[0] + 2.5, x2[1] = -7.5 * x1[0] - 11.0 * x2[0] + 0.25"
+      },
+      {
+        "id": 2,
+        "eq": "x1[1] = -9.0 * x1[0] - 10.5 * x2[0] - 2.1, x2[1] = -6.8 * x1[0] - 10.5 * x2[0] - 0.16"
+      }
+    ],
+    "edge": [
+      {
+        "direction": "1 -> 2",
+        "condition": "x1 >= 0.655",
+        "reset": {
+          "x1": [
+            "x1[0]-0.075"
+          ],
+          "x2": [
+            "x2[0]+0.035"
+          ]
+        }
+      },
+      {
+        "direction": "2 -> 1",
+        "condition": "x1 <= -0.655",
+        "reset": {
+          "x1": [
+            "x1[0]+0.030"
+          ],
+          "x2": [
+            "x2[0]+0.018"
+          ]
+        }
+      }
+    ]
+  },
+  "config": {
+    "dt": 0.01,
+    "total_time": 20.0,
+    "order": 1
+  }
+}
+
+Experiment Hyperparameters
+============================================================
+
+--- Manager Agent ---
+Model: gemini/gemini-3-flash-preview
+Type: CodeAgent
+
+--- Managed Agents ---
+Count: 1
+Agent Names: data_analysis_expert
+Model: gemini/gemini-3-flash-preview
+
+--- Tools ---
+Tools List: hybrid_automaton_image_analysis
+Image Tool Model: gemini/gemini-3-flash-preview
+Review Tool Model: gemini/gemini-flash-lite-latest
+Summarize Tool Model: gemini/gemini-flash-lite-latest
+
+--- Iteration Configuration ---
+Max Iterations: 50
+Feedback Top-K: 50
+Target Error: 0.1
+No Improvement Patience: 20
+
+--- Data Configuration ---
+Input Data Path: data_all/ATVA/oci
+System Name: 
+Num Variables: 2
+Num Inputs: 0
+
+--- Other ---
+Use JSON Schema: True
+Use Structured Output: True
+Structured Output Model: gemini/gemini-3-flash-preview
+============================================================
+

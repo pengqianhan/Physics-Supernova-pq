@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.8724286665183391,
+    "Mean Difference": 0.18411001080611689,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_12_0>",
+      "<iter_image_12_1>",
+      "<iter_image_12_2>"
+    ],
+    "Summary": "Inaccuracy:** The fixed reset `x2 = 0` does not align with the GT's post-jump states.\n    *   *Improvements:*\n        1. **Multi-mode"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_12_0>",
+      "max_diff": 0.9998764853657264,
+      "mean_diff": 0.20155306331595998
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_12_1>",
+      "max_diff": 0.9819265486956332,
+      "mean_diff": 0.18997194050438077
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_12_2>",
+      "max_diff": 0.6354829654936575,
+      "mean_diff": 0.1608050285980099
+    }
+  ]
+}

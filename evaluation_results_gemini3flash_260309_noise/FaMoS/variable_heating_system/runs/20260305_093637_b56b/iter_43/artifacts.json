@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.37378194077493127,
+    "Mean Difference": 0.121393505423349,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_43_0>",
+      "<iter_image_43_1>",
+      "<iter_image_43_2>"
+    ],
+    "Summary": "for Mode 2).\n        2.  **Relax Guards:** The $x_1 \\ge 25.10$ guard is too high; the simulation peaks below this. Lower"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_43_0>",
+      "max_diff": 0.3488354570256464,
+      "mean_diff": 0.10992417666860525
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_43_1>",
+      "max_diff": 0.4156195310358026,
+      "mean_diff": 0.1335185936697557
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_43_2>",
+      "max_diff": 0.35689083426334484,
+      "mean_diff": 0.12073774593168604
+    }
+  ]
+}

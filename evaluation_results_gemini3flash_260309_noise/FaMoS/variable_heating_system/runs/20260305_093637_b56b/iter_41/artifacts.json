@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 5.665019276476844,
+    "Mean Difference": 2.0011872766307373,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_41_0>",
+      "<iter_image_41_1>",
+      "<iter_image_41_2>"
+    ],
+    "Summary": "The HA model demonstrates poor long-term stability, with total divergence occurring after $t \\approx 5s$. While Mode 1 tracks the initial oscillatory behavior, the transition to Mode 2 triggers an unstable trajectory that fails to recover.\n\n**Key Issues:**\n1.  **Unstable Dynamics:** Mode"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_41_0>",
+      "max_diff": 6.655894298748126,
+      "mean_diff": 2.1184025300259917
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_41_1>",
+      "max_diff": 5.409403185342759,
+      "mean_diff": 1.9957947766145758
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_41_2>",
+      "max_diff": 4.929760345339647,
+      "mean_diff": 1.8893645232516438
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.8718351559108306,
+    "Mean Difference": 0.1798998413956828,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_42_0>",
+      "<iter_image_42_1>",
+      "<iter_image_42_2>"
+    ],
+    "Summary": "The identification captures the hybrid structure but fails on energy dissipation and temporal precision. The `mean_diff` of 0.18 and `max_diff` of 1.87 indicate significant long-term divergence.\n\n**Key Issues:**\n1. **Amplitude Error:** The simulated peaks for $x_1$ and $x_2$ are consistently higher than the ground truth. The current reset `x2 = -1.0 * x2[0]` assumes a perfectly elastic collision, whereas the ground truth shows clear damping.\n2. **Phase Drift:** Mode switch timing drifts over time. The guard `x1 <= 0` combined with the discrete time step causes the simulation to \"penetrate\" the boundary before resetting, accumulating phase lag.\n3. **Dynamics Mismatch:** The linear coefficients in the mode equation likely underestimate air resistance or internal damping.\n\n**Concrete Suggestions:**\n1. **Inelastic Reset:** Update the edge reset to include a coefficient of restitution (e.g., `x2 = -0.85 * x2[0]`) to match the observed peak decay.\n2. **Refine Guard:** Tighten the guard condition or implement a zero-crossing detection if possible.\n3. **Parameter Tuning:** Re-estimate the mode dynamics, specifically the gravity term (`-10.06`) and the $x_2$ coefficient, to better reflect the dissipative forces."
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_42_0>",
+      "max_diff": 1.9408833493368545,
+      "mean_diff": 0.20099704350698397
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_42_1>",
+      "max_diff": 1.8280632725958816,
+      "mean_diff": 0.15809747673649202
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_42_2>",
+      "max_diff": 1.846558845799756,
+      "mean_diff": 0.18060500394357232
+    }
+  ]
+}

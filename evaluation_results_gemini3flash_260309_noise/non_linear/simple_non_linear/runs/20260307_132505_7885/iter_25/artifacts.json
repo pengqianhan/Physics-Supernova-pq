@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 328.18372025374276,
+    "Mean Difference": 39.9986894922903,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_25_0>",
+      "<iter_image_25_1>",
+      "<iter_image_25_2>"
+    ],
+    "Summary": "The identification results show **catastrophic divergence**. While the ground truth remains stable near zero, the simulated trajectory diverges exponentially to $-60,000$ after $t=4s$.\n\n**Analysis:**\n1.  **Instability:** Mode 2 is numerically unstable. The characteristic equation $z^2 + 1.6887z + 0.3794 = 0$ has a root at approximately $-1.42$, which is outside the unit circle, leading to the observed exponential growth.\n2.  **Guard/Reset Issues:** The reset `x1[1] = -78.7709` is a hardcoded constant rather than a state-dependent mapping. This creates a massive discontinuity that likely pushes the system into the unstable regime of Mode 2.\n3.  **Threshold Mismatch:** The guard `x1 >= 125.0` is never reached by the ground truth (which stays near zero), suggesting the transition logic or the scale of the identified coefficients is incorrect.\n\n**Improvements:**\n*   **Stability Constraints:** Re-estimate Mode 2 coefficients using constrained optimization to ensure eigenvalues remain within the unit circle ($|z| < 1$).\n*   **Refine Resets:** Remove hardcoded resets. Use identity resets or learn a linear mapping (e.g., $x^+ = Ax^"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_25_0>",
+      "max_diff": 117.05652685449826,
+      "mean_diff": 14.350515572530098
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_25_1>",
+      "max_diff": 381.7447689409405,
+      "mean_diff": 46.50373332413167
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_25_2>",
+      "max_diff": 485.7498649657895,
+      "mean_diff": 59.14181958020913
+    }
+  ]
+}

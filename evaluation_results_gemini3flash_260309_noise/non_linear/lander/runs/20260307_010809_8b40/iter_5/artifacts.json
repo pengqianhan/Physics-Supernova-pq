@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.8193763459642346,
+    "Mean Difference": 0.20938705805996605,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_5_0>",
+      "<iter_image_5_1>",
+      "<iter_image_5_2>"
+    ],
+    "Summary": "The system demonstrates high steady-state accuracy but exhibits transient tracking errors in $x_4$. The simulated $x_4$ trajectory rises faster than the ground truth, indicating the identified time constant is"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_5_0>",
+      "max_diff": 0.813786349813187,
+      "mean_diff": 0.20868566865011906
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_5_1>",
+      "max_diff": 0.8167825853407231,
+      "mean_diff": 0.20607387042938857
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_5_2>",
+      "max_diff": 0.8275601027387937,
+      "mean_diff": 0.2134016351003905
+    }
+  ]
+}

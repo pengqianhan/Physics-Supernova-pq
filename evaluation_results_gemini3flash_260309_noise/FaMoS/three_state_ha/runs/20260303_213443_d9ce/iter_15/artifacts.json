@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.1286816807857647,
+    "Mean Difference": 0.25498518265682035,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_15_0>",
+      "<iter_image_15_1>",
+      "<iter_image_15_2>"
+    ],
+    "Summary": ") are too high, suppressing the oscillatory behavior seen in the ground truth.\n        2. **Incorrect Mode Switching:** The guards ($|x_1| > 10$) are too wide."
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_15_0>",
+      "max_diff": 1.0070659634980133,
+      "mean_diff": 0.10840677890486536
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_15_1>",
+      "max_diff": 1.0051721655778787,
+      "mean_diff": 0.11460871768298023
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_15_2>",
+      "max_diff": 1.3738069132814021,
+      "mean_diff": 0.5419400513826155
+    }
+  ]
+}

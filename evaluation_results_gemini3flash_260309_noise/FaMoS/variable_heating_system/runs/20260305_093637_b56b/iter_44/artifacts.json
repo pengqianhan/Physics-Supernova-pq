@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.4558347641667067,
+    "Mean Difference": 0.15146264175348437,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_44_0>",
+      "<iter_image_44_1>",
+      "<iter_image_44_2>"
+    ],
+    "Summary": "The HA fails to capture the ground truth limit cycle, instead converging to a stable equilibrium ($x_1 \\approx 14.8, x_2 \\approx 10.3"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_44_0>",
+      "max_diff": 0.43440611641518034,
+      "mean_diff": 0.14271646684869163
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_44_1>",
+      "max_diff": 0.48480728173485055,
+      "mean_diff": 0.16464953761462237
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_44_2>",
+      "max_diff": 0.44829089435008923,
+      "mean_diff": 0.14702192079713913
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.3803577042271548,
+    "Mean Difference": 0.13974286893336277,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_38_0>",
+      "<iter_image_38_1>",
+      "<iter_image_38_2>"
+    ],
+    "Summary": "ge 24.8$, $x_1 \\le 10.2$) are slightly off, leading to premature or delayed mode transitions.\n        3.  *Amplitude"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_38_0>",
+      "max_diff": 0.3405434715930958,
+      "mean_diff": 0.1285904656014799
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_38_1>",
+      "max_diff": 0.5853149325344464,
+      "mean_diff": 0.2228251119273587
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_38_2>",
+      "max_diff": 0.21521470855392222,
+      "mean_diff": 0.0678130292712497
+    }
+  ]
+}

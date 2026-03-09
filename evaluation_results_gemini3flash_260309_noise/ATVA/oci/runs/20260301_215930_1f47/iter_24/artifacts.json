@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 252.8873743499894,
+    "Mean Difference": 17.771830933316636,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_24_0>",
+      "<iter_image_24_1>",
+      "<iter_image_24_2>"
+    ],
+    "Summary": "The identification is **failed**, characterized by catastrophic divergence (max error > 250) and a failure to capture the limit cycle.\n\n**Analysis:**\n1.  **Instability:** The discrete-time coefficients (e.g., 7.25, 10.61) are excessively large for $dt=0.01$. The resulting eigenvalues are far outside the unit circle, causing the exponential divergence seen in Plot 2.\n2.  **Structural Mismatch:** The ground truth exhibits relaxation oscillations (sawtooth-like). The current linear affine modes are either unstable or drive the system to a trivial equilibrium (Plots 1 & 3), failing to sustain the oscillation.\n3.  **Switching Logic:** The guard $x_1=0$ is insufficient. The ground truth transitions occur near state extrema ($\\approx"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_24_0>",
+      "max_diff": 1.0029538977705597,
+      "mean_diff": 0.49740069632118494
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_24_1>",
+      "max_diff": 756.6535426453964,
+      "mean_diff": 52.27132937864228
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_24_2>",
+      "max_diff": 1.005626506801161,
+      "mean_diff": 0.5467627249864425
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.5528211020627994,
+    "Mean Difference": 0.10272383482918336,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_27_0>",
+      "<iter_image_27_1>",
+      "<iter_image_27_2>"
+    ],
+    "Summary": "The system identification shows a strong structural fit (Mean Diff: 0.10), with the guard `x7 >= 10.0` accurately capturing the mode transition at $"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_27_0>",
+      "max_diff": 0.4525174671930022,
+      "mean_diff": 0.08419937057058452
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_27_1>",
+      "max_diff": 0.4857937342392738,
+      "mean_diff": 0.09813484603947216
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_27_2>",
+      "max_diff": 0.7201521047561223,
+      "mean_diff": 0.12583728787749343
+    }
+  ]
+}

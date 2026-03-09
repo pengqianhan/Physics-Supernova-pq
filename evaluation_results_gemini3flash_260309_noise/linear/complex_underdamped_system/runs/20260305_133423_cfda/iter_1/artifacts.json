@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.8524774896071892,
+    "Mean Difference": 0.6036738954878408,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_1_0>",
+      "<iter_image_1_1>",
+      "<iter_image_1_2>"
+    ],
+    "Summary": "The identification shows poor fit (mean_diff: 0.60). The simulation fails to capture the hybrid dynamics, primarily because **$x_1$ remains stationary** in all evaluations,"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_1_0>",
+      "max_diff": 2.5726255569928145,
+      "mean_diff": 0.8194121208046345
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_1_1>",
+      "max_diff": 2.236576340016326,
+      "mean_diff": 0.7055241455276129
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_1_2>",
+      "max_diff": 0.7482305718124269,
+      "mean_diff": 0.28608542013127486
+    }
+  ]
+}

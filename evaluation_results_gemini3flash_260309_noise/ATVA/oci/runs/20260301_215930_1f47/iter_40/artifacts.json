@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.7766089812129652,
+    "Mean Difference": 0.2727927820109854,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_40_0>",
+      "<iter_image_40_1>",
+      "<iter_image_40_2>"
+    ],
+    "Summary": "The HA model captures the limit cycle topology but suffers from significant **phase lag** and **period mismatch**. The simulated frequency is lower than the ground truth, leading to a cumulative temporal drift and a high `mean_diff` (0.27).\n\n**Key Issues:**\n1.  **Dynamics Underestimation:** The linear transition matrices ($A$) in both modes produce slower state evolution than observed, causing the \"stretched\" appearance of the simulated cycles.\n2.  **Switching Latency:** The guard conditions ($x_1 \\geq 0.6$, $x_1 \\leq -0.6091$) are met, but the discrete-time dynamics don't transition sharply enough, contributing to the phase shift.\n3.  **Reset Inaccuracy:** The constant resets ($+0.0578, -0.0423$) appear to introduce offsets that don't align with the ground truth's peak behavior.\n\n**Suggestions for Improvement:**\n*   **Refine Dynamics:** Re-estimate the $A$ and $B$ coefficients using a weighted least-squares approach to prioritize matching the slopes ("
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_40_0>",
+      "max_diff": 0.7291891295264219,
+      "mean_diff": 0.25152134683071
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_40_1>",
+      "max_diff": 0.6691283959813206,
+      "mean_diff": 0.22841114983717212
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_40_2>",
+      "max_diff": 0.9315094181311531,
+      "mean_diff": 0.33844584936507405
+    }
+  ]
+}

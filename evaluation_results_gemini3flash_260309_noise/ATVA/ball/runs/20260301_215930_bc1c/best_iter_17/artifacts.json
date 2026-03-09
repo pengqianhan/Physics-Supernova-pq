@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.8471523551594926,
+    "Mean Difference": 0.13761819314912,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_17_0>",
+      "<iter_image_17_1>",
+      "<iter_image_17_2>"
+    ],
+    "Summary": "The system identifies a bouncing ball. While the initial fit is good, the `max_diff` of 1.847 indicates significant divergence in the tail.\n\n**Analysis:**\n1.  **Phase Lag & Timing:** A noticeable phase shift develops after $t=5s$. Simulated bounces occur later than ground truth, likely due to cumulative errors from the"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_17_0>",
+      "max_diff": 1.8814471749305217,
+      "mean_diff": 0.13770370350282554
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_17_1>",
+      "max_diff": 1.8928446560350833,
+      "mean_diff": 0.11689991163313537
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_17_2>",
+      "max_diff": 1.767165234512873,
+      "mean_diff": 0.15825096431139907
+    }
+  ]
+}

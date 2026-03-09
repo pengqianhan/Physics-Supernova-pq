@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.9026751403597997,
+    "Mean Difference": 0.7289857177936634,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_50_0>",
+      "<iter_image_50_1>",
+      "<iter_image_50_2>"
+    ],
+    "Summary": "The HA model demonstrates poor fit (mean_diff \u2248 0.73) characterized by severe frequency mismatch and high-frequency \"chatter.\" While the ground truth shows a smooth, low-"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_50_0>",
+      "max_diff": 1.8991431931898282,
+      "mean_diff": 0.7291894993640021
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_50_1>",
+      "max_diff": 1.897256347611421,
+      "mean_diff": 0.7231886806037225
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_50_2>",
+      "max_diff": 1.9116258802781498,
+      "mean_diff": 0.7345789734132656
+    }
+  ]
+}

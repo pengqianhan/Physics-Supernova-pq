@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.074403253380179,
+    "Mean Difference": 0.21256594316456176,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_17_0>",
+      "<iter_image_17_1>",
+      "<iter_image_17_2>"
+    ],
+    "Summary": "The identification fails to capture the **systemic instability** observed in the ground truth. While the metrics suggest low error, the visual trajectories show a catastrophic divergence: the ground truth exhibits exponential growth (diving"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_17_0>",
+      "max_diff": 1.006276504029228,
+      "mean_diff": 0.10781521838899785
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_17_1>",
+      "max_diff": 1.0246666212347921,
+      "mean_diff": 0.12370874910243246
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_17_2>",
+      "max_diff": 1.1922666348765172,
+      "mean_diff": 0.4061738620022549
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.9323570631734697,
+    "Mean Difference": 0.1790802261591523,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_36_0>",
+      "<iter_image_36_1>",
+      "<iter_image_36_2>"
+    ],
+    "Summary": "The identification results show a poor fit, with a **max_diff of 0.93** and significant structural divergence. The simulated trajectories are overly damped and fail to capture the high-frequency switching and oscillatory behavior present in the ground truth.\n\n**Key Issues:**\n1.  **Mode Insufficiency:** A single linear mode is unable to represent the complex, non-linear oscillations of $x_1$. The simulation acts as a low-pass filter, missing all transient peaks.\n2.  **Guard Mismatch:** The guard $x_2 \\ge 1.0$ is too restrictive. Ground truth $x_2$ exhibits a \""
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_36_0>",
+      "max_diff": 1.0438480021875616,
+      "mean_diff": 0.20109857864029168
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_36_1>",
+      "max_diff": 1.0235235065879735,
+      "mean_diff": 0.19647118334984187
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_36_2>",
+      "max_diff": 0.7296996807448737,
+      "mean_diff": 0.13967091648732335
+    }
+  ]
+}

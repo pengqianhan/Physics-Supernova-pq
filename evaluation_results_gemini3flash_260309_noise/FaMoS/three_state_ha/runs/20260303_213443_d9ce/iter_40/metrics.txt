@@ -1,0 +1,101 @@
+Hybrid Automaton Evaluation Results
+================================================================================
+Timestamp: 20260305_232855
+Iteration: 40
+Run ID: 20260303_213443_d9ce
+Number of Ground Truth Files: 3
+
+Aggregated Metrics:
+  Mean Max Diff: 1.4212026237755555
+  Mean Mean Diff: 0.470293388297885
+
+Per-File Metrics:
+
+  [0] ground_truth_0.npz:
+      TC (Change-Point Error):3.950000 seconds
+  Max Difference:1.015202
+  Mean Difference:0.112080
+
+  [1] ground_truth_1.npz:
+      TC (Change-Point Error):4.670000 seconds
+  Max Difference:1.639752
+  Mean Difference:0.643062
+
+  [2] ground_truth_2.npz:
+      TC (Change-Point Error):3.450000 seconds
+  Max Difference:1.608654
+  Mean Difference:0.655738
+
+HA Specification:
+{
+  "automaton": {
+    "var": "x1",
+    "input": "",
+    "mode": [
+      {
+        "id": 1,
+        "eq": "x1[2] = -0.0385 * x1[1] - 34.3195 * x1[0] + 703.9822"
+      },
+      {
+        "id": 2,
+        "eq": "x1[2] = 0.0142 * x1[1] - 30.0814 * x1[0] - 85.4405"
+      },
+      {
+        "id": 3,
+        "eq": "x1[2] = 0.0904 * x1[1] - 0.0720 * x1[0] - 10.5310"
+      }
+    ],
+    "edge": [
+      {
+        "direction": "1 -> 2",
+        "condition": "x1 < 10.5"
+      },
+      {
+        "direction": "2 -> 3",
+        "condition": "x1 < -14.5"
+      }
+    ]
+  },
+  "config": {
+    "dt": 0.01,
+    "total_time": 20.0,
+    "order": 2
+  }
+}
+
+Experiment Hyperparameters
+============================================================
+
+--- Manager Agent ---
+Model: gemini/gemini-3-flash-preview
+Type: CodeAgent
+
+--- Managed Agents ---
+Count: 1
+Agent Names: data_analysis_expert
+Model: gemini/gemini-3-flash-preview
+
+--- Tools ---
+Tools List: hybrid_automaton_image_analysis
+Image Tool Model: gemini/gemini-3-flash-preview
+Review Tool Model: gemini/gemini-flash-lite-latest
+Summarize Tool Model: gemini/gemini-flash-lite-latest
+
+--- Iteration Configuration ---
+Max Iterations: 50
+Feedback Top-K: 50
+Target Error: 0.1
+No Improvement Patience: 20
+
+--- Data Configuration ---
+Input Data Path: data_all/FaMoS/three_state_ha
+System Name: 
+Num Variables: 1
+Num Inputs: 0
+
+--- Other ---
+Use JSON Schema: True
+Use Structured Output: True
+Structured Output Model: gemini/gemini-3-flash-preview
+============================================================
+

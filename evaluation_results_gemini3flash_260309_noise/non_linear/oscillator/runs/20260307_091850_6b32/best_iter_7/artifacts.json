@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.5085955552380653,
+    "Mean Difference": 0.08150881973042144,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_7_0>",
+      "<iter_image_7_1>",
+      "<iter_image_7_2>"
+    ],
+    "Summary": "The HA model exhibits poor transient accuracy, evidenced by a high **max_diff (0.51)**. The primary failure is a significant **timescale mismatch** in Mode 2 dynamics."
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_7_0>",
+      "max_diff": 0.5085512863827153,
+      "mean_diff": 0.0859519097602215
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_7_1>",
+      "max_diff": 0.50535706302451,
+      "mean_diff": 0.08575471292934629
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_7_2>",
+      "max_diff": 0.5118783163069707,
+      "mean_diff": 0.07281983650169653
+    }
+  ]
+}

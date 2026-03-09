@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.9317669266908073,
+    "Mean Difference": 0.3398376502300278,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_9_0>",
+      "<iter_image_9_1>",
+      "<iter_image_9_2>"
+    ],
+    "Summary": "The hybrid automaton captures the oscillatory relaxation behavior but exhibits significant **phase drift** and **period mismatch** across all evaluations. While the `mean_diff` is low, the visual evidence shows the simulated system completes cycles faster than the ground truth.\n\n**Key Issues:**\n1.  **Frequency Error:** The eigenvalues of the linear dynamics in both modes are too large, causing the state to"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_9_0>",
+      "max_diff": 0.816758656532003,
+      "mean_diff": 0.3049233177026335
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_9_1>",
+      "max_diff": 0.7936798696461723,
+      "mean_diff": 0.3219554162988822
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_9_2>",
+      "max_diff": 1.1848622538942464,
+      "mean_diff": 0.3926342166885678
+    }
+  ]
+}

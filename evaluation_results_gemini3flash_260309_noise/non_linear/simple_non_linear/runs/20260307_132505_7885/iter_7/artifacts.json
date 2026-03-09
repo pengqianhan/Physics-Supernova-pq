@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.8550028302508444,
+    "Mean Difference": 0.12942078612466695,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_7_0>",
+      "<iter_image_7_1>",
+      "<iter_image_7_2>"
+    ],
+    "Summary": "The HA model fails to capture the system's periodic limit cycle. While the initial transient is modeled accurately, the simulation diverges after the first peak, settling into a steady state near $x_1 \\approx"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_7_0>",
+      "max_diff": 0.8429433839198892,
+      "mean_diff": 0.11602385349546039
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_7_1>",
+      "max_diff": 0.8619145616518865,
+      "mean_diff": 0.1349640969558456
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_7_2>",
+      "max_diff": 0.8601505451807577,
+      "mean_diff": 0.13727440792269485
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.5469864472818654,
+    "Mean Difference": 0.08513656394958381,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_5_0>",
+      "<iter_image_5_1>",
+      "<iter_image_5_2>"
+    ],
+    "Summary": "The HA model fails to capture the **limit cycle dynamics** observed in the ground truth. While the initial transient is roughly approximated, the simulation diverges significantly after $t \\approx 0.003"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_5_0>",
+      "max_diff": 0.6789503792200332,
+      "mean_diff": 0.08783092013014217
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_5_1>",
+      "max_diff": 0.27791531064235875,
+      "mean_diff": 0.0755952514697137
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_5_2>",
+      "max_diff": 0.6840936519832044,
+      "mean_diff": 0.0919835202488956
+    }
+  ]
+}

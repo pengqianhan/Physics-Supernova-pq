@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.9181269999552306,
+    "Mean Difference": 0.667211224474078,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_20_0>",
+      "<iter_image_20_1>",
+      "<iter_image_20_2>"
+    ],
+    "Summary": "The identification results show a **poor fit** with a high `mean_diff` (0.667) and significant **phase divergence**. While the simulation captures the oscillatory nature, it suffers from a severe **frequency mismatch** and cumulative **phase lag**.\n\n**Key Issues:**\n1.  **Temporal Drift:** The simulated period is longer than the ground truth, causing the trajectories to desynchronize rapidly after the first cycle.\n2.  **Dynamics Scaling:** The coefficients in the mode equations (e.g., -10.65) are excessively large for a"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_20_0>",
+      "max_diff": 1.9409361306648734,
+      "mean_diff": 0.6706998145568607
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_20_1>",
+      "max_diff": 1.8996574346307624,
+      "mean_diff": 0.6840861321123831
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_20_2>",
+      "max_diff": 1.9137874345700556,
+      "mean_diff": 0.6468477267529902
+    }
+  ]
+}

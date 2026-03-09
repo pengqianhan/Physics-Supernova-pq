@@ -1,0 +1,32 @@
+{
+  "automaton": {
+    "var": "x1, x2",
+    "input": "",
+    "mode": [
+      {
+        "id": 1,
+        "eq": "x1[1] = x2[0], x2[1] = -9.8"
+      }
+    ],
+    "edge": [
+      {
+        "direction": "1 -> 1",
+        "condition": "x1 <= 0 and x2 < 0",
+        "reset": {
+          "x1": [
+            "0"
+          ],
+          "x2": [
+            "-0.91*x2[0]"
+          ]
+        }
+      }
+    ]
+  },
+  "config": {
+    "dt": 0.01,
+    "total_time": 10.0,
+    "order": 1,
+    "self_loop": true
+  }
+}

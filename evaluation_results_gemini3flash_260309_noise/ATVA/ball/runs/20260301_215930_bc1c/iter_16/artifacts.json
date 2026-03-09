@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.7883069335735045,
+    "Mean Difference": 0.19903762832643876,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_16_0>",
+      "<iter_image_16_1>",
+      "<iter_image_16_2>"
+    ],
+    "Summary": "The HA captures the fundamental bouncing ball dynamics, but the metrics ($\\text{max\\_diff} \\approx 1.79$) and plots reveal significant cumulative error.\n\n**Analysis:**\n1"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_16_0>",
+      "max_diff": 1.8398553062548477,
+      "mean_diff": 0.2046718699429348
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_16_1>",
+      "max_diff": 1.8928446560350833,
+      "mean_diff": 0.208636051318385
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_16_2>",
+      "max_diff": 1.632220838430583,
+      "mean_diff": 0.18380496371799646
+    }
+  ]
+}

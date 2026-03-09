@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.847526691590633,
+    "Mean Difference": 0.21621332608068825,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_20_0>",
+      "<iter_image_20_1>",
+      "<iter_image_20_2>"
+    ],
+    "Summary": "_2[0] - c$) or a identity reset if the \"jump\" is actually just a fast continuous change.\n        4.  *Add Modes:* Consider a second mode"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_20_0>",
+      "max_diff": 0.8645731731440968,
+      "mean_diff": 0.23165551015047067
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_20_1>",
+      "max_diff": 0.8057404133152699,
+      "mean_diff": 0.22851325039656684
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_20_2>",
+      "max_diff": 0.8722664883125322,
+      "mean_diff": 0.18847121769502725
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 1.2369622637444542,
+    "Mean Difference": 0.33906672769660734,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_37_0>",
+      "<iter_image_37_1>",
+      "<iter_image_37_2>"
+    ],
+    "Summary": "The simulation fails to capture the system's transition into the divergent \"falling\" phase seen in the ground truth. While the metrics suggest a low mean error, the visual divergence is catastrophic, with the"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_37_0>",
+      "max_diff": 1.0156443052810245,
+      "mean_diff": 0.11411440356424682
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_37_1>",
+      "max_diff": 0.9999998213520312,
+      "mean_diff": 0.11415217249248016
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_37_2>",
+      "max_diff": 1.6952426646003067,
+      "mean_diff": 0.788933607033095
+    }
+  ]
+}

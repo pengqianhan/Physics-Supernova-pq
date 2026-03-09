@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.8613854237395104,
+    "Mean Difference": 0.15738851680179233,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_27_0>",
+      "<iter_image_27_1>",
+      "<iter_image_27_2>"
+    ],
+    "Summary": "The identification shows a significant **phase lag** that accumulates over time, resulting in a high `max_diff` (0.86). While the initial cycle matches well, the simulation frequency is lower than the ground truth, leading to a nearly 180-degree phase shift by $t=20s$.\n\n**Specific Issues:**\n1.  **Delayed Mode Switching:** The guard conditions ($x_1 \\ge 0.6921$ and $x_1 \\le -0.6788$) are too high/low. The ground truth peaks closer to $\\pm 0.65$, causing the simulation to \"overshoot\" in time before triggering a transition.\n2.  **Dynamics Mismatch:** The linear discrete-time coefficients produce slower state evolution than the physical system.\n3.  **Peak Curvature:** The ground truth exhibits smoother transitions at extrema, whereas the HA produces sharp, triangular peaks.\n\n**Suggestions for Improvement:**\n*   **Tighten Guards:** Reduce the $x_1$ thresholds in the `edge` conditions to approximately $\\pm 0.65$ to trigger transitions earlier.\n*   **Re-calibrate Mode Equations:** Increase the magnitude of the $x_1, x_2$ coefficients to speed up the dynamics and correct the period.\n*   **Higher-Order Dynamics:** Consider using `order: 2` or adding intermediate modes to better capture the nonlinear curvature near switching boundaries."
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_27_0>",
+      "max_diff": 0.871473407929504,
+      "mean_diff": 0.16036735577032024
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_27_1>",
+      "max_diff": 0.9335068120806921,
+      "mean_diff": 0.17815774000470286
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_27_2>",
+      "max_diff": 0.7791760512083354,
+      "mean_diff": 0.13364045463035393
+    }
+  ]
+}

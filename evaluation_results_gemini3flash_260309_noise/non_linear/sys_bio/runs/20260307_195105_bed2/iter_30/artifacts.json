@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.9671795082123748,
+    "Mean Difference": 0.2729807026145052,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_30_0>",
+      "<iter_image_30_1>",
+      "<iter_image_30_2>"
+    ],
+    "Summary": "The HA demonstrates a strong overall fit (**mean_diff: 0.27**), successfully capturing the complex, multi-modal dynamics of the 9-state system. The simulation effectively filters"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_30_0>",
+      "max_diff": 0.9700296760671737,
+      "mean_diff": 0.26997042443434305
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_30_1>",
+      "max_diff": 0.9463461560107899,
+      "mean_diff": 0.25920891206398533
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_30_2>",
+      "max_diff": 0.9851626925591609,
+      "mean_diff": 0.28976277134518713
+    }
+  ]
+}

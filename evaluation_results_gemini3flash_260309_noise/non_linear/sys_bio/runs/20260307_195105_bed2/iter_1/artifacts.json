@@ -1,0 +1,38 @@
+{
+  "Evaluation Metrics (Averaged)": {
+    "Max Difference": 0.5969006608926737,
+    "Mean Difference": 0.10641675572184504,
+    "Num Ground Truth Files": 3
+  },
+  "Evaluation Plot": {
+    "Placeholders": [
+      "<iter_image_1_0>",
+      "<iter_image_1_1>",
+      "<iter_image_1_2>"
+    ],
+    "Summary": "The identification captures the hybrid structure well, specifically the transition triggered by $x_7 \\ge 10.0$ at $t \\approx 1.5s$. However, significant **slope mismatches** in both modes lead to the observed $0.6$ max error.\n\n**Key Observations:**\n1.  **Mode 1 Overestimation:** Simulated trajectories for $x_8$ (yellow) and $x_9$ (cyan) diverge upwards early, indicating that derivatives $\\dot{x}_8=11.0$ and $\\dot{x}_9=13.0$ are too high.\n2.  **Mode 2 Divergence:** Post-transition, $x_5$ (brown) simulated slope ($\\dot{x}_5=33.0$) slightly overshoots the ground truth, while $x_8$ (yellow) simulated slope ($\\dot{x}_"
+  },
+  "Per-File Results": [
+    {
+      "ground_truth_index": 0,
+      "ground_truth_file": "ground_truth_0.npz",
+      "plot_placeholder": "<iter_image_1_0>",
+      "max_diff": 0.4989536534867239,
+      "mean_diff": 0.08210092506405539
+    },
+    {
+      "ground_truth_index": 1,
+      "ground_truth_file": "ground_truth_1.npz",
+      "plot_placeholder": "<iter_image_1_1>",
+      "max_diff": 0.6123757016478207,
+      "mean_diff": 0.08393619783929654
+    },
+    {
+      "ground_truth_index": 2,
+      "ground_truth_file": "ground_truth_2.npz",
+      "plot_placeholder": "<iter_image_1_2>",
+      "max_diff": 0.6793726275434765,
+      "mean_diff": 0.1532131442621832
+    }
+  ]
+}
