@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# run_all.sh - Run all datasets in data_all directory
+# run_all.sh - Run all datasets in data_all_withnoise directory
 # Runs 4 datasets in parallel to respect Gemini API rate limits
 
 # Configuration
 MAX_PARALLEL=3
-DATA_BASE="data_all"
+DATA_BASE="data_all_withnoise"
 MODEL="gemini/gemini-3.1-flash-lite-preview"
 MAX_ITERATIONS=50
 FEEDBACK_TOP_K=50
