@@ -11,6 +11,7 @@ This project uses an LLM agent to learn hybrid automata from trace data and plot
 ## Guidelines
 - Keep the pipeline compatible with any LLM API.
 - Use `utils/llm_providers.py` as the interface module for different LLM providers. At present, `utils/imgTools_ha.py` can already adapt to different LLM APIs. It uses `genai.Client` only when the input model is Gemini (image processing uses `code_execution=types.ToolCodeExecution`, so `HybridAutomatonImageTool` uses Gemini's `genai.Client` for image handling). Other models all use the LiteLLM interface.
+- DO NOT modify the original code in `utils/imgTools_ha.py`
 - `run_llm_ha_gamma.py` also needs to be modified in the part that calls the LLM provider so it can adapt to different LLM APIs. Make the parameters `--manager-model`, `summary-model`, `managed-agents-list-model`, and `structured-output-model` compatible with different LLM APIs.
 - When modifying the code, keep it clear and maintainable. Ensure the adaptation logic for different LLM APIs is cleanly separated to avoid confusion. Minimize changes to the original code and keep the original logic completely unchanged.
 - When test other model except gemini, use kimi-k2.5
