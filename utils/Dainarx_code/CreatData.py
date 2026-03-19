@@ -6,7 +6,7 @@ from HA_evaluation import TrajectoryPlotter
 import json
 
 
-def creat_data(json_path: str, data_path: str, dT: float, times: float, ground_truth_path: str = None):
+def creat_data(json_path: str, data_path: str, dT: float, times: float, ground_truth_path: str = None,noise_level: float = 0.05):
     r"""
     :param json_path: File path of automata.
     :param data_path: Data storage path for sample data and plots.
@@ -14,6 +14,7 @@ def creat_data(json_path: str, data_path: str, dT: float, times: float, ground_t
     :param times: Total sampling time.
     :param ground_truth_path: Optional separate path for ground truth data.
                               If None, ground truth is saved to data_path.
+    :param noise_level: Level of noise to add to the data.
     """
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -91,7 +92,6 @@ def creat_data(json_path: str, data_path: str, dT: float, times: float, ground_t
             '''
 
             # Add measurement noise scaled by each dimension's standard deviation
-            noise_level = 0.05
             if noise_level > 0:
                 for dim in range(state_data.shape[0]):
                     dim_std = np.std(state_data[dim])
@@ -128,7 +128,7 @@ def creat_data(json_path: str, data_path: str, dT: float, times: float, ground_t
             state_id += 1
 
 
-def creat_all_data(automata_dir: str = None, output_dir: str = None, default_dt: float = 0.001, default_total_time: float = 10.0, separate_ground_truth: bool = True):
+def creat_all_data(automata_dir: str = None, output_dir: str = None, default_dt: float = 0.001, default_total_time: float = 10.0, separate_ground_truth: bool = True, noise_level: float = 0.05):
     r"""
     Create datasets for all JSON files under the automata directory.
 
@@ -186,9 +186,7 @@ def creat_all_data(automata_dir: str = None, output_dir: str = None, default_dt:
             # Get dt and total_time from config, use defaults if not present
             config = data.get('config', {})
             dt = config.get('dt', default_dt)
-            # dt = 0.001
             total_time = config.get('total_time', default_total_time)
-            # total_time = 10.0
 
             # Determine ground truth output path
             if separate_ground_truth:
@@ -203,7 +201,7 @@ def creat_all_data(automata_dir: str = None, output_dir: str = None, default_dt:
             print(f"  dt={dt}, total_time={total_time}")
 
             # Create data using creat_data function
-            creat_data(json_path, data_output_path, dt, total_time, ground_truth_output_path)
+            creat_data(json_path, data_output_path, dt, total_time, ground_truth_output_path, noise_level)
             print(f"  Done!")
 
         except Exception as e:
@@ -215,11 +213,11 @@ def creat_all_data(automata_dir: str = None, output_dir: str = None, default_dt:
 
 if __name__ == "__main__":
     # Example: create data for a single automaton
-    creat_data('automata/non_linear/duffing.json', 'data_duffing', 0.001, 10)
+    # creat_data('automata/non_linear/duffing.json', 'data_duffing', 0.001, 10)
     # creat_data('automata/ATVA/ball.json', 'data_ball', 0.01, 10)
     # creat_data('automata/non_linear/lander.json', 'data_lander', 0.01, 10)
     # creat_data('automata/non_linear/sys_bio.json', 'data_sys_bio', 0.001, 2)
     # creat_data('automata/FaMoS/buck_converter.json', 'data_buck_converter', 1E-5, 0.02)
 
-    # Create data for all automata
-    # creat_all_data()
+    # Create data for all automata, default noise_level=0.05 (5% of std deviation), if you want noiseless data, set noise_level=0
+    creat_all_data()
