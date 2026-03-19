@@ -68,6 +68,7 @@ run_dataset() {
         --max-iterations $MAX_ITERATIONS \
         --feedback-top-k $FEEDBACK_TOP_K \
         --target-error $TARGET_ERROR \
+        --structured-output-model "$MODEL" \
         --no-improvement-patience $NO_IMPROVEMENT_PATIENCE \
         > "$log_file" 2>&1
 
