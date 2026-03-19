@@ -764,7 +764,7 @@ def evaluate_ha_specification_with_feedback(
     hyperparameters: HAHyperparameters = None,
     iteration: int = 1,
     use_structured_output: bool = True,
-    structured_output_model: str = "gemini-3-flash-preview",
+    structured_output_model: str = "gemini/gemini-3-flash-preview",
     run_id: str = None,
     summary_model: str = "gemini/gemini-3-flash-preview",
     image_tool: HybridAutomatonImageTool = None,
