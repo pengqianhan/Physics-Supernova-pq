@@ -35,7 +35,7 @@ class HybridAutomatonImageTool(Tool):
     ALLOWED_EXTENSIONS = {'.png', '.jpg', '.jpeg', '.webp', '.gif'}
     ALLOWED_PATH_PREFIXES = ['evaluation_results', 'data_all/']
 
-    def __init__(self, worker_agent=None, vision_model_id: str = "gemini-3-flash-preview", max_short_side_pixels: int = 9999):
+    def __init__(self, worker_agent=None, vision_model_id: str = "gemini/gemini-3-flash-preview", max_short_side_pixels: int = 9999):
         super().__init__()
         self.worker_agent = worker_agent
         self.vision_model_id = vision_model_id

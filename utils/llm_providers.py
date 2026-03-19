@@ -33,13 +33,18 @@ def get_litellm_kwargs(model_id: str) -> dict:
 
 
 def is_native_gemini(model_id: str) -> bool:
-    """Check if model_id refers to a native Gemini model (no 'gemini/' litellm prefix).
+    """Check if model_id refers to a Gemini model (requires 'gemini/' prefix).
 
-    Native Gemini models (e.g. 'gemini-3-flash-preview') use the google-genai SDK
-    directly to support features like code_execution. Models with 'gemini/' prefix
-    are routed through litellm instead.
+    Gemini models use the google-genai SDK directly to support features like
+    code_execution. The 'gemini/' prefix is required; bare names like
+    'gemini-3-flash-preview' will raise ValueError.
     """
-    return model_id.startswith("gemini") and not model_id.startswith("gemini/")
+    if model_id.startswith("gemini") and not model_id.startswith("gemini/"):
+        raise ValueError(
+            f"Invalid model_id '{model_id}'. Gemini models must use the "
+            f"'gemini/' prefix, e.g. 'gemini/{model_id}'."
+        )
+    return model_id.startswith("gemini/")
 
 
 def get_gemini_api_key() -> str | None:
