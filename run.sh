@@ -4,12 +4,12 @@
 # Runs 4 datasets in parallel to respect Gemini API rate limits
 
 # Configuration
-MAX_PARALLEL=4
+MAX_PARALLEL=3
 DATA_BASE="data_all"
-MODEL="gemini/gemini-3-flash-preview"
+MODEL="gemini/gemini-3.1-flash-lite-preview"
 MAX_ITERATIONS=50
 FEEDBACK_TOP_K=50
-TARGET_ERROR=0.001
+TARGET_ERROR=0.1 # 0.001 is the default value, 0.1 is the added noise level
 NO_IMPROVEMENT_PATIENCE=20
 
 # Log directory
@@ -18,8 +18,9 @@ mkdir -p "$LOG_DIR"
 
 # All datasets
 DATASETS=(
-    # "ATVA/ball"
-    "non_linear/duffing"
+    # ATVA
+    "ATVA/ball"
+
 )
 
 # Function to run a single dataset
@@ -40,6 +41,7 @@ run_dataset() {
         --max-iterations $MAX_ITERATIONS \
         --feedback-top-k $FEEDBACK_TOP_K \
         --target-error $TARGET_ERROR \
+        --structured-output-model "$MODEL" \
         --no-improvement-patience $NO_IMPROVEMENT_PATIENCE \
         > "$log_file" 2>&1
 
