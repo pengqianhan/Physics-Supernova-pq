@@ -1,5 +1,6 @@
 import os
 
+
 def get_litellm_kwargs(model_id: str) -> dict:
     """
     Return the appropriate api_key and api_base for a given model_id.
@@ -29,3 +30,18 @@ def get_litellm_kwargs(model_id: str) -> dict:
     else:
         # For other providers (openrouter, anthropic, etc.), let litellm handle it
         return {}
+
+
+def is_native_gemini(model_id: str) -> bool:
+    """Check if model_id refers to a native Gemini model (no 'gemini/' litellm prefix).
+
+    Native Gemini models (e.g. 'gemini-3-flash-preview') use the google-genai SDK
+    directly to support features like code_execution. Models with 'gemini/' prefix
+    are routed through litellm instead.
+    """
+    return model_id.startswith("gemini") and not model_id.startswith("gemini/")
+
+
+def get_gemini_api_key() -> str | None:
+    """Return the Gemini API key from environment."""
+    return os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
