@@ -10,7 +10,7 @@ from utils.imgTools_ha import HybridAutomatonImageTool
 from utils.markdown_utils import MarkdownMessage, load_trace_data_from_filepath
 import json
 # vision_model_id = 'openai/kimi-k2.5'
-vision_model_id = 'gemini-3-flash-preview'
+vision_model_id = 'gemini/gemini-3-flash-preview'
 # Create a mock worker_agent with required attributes
 class MockWorkerAgent:
     def __init__(self):
