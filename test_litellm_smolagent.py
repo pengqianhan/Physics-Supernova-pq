@@ -27,14 +27,19 @@ def test_model(model_id: str):
     )
 
     agent = CodeAgent(tools=[], model=model, max_steps=2)
-    result = agent.run("What is 2 + 3? Return the answer as a number.")
+    result = agent.run("What is 2 + 3+5+5? Return the answer as a number.")
     print(f"Result: {result}")
     return result
 
 
 if __name__ == "__main__":
     # Default models to test; override via command line args
-    models = sys.argv[1:] or ["gemini/gemini-3-flash-preview"]
+    models = sys.argv[1:] or ["gemini/gemini-flash-lite-latest"]
+    # gemini/gemini-flash-lite-latest  and gemini/gemini-3.1-flash-lite-preview are both ok for the test,
+    # but for the `run_llm_ha_gamma.py`, `gemini/gemini-3.1-flash-lite-preview` will show the following issue 
+    # `Error in code parsing:
+    # expected string or bytes-like object, got 'NoneType'
+    # Make sure to provide correct code blobs.`
 
     for m in models:
         try:
