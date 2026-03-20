@@ -1234,10 +1234,10 @@ def main():
         )
 
         # save the task to a file and set up output directory
-        task_filename = os.path.join(os.path.dirname(__file__), 'task_prompts', f'iter_{iteration}_task.md')
-        os.makedirs(os.path.dirname(task_filename), exist_ok=True)
-        with open(task_filename, "w", encoding="utf-8") as f:
-            f.write(task)
+        # task_filename = os.path.join(os.path.dirname(__file__), 'task_prompts', f'iter_{iteration}_task.md')
+        # os.makedirs(os.path.dirname(task_filename), exist_ok=True)
+        # with open(task_filename, "w", encoding="utf-8") as f:
+        #     f.write(task)
 
         # Run the agent with task and compressed images
         try:
