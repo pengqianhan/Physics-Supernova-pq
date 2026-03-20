@@ -19,6 +19,10 @@ import re
 from typing import Any, Dict, Optional, Tuple
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
+try:
+    from .llm_providers import get_litellm_kwargs
+except ImportError:
+    from utils.llm_providers import get_litellm_kwargs
 
 # 尝试导入 litellm
 try:
@@ -241,21 +245,17 @@ def convert_agent_result_to_ha(
     if verbose:
         print("[StructuredOutput] Stage 2: Using LLM structured output conversion...")
     
-    # 获取 API key
-    if api_key is None:
-        load_dotenv(override=True)
-        api_key = os.environ.get("GEMINI_API_KEY")
-    if not api_key:
-        msg = "No GEMINI_API_KEY found, cannot use structured output"
-        messages.append(msg)
-        return ha_dict, ha_dict is not None, "\n".join(messages)
-    
+    # 获取 LLM provider kwargs
+    llm_kwargs = get_litellm_kwargs(model_id)
+    if api_key is not None:
+        llm_kwargs["api_key"] = api_key
+
     # 准备输入文本
     if isinstance(agent_result, dict):
         input_text = json.dumps(agent_result, indent=2)
     else:
         input_text = str(agent_result)
-    
+
     # 如果输入太长，截取关键部分
     if len(input_text) > 10000:
         # 尝试找到 JSON 块
@@ -265,7 +265,7 @@ def convert_agent_result_to_ha(
         else:
             # 取最后部分（通常是最终答案）
             input_text = input_text[-8000:]
-    
+
     try:
         response = litellm.completion(
             model=model_id,
@@ -273,7 +273,7 @@ def convert_agent_result_to_ha(
                 {"role": "system", "content": _get_structured_output_prompt()},
                 {"role": "user", "content": f"Convert this Hybrid Automaton description to JSON format:\n\n{input_text}"}
             ],
-            api_key=api_key,
+            **llm_kwargs,
             timeout=timeout,
             response_format={
                 "type": "json_schema",
@@ -352,33 +352,31 @@ def preprocess_ha_for_evaluation_v2(
     if not HAS_LITELLM:
         return None, False, "Error: litellm not installed"
     
-    # 获取 API key
-    if api_key is None:
-        load_dotenv(override=True)
-        api_key = os.environ.get("GEMINI_API_KEY")
-    if not api_key:
-        return None, False, "Error: No GEMINI_API_KEY found"
-    
+    # 获取 LLM provider kwargs
+    llm_kwargs = get_litellm_kwargs(model_id)
+    if api_key is not None:
+        llm_kwargs["api_key"] = api_key
+
     # 准备输入文本
     input_text = json.dumps(agent_result, indent=2) if isinstance(agent_result, dict) else str(agent_result)
-    
+
     # 输入过长时提取关键部分
     if len(input_text) > 10000:
         json_match = re.search(r'\{[\s\S]*"automaton"[\s\S]*\}', input_text)
         input_text = json_match.group(0) if json_match else input_text[-8000:]
-    
+
     # 调用 LLM 进行结构化输出转换
     try:
         if verbose:
             print("[StructuredOutput] Converting with LLM...")
-        
+
         response = litellm.completion(
             model=model_id,
             messages=[
                 {"role": "system", "content": _get_structured_output_prompt()},
                 {"role": "user", "content": f"Convert this Hybrid Automaton description to JSON format:\n\n{input_text}"}
             ],
-            api_key=api_key,
+            **llm_kwargs,
             timeout=timeout,
             response_format={
                 "type": "json_schema",

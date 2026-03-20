@@ -60,6 +60,7 @@ from utils.markdown_utils import load_trace_data_from_filepath, markdown_to_plai
 from utils.utils import HAHyperparameters, IterationResult, ResultsAggregator
 # Import HA-specific tools
 from utils.imgTools_ha import HybridAutomatonImageTool
+from utils.llm_providers import get_litellm_kwargs
 from utils.reviewTools_ha import ReviewRequestTool_ha
 from utils.summemoryTools_ha import SummarizeMemoryTool
 from utils.validateTools_ha import ValidateHASpecTool
@@ -185,19 +186,19 @@ AUTHORIZED_IMPORTS_LIST = [
 
 def _create_HA_agent(Tools_list: List[type[Tool]],
                      markdown_content: MarkdownMessage,
-                     model_id: str = "gemini/gemini-flash-lite-latest",
+                     model_id: str = "gemini/gemini-3.1-flash-lite-preview",
                      managed_agents_list: List[MultiStepAgent] = None,
                      max_steps: int = 80,
                      **kwargs) -> ToolCallingAgent | CodeAgent:
 
     # LLM to use for the agent
+    llm_kwargs = get_litellm_kwargs(model_id)
     model = LiteLLMModel(
         model_id=model_id,
-        api_key=os.environ.get("GEMINI_API_KEY"),
+        **llm_kwargs,
         # max_completion_tokens=24576,
         num_retries=3,
         timeout=1200,
-        thinking_level = "high" # high, low
     )
 
     # tools for the manager agent
@@ -270,13 +271,13 @@ def get_managed_agents_list(managed_agents_list: List[str] = None,
         npz_paths_list = [os.path.join(input_data_path, "sample_0.npz")]
 
     managed_agents = []
+    llm_kwargs = get_litellm_kwargs(managed_agents_list_model_id)
     model = LiteLLMModel(
             model_id=managed_agents_list_model_id,
-            api_key=os.environ.get("GEMINI_API_KEY"),
+            **llm_kwargs,
             # max_completion_tokens=24576,
             num_retries=3,
             timeout=1200,
-            thinking_level = "high" # high, low
         )
     managed_agent_kwargs = dict(
         model=model,
@@ -354,7 +355,7 @@ You have access to the following NPZ data files:
 
 
 # create the agent
-def create_agent(model_id: str = "gemini/gemini-flash-lite-latest",
+def create_agent(model_id: str = "gemini/gemini-3.1-flash-lite-preview",
                 input_data_path: str = None,
                 tools_list: List[str] = [],
                 managed_agents_list: List[str] = None,
@@ -691,12 +692,13 @@ Identify the main sources of error and suggest specific improvements to the HA J
     max_retries = 3
     for attempt in range(max_retries):
         try:
+            llm_kwargs = get_litellm_kwargs(model_id)
             response = completion(
                 model=model_id,
                 messages=messages,
                 max_tokens=1024,
                 temperature=0.3,
-                api_key=os.environ.get("GEMINI_API_KEY")
+                **llm_kwargs
             )
             summary = response.choices[0].message.content.strip()
             if summary:
@@ -998,7 +1000,7 @@ def parse_args():
     ap.add_argument(
         "--manager-model",
         type=str,
-        default="gemini/gemini-flash-lite-latest",
+        default="gemini/gemini-3.1-flash-lite-preview",
         help="Model ID to use for the agent.",
     )
 
@@ -1025,19 +1027,19 @@ def parse_args():
     ap.add_argument(
         "--image-tool-model",
         type=str,
-        default="gemini/gemini-flash-lite-latest",
+        default="gemini/gemini-3.1-flash-lite-preview",
         help="Model ID to use for the image analysis tool (Gemini API format).",
     )
     ap.add_argument(
         "--review-tool-model",
         type=str,
-        default="gemini/gemini-flash-lite-latest",
+        default="gemini/gemini-3.1-flash-lite-preview",
         help="Model ID to use for the review tool (Gemini API format).",
     )
     ap.add_argument(
         "--summarize-tool-model",
         type=str,
-        default="gemini/gemini-flash-lite-latest",
+        default="gemini/gemini-3.1-flash-lite-preview",
         help="Model ID to use for the summarize iterations tool (Gemini API format).",
     )
 
@@ -1045,8 +1047,8 @@ def parse_args():
     ap.add_argument(
         "--summary-model",
         type=str,
-        default="gemini/gemini-flash-lite-latest",
-        help="Model ID for gen_summary LLM-based evaluation analysis (default: gemini/gemini-flash-lite-latest).",
+        default="gemini/gemini-3.1-flash-lite-preview",
+        help="Model ID for gen_summary LLM-based evaluation analysis (default: gemini/gemini-3.1-flash-lite-preview).",
     )
 
     # agent names of managed agents
@@ -1062,7 +1064,7 @@ def parse_args():
     ap.add_argument(
         "--managed-agents-list-model",
         type=str,
-        default="gemini/gemini-flash-lite-latest",
+        default="gemini/gemini-3.1-flash-lite-preview",
         help="Model ID to use for managed agents.",
     )
 
