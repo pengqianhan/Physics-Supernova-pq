@@ -10,7 +10,7 @@ from utils.imgTools_ha import HybridAutomatonImageTool
 from utils.markdown_utils import MarkdownMessage, load_trace_data_from_filepath
 import json
 # vision_model_id = 'openai/kimi-k2.5'
-vision_model_id = 'gemini/gemini-3-flash-preview'
+vision_model_id = 'gemini/gemini-3.1-flash-lite-preview'
 # Create a mock worker_agent with required attributes
 class MockWorkerAgent:
     def __init__(self):
@@ -25,7 +25,7 @@ mock_agent = MockWorkerAgent()
 image_tool = HybridAutomatonImageTool(worker_agent=mock_agent,vision_model_id=vision_model_id)
 
 
-success, error_msg = image_tool.register_iteration_image(100, "evaluation_results_gemini3flash_260129/ATVA/ball/runs/20260125_174104_11ed/iter_1/overlay.png")
+success, error_msg = image_tool.register_iteration_image(100, "data_all/ATVA/ball/sample_0.png")
 if not success:
     print(f"Registration failed: {error_msg}")
     sys.exit(1)
