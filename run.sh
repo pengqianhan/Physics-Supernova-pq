@@ -6,7 +6,7 @@
 # Configuration
 MAX_PARALLEL=3
 DATA_BASE="data_all"
-MODEL="gemini/gemini-flash-lite-latest"
+MODEL="moonshot/kimi-k2.5"
 MAX_ITERATIONS=2
 FEEDBACK_TOP_K=50
 TARGET_ERROR=0.1 # 0.001 is the default value, 0.1 is the added noise level

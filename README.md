@@ -54,13 +54,3 @@ To start the Phoenix server, run the following command:
 ```bash
 python -m phoenix.server.main serve
 ```
-
-To save Phoenix traces, run the following command:
-```bash
-python run_llm_ha_gamma.py --save-traces-dir "phoenix_traces"
-```
-
-To load Phoenix traces, run the following command:
-```bash
-python run_llm_ha_gamma.py --load-traces-dir "phoenix_traces"
-```
