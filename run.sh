@@ -6,8 +6,8 @@
 # Configuration
 MAX_PARALLEL=4
 DATA_BASE="data_all"
-MODEL="gemini/gemini-3-flash-preview"
-MAX_ITERATIONS=50
+MODEL="gemini/gemini-flash-lite-latest"
+MAX_ITERATIONS=2
 FEEDBACK_TOP_K=50
 TARGET_ERROR=0.001
 NO_IMPROVEMENT_PATIENCE=20
@@ -18,8 +18,8 @@ mkdir -p "$LOG_DIR"
 
 # All datasets
 DATASETS=(
-    # "ATVA/ball"
-    "non_linear/duffing"
+    "ATVA/ball"
+    # "non_linear/duffing"
 )
 
 # Function to run a single dataset
