@@ -1,15 +1,15 @@
 #!/bin/bash
 
-# run_all.sh - Run all datasets in data_all directory
+# run_all.sh - Run all datasets in data_all_withnoise directory
 # Runs 4 datasets in parallel to respect Gemini API rate limits
 
 # Configuration
-MAX_PARALLEL=4
-DATA_BASE="data_all"
+MAX_PARALLEL=3
+DATA_BASE="data_all_withnoise"
 MODEL="gemini/gemini-3.1-pro-preview"
-MAX_ITERATIONS=2
+MAX_ITERATIONS=50
 FEEDBACK_TOP_K=50
-TARGET_ERROR=0.001
+TARGET_ERROR=0.1 # 0.001 is the default value, 0.1 is the added noise level
 NO_IMPROVEMENT_PATIENCE=20
 
 # Log directory
@@ -18,8 +18,36 @@ mkdir -p "$LOG_DIR"
 
 # All datasets
 DATASETS=(
+    # ATVA
     "ATVA/ball"
+    "ATVA/cell"
+    "ATVA/oci"
+    "ATVA/tanks"
+    # # FaMoS
+    # "FaMoS/buck_converter"
+    # "FaMoS/complex_tank"
+    # "FaMoS/multi_room_heating"
+    # "FaMoS/simple_heating_system"
+    # "FaMoS/three_state_ha"
+    # "FaMoS/two_state_ha"
+    # "FaMoS/variable_heating_system"
+    # # linear
+    # "linear/complex_underdamped_system"
+    # "linear/dc_motor_position_PID"
+    # "linear/linear_1"
+    # "linear/loop"
+    # "linear/one_legged_jumper"
+    # "linear/two_tank"
+    # "linear/underdamped_system"
+    # # non_linear
     # "non_linear/duffing"
+    # "non_linear/lander"
+    # "non_linear/lotkaVolterra"
+    # "non_linear/oscillator"
+    # "non_linear/simple_non_linear"
+    # "non_linear/simple_non_poly"
+    # "non_linear/spacecraft"
+    # "non_linear/sys_bio"
 )
 
 # Function to run a single dataset
