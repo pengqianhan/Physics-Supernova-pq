@@ -6,7 +6,7 @@
 # Configuration
 MAX_PARALLEL=4
 DATA_BASE="data_all"
-MODEL="gemini/gemini-3.1-pro-preview"
+MODEL="gemini/gemini-2.5-pro"
 MAX_ITERATIONS=2
 FEEDBACK_TOP_K=50
 TARGET_ERROR=0.001
